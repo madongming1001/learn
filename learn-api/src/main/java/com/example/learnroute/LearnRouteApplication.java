@@ -12,7 +12,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @SpringBootApplication(scanBasePackages = {
         "com.example.learnroute"
 })
-@EnableAspectJAutoProxy
 public class LearnRouteApplication {
 
     public static void main(String[] args) {
