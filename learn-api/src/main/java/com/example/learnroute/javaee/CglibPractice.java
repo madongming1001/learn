@@ -1,6 +1,5 @@
 package com.example.learnroute.javaee;
 
-import org.elasticsearch.search.sort.MinAndMax;
 
 public class CglibPractice {
     public static void main(String[] args) {
