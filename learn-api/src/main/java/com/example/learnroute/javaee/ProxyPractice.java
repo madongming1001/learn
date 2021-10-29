@@ -46,10 +46,6 @@ class TargetInvoker implements InvocationHandler {
         System.out.println("jdk 代理执行后");
         return result;
     }
-}
-
-class DynamicProxyAnimal {
-
     public static Object getProxy(Object target) throws Exception {
         Object proxy = Proxy.newProxyInstance(
                 // 指定目标类的类加载
@@ -61,7 +57,6 @@ class DynamicProxyAnimal {
         );
         return proxy;
     }
-
 }
 
 public class ProxyPractice {
@@ -69,7 +64,7 @@ public class ProxyPractice {
     public static void main(String[] args) throws Exception {
         System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles","true");
         Cat cat = new Cat();
-        Animal proxy = (Animal) DynamicProxyAnimal.getProxy(cat);
+        Animal proxy = (Animal) TargetInvoker.getProxy(cat);
         proxy.call();
     }
 

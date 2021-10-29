@@ -10,5 +10,5 @@ spring:
     username: centvipd
     password: he&3d1%sxz!
   redis:
-    database: 1
+    database: 0
     url: redis://127.0.0.1:6379
