@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class QuickSortPractice {
     public static void main(String[] args) {
-        int[] ints = {6, 1, 2, 7, 9, 3, 4, 5, 10, 8};
+        int[] ints = {6, 1, 2, 7, 9};
         quick_sort(ints, 0, ints.length - 1);
         Arrays.stream(ints).forEach(System.out::print);
     }
@@ -13,25 +13,25 @@ public class QuickSortPractice {
         if (begin > end) {
             return;
         }
-        int tempbegin = arr[begin];
-        int i = begin;
-        int j = end;
-        while (i < j) {
-            while (arr[j] >= tempbegin && i < j) {
-                j--;
+        int pivot = arr[begin];
+        int left = begin;
+        int right = end;
+        while (left < right) {
+            while (arr[right] >= pivot && left < right) {
+                right--;
             }
-            while (arr[i] <= tempbegin && i < j) {
-                i++;
+            while (arr[left] <= pivot && left < right) {
+                left++;
             }
-            if (i < j) {
-                int temp = arr[i];
-                arr[i] = arr[j];
-                arr[j] = temp;
+            if (left < right) {
+                int temp = arr[left];
+                arr[left] = arr[right];
+                arr[right] = temp;
             }
         }
-        arr[begin] = arr[i];
-        arr[i] = tempbegin;
-        quick_sort(arr, begin, i - 1);
-        quick_sort(arr, i + 1, end);
+        arr[begin] = arr[left];
+        arr[left] = pivot;
+        quick_sort(arr, begin, left - 1);
+        quick_sort(arr, left + 1, end);
     }
 }

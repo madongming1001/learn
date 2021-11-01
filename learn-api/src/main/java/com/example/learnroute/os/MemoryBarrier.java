@@ -14,8 +14,7 @@ public class MemoryBarrier {
      */
     public static void main(String[] args) {
         int[] a = new int[1024];
-        System.out.println(RamUsageEstimator.sizeOf(a));
+        System.out.println(RamUsageEstimator.sizeOfObject(MemoryBarrier.class));
         System.out.println(ClassLayout.parseClass(MemoryBarrier.class).toPrintable());
     }
-
 }

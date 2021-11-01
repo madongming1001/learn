@@ -17,7 +17,7 @@ package com.yg.edu.jmm;
  * @description: -server -Xcomp -XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly -XX:CompileCommand=compileonly,*Jmm07_ByteCodeJitDump.refresh
  **/
 public class Jmm07_ByteCodeJitDump {
-    private static int c = 1;
+    private static volatile int c = 1;
 
     public static int refresh(){
         int a = 0;
