@@ -24,9 +24,9 @@ public class MaxMemoryPractice {
     }
 
     public static void main(String[] args) {
-        MaxMemoryPractice match = new MaxMemoryPractice();
-        while (true) {
-            match.compute();
-        }
+//        MaxMemoryPractice match = new MaxMemoryPractice();
+//        while (true) {
+//            match.compute();
+//        }
     }
 }
