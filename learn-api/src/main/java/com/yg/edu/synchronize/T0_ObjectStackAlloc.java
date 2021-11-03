@@ -1,4 +1,4 @@
-package com.yg.edu;
+package com.yg.edu.synchronize;
 
 /**
  * @author ：图灵-杨过

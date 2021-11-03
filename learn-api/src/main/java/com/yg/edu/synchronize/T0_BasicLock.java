@@ -1,4 +1,4 @@
-package com.yg.edu;
+package com.yg.edu.synchronize;
 
 import ch.qos.logback.core.net.SyslogOutputStream;
 import lombok.extern.slf4j.Slf4j;

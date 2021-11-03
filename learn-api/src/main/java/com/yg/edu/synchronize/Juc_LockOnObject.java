@@ -1,4 +1,4 @@
-package com.yg.edu;
+package com.yg.edu.synchronize;
 
 /**
  * @author ：杨过

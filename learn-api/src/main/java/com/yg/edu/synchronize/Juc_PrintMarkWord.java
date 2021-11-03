@@ -1,4 +1,4 @@
-package com.yg.edu;
+package com.yg.edu.synchronize;
 
 import org.openjdk.jol.info.ClassLayout;
 
@@ -18,7 +18,7 @@ public class Juc_PrintMarkWord {
         // 偏向锁，会出现很多没有必要的锁撤销
         Thread.sleep(5000);
         T t = new T();
-        //未出现任何获取锁的时候
+        //未出现任何获取锁的时候(匿名偏向)
         System.out.println(ClassLayout.parseInstance(t).toPrintable());
         synchronized (t){
             // 获取一次锁之后
@@ -26,10 +26,10 @@ public class Juc_PrintMarkWord {
         }
         // 输出hashcode
         System.out.println(t.hashCode());
-        // 计算了hashcode之后，将导致锁的升级
+        // 计算了hashcode之后，将导致锁的升级（无锁）
         System.out.println(ClassLayout.parseInstance(t).toPrintable());
         synchronized (t){
-            // 再次获取锁
+            // 再次获取锁（轻量级锁）
             System.out.println(ClassLayout.parseInstance(t).toPrintable());
         }
         System.out.println(ClassLayout.parseInstance(t).toPrintable());
