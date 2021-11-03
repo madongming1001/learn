@@ -1,4 +1,4 @@
-package com.yg.edu;
+package com.yg.edu.synchronize;
 
 import org.openjdk.jol.info.ClassLayout;
 
