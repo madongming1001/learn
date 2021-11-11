@@ -20,6 +20,8 @@
     <modules>
         <module>learn-api</module>
         <module>learn-discovery</module>
+        <module>learN</module>
+        <module>learn-common</module>
     </modules>
 
     <properties>
