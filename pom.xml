@@ -20,7 +20,6 @@
     <modules>
         <module>learn-api</module>
         <module>learn-discovery</module>
-        <module>learN</module>
         <module>learn-common</module>
     </modules>
 
@@ -32,7 +31,7 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.springfrafmework.cloud</groupId>
+                <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud.version}</version>
                 <type>pom</type>
@@ -112,30 +111,6 @@
             <groupId>org.jsondoc</groupId>
             <artifactId>jsondoc-ui-webjar</artifactId>
             <version>1.2.22</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.redisson/redisson-spring-boot-starter -->
-        <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson-spring-boot-starter</artifactId>
-            <version>3.14.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.redisson</groupId>
-                    <artifactId>redisson-spring-data-23</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.redisson/redisson -->
-        <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson</artifactId>
-            <version>3.14.1</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.redisson/redisson-spring-data-23 -->
-        <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson-spring-data-23</artifactId>
-            <version>3.14.1</version>
         </dependency>
     </dependencies>
     <build>
