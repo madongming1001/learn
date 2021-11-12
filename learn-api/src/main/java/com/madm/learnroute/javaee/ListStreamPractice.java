@@ -1,7 +1,7 @@
 package com.madm.learnroute.javaee;
 
 import cn.hutool.core.lang.func.Func1;
-import com.madm.pojo.Teacher;
+import com.madm.learnroute.pojo.Teacher;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
