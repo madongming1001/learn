@@ -1,6 +1,6 @@
 package com.madm.learnroute.javaee;
 
-import com.madm.pojo.Teacher;
+import com.madm.learnroute.pojo.Teacher;
 
 /**
  *

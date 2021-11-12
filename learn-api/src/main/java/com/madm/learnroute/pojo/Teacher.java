@@ -1,4 +1,4 @@
-package com.madm.pojo;
+package com.madm.learnroute.pojo;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
