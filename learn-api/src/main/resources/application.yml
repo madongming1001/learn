@@ -1,9 +1,11 @@
+server:
+  port: 8080
 spring:
   application:
-    name: learn-route
+    name: learn-route-api
   datasource:
     driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://rm-bp1072nxkqxhi2afv.mysql.rds.aliyuncs.com/viptest?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
+    url: jdbc:mysql://localhost/practice?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
     username: centvipd
     password: he&3d1%sxz!
   redis:

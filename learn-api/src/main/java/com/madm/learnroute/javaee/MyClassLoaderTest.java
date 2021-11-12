@@ -65,7 +65,7 @@ public class MyClassLoaderTest {
 
     public static void main(String[] args) throws Exception {
         MyClassLoader classLoader =  new MyClassLoader("/Users/madongming/IdeaProjects/learn-route/target/classes");
-        Class clazz = classLoader.loadClass("com.madm.learnroute.pojo.Teacher");
+        Class clazz = classLoader.loadClass("com.madm.pojo.Teacher");
         Object obj = clazz.newInstance();
         Method method = clazz.getDeclaredMethod("sout", null);
         method.invoke(obj, null);
