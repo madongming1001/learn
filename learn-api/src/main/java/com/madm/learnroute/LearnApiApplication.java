@@ -12,7 +12,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @SpringBootApplication(scanBasePackages = {
         "com.madm.learnroute"
 })
-@EnableAspectJAutoProxy
 //@EnableFeignClients
 public class LearnApiApplication {
 

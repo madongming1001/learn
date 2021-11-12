@@ -54,6 +54,7 @@ public class ThreadCreationPractice {
 }
 
 
+@SuppressWarnings(value = {"unused","Tash"})
 class RunableTash implements Runnable {
 
     @Override
