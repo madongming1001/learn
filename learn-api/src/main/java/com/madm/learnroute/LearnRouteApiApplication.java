@@ -10,10 +10,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication(scanBasePackages = {
         "com.madm.learnroute"
 })
-public class LearnRouteApplication {
+public class LearnRouteApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(LearnRouteApplication.class, args);
+        SpringApplication.run(LearnRouteApiApplication.class, args);
     }
 
 }

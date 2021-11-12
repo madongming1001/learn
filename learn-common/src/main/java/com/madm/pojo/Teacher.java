@@ -1,8 +1,5 @@
-package com.madm.learnroute.pojo;
+package com.madm.pojo;
 
-import cn.hutool.system.oshi.OshiUtil;
-import com.sun.media.sound.SoftTuning;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
