@@ -10,6 +10,7 @@ public class ConfigCenter {
     private final static Integer SESSION_TIMEOUT = 30 * 1000;
     private static ZooKeeper zookeeper = null;
     private static CountDownLatch countDownLatch = new CountDownLatch(1);
+
     public static void main(String[] args) throws Exception {
         zookeeper = new ZooKeeper(CONNECT_STR, SESSION_TIMEOUT, (event) -> {
             if (event.getType() == Watcher.Event.EventType.None && event.getState() == Watcher.Event.KeeperState.SyncConnected) {
@@ -17,7 +18,5 @@ public class ConfigCenter {
             }
         });
         countDownLatch.await();
-
-
     }
 }
