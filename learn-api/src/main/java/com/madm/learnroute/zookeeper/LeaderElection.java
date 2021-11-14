@@ -16,10 +16,10 @@ public class LeaderElection {
     public static void main(String[] args) {
         curatorFramework.start();
         LeaderSelectorListener listener = new LeaderSelectorListenerAdapter() {
+            // this callback will get called when you are the leader
+            // do whatever leader work you need to and only exit
+            // this method when you want to relinquish leadership
             public void takeLeadership(CuratorFramework client) throws Exception {
-                // this callback will get called when you are the leader
-                // do whatever leader work you need to and only exit
-                // this method when you want to relinquish leadership
             }
         };
         LeaderSelector selector = new LeaderSelector(curatorFramework, CONNECT_PATH, listener);
