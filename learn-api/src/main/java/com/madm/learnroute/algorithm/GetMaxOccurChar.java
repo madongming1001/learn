@@ -11,7 +11,6 @@ public class GetMaxOccurChar {
 
     public static void main(String[] args) {
         System.out.println(Objects.equals(new Long(1),new Long(2)));
-
 //        char result = getMaxOccurChar("hello world, every body!");
 //        System.out.println(result);
         char result = getMaxOccurChar02("aaabbbbcccc");
