@@ -23,7 +23,8 @@ public class LeaderElection {
             }
         };
         LeaderSelector selector = new LeaderSelector(curatorFramework, CONNECT_PATH, listener);
-        selector.autoRequeue();  // not required, but this is behavior that you will probably expect
+        // not required, but this is behavior that you will probably expect
+        selector.autoRequeue();
         selector.start();
     }
 }
