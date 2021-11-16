@@ -15,8 +15,6 @@ public class FunctionalInterfaceHandleUtil {
     public static BranchHandle isTureOrFalse(boolean b) {
         String string = new String();
         String str = string;
-
-
         return (trueHandle, falseHandle) -> {
             if (b) {
                 trueHandle.run();
