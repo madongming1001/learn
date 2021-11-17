@@ -41,6 +41,7 @@ public class FunctionalInterfaceHandleUtil {
     }
 
     public static void main(String[] args) {
-        FunctionalInterfaceHandleUtil.isBlankOrNoBlank("").presentOrElseHandle(System.out::println, () -> System.out.println("空字符串"));
+        FunctionalInterfaceHandleUtil.isBlankOrNoBlank("")
+                .presentOrElseHandle(System.out::println, () -> System.out.println("空字符串"));
     }
 }
