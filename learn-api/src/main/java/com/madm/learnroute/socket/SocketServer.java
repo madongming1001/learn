@@ -21,8 +21,8 @@ public class SocketServer {
         System.out.println("准备read。。");
         int read = socket.getInputStream().read(bytes);
         System.out.println("read完毕。。");
-        if(read != 1){
-            System.out.println("接收到客户端的数据：" + new String(bytes,0,read));
+        if (read != 1) {
+            System.out.println("接收到客户端的数据：" + new String(bytes, 0, read));
         }
     }
 }

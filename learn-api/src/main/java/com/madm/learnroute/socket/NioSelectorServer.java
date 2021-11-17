@@ -37,9 +37,9 @@ public class NioSelectorServer {
             // 中断是系统用来响应硬件设备请求的一种机制，操作系统收到硬件的中断请求，会打断正在执行的进程，然后调用内核中的中断处理程序来响应请求
             // 第一个参数是epoll_create()的返回值，
             // 第二个参数表示动作，用三个宏来表示：
-                // EPOLL_CTL_ADD：注册新的fd到epfd中；
-                // EPOLL_CTL_MOD：修改已经注册的fd的监听事件；
-                // EPOLL_CTL_DEL：从epfd中删除一个fd；
+            // EPOLL_CTL_ADD：注册新的fd到epfd中；
+            // EPOLL_CTL_MOD：修改已经注册的fd的监听事件；
+            // EPOLL_CTL_DEL：从epfd中删除一个fd；
             // 第三个参数是需要监听的fd，
             // 第四个参数是告诉内核需要监听什么事
             // 返回rdList里面的事件
