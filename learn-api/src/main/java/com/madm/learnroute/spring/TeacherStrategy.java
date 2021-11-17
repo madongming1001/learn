@@ -1,6 +1,7 @@
 package com.madm.learnroute.spring;
 
 import com.madm.learnroute.pojo.Teacher;
+import com.sun.media.sound.SoftTuning;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -29,13 +30,22 @@ public class TeacherStrategy implements InitializingBean, ApplicationContextAwar
     }
 
     public static void main(String[] args) {
-        System.out.println(1 | 1);
-        System.out.println(1 ^ 1);
-        System.out.println(1 & 1);
+//        System.out.println(1 | 1);
+//        System.out.println(1 ^ 1);
+//        System.out.println(1 & 1);
+//
+//        System.out.println(1 | 2);
+//        System.out.println(1 ^ 2);
+//        System.out.println(1 & 2);
+//        System.out.println(0x1 << 2);
+//        System.out.println(0x1);
+//        System.out.println(0x2);
+//        System.out.println(0x20);
 
-        System.out.println(1 | 2);
-        System.out.println(1 ^ 2);
-        System.out.println(1 & 2);
+        System.out.println(4 | 2);
+//        System.out.println(0x1 << 1);
+
+
 
 
 //        List<Integer> list = new ArrayList<>();
