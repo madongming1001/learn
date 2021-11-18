@@ -6,8 +6,8 @@ spring:
   datasource:
     driverClassName: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost/practice?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
-    username: centvipd
-    password: he&3d1%sxz!
+    username: root
+    password: 123456789
   redis:
     database: 0
     url: redis://127.0.0.1:6379
