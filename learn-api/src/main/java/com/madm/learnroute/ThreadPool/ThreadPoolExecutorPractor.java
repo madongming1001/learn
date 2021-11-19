@@ -1,5 +1,7 @@
 package com.madm.learnroute.ThreadPool;
 
+import lombok.SneakyThrows;
+
 import java.util.concurrent.*;
 
 public class ThreadPoolExecutorPractor {
@@ -20,16 +22,26 @@ public class ThreadPoolExecutorPractor {
         // DiscardOldestPolicy
         // DiscardPolicy 第五种什么也没做
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(5, 5, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(1), Executors.defaultThreadFactory(), new RejectedExecutionHandler() {
+            @SneakyThrows
             @Override
             public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                throw new IllegalAccessException();
+            }
+        });
 
-            }
-        });
-        threadPoolExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println(Long.valueOf("1001010001010101",2));
-            }
-        });
+        for (int i = 0; i < 100; i++) {
+            int finalI = i;
+            threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println("第" + finalI + "个任务被执行！");
+                }
+            });
+        }
+
+//        ExecutorService executorService1 = Executors.newCachedThreadPool();
+//        ExecutorService executorService2 = Executors.newFixedThreadPool(10);
+//        ScheduledExecutorService executorService3 = Executors.newScheduledThreadPool(10);
+//        ExecutorService executorService4 = Executors.newSingleThreadExecutor();
     }
 }

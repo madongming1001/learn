@@ -1,27 +1,26 @@
 package com.madm.learnroute.interview;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Objects;
+
 public class ShowMeBug {
-    public static void main(String[] args) {
-        String line = "sa12cdsafasf";
-        System.out.println(search(line));
+//    interface IA{
+//        String getHelloName();
+//    }
+
+    public static void main(String[] args) throws Exception {
+        IA ia = (IA) createObject(IA.class.getName() + "$getHelloName=Abc");
+        System.out.println(ia.getHelloName());
+        ia = (IA) createObject(IA.class.getName() + "$getTest=BCd");
+        System.out.println(ia.getHelloName());
     }
 
-    private static Object search(String line) {
-        char[] chars = line.toCharArray();
-        // 于上处第一点分析，256长度足以。
-        int[] charArray = new int[256];
-        // 1、计算出现字符次数
-        for (char c : chars) {
-            charArray[(int) c]++;
-        }
-        // 2、按照字符出现顺序查找出现次数，返回第一个为1的字符。
-        for (char c : chars) {
-            if (charArray[(int) c] == 1) {
-                return c;
-            }
-        }
-        return 0;
+    public static Object createObject(String str) throws Exception {
+        String[] className = str.split("\\$");
+        Class<?> aClass = Class.forName(className[0]);
+        Method[] methods = aClass.getMethods();
+        String[] methodName = className[1].split("=");
+        return (IA) () -> Arrays.stream(methods).filter(m -> Objects.equals(m.getName(), methodName[0])).count() == 0 ? null : methodName[1];
     }
-
-
 }
