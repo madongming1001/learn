@@ -5,9 +5,6 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class ShowMeBug {
-//    interface IA{
-//        String getHelloName();
-//    }
 
     public static void main(String[] args) throws Exception {
         IA ia = (IA) createObject(IA.class.getName() + "$getHelloName=Abc");
