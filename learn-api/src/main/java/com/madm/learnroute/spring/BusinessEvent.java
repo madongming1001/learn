@@ -6,7 +6,7 @@ public class BusinessEvent extends ApplicationEvent {
 
     private String type;
 
-    public BusinessEvent(Object source,String type) {
+    public BusinessEvent(MyObject source, String type) {
         super(source);
     }
 }

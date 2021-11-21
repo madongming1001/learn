@@ -17,7 +17,9 @@ public class ObjectMemorySizeView {
 
 
         System.out.println(System.getProperties());
-//        System.out.println(RamUsageEstimator.sizeOf(a));
+        System.out.println(RamUsageEstimator.sizeOf(a));
+
+        System.out.println(RamUsageEstimator.shallowSizeOf(new Object()));
 //        System.out.println(ClassLayout.parseInstance(ObjectMemorySizeView.class).instanceSize());
 
 
