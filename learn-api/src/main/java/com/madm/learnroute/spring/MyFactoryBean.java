@@ -4,7 +4,7 @@ import org.springframework.beans.factory.FactoryBean;
 
 public class MyFactoryBean implements FactoryBean {
     @Override
-    public Object getObject() throws Exception {
+    public MyObject getObject() throws Exception {
         return null;
     }
 
@@ -12,4 +12,5 @@ public class MyFactoryBean implements FactoryBean {
     public Class<?> getObjectType() {
         return null;
     }
+
 }
