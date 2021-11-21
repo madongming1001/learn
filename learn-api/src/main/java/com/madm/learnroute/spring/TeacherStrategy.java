@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.LockSupport;
 
 @Component
 public class TeacherStrategy implements InitializingBean, ApplicationContextAware {
@@ -30,42 +31,30 @@ public class TeacherStrategy implements InitializingBean, ApplicationContextAwar
     }
 
     public static void main(String[] args) {
-//        System.out.println(1 | 1);
+        System.out.println(1 & 3);
+//
+//        // 数相同返回零
 //        System.out.println(1 ^ 1);
-//        System.out.println(1 & 1);
-//
+//        // 数不同就是相加
 //        System.out.println(1 | 2);
-//        System.out.println(1 ^ 2);
-//        System.out.println(1 & 2);
-//        System.out.println(0x1 << 2);
-//        System.out.println(0x1);
-//        System.out.println(0x2);
-//        System.out.println(0x20);
-
-        System.out.println(4 | 2);
-//        System.out.println(0x1 << 1);
-
-
-
-
-//        List<Integer> list = new ArrayList<>();
-//        list.add(1);
-//        list.add(2);
-//        list.add(3);
-//        list.add(4);
-//        list.add(5);
 //
-//        List<Integer> list1 = new ArrayList<>();
-//        list1.add(1);
-//        list1.add(7);
-//        list1.add(8);
-//        list1.add(9);
-//        list1.add(10);
-//
-//        int result = 0;
-//        for (int i = 0; i < list.size(); i++) {
-//            result = (result ^ list.get(i)) ^ (result ^ list1.get(i));
+//        boolean isZero = true;
+//        boolean isNotZero = true;
+//        if(isZero){
+//            // 两个数相等的话用^返回为零
+//            System.out.println(1 ^ 1);
+//            // 不同就为0
+//            System.out.println(1 & 3);
 //        }
-//        System.out.println(result);
+//        if(isNotZero){
+//            // ｜ 的话就是数的本身
+//            System.out.println(1 | 1);
+//            // & 的话就是数的本身
+//            System.out.println(1 & 1);
+//            // 数不同就是相加
+//            System.out.println(1 | 2);
+//            // 数不同就是相加
+//            System.out.println(1 ^ 2);
+//        }
     }
 }
