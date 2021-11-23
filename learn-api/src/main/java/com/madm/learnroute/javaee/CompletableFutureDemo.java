@@ -6,8 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CompletableFutureDemo {
     static List<Shop> shops = Arrays.asList(new Shop("BestPrice"),
