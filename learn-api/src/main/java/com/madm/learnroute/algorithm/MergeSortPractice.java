@@ -4,7 +4,8 @@ import com.madm.learnroute.util.PrintUtils;
 
 public class MergeSortPractice {
     public static void main(String[] args) {
-        int[] arr = {5,8,6,3,9,2,1,7};
+//        int[] arr = {5,8,6,3,9,2,1,7};
+        int[] arr = {7,6,5,3,1,4,5,6,7};
         sort(arr,0,arr.length-1);
         PrintUtils.printArray(arr);
     }

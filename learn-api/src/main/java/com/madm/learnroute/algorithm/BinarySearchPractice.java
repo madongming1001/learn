@@ -3,7 +3,7 @@ package com.madm.learnroute.algorithm;
 public class BinarySearchPractice {
 
     public static void main(String[] args) {
-        int[] arr = {1,1,2,3,4};
+        int[] arr = {7,6,5,3,1,4,5,6,7};
         int target = 1;
 //        System.out.println(binarySearch(arr,target));
 //        System.out.println(binarySearch1(arr,target));
