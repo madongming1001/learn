@@ -18,6 +18,9 @@ public class ShowMeBug {
         Class<?> aClass = Class.forName(className[0]);
         Method[] methods = aClass.getMethods();
         String[] methodName = className[1].split("=");
+        Arrays.stream(IA.class.getMethods()).filter(m -> m.getName().equals(methodName[0])).limit(1);
+        Class<IA> iaClass = IA.class;
+        IA obj = iaClass.newInstance();
         return (IA) () -> Arrays.stream(methods).filter(m -> Objects.equals(m.getName(), methodName[0])).count() == 0 ? null : methodName[1];
     }
 }

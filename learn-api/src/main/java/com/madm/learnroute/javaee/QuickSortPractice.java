@@ -4,7 +4,8 @@ import java.util.Arrays;
 
 public class QuickSortPractice {
     public static void main(String[] args) {
-        int[] ints = {6, 1, 2, 7, 9};
+//        int[] ints = {6, 1, 2, 7, 9};
+        int[] ints = {7,6,5,3,1,4,5,6,7};
         quick_sort(ints, 0, ints.length - 1);
         Arrays.stream(ints).forEach(System.out::print);
     }
