@@ -21,7 +21,6 @@ public class MyHandlerInterceptor extends HandlerInterceptorAdapter {
         UserAuthenticate userAuthenticate = method.getAnnotation(UserAuthenticate.class);
         //如果没有加注解则userAuthenticate为null
         if (Objects.nonNull(userAuthenticate)) {
-            System.out.println("传入了userAuthenticate注解");
         }else{
             System.out.println("没有传入userAuthenticate注解");
         }
