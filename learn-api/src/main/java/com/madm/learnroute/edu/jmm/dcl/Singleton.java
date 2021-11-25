@@ -29,8 +29,4 @@ public class Singleton {
         }
         return myinstance;
     }
-
-    public static void main(String[] args) {
-        Singleton.getInstance();
-    }
 }
