@@ -24,5 +24,6 @@ public class SocketServer {
         if (read != 1) {
             System.out.println("接收到客户端的数据：" + new String(bytes, 0, read));
         }
+        socket.getOutputStream().write("recevie message！".getBytes());
     }
 }
