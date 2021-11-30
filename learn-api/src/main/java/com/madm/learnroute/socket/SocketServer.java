@@ -8,9 +8,20 @@ public class SocketServer {
     public static void main(String[] args) {
         try {
             ServerSocket serverSocket = new ServerSocket(9000);
-            Socket socket = serverSocket.accept();
-            System.out.println("有客户端连接了");
-            handler(socket);
+            //单线程处理可以接受多个客户端，但是只能处理一个客户端的数据
+            //多线程处理客户端的数据 handler(socket);
+            for (; ; ) {
+                Socket socket = serverSocket.accept();
+                System.out.println("有客户端连接了");
+                new Thread(() -> {
+                    try {
+                        handler(socket);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+//                handler(socket);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
