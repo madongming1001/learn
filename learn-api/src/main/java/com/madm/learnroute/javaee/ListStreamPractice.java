@@ -1,19 +1,26 @@
 package com.madm.learnroute.javaee;
 
 import cn.hutool.core.lang.func.Func1;
+import com.madm.learnroute.pojo.Apple;
 import com.madm.learnroute.pojo.Teacher;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparingLong;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
 
 public class ListStreamPractice {
 
     public static void main(String[] args) {
-        for (;;){
-            Func1<Teacher, Integer> getAge = Teacher::getAge;
-        }
 //        int init = 0;
 //        List<String> userIds = new ArrayList<>();
 //        userIds.add("11");
@@ -49,10 +56,27 @@ public class ListStreamPractice {
 //        list.stream().forEach(i -> {
 //        });
 //        System.out.println(teacher);
+        //存放apple对象集合
+
+        Apple apple1 = new Apple(1, "苹果1", new BigDecimal("3.25"), 10);
+        Apple apple12 = new Apple(1, "苹果2", new BigDecimal("1.35"), 20);
+        Apple apple2 = new Apple(2, "香蕉", new BigDecimal("2.89"), 30);
+        Apple apple3 = new Apple(3, "荔枝", new BigDecimal("9.99"), 40);
+
+        List<Apple> appleList = new ArrayList();
+        appleList.add(apple1);
+        appleList.add(apple12);
+        appleList.add(apple2);
+        appleList.add(apple3);
+        // 去重
+        List<Integer> collect = appleList.stream().map(list -> list.getId()).distinct().collect(Collectors.toList());
+        appleList.stream().collect(Collectors.groupingBy(x->x.getId())).entrySet().stream().distinct().collect(Collectors.toList()).forEach(x-> System.out.println(x.getValue()));
+//        collect.stream().forEach(System.out::println);
+
     }
 
-    private static <T> Predicate<T> distinctBuMasterId(Function<? super T,?> masterId) {
+    private static <T> Predicate<T> distinctBuMasterId(Function<? super T, ?> masterId) {
         ConcurrentMap<Object, Object> map = new ConcurrentHashMap<>();
-        return m -> map.putIfAbsent(masterId.apply(m),Boolean.TRUE) == null;
+        return m -> map.putIfAbsent(masterId.apply(m), Boolean.TRUE) == null;
     }
 }

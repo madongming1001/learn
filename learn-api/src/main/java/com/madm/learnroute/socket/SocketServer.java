@@ -10,7 +10,7 @@ public class SocketServer {
             ServerSocket serverSocket = new ServerSocket(9000);
             //单线程处理可以接受多个客户端，但是只能处理一个客户端的数据
             //多线程处理客户端的数据 handler(socket);
-            for (; ; ) {
+            for (;;) {
                 Socket socket = serverSocket.accept();
                 System.out.println("有客户端连接了");
                 new Thread(() -> {
