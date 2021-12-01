@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class NioSelectorServer {
     public static void main(String[] args) throws IOException, InterruptedException {
-
+        NioSelectorServer nioSelectorServer = new NioSelectorServer();
         // 创建NIO ServerSocketChannel
         ServerSocketChannel serverSocket = ServerSocketChannel.open();
         serverSocket.socket().bind(new InetSocketAddress(9000));
@@ -46,7 +46,7 @@ public class NioSelectorServer {
             selector.select();
             // 获取selector中注册的全部事件的 SelectionKey 实例
             Set<SelectionKey> selectionKeys = selector.selectedKeys();
-            System.out.println("请求数："+selectionKeys.size());
+            System.out.println("请求数：" + selectionKeys.size());
             Iterator<SelectionKey> iterator = selectionKeys.iterator();
 
             // 遍历SelectionKey对事件进行处理
