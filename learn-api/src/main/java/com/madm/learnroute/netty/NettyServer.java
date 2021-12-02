@@ -10,6 +10,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class NettyServer {
+    // ServerBootstrap -》 AbstractBootstrap
     public static void main(String[] args) throws InterruptedException {
         //创建两个线程组bossGroup和workerGroup, 含有的子线程NioEventLoop的个数默认为cpu核数的两倍
         // bossGroup只是处理连接请求 ,真正的和客户端业务处理，会交给workerGroup完成
@@ -20,6 +21,7 @@ public class NettyServer {
             ServerBootstrap bootstrap = new ServerBootstrap();
             //使用链式编程来配置参数
             bootstrap.group(bossGroup, workerGroup) //设置两个线程组
+                    //先写入到一个工程里面
                     .channel(NioServerSocketChannel.class)//使用NioServerSocketChannel作为服务器的通道实现
                     // 初始化服务器连接队列大小，服务端处理客户端连接请求是顺序处理的,所以同一时间只能处理一个客户端连接。
                     // 多个客户端同时来的时候,服务端将不能处理的客户端连接请求放在队列中等待处理
