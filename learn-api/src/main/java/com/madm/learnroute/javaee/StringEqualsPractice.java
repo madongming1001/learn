@@ -18,7 +18,19 @@ public class StringEqualsPractice {
             System.out.println("结果是null");
         }
 
+        System.out.println(1 & -1);
+        System.out.println(2 & -2);
+        System.out.println(3 & -3);
+        System.out.println(4 & -4);
+//        System.out.println(Integer.toBinaryString(1));
+//        System.out.println(Integer.toBinaryString(-1));
+//        System.out.println(Integer.toBinaryString(-2));
+//        System.out.println(Integer.toBinaryString(-3));
 
 //        System.out.println(abc1 == abc.intern());
+    }
+
+    private static boolean isPowerOfTwo(int val) {
+        return (val & -val) == val;
     }
 }
