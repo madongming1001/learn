@@ -1,6 +1,5 @@
 package com.madm.learnroute.edu.synchronize;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.openjdk.jol.info.ClassLayout;
 

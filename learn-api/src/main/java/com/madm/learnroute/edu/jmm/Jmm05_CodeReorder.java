@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  * @slogan: 天下风云出我辈，一入代码岁月催
  * @description: 
  **/
-@Slf4j
+//@Slf4j
 public class Jmm05_CodeReorder {
     private  static int x = 0, y = 0;
     private  static int a = 0, b = 0;
@@ -60,7 +60,7 @@ public class Jmm05_CodeReorder {
                 System.out.println(result);
                 break;
             } else {
-                log.info(result);
+//                log.info(result);
             }
         }
 
