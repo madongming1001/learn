@@ -20,7 +20,7 @@ public class SemaphorePractice {
             boolean acquire = semaphore.tryAcquire(3000, TimeUnit.MILLISECONDS);
             if (acquire) {
                 CompletableFuture<Object> supplyAsync = CompletableFuture.supplyAsync(() -> doSomeThing());
-                supplyAsync.whenComplete((result, t) -> {
+                supplyAsync.whenCompleteAsync((result, t) -> {
                     System.out.println("whencomplete");
                     if (t != null) {
                         t.printStackTrace();

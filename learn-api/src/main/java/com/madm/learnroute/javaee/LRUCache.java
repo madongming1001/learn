@@ -12,8 +12,8 @@ public class LRUCache<K, V> {
      * 双链表的元素节点
      */
     private class Entry<K, V> {
-        Entry<K, V> before;
-        Entry<K, V> after;
+        Entry<K, V> pre;
+        Entry<K, V> next;
         private K key;
         private V value;
     }
@@ -57,27 +57,27 @@ public class LRUCache<K, V> {
         // 如果e不是尾节点，才需要移动
         if (last != e) {
             // 删除该该节点与前一个节点的联系，判断是不是头结点
-            if (e.before == null) {
-                head = e.after;
+            if (e.pre == null) {
+                head = e.next;
             } else {
-                e.before.after = e.after;
+                e.pre.next = e.next;
             }
 
             // 删除该该节点与后一个节点的联系
-            if (e.after == null) {
-                last = e.before;
+            if (e.next == null) {
+                last = e.pre;
             } else {
-                e.after.before = e.before;
+                e.next.pre = e.pre;
             }
 
             // 把该节点添加尾节点，判断尾节点是否为空
             if (last == null) {
                 head = e;
             } else {
-                e.before = last;
-                last.after = e;
+                e.pre = last;
+                last.next = e;
             }
-            e.after = null;
+            e.next = null;
             tail = e;
         }
     }
@@ -113,8 +113,8 @@ public class LRUCache<K, V> {
         if (head == null) {
             head = e;
         } else {
-            e.before = last;
-            last.after = e;
+            e.pre = last;
+            last.next = e;
         }
         tail = e;
     }
@@ -123,16 +123,30 @@ public class LRUCache<K, V> {
      * 删除该节点
      */
     void afterNodeRemoval(Entry<K, V> e) {
-        if (e.before == null) {
-            head = e.after;
+        if (e.pre == null) {
+            head = e.next;
         } else {
-            e.before.after = e.after;
+            e.pre.next = e.next;
         }
 
-        if (e.after == null) {
-            tail = e.before;
+        if (e.next == null) {
+            tail = e.pre;
         } else {
-            e.after.before = e.before;
+            e.next.pre = e.pre;
         }
+    }
+
+    public static void main(String[] args) {
+        char c = 110;
+        System.out.println((char)110);
+        System.out.println(c ^ 32);
+        System.out.println(Integer.toBinaryString(c));
+        System.out.println(Integer.toBinaryString(32));
+        System.out.println(Integer.valueOf("100_1110", 2));
+        System.out.println("=====================================");
+        System.out.println(Integer.valueOf("1001110", 2));
+        System.out.println(Integer.toBinaryString(110_1110));
+        System.out.println(Integer.valueOf("1001110", 2));
+        System.out.println(Integer.valueOf("0101110",2));
     }
 }
