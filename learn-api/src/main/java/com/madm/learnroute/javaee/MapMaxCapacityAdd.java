@@ -1,2 +1,5 @@
-package com.madm.learnroute.javaee;public class MapMaxCapacityAdd {
+package com.madm.learnroute.javaee;
+
+public class MapMaxCapacityAdd {
+    Object obj = new Object();
 }
