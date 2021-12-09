@@ -21,7 +21,7 @@
         <module>learn-api</module>
         <module>learn-discovery</module>
         <module>learn-common</module>
-        <module>learn-common</module>
+        <module>learn-ds-algorithm</module>
     </modules>
 
     <properties>
