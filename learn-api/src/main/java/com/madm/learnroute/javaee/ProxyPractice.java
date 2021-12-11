@@ -66,6 +66,7 @@ public class ProxyPractice {
         Cat cat = new Cat();
         Animal proxy = (Animal) TargetInvoker.getProxy(cat);
         proxy.call();
+
     }
 
 }
