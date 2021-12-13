@@ -1,9 +1,16 @@
 package com.madm.learnroute.javaee;
 
 
+import net.sf.cglib.core.DebuggingClassWriter;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
+import org.springframework.cglib.proxy.MethodProxy;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Properties;
 
 /**
  * Created by YangTao
@@ -21,9 +28,11 @@ class Cat implements Animal {
 
 class StaticProxyAnimal implements Animal {
     private Animal impl;
+
     public StaticProxyAnimal(Animal impl) {
         this.impl = impl;
     }
+
     @Override
     public void call() {
         System.out.println("猫饥饿");
@@ -46,6 +55,7 @@ class TargetInvoker implements InvocationHandler {
         System.out.println("jdk 代理执行后");
         return result;
     }
+
     public static Object getProxy(Object target) throws Exception {
         Object proxy = Proxy.newProxyInstance(
                 // 指定目标类的类加载
@@ -62,11 +72,46 @@ class TargetInvoker implements InvocationHandler {
 public class ProxyPractice {
 
     public static void main(String[] args) throws Exception {
-        System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles","true");
+
+        //JDK代理生成
+        jdkProxyGenerate();
+
+        //CGLIB代理生成
+//		cglibProxyGenerate();
+    }
+
+    private static void cglibProxyGenerate() {
+        saveGeneratedCGlibProxyFile(System.getProperty("user.dir") + "/proxy");
+        //通过cglib动态代理获取代理对象的过程，创建调用的对象，在后续创建过程中Enhancekey的对象，所以在进行enhancer对象创建的时候需要把EnhancerKey（newInstance）对象准备好
+        //恰好这个对象也需要动态代理生成
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(Cat.class);
+        enhancer.setCallback(new MethodInterceptor() {
+            @Override
+            public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+                return methodProxy.invokeSuper(o, objects);
+            }
+        });
+        Cat cat = (Cat) enhancer.create();
+        cat.call();
+    }
+
+    private static void jdkProxyGenerate() throws Exception {
+        System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles","true");
         Cat cat = new Cat();
         Animal proxy = (Animal) TargetInvoker.getProxy(cat);
         proxy.call();
-
     }
 
+    public static void saveGeneratedCGlibProxyFile(String dir) {
+        try {
+            Field field = System.class.getDeclaredField("props");
+            field.setAccessible(true);
+            Properties properties = (Properties) field.get(null);
+            System.setProperty(DebuggingClassWriter.DEBUG_LOCATION_PROPERTY, dir);
+            properties.put("net.sf.cglib.core.DebuggingClassWriter.traceEnabled", "true");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
