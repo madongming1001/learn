@@ -5,6 +5,7 @@ import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 
 public class MultiThread {
+
     public static void main(String[] args) {
         //获取java线程管理MXBean
         ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
