@@ -10,8 +10,7 @@ import sun.misc.Unsafe;
 public class UnsafeFactory {
 
     /**
-     * 获取 Unsafe 对象
-     *
+     *获取unsafe对象
      * @return
      */
     public static Unsafe getUnsafe() {
