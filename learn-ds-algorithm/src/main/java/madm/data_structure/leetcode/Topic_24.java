@@ -33,7 +33,6 @@ public class Topic_24 {
             next = head.next;
             head.next = pre;
             pre = head;
-
             head = next;
         }
         return pre;
