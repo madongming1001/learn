@@ -10,12 +10,13 @@ public class Piped {
         PipedReader in = new PipedReader();
         //将输出流和输入流进行连接，否则在使用时会抛出IOException
         out.connect(in);
-        Thread printThread = new Thread(new Print(in), "PrintThread");
-        printThread.start();
+//        Thread printThread = new Thread(new Print(in), "PrintThread");
+//        printThread.start();
         int receive = 0;
         try{
             while((receive = System.in.read()) != -1){
                 out.write(receive);
+                System.out.print((char)receive);
             }
         }finally{
             out.close();
