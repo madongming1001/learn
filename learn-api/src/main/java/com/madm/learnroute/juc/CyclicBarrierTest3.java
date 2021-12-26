@@ -1,6 +1,5 @@
 package com.madm.learnroute.juc;
 
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 public class CyclicBarrierTest3 {
@@ -18,7 +17,7 @@ public class CyclicBarrierTest3 {
             }
         }, "customThread");
         t.start();
-        t.interrupt();
+//        t.interrupt();
         try {
             c.await();
         } catch (Exception e) {
