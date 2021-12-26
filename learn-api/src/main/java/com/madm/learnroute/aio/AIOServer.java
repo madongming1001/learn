@@ -17,7 +17,7 @@ public class AIOServer {
             @Override
             public void completed(AsynchronousSocketChannel socketChannel, Object attachment) {
                 try {
-                    System.out.println("2--"+Thread.currentThread().getName());
+                    System.out.println("2--" + Thread.currentThread().getName());
                     // 再此接收客户端连接，如果不写这行代码后面的客户端连接连不上服务端
                     serverChannel.accept(attachment, this);
                     System.out.println(socketChannel.getRemoteAddress());
@@ -25,7 +25,7 @@ public class AIOServer {
                     socketChannel.read(buffer, buffer, new CompletionHandler<Integer, ByteBuffer>() {
                         @Override
                         public void completed(Integer result, ByteBuffer buffer) {
-                            System.out.println("3--"+Thread.currentThread().getName());
+                            System.out.println("3--" + Thread.currentThread().getName());
                             buffer.flip();
                             System.out.println(new String(buffer.array(), 0, result));
                             socketChannel.write(ByteBuffer.wrap("HelloClient".getBytes()));
@@ -47,7 +47,7 @@ public class AIOServer {
             }
         });
 
-        System.out.println("1--"+Thread.currentThread().getName());
+        System.out.println("1--" + Thread.currentThread().getName());
         Thread.sleep(Integer.MAX_VALUE);
     }
 }
