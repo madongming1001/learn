@@ -2,6 +2,12 @@ package com.madm.learnroute.javaee;
 
 import java.util.Arrays;
 
+
+/**
+ * 快排优化
+ * 1. 三数取中法
+ * 2. 随机法
+ */
 public class QuickSortPractice {
     public static void main(String[] args) {
 //        int[] ints = {6, 1, 2, 7, 9};
