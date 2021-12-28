@@ -1,88 +1,141 @@
 package madm.data_structure;
 
 
-import lombok.Data;
-
 import java.util.LinkedList;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.Stack;
 
 public class BinaryTree {
+    private Node head;
 
-    static class TreeNode<T> {
-        T data;
-        public TreeNode leftChild;
-        public TreeNode rightChild;
-        public TreeNode(T data) {
-            this.data = data;
+    static class Node<T> {
+        T value;
+        public Node left;
+        public Node right;
+
+        public Node(T value) {
+            this.value = value;
         }
 
     }
 
 
-    public static TreeNode createBinaryTree(LinkedList<Integer> inputList) {
-        TreeNode node = null;
+    public static Node createBinaryTree(LinkedList<Integer> inputList) {
+        Node node = null;
         if (inputList == null || inputList.isEmpty()) {
             return null;
         }
         Integer data = inputList.removeFirst();
         if (data != null) {
-            node = new TreeNode<Integer>(data);
-            node.leftChild = createBinaryTree(inputList);
-            node.rightChild = createBinaryTree(inputList);
+            node = new Node<Integer>(data);
+            node.left = createBinaryTree(inputList);
+            node.right = createBinaryTree(inputList);
         }
         return node;
     }
 
-    public static void preOrderTraveral(TreeNode node) {
+    public static void preOrderTraveral(Node node) {
         if (Objects.isNull(node)) {
             return;
         }
-        System.out.println(node.data);
-        preOrderTraveral(node.leftChild);
-        preOrderTraveral(node.rightChild);
+        System.out.println(node.value);
+        preOrderTraveral(node.left);
+        preOrderTraveral(node.right);
     }
 
-    public static void inOrderTraveral(TreeNode node) {
+    public static void inOrderTraveral(Node node) {
         if (Objects.isNull(node)) {
             return;
         }
-        preOrderTraveral(node.leftChild);
-        System.out.println(node.data);
-        preOrderTraveral(node.rightChild);
+        preOrderTraveral(node.left);
+        System.out.println(node.value);
+        preOrderTraveral(node.right);
     }
 
-    public static void postOrderTraveral(TreeNode node) {
+    public static void postOrderTraveral(Node node) {
         if (Objects.isNull(node)) {
             return;
         }
-        preOrderTraveral(node.leftChild);
-        preOrderTraveral(node.rightChild);
-        System.out.println(node.data);
+        preOrderTraveral(node.left);
+        preOrderTraveral(node.right);
+        System.out.println(node.value);
     }
 
     /**
      * 二叉树非递归前序遍历
      */
-    public static void preOrderTraveralWithStack(TreeNode root) {
-        Stack<TreeNode> stack = new Stack<TreeNode>();
-        TreeNode treeNode = root;
-        while (treeNode != null || !stack.isEmpty()) {
+    public static void preOrderTraveralWithStack(Node root) {
+        Stack<Node> stack = new Stack<Node>();
+        Node node = root;
+        while (node != null || !stack.isEmpty()) {
             //迭代访问节点的左孩子，并入栈
-            while (treeNode != null) {
-                System.out.println(treeNode.data);
-                stack.push(treeNode);
-                treeNode = treeNode.leftChild;
+            while (node != null) {
+                System.out.println(node.value);
+                stack.push(node);
+                node = node.left;
             }
             //如果节点没有左孩子，则弹出栈顶节点，访问节点右孩子
             if (!stack.isEmpty()) {
-                treeNode = stack.pop();
-                treeNode = treeNode.rightChild;
+                node = stack.pop();
+                node = node.right;
             }
 
         }
     }
 
+    /**
+     * 二叉树--广度优先遍历--层次遍历法
+     *
+     * @param root
+     */
+    public static void breadthFirstSearch(Node root) {
+        LinkedList<Node> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            Node node = queue.poll();
+            System.out.println(node.value);
+            if (node.left != null) {
+                queue.offer(node.left);
+            }
+            if (node.right != null) {
+                queue.offer(node.right);
+            }
+        }
+    }
+
+    public Node find(int data) {
+        Node<Integer> p = head;
+        while (p != null) {
+            if (data < p.value) p = p.left;
+            else if (data > p.value) p = p.right;
+            else return p;
+        }
+        return null;
+    }
+
+
+    public void insert(int data) {
+        if (head == null) {
+            head = new Node(data);
+            return;
+        }
+
+        Node<Integer> p = head;
+        while (p != null) {
+            if (data > p.value) {
+                if (p.right == null) {
+                    p.right = new Node(data);
+                    return;
+                }
+                p = p.right;
+            } else { // data < p.data
+                if (p.left == null) {
+                    p.left = new Node(data);
+                    return;
+                }
+                p = p.left;
+            }
+        }
+    }
 
 }
