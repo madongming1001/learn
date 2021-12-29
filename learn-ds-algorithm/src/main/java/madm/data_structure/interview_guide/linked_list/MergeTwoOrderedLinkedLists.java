@@ -2,7 +2,7 @@ package madm.data_structure.interview_guide.linked_list;
 
 import madm.data_structure.ListNode;
 
-public class MergeTwoOrderlyLinkedList {
+public class MergeTwoOrderedLinkedLists {
 
     public ListNode merge(ListNode head1, ListNode head2) {
         if (head1 == null || head2 == null) {
