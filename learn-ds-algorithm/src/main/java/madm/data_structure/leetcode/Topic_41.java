@@ -2,6 +2,7 @@ package madm.data_structure.leetcode;
 
 import org.springframework.messaging.tcp.FixedIntervalReconnectStrategy;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -49,7 +50,6 @@ public class Topic_41 {
     public static int firstMissingPositive2(int[] nums) {
         int len = nums.length;
         // {3, 4, -1, 1}
-        // {1, 2, 3, 4} 假设的数组
         for (int i = 0; i < len; i++) {
             // 如果当前位置的数
             while (nums[i] > 0 && nums[i] <= len && nums[nums[i] - 1] != nums[i]) {
