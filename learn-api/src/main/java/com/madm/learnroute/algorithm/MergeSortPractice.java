@@ -39,7 +39,6 @@ public class MergeSortPractice {
                 temp[p++] = array[p2++];
             }
         }
-
         while (p1 <= mid) temp[p++] = array[p1++];
         while (p2 <= end) temp[p++] = array[p2++];
         for (int i = 0; i < temp.length; i++) {
