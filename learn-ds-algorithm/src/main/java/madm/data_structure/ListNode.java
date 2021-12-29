@@ -1,10 +1,10 @@
 package madm.data_structure;
 
 public class ListNode {
-    public int val;
+    public int value;
     public ListNode next;
 
     ListNode(int x) {
-        val = x;
+        value = x;
     }
 }
