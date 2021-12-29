@@ -1,10 +1,9 @@
-package madm.data_structure.interview_guide.linked_list;
+package madm.data_structure.leetcode;
 
 import madm.data_structure.ListNode;
 
-public class MergeTwoOrderedLinkedLists {
-
-    public ListNode merge(ListNode head1, ListNode head2) {
+public class Topic_21 {
+    public ListNode mergeTwoLists(ListNode head1, ListNode head2) {
         if (head1 == null || head2 == null) {
             return head1 != null ? head1 : head2;
         }
@@ -13,7 +12,7 @@ public class MergeTwoOrderedLinkedLists {
         ListNode cur2 = head == head1 ? head2 : head1;
         ListNode pre = null;
         ListNode next = null;
-        //那个小继续遍历哪个
+
         while (cur1 != null && cur2 != null) {
             if (cur1.val <= cur2.val) {
                 pre = cur1;
