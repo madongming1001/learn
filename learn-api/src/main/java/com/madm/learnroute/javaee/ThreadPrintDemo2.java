@@ -1,5 +1,8 @@
 package com.madm.learnroute.javaee;
 
+/**
+ * 交叉打印
+ */
 class ThreadPrintDemo2 {
     public static void main(String[] args) {
         final ThreadPrintDemo2 demo2 = new ThreadPrintDemo2();
