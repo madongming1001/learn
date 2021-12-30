@@ -20,9 +20,13 @@ public class LRUCache<K, V> {
     Node<K, V> tail;
 
     private Integer capacity;
-    private Map<K, Node<K, V>> caches = new HashMap<>();
+    private Map<K, Node<K, V>> caches;
 
     public LRUCache(int capacity) {
+        if (capacity < 1) {
+            throw new RuntimeException("should be more than 0.");
+        }
+        caches = new HashMap<>();
         this.capacity = capacity;
     }
 
