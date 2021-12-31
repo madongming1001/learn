@@ -145,7 +145,7 @@ public class LRUCache<K, V> {
         System.out.println(Integer.valueOf("100_1110", 2));
         System.out.println("=====================================");
         System.out.println(Integer.valueOf("1001110", 2));
-        System.out.println(Integer.toBinaryString(110_1110));
+        System.out.println(Integer.toBinaryString(1101110));
         System.out.println(Integer.valueOf("1001110", 2));
         System.out.println(Integer.valueOf("0101110",2));
     }
