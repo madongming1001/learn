@@ -1,5 +1,7 @@
 package madm.data_structure;
 
+import java.util.Stack;
+
 /**
  * 大顶堆 数组话显示
  * {0, 33, 17, 31, 16, 13, 15, 9, 5, 6, 7, 8, 1, 2, 0}
@@ -97,5 +99,6 @@ public class Heap {
         int[] intr = {0, 33, 17, 31, 16, 13, 15, 9, 5, 6, 7, 8, 1, 2, 0};
         Heap heap = new Heap(intr);
         heap.insert(22);
+        Stack<Integer> stack = new Stack<>();
     }
 }
