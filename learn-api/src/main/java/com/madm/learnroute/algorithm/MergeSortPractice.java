@@ -20,23 +20,18 @@ public class MergeSortPractice {
         return arr;
     }
 
-    public static void merge(int[] array, int start, int mid, int end) {
+    public static void merge(int[] arr, int start, int mid, int end) {
         int[] cond = new int[end - start + 1];
         int p1 = start;
         int p2 = mid + 1;
-        //他是数组的地址
         int p = 0;
         while (p1 <= mid && p2 <= end) {
-            if (array[p1] <= array[p2]) {
-                cond[p++] = array[p1++];
-            } else {
-                cond[p++] = array[p2++];
-            }
+            cond[p++] = arr[p1] <= arr[p2] ? arr[p1++] : arr[p2++];
         }
-        while (p1 <= mid) cond[p++] = array[p1++];
-        while (p2 <= end) cond[p++] = array[p2++];
+        while (p1 <= mid) cond[p++] = arr[p1++];
+        while (p2 <= end) cond[p++] = arr[p2++];
         for (int i = 0; i < cond.length; i++) {
-            array[i + start] = cond[i];
+            arr[i + start] = cond[i];
         }
     }
 }
