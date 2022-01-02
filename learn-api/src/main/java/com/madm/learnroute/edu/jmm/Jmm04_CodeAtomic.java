@@ -25,9 +25,9 @@ public class Jmm04_CodeAtomic {
     public static void main(String[] args) {
 
         for (int i = 0; i < 10; i++) {
-            Thread thread = new Thread(()->{
+            Thread thread = new Thread(() -> {
                 for (int j = 0; j < 1000; j++) {
-                    synchronized (object){
+                    synchronized (object) {
                         counter++;//分三步- 读，自加，写回
                         //读
                     }
