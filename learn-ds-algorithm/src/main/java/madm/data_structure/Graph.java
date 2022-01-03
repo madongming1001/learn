@@ -22,7 +22,7 @@ public class Graph { // 无向图
     }
 
     /**
-     *
+     * O(V+E) 顶点的数量+边的数量
      * @param s 起点
      * @param t 终点
      */
@@ -62,5 +62,9 @@ public class Graph { // 无向图
             print(prev, s, prev[t]);
         }
         System.out.print(t + " ");
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Integer.toBinaryString(Integer.MAX_VALUE).length());
     }
 }
