@@ -1,5 +1,6 @@
 package madm.data_structure;
 
+import java.util.Arrays;
 import java.util.Stack;
 
 /**
@@ -25,6 +26,10 @@ public class Heap {
         a = arr;
         n = arr.length + 1;
         count = arr.length - 2;
+    }
+
+    public Heap() {
+
     }
 
     public void insert(int data) {
@@ -96,10 +101,26 @@ public class Heap {
         }
     }
 
+    /**
+     * 优先级队列实现小顶堆
+     */
+    private static <T> void siftUpComparable(int k, T x, Object[] array) {
+        Comparable<? super T> key = (Comparable<? super T>) x;
+        while (k > 0) {
+            int parent = (k - 1) >>> 1;
+            Object e = array[parent];
+            if (key.compareTo((T) e) >= 0)
+                break;
+            array[k] = e;
+            k = parent;
+        }
+        array[k] = key;
+    }
+
     public static void main(String[] args) {
+        Heap heap = new Heap();
         int[] intr = {0, 33, 17, 31, 16, 13, 15, 9, 5, 6, 7, 8, 1, 2, 0};
-        Heap heap = new Heap(intr);
-        heap.insert(22);
-        Stack<Integer> stack = new Stack<>();
+        heap.sort(intr,intr.length);
+        System.out.println(Arrays.toString(intr));
     }
 }
