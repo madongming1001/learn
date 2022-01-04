@@ -10,7 +10,7 @@ public class Knapsack_01 {
      *
      * @param i     i表示考察到哪个物品了
      * @param cw    cw表示当前已经装进去的物品的重量和；
-     * @param items items表示每个物品的重量
+     * @param items 物品重量数组
      * @param n     n表示物品个数
      * @param w     w背包重量
      */
