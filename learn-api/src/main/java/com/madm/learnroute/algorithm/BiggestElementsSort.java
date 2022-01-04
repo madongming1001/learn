@@ -29,7 +29,7 @@ public class BiggestElementsSort {
         for (Integer i = 0; i < partition; i++) {
             result[i] = sourcesData[i];
         }
-        mergeProcess(result,0,partition-1);
+        grouping(result,0,partition-1);
 
         // 2.分段比较开始
         while (index < sourcesData.length) {
@@ -48,7 +48,7 @@ public class BiggestElementsSort {
         int leftIndex = 0;
         int rightIndex = 0;
         int index = 0;
-        mergeProcess(rightArr, 0, partition - 1);
+        grouping(rightArr, 0, partition - 1);
         while ((leftIndex < partition) && (rightIndex < partition) && (index < partition)) {
             help[index++] = leftArr[leftIndex] < rightArr[rightIndex] ? rightArr[rightIndex++] : leftArr[leftIndex++];
         }
@@ -58,17 +58,17 @@ public class BiggestElementsSort {
         leftArr=help;
     }
 
-    public static void mergeProcess(Integer[] arr, int L, int R) {
+    public static void grouping(Integer[] arr, int L, int R) {
         if (L >= R) {
             return;
         }
         int mid = L + ((R - L) >> 1);
-        mergeProcess(arr, L, mid);
-        mergeProcess(arr, mid + 1, R);
-        mergeSort(arr, L, mid, R);
+        grouping(arr, L, mid);
+        grouping(arr, mid + 1, R);
+        merge(arr, L, mid, R);
     }
 
-    public static void mergeSort(Integer[] arr, int L, int Mid, int R) {
+    public static void merge(Integer[] arr, int L, int Mid, int R) {
         int[] help = new int[R - L + 1];
         int i = 0;
         int left = L;
