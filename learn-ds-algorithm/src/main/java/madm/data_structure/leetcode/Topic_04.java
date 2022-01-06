@@ -19,18 +19,31 @@ package madm.data_structure.leetcode;
  */
 public class Topic_04 {
     public boolean findNumberIn2DArray(int[][] matrix, int target) {
-        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
-            return false;
-        }
-        int rows = matrix.length, columns = matrix[0].length;
-        int row = 0, column = columns - 1;
-        while (row < rows && column >= 0) {
-            int num = matrix[row][column];
-            if (num == target) {
+//        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+//            return false;
+//        }
+//        int rows = matrix.length, columns = matrix[0].length;
+//        int row = 0, column = columns - 1;
+//        while (row < rows && column >= 0) {
+//            int num = matrix[row][column];
+//            if (num == target) {
+//                return true;
+//            } else if (num > target) {
+//                column--;
+//            } else {
+//                row++;
+//            }
+//        }
+//        return false;
+        int rows = matrix.length,row  = 0;
+        int column = matrix[0].length - 1;
+        while(row < rows && column >= 0){
+            int res = matrix[row][column];
+            if(res == target){
                 return true;
-            } else if (num > target) {
+            }else if(res > target){
                 column--;
-            } else {
+            }else{
                 row++;
             }
         }
@@ -46,6 +59,6 @@ public class Topic_04 {
                 {18, 21, 23, 26, 30}
         };
         Topic_04 tp = new Topic_04();
-        tp.findNumberIn2DArray(ints,8);
+        System.out.println(tp.findNumberIn2DArray(ints, 19));
     }
 }
