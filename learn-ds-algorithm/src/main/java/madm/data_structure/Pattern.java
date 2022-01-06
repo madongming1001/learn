@@ -1,4 +1,4 @@
-package madm.data_structure.leetcode;
+package madm.data_structure;
 
 
 public class Pattern {
