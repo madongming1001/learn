@@ -19,31 +19,18 @@ package madm.data_structure.leetcode;
  */
 public class Topic_04 {
     public boolean findNumberIn2DArray(int[][] matrix, int target) {
-//        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
-//            return false;
-//        }
-//        int rows = matrix.length, columns = matrix[0].length;
-//        int row = 0, column = columns - 1;
-//        while (row < rows && column >= 0) {
-//            int num = matrix[row][column];
-//            if (num == target) {
-//                return true;
-//            } else if (num > target) {
-//                column--;
-//            } else {
-//                row++;
-//            }
-//        }
-//        return false;
-        int rows = matrix.length,row  = 0;
+        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+            return false;
+        }
+        int rows = matrix.length, row = 0;
         int column = matrix[0].length - 1;
-        while(row < rows && column >= 0){
+        while (row < rows && column >= 0) {
             int res = matrix[row][column];
-            if(res == target){
+            if (res == target) {
                 return true;
-            }else if(res > target){
+            } else if (res > target) {
                 column--;
-            }else{
+            } else {
                 row++;
             }
         }
