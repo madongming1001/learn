@@ -1,5 +1,7 @@
 package com.madm.learnroute.javaee;
 
+import com.madm.learnroute.pojo.Apple;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
