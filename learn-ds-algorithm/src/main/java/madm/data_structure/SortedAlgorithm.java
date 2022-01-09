@@ -63,14 +63,14 @@ public class SortedAlgorithm {
 
         // 依次累加
         for (int i = 1; i <= max; ++i) {
-            c[i] = c[i-1] + c[i];
+            c[i] = c[i - 1] + c[i];
         }
 
         // 临时数组r，存储排序之后的结果
         int[] r = new int[n];
         // 计算排序的关键步骤，有点难理解
         for (int i = n - 1; i >= 0; --i) {
-            int index = c[a[i]]-1;
+            int index = c[a[i]] - 1;
             r[index] = a[i];
             c[a[i]]--;
         }
