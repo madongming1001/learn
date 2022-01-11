@@ -15,6 +15,10 @@ public class GetMaxOccurChar {
 //        System.out.println(result);
         char result = getMaxOccurChar02("aaabbbbcccc");
         System.out.println(result);
+        LinkedHashMap lh = new LinkedHashMap();
+        lh.put("1",1);
+
+
     }
 
     private static char getMaxOccurChar02(String str) {
