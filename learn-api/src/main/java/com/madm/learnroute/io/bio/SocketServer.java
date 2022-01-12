@@ -1,4 +1,4 @@
-package com.madm.learnroute.socket;
+package com.madm.learnroute.io.bio;
 
 import java.io.IOException;
 import java.net.ServerSocket;

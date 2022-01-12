@@ -1,4 +1,4 @@
-package com.madm.learnroute.nio;
+package com.madm.learnroute.io.nio;
 
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;

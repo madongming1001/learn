@@ -24,7 +24,7 @@ public class ThreadPrintDemo {
                         Thread.sleep(100);// 防止打印速度过快导致混乱
                     } catch (InterruptedException e) {            //NO
                     }
-                    System.out.println(cxsNum.get());
+                    System.out.println(cxsNum.get() + "：当前线程是：" + Thread.currentThread().getName());
                     flag = true;
                 }
             }
@@ -40,7 +40,7 @@ public class ThreadPrintDemo {
                         Thread.sleep(100);// 防止打印速度过快导致混乱
                     } catch (InterruptedException e) {            //NO
                     }
-                    System.out.println(cxsNum.get());
+                    System.out.println(cxsNum.get() + "：当前线程是：" + Thread.currentThread().getName());
                     flag = false;
                 }
             }
