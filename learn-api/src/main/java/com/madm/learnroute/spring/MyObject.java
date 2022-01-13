@@ -28,6 +28,12 @@ public class MyObject {
         System.out.println((i & (i - 1)) + "：普通&操作I");
         System.out.println((disturbingTermJ & (j - 1)) + "：扰动函数J");
         System.out.println((j & (j - 1)) + "：普通&操作J");
+
+
+        System.out.println(Integer.toBinaryString(-1 << 29));
+        System.out.println(-1 << 29);
+
+        System.out.println(-536870912 | 0);
     }
 
     private static Object getObjectByName(String name) {

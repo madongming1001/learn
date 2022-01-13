@@ -18,12 +18,12 @@ public class ThreadExecuteTest {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
 
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                log.debug("通过Runnable方式执行任务");
-            }
-        };
+//        Runnable runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                log.debug("通过Runnable方式执行任务");
+//            }
+//        };
 
         // 操作系统创建线程
         // java Thread --> jvm JavaThread---->os Thread
@@ -31,10 +31,10 @@ public class ThreadExecuteTest {
         // new Thread(runnable).start();
         // new Object()--->jvm JavaThread
 
-        new Thread(runnable).start();
+//        new Thread(runnable).start();
         // 这是一个真正的线程吗？  普通对象的方法调用
-        new Thread(runnable).run();
-        runnable.run();
+//        new Thread(runnable).run();
+//        runnable.run();
 
 
 //        FutureTask task = new FutureTask(new Callable() {
@@ -50,8 +50,10 @@ public class ThreadExecuteTest {
 //        log.debug("结果：{}",task.get());
 
 
-//        ExecutorService executor = Executors.newFixedThreadPool(2);
-//
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        executor.execute(() -> {
+            System.out.println("测试execute方法");
+        });
 //        log.debug("monkey下班回家做饭");
 //        Future<String> future = executor.submit(new Callable<String>() {
 //            @Override
