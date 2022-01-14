@@ -1,4 +1,4 @@
-package com.tuling.jucdemo.threadbase;
+package com.madm.learnroute.threadbase;
 
 import java.util.Random;
 import java.util.concurrent.Callable;
