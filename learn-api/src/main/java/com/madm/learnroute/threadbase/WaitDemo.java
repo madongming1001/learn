@@ -1,4 +1,4 @@
-package com.tuling.jucdemo.threadbase;
+package com.madm.learnroute.threadbase;
 
 public class WaitDemo {
 

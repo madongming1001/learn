@@ -1,4 +1,4 @@
-package com.tuling.jucdemo.threadbase;
+package com.madm.learnroute.threadbase;
 
 import java.io.IOException;
 import java.io.PipedReader;
