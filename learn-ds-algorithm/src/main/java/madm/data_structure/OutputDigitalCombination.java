@@ -1,6 +1,7 @@
 package madm.data_structure;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,7 +13,7 @@ public class OutputDigitalCombination {
     public static void main(String[] args) {
         // TODO Auto-generated method stub
         String[] array = new String[]{
-                "1", "2", "3", "4", "5", "6", "7", "8", "9"
+                "1", "2", "3", "4"
         };
         listAll(Arrays.asList(array), " ");
 
@@ -26,5 +27,4 @@ public class OutputDigitalCombination {
             listAll(temp, prefix + temp.remove(i));
         }
     }
-
 }
