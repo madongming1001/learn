@@ -15,5 +15,6 @@ public class MybatisPractice {
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(InputStream);
         SqlSession sqlSession = sqlSessionFactory.openSession();
         UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        mapper.selectById();
     }
 }
