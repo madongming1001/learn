@@ -27,10 +27,10 @@ public class SimpleDateFormatNotSafe {
                                         + Thread.currentThread().getId() + "\tThreadName: "
                                         + Thread.currentThread().getName() + "\t" + str + "\t" + str2);
                             }
-                            if (!str.equals(str2)) {
-                                throw new RuntimeException("date conversion failed after " + j
-                                        + " iterations. Expected " + str + " but got " + str2);
-                            }
+//                            if (!str.equals(str2)) {
+//                                throw new RuntimeException("date conversion failed after " + j
+//                                        + " iterations. Expected " + str + " but got " + str2);
+//                            }
                         }
                     } catch (ParseException e) {
                         throw new RuntimeException("parse failed");
