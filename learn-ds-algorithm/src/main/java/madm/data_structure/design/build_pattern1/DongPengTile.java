@@ -1,30 +1,30 @@
-package madm.data_structure.design.build_pattern;
+package madm.data_structure.design.build_pattern1;
 
 import java.math.BigDecimal;
 
-public class DuluxCoat implements Matter{
+public class DongPengTile implements Matter{
     @Override
     public String scene() {
-        return "涂料";
+        return "地砖";
     }
 
     @Override
     public String brand() {
-        return "多乐士（Dulux）";
+        return "东鹏瓷砖";
     }
 
     @Override
     public String model() {
-        return "第二代";
+        return "10001";
     }
 
     @Override
     public BigDecimal price() {
-        return new BigDecimal(719);
+        return new BigDecimal(102);
     }
 
     @Override
     public String desc() {
-        return "多乐士";
+        return "东鹏瓷砖";
     }
 }

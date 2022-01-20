@@ -17,7 +17,7 @@ sdc：
 
 ## Redis的五种数据结构
 
-![image-20211112104553376](noteImg/image-20211112104553376.png)
+![image-20211112104553376](./noteImg/image-20211112104553376.png)
 
 ### String
 
@@ -107,7 +107,7 @@ Redis集群架构下不适合大规模使用
 
 
 
-![image-20211112112216161](noteImg/image-20211112112216161.png)
+![image-20211112112216161](./noteImg/image-20211112112216161.png)
 
 ### List
 
@@ -187,7 +187,7 @@ Zset集合操作
 ZUNIONSTORE destkey numkeys key [key ...] 	//并集计算
 ZINTERSTORE destkey numkeys key [key …]	//交集计算
 
-![image-20211112151422170](noteImg/image-20211112151422170.png)
+![image-20211112151422170](./noteImg/image-20211112151422170.png)
 
 Zset集合操作实现排行榜
 1）点击新闻
@@ -206,11 +206,11 @@ ZREVRANGE hotNews:20190813-20190819  0  9  WITHSCORES
 
 ## Redis锁
 
-![image-20211124230403632](noteImg/image-20211124230403632.png)
+![image-20211124230403632](./noteImg/image-20211124230403632.png)
 
 **redisSesson故障转移redis的线程1在master加了锁，转移到slave的时候数据没有同步，线程2在新的master节点上又加锁成功了。redlock超过半数redis节点加锁成功才算加锁成功**
 
-![image-20211124231910627](noteImg/image-20211124231910627.png)
+![image-20211124231910627](./noteImg/image-20211124231910627.png)
 
 Redlock问题：
 
@@ -230,7 +230,7 @@ Redlock问题：
 
 **集群模式下一个节点配置的主没有从 宕机了怎么办 默认无不可用**
 
-![image-20211127185317154](noteImg/image-20211127185317154.png)
+![image-20211127185317154](./noteImg/image-20211127185317154.png)
 
 
 
@@ -270,7 +270,7 @@ typedef struct zset {
 } zset;
 ```
 
-<img src="noteImg/image-20211206185332038.png" alt="image-20211206185332038" style="zoom:50%;" />
+<img src="./noteImg/image-20211206185332038.png" alt="image-20211206185332038" style="zoom:50%;" />
 
 
 
