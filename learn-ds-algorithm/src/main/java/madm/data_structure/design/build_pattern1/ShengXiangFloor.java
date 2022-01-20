@@ -1,8 +1,8 @@
-package madm.data_structure.design.build_pattern;
+package madm.data_structure.design.build_pattern1;
 
 import java.math.BigDecimal;
 
-public class DerFloor implements Matter{
+public class ShengXiangFloor implements Matter{
     @Override
     public String scene() {
         return "地板";
@@ -10,21 +10,21 @@ public class DerFloor implements Matter{
 
     @Override
     public String brand() {
-        return "德尔（Der）";
+        return "圣象";
     }
 
     @Override
     public String model() {
-        return "A+";
+        return "一级";
     }
 
     @Override
     public BigDecimal price() {
-        return new BigDecimal(119);
+        return new BigDecimal(318);
     }
 
     @Override
     public String desc() {
-        return "DER德尔";
+        return "圣象";
     }
 }
