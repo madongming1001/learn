@@ -3,6 +3,8 @@ package madm.data_structure;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ */
 public class LRUCache<K, V> {
     class Node<K, V> {
         K key;
