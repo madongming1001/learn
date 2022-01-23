@@ -6,6 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ *
+ */
 public class BiggestElementsSort {
 
     public static void main(String[] args) {
@@ -14,8 +17,8 @@ public class BiggestElementsSort {
         // 2.开始排序
         long begin = System.currentTimeMillis();
         Integer[] processor = BiggestElementsSort.processor(sourcesData, 2);
-        long end=System.currentTimeMillis();
-        System.out.println(end-begin);
+        long end = System.currentTimeMillis();
+        System.out.println(end - begin);
         List<Integer> collect = Arrays.stream(processor).collect(Collectors.toList());
         System.out.println(collect);
     }
@@ -29,7 +32,7 @@ public class BiggestElementsSort {
         for (Integer i = 0; i < partition; i++) {
             result[i] = sourcesData[i];
         }
-        grouping(result,0,partition-1);
+        grouping(result, 0, partition - 1);
 
         // 2.分段比较开始
         while (index < sourcesData.length) {
@@ -55,7 +58,7 @@ public class BiggestElementsSort {
 //         for (Integer i = 0; i < partition; i++) {
 //             leftArr[i]=help[i];
 //         }
-        leftArr=help;
+        leftArr = help;
     }
 
     public static void grouping(Integer[] arr, int L, int R) {
