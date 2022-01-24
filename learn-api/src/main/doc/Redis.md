@@ -17,7 +17,7 @@ sdc：
 
 ## Redis的五种数据结构
 
-![image-20211112104553376](./noteImg/image-20211112104553376.png)
+![image-20211112104553376](noteImg/image-20211112104553376.png)
 
 ### String
 
@@ -107,7 +107,7 @@ Redis集群架构下不适合大规模使用
 
 
 
-![image-20211112112216161](./noteImg/image-20211112112216161.png)
+![image-20211112112216161](noteImg/image-20211112112216161.png)
 
 ### List
 
@@ -187,7 +187,7 @@ Zset集合操作
 ZUNIONSTORE destkey numkeys key [key ...] 	//并集计算
 ZINTERSTORE destkey numkeys key [key …]	//交集计算
 
-![image-20211112151422170](./noteImg/image-20211112151422170.png)
+![image-20211112151422170](noteImg/image-20211112151422170.png)
 
 Zset集合操作实现排行榜
 1）点击新闻
@@ -206,11 +206,11 @@ ZREVRANGE hotNews:20190813-20190819  0  9  WITHSCORES
 
 ## Redis锁
 
-![image-20211124230403632](./noteImg/image-20211124230403632.png)
+![image-20211124230403632](noteImg/image-20211124230403632.png)
 
 **redisSesson故障转移redis的线程1在master加了锁，转移到slave的时候数据没有同步，线程2在新的master节点上又加锁成功了。redlock超过半数redis节点加锁成功才算加锁成功**
 
-![image-20211124231910627](./noteImg/image-20211124231910627.png)
+![image-20211124231910627](noteImg/image-20211124231910627.png)
 
 Redlock问题：
 
@@ -230,7 +230,7 @@ Redlock问题：
 
 **集群模式下一个节点配置的主没有从 宕机了怎么办 默认无不可用**
 
-![image-20211127185317154](./noteImg/image-20211127185317154.png)
+![image-20211127185317154](noteImg/image-20211127185317154.png)
 
 
 
@@ -270,7 +270,7 @@ typedef struct zset {
 } zset;
 ```
 
-<img src="./noteImg/image-20211206185332038.png" alt="image-20211206185332038" style="zoom:50%;" />
+<img src="noteImg/image-20211206185332038.png" alt="image-20211206185332038" style="zoom:50%;" />
 
 
 
@@ -773,4 +773,176 @@ int expireIfNeeded(redisDb *db, robj *key) {
 1、如果服务器以主服务器模式运行，那么在载入RDB文件时，程序会对文件中保存的键进行检查，未过期的键会被载入到数据库中，而过期键则会被忽略，所以过期键对载入RDB文件的主服务器不会造成影响。
 
 2、如果服务器以从服务器模式运行，那么在载入RDB文件时，文件中保存的所有键，不论是否过期，都会被载入到数据库中。不过，因为主从服务器在进行数据同步的时候，从服务器的数据就会被清空，所以一般来讲，过期键对载入RDB文件的从服务器也不会造成影响。
+
+
+
+### AOF文件写入
+
+****
+
+当过期键被惰性删除或者定期删除之后，程序会向AOF文件追加（append）一条DEL命令，来显式地记录该键已被删除。
+
+### AOF重写
+
+****
+
+在执行AOF重写的过程中，程序会对数据库中的键进行检查，已过期的键不会保存到重写后的AOF文件中。
+
+
+
+## AOF持久化
+
+AOF持久化功能的实现可以分为命令追加、文件写入、文件同步三个步骤。
+
+### 1、命令追加
+
+当AOF持久化功能处于打开状态时，服务器在执行完一个写命令之后，会以协议格式将被执行的写命令追加到服务器状态的aof_buf缓冲区的末尾。
+
+### 2、AOF文件的写入与同步
+
+Redis 的服务器进程就是一个事件循环（loop）， 这个循环中的文件事件负责接收客户端的命令请求， 以及向客户端发送命令回复， 而时间事件则负责执行像 `serverCron` 函数这样需要定时运行的函数。
+
+因为服务器在处理文件事件时可能会执行写命令， 使得一些内容被追加到 `aof_buf` 缓冲区里面， 所以在服务器每次结束一个事件循环之前， 它都会调用 `flushAppendOnlyFile` 函数， 考虑是否需要将 `aof_buf` 缓冲区中的内容写入和保存到 AOF 文件里面。
+
+| `appendfsync` 选项的值 | `flushAppendOnlyFile` 函数的行为                             |
+| :--------------------- | :----------------------------------------------------------- |
+| `always`               | 将 `aof_buf` 缓冲区中的所有内容写入并同步到 AOF 文件。       |
+| `everysec`             | 将 `aof_buf` 缓冲区中的所有内容写入到 AOF 文件， 如果上次同步 AOF 文件的时间距离现在超过一秒钟， 那么再次对 AOF 文件进行同步， 并且这个同步操作是由一个线程专门负责执行的。 |
+| `no`                   | 将 `aof_buf` 缓冲区中的所有内容写入到 AOF 文件， 但并不对 AOF 文件进行同步， 何时同步由操作系统来决定。 |
+
+```text
+文件的写入和同步
+
+为了提高文件的写入效率， 在现代操作系统中， 当用户调用 `write` 函数， 将一些数据写入到文件的时候， 操作系统通常会将写入数据暂时保存在一个内存缓冲区里面， 等到缓冲区的空间被填满、或者超过了指定的时限之后， 才真正地将缓冲区中的数据写入到磁盘里面。
+
+这种做法虽然提高了效率， 但也为写入数据带来了安全问题， 因为如果计算机发生停机， 那么保存在内存缓冲区里面的写入数据将会丢失。
+
+为此， 系统提供了 `fsync` 和 `fdatasync` 两个同步函数， 它们可以强制让操作系统立即将缓冲区中的数据写入到硬盘里面， 从而确保写入数据的安全性。
+```
+
+
+
+## 文件事件
+
+Redis 基于 [Reactor 模式](http://en.wikipedia.org/wiki/Reactor_pattern)开发了自己的网络事件处理器： 这个处理器被称为文件事件处理器（file event handler）：
+
+- 文件事件处理器使用 [I/O 多路复用（multiplexing）](http://en.wikipedia.org/wiki/Multiplexing)程序来同时监听多个套接字， 并根据套接字目前执行的任务来为套接字关联不同的事件处理器。
+- 当被监听的套接字准备好执行连接应答（accept）、读取（read）、写入（write）、关闭（close）等操作时， 与操作相对应的文件事件就会产生， 这时文件事件处理器就会调用套接字之前关联好的事件处理器来处理这些事件。
+
+虽然文件事件处理器以单线程方式运行， 但通过使用 I/O 多路复用程序来监听多个套接字， 文件事件处理器既实现了高性能的网络通信模型， 又可以很好地与 Redis 服务器中其他同样以单线程方式运行的模块进行对接， 这保持了 Redis 内部单线程设计的简单性。
+
+![image-20220121170554295](/Users/madongming/Library/Application Support/typora-user-images/image-20220121170554295.png)
+
+
+
+## 命令执行器
+
+​		命令执行器要做的第一件事情就是根据客户端状态的argv[0]参数，在命令表（command table）中查找参数所指定的命令，并将找到的命令保存到客户端状态的cmd属性里面。
+
+​		命令表是一个字典，字典的健是一个个命令名字，比如“set” “get” “del”等等；而字典的值是一个个redisCommand结构，每个redisCommand结构记录了一个Redis命令的实现信息。
+
+```c#
+struct redisCommand {
+    char *name;
+    redisCommandProc *proc;
+    int arity;
+    char *sflags;   /* Flags as string representation, one char per flag. */
+    uint64_t flags; /* The actual flags, obtained from the 'sflags' field. */
+    /* Use a function to determine keys arguments in a command line.
+     * Used for Redis Cluster redirect. */
+    redisGetKeysProc *getkeys_proc;
+    /* What keys should be loaded in background when calling this command? */
+    int firstkey; /* The first argument that's a key (0 = no keys) */
+    int lastkey;  /* The last argument that's a key */
+    int keystep;  /* The step between first and last key */
+    long long microseconds, calls;
+    int id;     /* Command ID. This is a progressive ID starting from 0 that
+                   is assigned at runtime, and is used in order to check
+                   ACLs. A connection is able to execute a given command if
+                   the user associated to the connection has this command
+                   bit set in the bitmap of allowed commands. */
+};
+```
+
+
+
+## 主从复制
+
+Redis具有高可靠性，主要体现在两方面，一是数据尽量少丢失，二是服务尽量少中断。AOF和RDB保证了第一点，而第二点的实现，Redis采用增加副本冗余量的方式。
+
+Redis提供主从库模式来保证数据副本一致，主从库采用读写分离。读操作可以通过主库或从库，而写操作首先到主库执行，再由主库将写操作同步给从库。
+
+为什么要采用读写分离的方式呢？
+
+如果客户端对同一个数据进行多次修改，每次写操作都发送到不同的实例上，会导致实例副本数据不一致。这种情况下如果要做到数据一致，就会涉及到加锁、实例之间协商是否完成修改等一系列操作，带来巨额开销。而读写分离把所有写操作的请求都发送到主库上，然后同步给从库，多个实例之间就不用协调了。
+
+主从库同步是如何完成的？
+
+启动多个Redis实例的时候，通过replicaof命令形成主从库关系。（Redis 5.0以前使用slaveof）
+
+![img](https://img-blog.csdnimg.cn/img_convert/1c92d91323819347b52cae093008650a.png)
+
+第一阶段，从库和主库建立连接，告诉主库即将进行同步，主库确认恢复后，主从库间就可以开始同步了，psync命令包含runID和offset两个参数，runID是主库实例的随机ID，由于第一次连接时不知道主库runID，所以是“?”，offset是复制进度，-1表示第一次复制。主库收到psync命令后，使用FULLRESYNC命带上runID和offset返回给从库，FULLRESYNC表示第一次复制采用全量复制。
+
+第二阶段，主库将所有数据同步给从库，从库收到数据后，在本地完成清空当前数据并重新进行数据加载。
+
+第三阶段，主库把第二阶段实行过程中收到的写命令记录在replication buffer中，当主库完成RDB文件发送后，再把replication buffer中的写操作发送给从库。这样就实现主从同步了。
+
+如果有多个从库，而且都要和主库进行全量复制的话，就会导致主库相应应用程序的请求变慢，可以通过“主-从-从”模式，将主库生成RDB和传输RDB的压力，以级联的方式分散到从库上。
+
+![img](https://img-blog.csdnimg.cn/img_convert/f4d88b7c7a37244a2bb8edd801ceb4db.png)
+
+一旦从库完成了全量复制，他们会一直维护一个网络连接，主库会通过这个连接将后续收到的命令操作同步给从库。这个过程称为基于长连接的命令传播。
+
+主从库间网络断了怎么办？
+
+Redis 2.8开始，网络中断后，主从库采用增量复制的方式继续同步，把主从库网络断开期间主库收到的命令，同步给从库。
+
+当主从断连后，主库会把断连期间收到的写操作命令，写入repl_backlog_buffer这个缓冲区。repl_backlog_buffer是一个环形缓冲区，主库会记录自己写到的位置，从库会记录自己已经读到的位置。
+
+![img](https://img-blog.csdnimg.cn/img_convert/4a70144751e3aebb1fc334e471cdedfe.png)
+
+![img](https://img-blog.csdnimg.cn/img_convert/526c5959ada2041c0acd9d141390012c.png)
+
+由于repl_backlog_bugger是环形缓冲区，所以缓冲区写满后，主库还会继续写入，就会覆盖之前的写入操作。如果从库读取的速度比较慢，可能会导致从库还未读取的操作被主库写的操作覆盖了，这会导致主从库间的数据不一致。
+
+为了避免这种情况，可以调整repl_backlog_size这个参数调整缓冲空间。缓冲空间大小 = 主库写入命令速度 * 操作大小 - 主从库间网络传输命令速度 * 操作大小。在实际应用中，还需考虑可能存在的突发请求压力，通常需要把缓冲空间扩大一倍，即repl_backlog_sieze = 缓冲空间大小 * 2；如果并发请求量非常大，两倍缓冲空间都存不下新操作的话，可以考虑继续增大缓冲空间，并使用切片集群来分担单个主库的请求压力。
+
+全量同步为什么使用RDB而不用AOF？
+
+RDB是压缩的二进制数据，AOF文件记录的是操作命令，使用RDB进行主从同步的成本最低；
+如果使用AOF做主从同步，就必须打开AOF功能，选择文件刷盘策略，选择不当会影响性能，而RDB只有在需要定时备份和主从全量同步数据时才处罚生成快照；
+repl_backlog_buffer和replication buffer的区别？  
+
+**repl_backlog_buffer**：它是为了从库断连后找到主从差异而设计的环形缓冲区。如果从库断连时间太久，repl_backlog_buffer的环形缓冲区被主库的写命令覆盖了，那么从库也只能进行一次全量同步，所以将repl_backlog_buffer配置尽量大一些，可以降低主从断开后全量同步的概率。而在repl_backlog_buffer中找到差异数据后，就用到了replication buffer；
+
+复制积压缓冲区的最小大小可以根据公式 disconnection_reconnection_second * write_size_per_second来估算
+
+disconnection_reconnection_second：从服务器断线后重新连接上主服务器所需的平均时间（以秒计算）
+
+write_size_per_second：主服务器平均每秒产生的写命令数据量
+
+**replication buffer**：Redis和客户端通信或者和从库通信，都需要分配一个内存buffer进行数据交互，实际上客户端和从库都可以看作是一个client，每一个client连接Redis后，Redis都会分配一个client buffer，所有数据交互都是通过这个buffer进行的。主从增量同步时，从库作为一个client，也会分配一个buffer，只不过这个buffer专门用来传播用户的写命令到从库，保证主从一致，这个buffer通常把它叫做replication buffer；
+如果主从在传播命令时，从库处理得非常慢，那么主库的replication buffer就会持续增长，消耗大量内存资源，甚至OOM。所以Redis提供了client-output-buffer-limit参数限制这个buffer的大小，如果超过限制，主库会强制断开这个client连接，复制中断，中断后如果从库再次发起复制请求，可能会造成恶行循环，引发复制风暴。
+
+
+
+### 服务器运行ID
+
+****
+
+
+
+除了复制偏移量和复制积压缓冲区之外，实现部分冲同步还需要用到服务器运行ID（run ID）：
+
+1、每个Redis服务器，不论主服务器还是从服务器，都会有自己的运行ID。
+
+2、运行ID在服务器启动时自动生成，由40个随机的十六进制字符组成。
+
+​		当从服务器对主服务器进行初次复制时，主服务器会将自己的运行ID传送给从服务器，而从服务器则会将这个运行ID保存起来。
+
+当从服务断线并重新连上一个主服务器时，从服务器将向当前连接的主服务器发送之前保存的运行ID：
+
+- 如果从服务保存的运行ID和当前连接的主服务器的运行ID相同，那么说明从服务器断线之前复制的就是当前连接的这个主服务器，主服务器可以继续尝试执行部分重同步操作。
+- 相反地，如果从服务器保存的运行ID和当前连接的主服务器的运行ID并不相同，那么说明从服务器断线之前复制的主服务器并不是当前连接的这个主服务器，主服务器将对从服务器执行完整重同步操作。
 
