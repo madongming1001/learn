@@ -148,7 +148,7 @@ privateTopicRouteDatatopicRouteData;
 
 #### BrokerOuterApi#registerBrokerAll（网络发送代码，broker注册NameServer）
 
-![image-20211117112639539](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211117112639539.png)
+![image-20211117112639539](noteImg/image-20211117112639539.png)
 
 
 
@@ -160,7 +160,7 @@ RocketMQ发送普通消息又三种实现方式：可靠同步发送，可靠异
 
 #### RokcetMQ消息封装类Message
 
-![image-20211117114528095](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211117114528095.png)
+![image-20211117114528095](noteImg/image-20211117114528095.png)
 
 
 
@@ -297,7 +297,7 @@ voidsendMessageAfter(finalSendMessageContextcontext);
 
 ##### MQFaultStrategy#selectOneMessageQueue
 
-![image-20211117214558386](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211117214558386.png)
+![image-20211117214558386](noteImg/image-20211117214558386.png)
 
 ```java
 LatencyFaultTolerance.java//延迟机制接口规范
@@ -323,7 +323,7 @@ privatelong[]notAvailableDuration={0L,0L,30000L,60000L,120000L,180000L,600000L};
 
 ##### DefaultMQProducerlmpl#sendDefaultlmpl
 
-![image-20211117220648669](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211117220648669.png)
+![image-20211117220648669](noteImg/image-20211117220648669.png)
 
 ```java
 MQFaultStrategy.java//消息失败策略，延迟实现的门面类
@@ -380,13 +380,13 @@ MQ客户端发送消息的入口是MQClientAPIImpl#sendMessage。请求命令是
 
 SendMessageProcessor是在BrokerController一开始注册的
 
-![image-20211117231653622](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211117231653622.png)
+![image-20211117231653622](noteImg/image-20211117231653622.png)
 
-![image-20211117231710748](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211117231710748.png)
+![image-20211117231710748](noteImg/image-20211117231710748.png)
 
-![image-20211117231723789](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211117231723789.png)
+![image-20211117231723789](noteImg/image-20211117231723789.png)
 
-![image-20211117231736905](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211117231736905.png)
+![image-20211117231736905](noteImg/image-20211117231736905.png)
 
 AbstractSendMessageProcessor#msgCheck
 
@@ -417,7 +417,7 @@ Step3:调用DefaultMessageStore#putMessage进行消息存储。关于消息存�
 
 并且单批次消息发送总长度不能超过DefaultMQProducer#maxMessageSize（4M）。
 
-![image-20211117232515232](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211117232515232.png)
+![image-20211117232515232](noteImg/image-20211117232515232.png)
 
 1) code:请求命令编码，请求命令类型。
 2) version:版本号。
@@ -426,7 +426,7 @@ Step3:调用DefaultMessageStore#putMessage进行消息存储。关于消息存�
 5) remark:描述。
 6) extFields:扩展属性。
 7) customeHeader:每个请求对应的请求头信息。
-8) byte[]body:消息体内容。单条消息发送时，消息体的内容将保存在body中。![image-20211117232909087](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211117232909087.png)
+8) byte[]body:消息体内容。单条消息发送时，消息体的内容将保存在body中。![image-20211117232909087](noteImg/image-20211117232909087.png)
 
 首先在消息发送端，调用batch方法，将一批消息封装成MessageBatch对象。Message­Batch继承自Message对象，Messag巳Batch内部持有List<Message>messages。这样的话，批量消息发送与单条消息发送的处理流程完全一样。MessageBatch只需要将该集合中的每条消息的消息体body聚合成一个byte口数值，在消息服务端能够从该byte[]数值中正确解
 析出消息即可。
@@ -441,7 +441,7 @@ RocketMQ主要存储的文件包括**Comitlog文件、ConsumeQueue文件、Index
 
 为了提高消息消费的效率，RocketMQ引入了ConsumeQueue消息队列文件，每个消息主题包含多个消息消费队列，每一个消息队列有一个消息文件。IndexFile索引文件，其主要设计理念就是为了加速消息的检索性能，根据消息的属性快速从Commitlog文件中检索消息。RocketMQ是一款高性能的消息中间件，存储部分的设计是核心，存储的核心是IO访问性能。
 
-![image-20211119224114184](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211119224114184.png)
+![image-20211119224114184](noteImg/image-20211119224114184.png)
 
 1. CommitLog:消息存储文件，所有消息主题的消息都存储在CommitLog文件中。
 2. ConsumeQueue:消息消费队列，消息到达CommitLog文件后，将异步转发到消息消费队列，供消息消费者消费。
@@ -480,7 +480,7 @@ StoreCheckpointstoreCheckpoint:文件刷盘检测点。
 LinkedList<CommitLogDispatcher>dispatcherList:CommitLog文件转发请求。
 ```
 
-![image-20211120170345463](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211120170345463.png)
+![image-20211120170345463](noteImg/image-20211120170345463.png)
 
 
 
@@ -494,7 +494,7 @@ LinkedList<CommitLogDispatcher>dispatcherList:CommitLog文件转发请求。
 
 RocketMQ通过使用内存映射文件来提高IO访问性能
 
-![image-20211120170931910](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211120170931910.png)
+![image-20211120170931910](noteImg/image-20211120170931910.png)
 
 #### MappedFileQueue
 
@@ -604,7 +604,7 @@ Store目录存储文件描述：
 
    topics.json:topic配置属性。
 
-![image-20211121212607648](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211121212607648.png)
+![image-20211121212607648](noteImg/image-20211121212607648.png)
 
 
 
@@ -617,7 +617,7 @@ Store目录存储文件描述：
 
 ## ConsumeQueue文件
 
-![image-20211121222746285](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211121222746285.png)
+![image-20211121222746285](noteImg/image-20211121222746285.png)
 
 ​		单个ConsumeQueue文件中默认包含30万个条目，单个文件的长度为30w×20字节，单个ConsumeQueue文件可以看出是一个ConsumeQueue条目的数组，其下标为Consume­Queue的逻辑偏移量，消息消费进度存储的偏移量即逻辑偏移量。
 
@@ -629,7 +629,7 @@ Store目录存储文件描述：
 
 消息消费队列是RocketMQ专门为**消息订阅**构建的索引文件，提高根据主题与消息队列检索消息的速度，另外RocketMQ引入了**Hash索引机制**为消息建立索引，HashMap的设计包含两个基本点:**Hash槽与Hash冲突的链表结构**。
 
-![image-20211121224541055](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211121224541055.png)
+![image-20211121224541055](noteImg/image-20211121224541055.png)
 
 1. IndexHeader头部，包含40个字节，记录该IndexFile的统计信息，其结构如下。beginTimestamp:该索引文件中包含消息的最小存储时间。
    endTimestamp:该索引文件中包含消息的最大存储时间。
@@ -694,7 +694,7 @@ Step2:如果对应的Hash槽中存储的数据小于1或大于当前索引条目
 
 ## checkpoint文件
 
-![image-20211121231156098](/Users/madongming/Library/ApplicationSupport/typora-user-images/image-20211121231156098.png)
+![image-20211121231156098](noteImg/image-20211121231156098.png)
 
 1. physicMsgTimestamp:commitlog文件刷盘时间点。
 2. logicsMsgTimestamp:消息消费队列文件刷盘时间点。
