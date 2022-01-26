@@ -13,6 +13,9 @@ public class FunctionalInterfaceHandleUtil {
      * @return com.example.demo.func.BranchHandle
      **/
     public static BranchHandle isTureOrFalse(boolean b) {
+        String string = new String();
+        String str = string;
+
 
         return (trueHandle, falseHandle) -> {
             if (b) {
@@ -29,9 +32,9 @@ public class FunctionalInterfaceHandleUtil {
      * @param str
      * @return com.example.demo.func.BranchHandle
      **/
-    public static PresentOrElseHandler<?> isBlankOrNoBlank(String str){
+    public static PresentOrElseHandler<?> isBlankOrNoBlank(String str) {
         return (consumer, runnable) -> {
-            if (StringUtils.isBlank(str)){
+            if (StringUtils.isBlank(str)) {
                 runnable.run();
             } else {
                 consumer.accept(str);
@@ -40,6 +43,6 @@ public class FunctionalInterfaceHandleUtil {
     }
 
     public static void main(String[] args) {
-        FunctionalInterfaceHandleUtil.isBlankOrNoBlank("我是一个帅哥").presentOrElseHandle(System.out::println, () -> System.out.println("空字符串"));
+        FunctionalInterfaceHandleUtil.isBlankOrNoBlank("").presentOrElseHandle(System.out::println, () -> System.out.println("空字符串"));
     }
 }
