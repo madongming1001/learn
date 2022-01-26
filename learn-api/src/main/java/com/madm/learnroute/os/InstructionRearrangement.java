@@ -1,6 +1,5 @@
 package com.madm.learnroute.os;
 
-import com.oracle.tools.packager.Log;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -34,11 +33,10 @@ public class InstructionRearrangement {
             t2.join();
 
             String result = "第" + i + "次 (" + x + "," + y + ")";
-            if(x == 0 && y == 0){
+            if (x == 0 && y == 0) {
                 System.out.println(result);
                 break;
-            }else {
-                Log.info(result);
+            } else {
             }
         }
     }

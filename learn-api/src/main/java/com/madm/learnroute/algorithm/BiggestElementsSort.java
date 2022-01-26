@@ -2,11 +2,15 @@ package com.madm.learnroute.algorithm;
 
 import com.madm.learnroute.util.RandomGeneratorNumber;
 
-
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 public class BiggestElementsSort {
+
+    private static final Map<String,Object> cache = new ConcurrentHashMap<String,Object>();
+
 
     public static void main(String[] args) {
         // 1.获取数据源
