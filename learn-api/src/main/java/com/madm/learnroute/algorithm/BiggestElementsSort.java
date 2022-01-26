@@ -2,13 +2,10 @@ package com.madm.learnroute.algorithm;
 
 import com.madm.learnroute.util.RandomGeneratorNumber;
 
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-/**
- *
- */
 public class BiggestElementsSort {
 
     public static void main(String[] args) {
