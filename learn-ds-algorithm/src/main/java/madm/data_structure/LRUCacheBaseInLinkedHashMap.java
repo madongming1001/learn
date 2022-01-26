@@ -3,6 +3,9 @@ package madm.data_structure;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 基于LinkedHashMap实现的LRU
+ */
 public class LRUCacheBaseInLinkedHashMap extends LinkedHashMap {
 
     private int capacity;
