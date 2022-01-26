@@ -1,17 +1,17 @@
-package com.madm.learnroute.common;
+package com.madm.learnroute.interceptor;
 
 
 import com.madm.learnroute.auth.UserAuthenticate;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-public class MyHandlerInterceptor extends HandlerInterceptorAdapter {
+public class MyHandlerInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
