@@ -38,4 +38,8 @@ public class FunctionalInterfaceHandleUtil {
             }
         };
     }
+
+    public static void main(String[] args) {
+        FunctionalInterfaceHandleUtil.isBlankOrNoBlank("我是一个帅哥").presentOrElseHandle(System.out::println, () -> System.out.println("空字符串"));
+    }
 }
