@@ -1,6 +1,8 @@
 package madm.data_structure;
 
-// 直接继承我们前面写好的LRUCache
+/**
+ * 如果有偶发性的批量操作，会使得热点数据被非热点数据挤出容器，使得缓存受到了“污染”。
+ */
 public class LRUKCache extends LRUCacheBaseInDoubleQueueNode {
 
     private int k; // 进入缓存队列的评判标准
