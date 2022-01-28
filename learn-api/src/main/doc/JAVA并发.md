@@ -1016,7 +1016,7 @@ https://blog.csdn.net/weixin_30587025/article/details/96339354
 
 
 
-<img src="/Users/madongming/Library/Application Support/typora-user-images/image-20211230163617464.png" alt="image-20211230163617464" style="zoom:50%;" />
+<img src="./noteImg/image-20211230163617464.png" alt="image-20211230163617464" style="zoom:50%;" />
 
 ## lock 与 lockInterruptibly比较区别在于：
 

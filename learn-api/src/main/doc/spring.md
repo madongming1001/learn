@@ -214,5 +214,5 @@ ExposeInvocationInterceptor
 
 ## RestTemplate的Ribbon
 
-![image-20220119111513269](/Users/madongming/Library/Application Support/typora-user-images/image-20220119111513269.png)
+![image-20220119111513269](./noteImg/image-20220119111513269.png)
 

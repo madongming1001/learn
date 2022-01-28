@@ -318,7 +318,7 @@ Java HotSpot(TM) 64-Bit Server VM warning: Option UseConcMarkSweepGC was depreca
 
 ·大型Region（Large Region）：容量不固定，可以动态变化，但必须为2MB的整数倍，用于放置 4MB或以上的大对象。每个大型Region中只会存放一个大对象，这也预示着虽然名字叫作“大型 Region”，但它的实际容量完全有可能小于中型Region，最小容量可低至4MB。大型Region在ZGC的实 现中是不会被重分配（重分配是ZGC的一种处理动作，用于复制对象的收集器阶段，稍后会介绍到） 的，因为复制一个大对象的代价非常高昂。
 
-![image-20211227184358667](/Users/madongming/Library/Application Support/typora-user-images/image-20211227184358667.png)
+![image-20211227184358667](./noteImg/image-20211227184358667.png)
 
 ​		接下来是ZGC的核心问题——并发整理算法的实现。Shenandoah使用转发指针和读屏障来实现并 发整理，ZGC虽然同样用到了读屏障，但用的却是一条与Shenandoah完全不同，更加复杂精巧的解题 思路。
 
@@ -329,7 +329,7 @@ Java HotSpot(TM) 64-Bit Server VM warning: Option UseConcMarkSweepGC was depreca
 
 ​		尽管Linux下64位指针的高18位不能用来寻址，但剩余的46位指针所能支持的64TB内存在今天仍 然能够充分满足大型服务器的需要。鉴于此，ZGC的染色指针技术继续盯上了这剩下的46位指针宽 度，将其高4位提取出来存储四个标志信息。通过这些标志位，虚拟机可以直接从指针中看到其引用对 象的三色标记状态、是否进入了重分配集（即被移动过）、是否只能通过finalize()方法才能被访问 到，如图3-20所示。当然，由于这些标志位进一步压缩了原本就只有46位的地址空间，也直接导致 ZGC能够管理的内存不可以超过4TB（2的42次幂）[5]。
 
-![image-20211227184527565](/Users/madongming/Library/Application Support/typora-user-images/image-20211227184527565.png)
+![image-20211227184527565](./noteImg/image-20211227184527565.png)
 
 
 
@@ -348,13 +348,13 @@ Java HotSpot(TM) 64-Bit Server VM warning: Option UseConcMarkSweepGC was depreca
 
 ​		不同层次的虚拟内存到物理内存的转换关系可以在硬件层面、操作系统层面或者软件进程层面实 现，如何完成地址转换，是一对一、多对一还是一对多的映射，也可以根据实际需要来设计。 Linux/x86-64平台上的ZGC使用了多重映射（Multi-Mapping）将多个不同的虚拟内存地址映射到同一 个物理内存地址上，这是一种多对一映射，意味着ZGC在虚拟内存中看到的地址空间要比实际的堆内 存容量来得更大。把染色指针中的标志位看作是地址的分段符，那只要将这些不同的地址段都映射到 同一个物理内存空间，经过多重映射转换后，就可以使用染色指针正常进行寻址了，效果如图3-21所 示。
 
-![image-20211227184720673](/Users/madongming/Library/Application Support/typora-user-images/image-20211227184720673.png)
+![image-20211227184720673](./noteImg/image-20211227184720673.png)
 
 ​		在某些场景下，多重映射技术确实可能会带来一些诸如复制大对象时会更容易这样的额外好处， 可从根源上讲，ZGC的多重映射只是它采用染色指针技术的伴生产物，并不是专门为了实现其他某种 特性需求而去做的。 
 
 ​		接下来，我们来学习ZGC收集器是如何工作的。ZGC的运作过程大致可划分为以下四个大的阶 段。全部四个阶段都是可以并发执行的，仅是两个阶段中间会存在短暂的停顿小阶段，这些小阶段， 譬如初始化GC Root直接关联对象的Mark Start，与之前G1和Shenandoah的Initial Mark阶段并没有什么 差异，笔者就不再单独解释了。ZGC的运作过程具体如图3-22所示。
 
-![image-20211227184814494](/Users/madongming/Library/Application Support/typora-user-images/image-20211227184814494.png)
+![image-20211227184814494](./noteImg/image-20211227184814494.png)
 
 ​		·并发标记（Concurrent Mark）：与G1、Shenandoah一样，并发标记是遍历对象图做可达性分析的 阶段，前后也要经过类似于G1、Shenandoah的初始标记、最终标记（尽管ZGC中的名字不叫这些）的 短暂停顿，而且这些停顿阶段所做的事情在目标上也是相类似的。与G1、Shenandoah不同的是，ZGC 的标记是在指针上而不是在对象上进行的，标记阶段会更新染色指针中的Marked 0、Marked 1标志 位。
 
