@@ -16,6 +16,9 @@ public class VisibilityPractice {
     // storeLoad  JVM内存屏障  ---->  (汇编层面指令)  lock; addl $0,0(%%rsp)
     // lock前缀指令不是内存屏障的指令，但是有内存屏障的效果  （立马刷新会主内存，还有一个效果是另其他工作内存缓存失效）
     private volatile boolean flag = true;
+
+    private volatile boolean flags = true;
+
     private Integer count = 0;
 
     public void refresh() {
