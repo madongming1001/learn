@@ -12,10 +12,10 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
         "com.madm.learnroute"
 })
 @EnableAspectJAutoProxy
-public class LearnRouteApiApplication {
+public class LearnApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(LearnRouteApiApplication.class, args);
+        SpringApplication.run(LearnApiApplication.class, args);
     }
 
 }
