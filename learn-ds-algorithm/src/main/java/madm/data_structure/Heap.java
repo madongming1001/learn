@@ -10,6 +10,7 @@ import java.util.Stack;
  * 非稳定
  * 如果节点的下标是 i，那左子节点的下标就是 2*i+1，右子节点的下标就是 2*i+2，父节点的下标就是 i−1/2。
  * 利用数组存储堆
+ * 
  */
 public class Heap {
     private int[] a; // 数组，从下标1开始存储数据
