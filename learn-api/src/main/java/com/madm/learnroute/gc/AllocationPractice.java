@@ -1,5 +1,8 @@
 package com.madm.learnroute.gc;
 
+/**
+ * cpu读取以缓存行为单位 一缓存行单位为64字节
+ */
 public class AllocationPractice {
     private static final int _1MB = 1024 * 1024;
 
