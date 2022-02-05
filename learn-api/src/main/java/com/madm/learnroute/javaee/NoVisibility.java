@@ -15,8 +15,8 @@ public class NoVisibility {
     }
 
     public static void main(String[] args) {
-        new ReaderThread().start();
-        number = 42;
-        ready = true;
+//        new ReaderThread().start();
+//        number = 42;
+//        ready = true;
     }
 }
