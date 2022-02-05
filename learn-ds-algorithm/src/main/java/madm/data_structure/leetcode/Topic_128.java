@@ -3,6 +3,7 @@ package madm.data_structure.leetcode;
 import com.google.common.collect.Lists;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 给定一个未排序的整数数组 nums ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。
@@ -23,7 +24,7 @@ import java.util.*;
  */
 public class Topic_128 {
     public int longestConsecutive(int[] nums) {
-        Set<Integer> hash = new HashSet<Integer>();
+        Set<Integer> hash = new HashSet<Integer>(Arrays.stream(nums).boxed().collect(Collectors.toList()));
         for (int x : nums) hash.add(x);    //放入hash表中
         int res = 0;
         for (int x : hash) {
