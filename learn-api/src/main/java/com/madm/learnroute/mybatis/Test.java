@@ -12,6 +12,6 @@ public class Test {
 		context.refresh();
 
 		UserService userService = (UserService) context.getBean("userService");
-		userService.test();
+//		userService.test();
 	}
 }

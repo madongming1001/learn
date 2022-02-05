@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
-public class RedisKeyExpirationListener extends KeyExpirationEventMessageListener {
-
+public class RedisKeyExpirationListener/* extends KeyExpirationEventMessageListener */{
+/*
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
@@ -30,5 +30,5 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
             log.info("expiredKey:{}", expiredKey);
             stringRedisTemplate.delete("SET_NX" + expiredKey);
         }
-    }
+    }*/
 }
