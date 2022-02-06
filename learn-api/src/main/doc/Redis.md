@@ -551,6 +551,30 @@ object encoding 相当于输出的是底层具体的实现
 
 列表对象的编码可以是 `ziplist` 或者 `linkedlist` 。
 
+```c#
+typedef struct listNode {
+    struct listNode *prev;
+    struct listNode *next;
+    void *value;
+} listNode;
+
+typedef struct listIter {
+    listNode *next;
+    int direction;
+} listIter;
+
+typedef struct list {
+    listNode *head;
+    listNode *tail;
+    void *(*dup)(void *ptr);
+    void (*free)(void *ptr);
+    int (*match)(void *ptr, void *key);
+    unsigned long len;
+} list;
+```
+
+
+
 ### 编码转换
 
 当列表对象可以同时满足以下两个条件时， 列表对象使用 `ziplist` 编码：
@@ -697,6 +721,176 @@ struct redisServer {
   //...
 }
 ```
+
+
+
+## Sentinel
+
+当server1的下线时长超过用户设定的下线时长上限时，Sentinel系统就会对server1执行故障转移操作：
+
+- 首先，sentinel系统就会挑选server1属下的其中一个从服务器，并将这个被选中的从服务器升级为新的主服务器。
+- 之后，sentinel系统会向server1属下的所有从服务器发送新的复制指令，让他们成为新的主服务器的从服务器，当所有从服务器都开始复制新的主服务器时，故障转移操作执行完毕。
+- 另外，sentinel还会继续见识已下线的server1，并在他重新上线时，将它设置为新的主服务器的从服务器。
+
+
+
+### 获取主服务器信息
+
+Sentinel默认会以每10秒一次的频率，通过命令连接向被监视的主服务器发送info命令，并通过分析info命令的回复来获取主服务器的当前信息。通过主服务器返回的info命令的回复，sentinel可以获取以下两方面的信息
+
+- 一是关于主服务器本身的信息
+- 二是关于主服务器属下所有从服务器的信息
+
+
+
+### 向主服务器和从服务器发送信息
+
+默认情况下，sentinel会以每两秒一次的频率，通过命令连接向所有被监视的主服务器和从服务器发送以下格式的命令
+
+publsh __sentinel__ hello"<s_ip>,<s_port>,<s_runid>,<s_epoch>,<m_name>,<m_ip>,<m_port>,<m_epoch>"
+
+- 其中以s_开头的参数记录的是sentinel本身的信息，各个参数的意义
+- 而m_开头的参数记录的则是sentinel本身的信息，如果sentienl正在监视的是主服务器，那么这些参数记录的就是主服务器的信息，如果sentinel正在监视的是从服务器，那么这些参数记录的就是从服务器正在复制的主服务器的信息
+
+| 参数    |          意义          |
+| :------ | :--------------------: |
+| s_ip    |    sentinel的ip地址    |
+| s_port  |    sentinel的端口号    |
+| s_runid |    sentinel的运行id    |
+| s_epoch | sentinel当前的配置纪元 |
+| m_name  |     主服务器的名字     |
+| m_ip    |    主服务器的ip地址    |
+| m_port  |    主服务器的端口号    |
+| m_epoch | 主服务器当前的配置纪元 |
+
+
+
+### 检测主观下线
+
+默认情况下，sentinel会以每秒一次的频率向所有与它创建了命令连接的实例（包括主服务器，从服务器，其他sentinel在内）发送ping命令
+
+sentinel配置文件中的down-after-milliseconds选项指定了sentinel判断实例进入主观下线所需的时间长度，如果一个实例在down-after-milliseconds毫秒内，连续向sentienl返回无效回复，那么sentienl会修改这个实例所对应的实例结构。
+
+
+
+### 检测客观下线
+
+当sentinel将一个主服务器判断为主观下线之后，为了确认这个主服务器是否真的下线了，他会想同样监视这 一主服务器的其他sentinel进行询问，看他们是否也认为主服务器已经经入了下线状态（可以是主观下线或者客观下线）。当sentinel从其他sentinel哪里接收到足够数量的已下线判断之后，sentienl就会将从服务器判定为客观下线，并对主服务器执行故障转移操作。
+
+
+
+### 发送sentinel is-master-down-by-add命令
+
+sentienl使用：
+
+sentienl is-master-down-by-addr <ip> <port> <current_epoch> <runid>
+
+命令询问其他sentinel是否同意主服务器已下线
+
+
+
+| 参数          |                             意义                             |
+| :------------ | :----------------------------------------------------------: |
+| ip            |          被sentinel判断为主观下线的主服务器的ip地址          |
+| port          |          被sentinel判断为主观下线的主服务器的端口号          |
+| current_epoch |         sentinel当前的配置纪元，用于选举领头sentinel         |
+| runid         | 可以是*符号或者sentinel的运行id，*符号代表的是检测主观下线状态，sentienl的运行id则用于选举领头sentienl |
+
+### 接收sentinel is-master-dow-by-add命令
+
+当一个sentinel（目标sentienl）接收到另一个sentinel（源sentinel）发来的sentinel is-master-down-by-add命令时，目标sentinel会分析并取出命令请求中包含的各个参数，并根据其中的主服务器ip和端口号，检查主服务器是否已经下线，然后向源sentienl返回一条包含三个参数的multi bulk回复作为sentinel is-master-down-by命令的回复：
+
+1. <down_state>
+2. <leader_runid>
+3. <leader_epoch>
+
+| 参数         | 意义                                                         |
+| ------------ | ------------------------------------------------------------ |
+| dwon_state   | 返回目标sentienl对主服务器的检查结果，1代表主服务器已下线 0代表主服务器未下线 |
+| leader_runid | 可以是*符号或者目标sentinel的局部领头sentinel的运行id：符号代表命令仅仅用于检测主服务器的下线状态，而局部领头sentinel的运行id则用于选举领头sentinel |
+| leader_epoch | 目标sentinel的局部领头sentinel的配置纪元，用于选举领头sentinel，仅用于leader_runid的值不为*时，如果为,那么leader_epoch总为0 |
+
+当这一数量达到配置指定的判断客观下线所需的数量时，sentinel就会将主服务器实例结构flags属性的STR—O—DOWN标识打开，表示主服务器已经进入客观下线状态。
+
+当认为主服务器已经进入下线状态的sentinel的数量，超过sentinel配置中心配置的quorum参数的值，那么该sentinel就会认为主服务器已经进入客观下线状态，比如，如果sentinel在启动时载入了以下配置
+
+sentinel monitor master 127.0.0.1 6379 2
+
+那么包括当前sentienl在内，只要总共有两个sentienl认为主服务器已经进入下线状态，那么当前sentienl就会将主服务器判断为客观下线
+
+
+
+## 选举领头sentinel
+
+当一个主服务器被判断为客观下线时，监视这个下线服务器的各个sentinel会进行协商，选举出一个领头sentinel，并由领头sentinel对下线主服务器执行故障转移操作。
+
+以下是redis选举领头sentinel的规则和方法。
+
+- 所有在线的sentinel都有被选为领头sentinel的资格，换句话说监视同一个主服务器的多个在线sentinel中的任意的一个都有可能成为领头sentinel。
+- 每次进行领头sentinel选举之后，不论选举是否成功，所有sentinel的配置纪元的值都会自增一次，配置纪元实际就是一个计数器，并没有什么特别的。
+- 在一个配置纪元里面，所有sentinel都有一次将某个sentinel设置为局部领头sentinel的机会，并且局部领头一旦设置，在这个纪元里面就不能再更改。
+- 每个发现主服务器进入客观下线的sentinel都会要求其他sentinel将自己设置为局部领头sentinel。
+- 当一个sentinel（源sentinel）向另一个sentinel（目标sentinel）发送sentinel is-master-down-by-add命令，并且命令中的runid参数不是*符号而是源sentinel的运行id时，这表示源sentinel要求目标sentinel将前者设置为后者的局部领头sentinel。
+- sentinel设置局部领头sentinel的规则是先到先得：最先向目标sentinel发送设置要求的源sentinel将成为目标sentinel的局部领头sentinel，而之后接收到的所有设置要求都会被目标sentinel拒绝。
+- 目标sentinel在接收到sentinel is-master-down-by-addr命令之后，将向源sentinel返回一条命令回复，回复中的leader_runid参数和leader_epoch参数分别记录了目标sentinel的局部sentinel的运行id和配置纪元。
+- 源sentinel在接收到目标sentinel返回的命令回复之后，会检查回复中leader_epoch参数的值和自己的配置纪元是否相同，如果相同的话，那么源sentinel继续取出回复中的leader_runid参数，如果ledaer_runid参数的值和源sentinel的运行id一直，那么表示目标sentinel将源sentinel设置成了局部领头sentinel。
+- 如果有某个sentinel被半数以上的sentinel设置成了局部领头sentienl，那么这个sentinel称为领头sentinel。举个例子，在一个由10个sentinel组成的sentinel系统里面，只要有大于等于10/2+1=6个sentinel将某个sentienl设置为局部领头sentienl，那么被设置的那个sentinel就会成为领头sentienl。
+- 因为领头sentinel的产生需要半数以上sentinel的支持，并且每个sentienl在每个配置纪元里面只能设置一次局部领头sentinel，所以在一个配置纪元里面，只会出现一个领头sentinel。
+- 如果在给定时限内，没有一个sentinel被选举为领头sentinel，那么各个sentinel将在一段时间之后再次进行选举，知道选出领头sentinel为止。
+
+### 故障转移
+
+在选举产生出领头sentinel之后，领头sentinel将对已下线的主服务器执行故障转移操作，该操作包含以下三个步骤：
+
+1. 在已下线主服务器属下的所有从服务器里面，挑选出一个从服务器，并将其转换为主服务器。
+2. 让已下线主服务器属下的所有从服务器改为复制新的主服务器。
+3. 将已下线主服务器设置为新的主服务器的从服务器，当这个旧的主服务器重新上线时，他就会成为新的主服务器的从服务器。
+
+### 选出新的主服务器
+
+故障转移第一步要做的就是在已下线主服务器属下的所有从给服务器中，挑选一个状态良好，数据完整的从服务器，然后向这个从服务器发送slaveof no one命令，将这个从服务器转换为主服务器。
+
+#### 新的主服务器时怎样挑选出来的
+
+领头sentinel会将已下线主服务器的所有从服务器保存到一个列表里面，然后按照一下规则，一项一项地对列表进行过滤:
+
+1. 删除列表中所有处于下线或者断线状态的从服务器，这可以保证列表中剩余的从服务器都是正常在线的
+
+2. 删除列表中所有最近5秒内没有回复过领头sentinel的info命令的从服务器，这可以保证列表剩余的从服务器 都是最近成功进行通信的。
+
+3. 删除所有与已下线主服务器连接断开超过down-after-milliseconds * 10 毫秒的从服务器：down-after-milliseconds 选项指定了判断主服务器下线所需的时间，而删除断开时常超过down-after-milliseconds * 10 毫秒的从服务器，则可以保证列表中剩余的从服务器都没有过早地与主服务器断开连接，换句话说，列表中剩余的从服务器保存的数据都是比较新的。之后，领头sentinel将根据服务器的优先级，对列表中的剩余从服务器进行排序，并选出其中优先级最高的从服务器。
+
+   ​		如果有多个具有相同最高优先级的从服务器，那么领头sentinel将按照从服务器的复制偏移量，对具有相同最高优先级的所有从服务器进行排序，并选出其中偏移量最大的从服务器（复制偏移量最大的从服务器就是保存着最新数据的从服务器）
+
+   ​		最后，如果有多个优先级最高、复制偏移量最大的从服务器，那么领头sentinel将按照运行id对这些从服务器进行排序，并选出其中运行id最小的从服务器。
+
+
+
+## 集群选举新的主节点
+
+新的主节点是通过选举产生的，以下是集群选举新的主节点的方法。
+
+1. 集群的配置纪元是一个自增计数器，它的初始值为0
+
+2. 当集群里的某个节点开始一次故障转移操作时，集群配置纪元的值会被增1
+
+3. 对于每个配置纪元，集群里每个负责处理槽的主节点都有一次投票的机会，而第一个向主节点要求投票的从节点将获得主节点的投票。
+
+4. 当从节点发现自己正在复制的主节点进入已下线状态时，从节点会向集群广播一条clustermsg_type_failover_auth_request消息，要求所有收到这条消息，并且具有投票权的主节点想这个从节点投票。
+
+5. 如果一个主节点具有投票权（它正在负责处理槽），并且这个主节点尚未投票给其他从节点，那么主节点将向要求投票的从节点返回一条clustermas_type_failover_auth_ack消息，表示这个主节点支持从节点称为新的主节点。
+
+6. 每个参与选举的从节点都会接收clustermsg_type_failover_auth_ack消息，并根据自己收到了多少条这种消息来统计自己获得了多少主节点的支持。
+
+7. 如果集群有N个具有投票权的主节点，那么当一个从节点收集到大于等于n/2+1张支持票时，这个从节点就会当选称为新的主节点。
+
+8. 因为在每一个配置纪元里面，每个具有投票权的主节点只能头一次票，所以如果有N个主节点进行投票，那么具有大于等于N/2+1支持票的从节点只会有一个，这确保了新的主节点只会有一个。
+
+9. 如果在一个配置纪元里面没有从节点能收集到足够多的支持票，那么集群进入一个新的配置纪元，并再次进行选举，知道选出新的主节点为止。
+
+   
+
+
 
 
 
@@ -858,8 +1052,6 @@ redis的服务器周期性操作函数servercron默认每隔100毫秒就会执�
 ****
 
 在执行AOF重写的过程中，程序会对数据库中的键进行检查，已过期的键不会保存到重写后的AOF文件中。
-
-
 
 ## AOF持久化
 
