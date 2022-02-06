@@ -560,7 +560,7 @@ object encoding 相当于输出的是底层具体的实现
 
 不能满足这两个条件的列表对象需要使用 `linkedlist` 编码。
 
-List-max-ziplist-value
+List-max-ziplist-value	
 
 List-max-ziplist-entries
 
@@ -645,7 +645,35 @@ zset-max-ziplist-value 64
 
 ![image-20220120115248702](./noteImg/image-20220120115248702.png)
 
-### 
+
+
+
+
+# 文件事件处理器的构成
+
+分别为套接字、I/O多路复用程序、文件时间分排器、事件处理器
+
+I/O多路复用器程序总是会将所有产生事件的套接字都放到一个队列里面，然后通过这个队列，以有序（sequentially），同步（synchronously），每次一个套接字的方式向文件时间分派器传送套接字。
+
+
+
+## I/O多路复用程序的实现
+
+​		Redis的I/O多路复用程序的所有功能都是通过包装常见的select、epoll、evport、和kqueue这些I/O多路复用函数库实现的，每个I/O多路复用函数在Redis源码中都对应一个单独的文件，比如as_select.c ae_epoll.c ae_kqueue.c
+
+​		程序编译时自动选择系统中性能最高的I/O多路复用函数库来作为Redis的I/O多路复用程序的底层实现。
+
+
+
+## 中断
+
+​		中断使得硬件得以发出通知给处理器。例如在你敲击键盘的时候，键盘控制器（控制键盘的硬件设备）会发出一个中断，通知操作系统有按键按下，中断本质上是一种特殊的电信号，由硬件设备发出向处理器。处理器接收到中断后，会马上向操作系统反映此信号的到来，然后就有操作系统负责处理这些新到来的数据。硬件设备生成中断的时候并不需要考虑与处理器的时钟同步，换句话说就是中断随时可以产生。因此，内核随时可能因为新到来的中断而被打断。
+
+​		在响应一个特定中断的时候，内核会执行一个函数，该函数叫做中断处理程序或者中断服务程序，产生中断的每个设备都有一个响应的中断处理程序。
+
+
+
+
 
 # 数据库
 
@@ -752,8 +780,6 @@ int expireIfNeeded(redisDb *db, robj *key) {
 
 
 
-## AOF、RDB和复制功能对过期键的处理
-
 ### 生成RDB文件
 
 ****
@@ -769,6 +795,55 @@ int expireIfNeeded(redisDb *db, robj *key) {
 1、如果服务器以主服务器模式运行，那么在载入RDB文件时，程序会对文件中保存的键进行检查，未过期的键会被载入到数据库中，而过期键则会被忽略，所以过期键对载入RDB文件的主服务器不会造成影响。
 
 2、如果服务器以从服务器模式运行，那么在载入RDB文件时，文件中保存的所有键，不论是否过期，都会被载入到数据库中。不过，因为主从服务器在进行数据同步的时候，从服务器的数据就会被清空，所以一般来讲，过期键对载入RDB文件的从服务器也不会造成影响。
+
+
+
+## BGSAVE命令执行时的服务器状态
+
+BGSAVE命令执行期间，服务器处理SAVE，BGSAVE，BGREWRITEAOF三个命令的方式回合平时有所不同。
+
+首先在BGSAVE命令执行期间，客户端发送的save和bgsave命令会被服务器拒绝，服务器禁止save命令和bgsave命令同时执行是为了避免父进程和子进程同时执行两个调用防止竞争条件。
+
+bgrewirteaof命令和bgsave两个命令不能同时执行。
+
+- 如果bgsave命令正在执行，那么客户端发送的bgrewirteaof命令会被延迟到bgsave命令执行完毕之后在执行。
+- 如果bgrewireaof命令正在执行，那么客户端发送的bgsave命令会被服务器拒绝。
+
+服务器程序会根据save选项的保存条件 设置服务器状态的redisserver结构的redisparams属性，他里面的每一个saveparam都是一个保存条件。
+
+```c#
+
+struct redisServer {
+    ……
+struct saveparam *saveparams;   /* Save points array for RDB */
+}
+
+struct saveparam {
+    //秒数
+    time_t seconds;
+    //修改数
+    int changes;
+};
+```
+
+### ditry计数器和lastsave属性
+
+****
+
+除了saveparams数组之外，服务器状态还维持着一个dirty计数器，以及一个lastsave属性。
+
+- dirty计数器纪录距离上一次成功执行save命令或者bgsave命令之后，服务器对数据库状态（服务器中的所有数据库）进行了多少次修改（包括写入、删除、更新等操作）
+- lastsave属性是一个时间戳，记录了服务器上一次成功执行save命令或者bgsave命令的时间。
+
+
+
+### 检查保存条件是否满足
+
+****
+
+redis的服务器周期性操作函数servercron默认每隔100毫秒就会执行一次，该函数用于对正在运行的服务器进行维护，他的其中一项工作就是检查save选项所设置的保存条件是否已经满足，如果满足的话就会执行bgsave命令。
+
+关于分析RDB文件的说明，因为Redis本身带有RDB文件检查工具redis-check-dump。
 
 
 
