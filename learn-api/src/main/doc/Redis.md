@@ -473,7 +473,7 @@ typedef struct intset {
 
 ## 压缩列表
 
-压缩列表是Redis为了节约内存而开发的，是由一系列特殊编码的连续内存块组成的顺序型数据结构，一个压缩列表可以包含热议多个节点，每个节点保存一个字节数组或者一个整数值。
+压缩列表是Redis为了节约内存而开发的，是由一系列特殊编码的连续内存块组成的顺序型数据结构，一个压缩列表可以包含任意多个节点，每个节点保存一个字节数组或者一个整数值。
 
 
 
@@ -492,6 +492,16 @@ previous_entry_length记录的是压缩列表中前一个节点的长度，小�
 encoding属性记录了节点的content属性所保存数据的类型以及长度，大于254字节用5字节长度保存
 
 content属性负责保存节点的值，节点值可以是一个字节数组或整数，值的类型和长度由节点的encoding属性决定
+
+**添加和删除节点都会可能引起连锁更新**
+
+zlbytes zltail zllen e1 e2 e3 e4 ……en zlend
+
+如果e1至en所有的节点长度都小于254字节，所以记录这些节点的长度只需要1字节常的previous_entry_length属性，这时如果我们将一个长度大于等于254字节的新节点new设置为压缩列表的表头节点，就会导致所有后续节点都需要重分配空间去存储前一节点的大小
+
+zlbytes zltail zllen big small e1 e2 e3 e4 ……en zlend
+
+如果e1至en都是大小介于250字节至253字节的节点，big节点的长度大于等于254字节（需要5字节的previous_entry_length来保存），而small节点的长度小于254字节（只需要1字节的previous_entry_length来保存），那么当我们将small节点从压缩列表中删除之后，为了让e1的previous_entry_length属性可以记录big节点的长度，程序将扩展e1的空间，并由此引发之后的连锁更新。
 
 
 
@@ -549,31 +559,63 @@ object encoding 相当于输出的是底层具体的实现
 
 ## 列表对象
 
-列表对象的编码可以是 `ziplist` 或者 `linkedlist` 。
+列表对象的编码可以是 `ziplist` 或者 `linkedlist` 。quicklist
+
+- **ziplist 的优点是内存紧凑，访问效率高，缺点是更新效率低，并且数据量较大时，可能导致大量的内存复制**
+- **linkedlist 的优点是节点修改的效率高，但是需要额外的内存开销，并且节点较多时，会产生大量的内存碎片**
+
+list-max-ziplist-size  -2        //  单个ziplist节点最大能存储  8kb  ,超过则进行分裂,将数据存储在新的ziplist节点中
+list-compress-depth  1        //  0 代表所有节点，都不进行压缩，1， 代表从头节点往后走一个，尾节点往前走一个不用压缩，其他的全部压缩，2，3，4 ... 以此类推
+
+为了结合两者的优点，**在 redis 3.2 之后，list 的底层实现变为快速列表 quicklist**。
 
 ```c#
-typedef struct listNode {
-    struct listNode *prev;
-    struct listNode *next;
-    void *value;
-} listNode;
+robj *createQuicklistObject(void) {
+    quicklist *l = quicklistCreate();
+    robj *o = createObject(OBJ_LIST,l);
+    o->encoding = OBJ_ENCODING_QUICKLIST;
+    return o;
+}
 
-typedef struct listIter {
-    listNode *next;
-    int direction;
-} listIter;
+quicklist *quicklistCreate(void) {
+    struct quicklist *quicklist;
 
-typedef struct list {
-    listNode *head;
-    listNode *tail;
-    void *(*dup)(void *ptr);
-    void (*free)(void *ptr);
-    int (*match)(void *ptr, void *key);
-    unsigned long len;
-} list;
+    quicklist = zmalloc(sizeof(*quicklist));
+    quicklist->head = quicklist->tail = NULL;
+    quicklist->len = 0;
+    quicklist->count = 0;
+    quicklist->compress = 0;
+    quicklist->fill = -2;
+    quicklist->bookmark_count = 0;
+    return quicklist;
+}
+
+typedef struct quicklist {
+    quicklistNode *head;
+    quicklistNode *tail;
+    unsigned long count;       
+    unsigned long len;           
+    int fill : QL_FILL_BITS;                
+    unsigned int compress : QL_COMP_BITS;  
+    unsigned int bookmark_count: QL_BM_BITS;
+    quicklistBookmark bookmarks[];
+} quicklist;
+
+typedef struct quicklistNode {
+    struct quicklistNode *prev;
+    struct quicklistNode *next;
+    unsigned char *zl;
+    unsigned int sz;            
+    unsigned int count : 16;    
+    unsigned int encoding : 2;    
+    unsigned int container : 2;  
+    unsigned int recompress : 1; 
+    unsigned int attempted_compress : 1; 
+    unsigned int extra : 10;  
+} quicklistNode;
 ```
 
-
+![image-20220206193436123](.\noteImg\image-20220206193436123.png)
 
 ### 编码转换
 
@@ -595,6 +637,9 @@ List-max-ziplist-entries
 ## 哈希对象
 
 哈希对象的编码可以是 `ziplist` 或者 `hashtable` 。
+
+hash-max-ziplist-entries  512    //  ziplist 元素个数超过 512 ，将改为hashtable编码 
+hash-max-ziplist-value    64      //  单个元素大小超过 64 byte时，将改为hashtable编码
 
 `ziplist` 编码的哈希对象使用压缩列表作为底层实现， 每当有新的键值对要加入到哈希对象时， 程序会先将保存了键的压缩列表节点推入到压缩列表表尾， 然后再将保存了值的压缩列表节点推入到压缩列表表尾， 因此：
 
@@ -889,10 +934,6 @@ sentinel monitor master 127.0.0.1 6379 2
 9. 如果在一个配置纪元里面没有从节点能收集到足够多的支持票，那么集群进入一个新的配置纪元，并再次进行选举，知道选出新的主节点为止。
 
    
-
-
-
-
 
 ### 设置键的生存时间或过期时间
 
