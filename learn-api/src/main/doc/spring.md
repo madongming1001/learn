@@ -85,15 +85,15 @@ ConfigurationClassParser#doProcessConfigurationClass
 
 #### https://juejin.cn/post/6844903944146124808
 
-![image-20211203170110834](./noteImg/image-20211203170110834.png)
+![image-20211203170110834](noteImg/image-20211203170110834.png)
 
-![image-20211203153845270](./noteImg/image-20211203153845270.png)
+![image-20211203153845270](noteImg/image-20211203153845270.png)
 
-![image-20211203210201852](./noteImg/image-20211203210201852.png)
+![image-20211203210201852](noteImg/image-20211203210201852.png)
 
 ## Bean名称生成策略
 
-![image-20211203155749557](./noteImg/image-20211203155749557.png)
+![image-20211203155749557](noteImg/image-20211203155749557.png)
 
 
 
@@ -101,11 +101,11 @@ ConfigurationClassParser#doProcessConfigurationClass
 
 启动流程
 
-![image-20211203221333010](./noteImg/image-20211203221333010.png)
+![image-20211203221333010](noteImg/image-20211203221333010.png)
 
 ## BeanPostProcessor关键实现类
 
-![image-20211203224648324](./noteImg/image-20211203224648324.png)
+![image-20211203224648324](noteImg/image-20211203224648324.png)
 
 
 
@@ -113,9 +113,9 @@ ConfigurationClassParser#doProcessConfigurationClass
 
 **refresh()#initApplicationEventMulticaster()**
 
-![image-20211203233156035](./noteImg/image-20211203233156035.png)
+![image-20211203233156035](noteImg/image-20211203233156035.png)
 
-![image-20211203233700666](./noteImg/image-20211203233700666.png)
+![image-20211203233700666](noteImg/image-20211203233700666.png)
 
 ```txt
 initialMulticaster（springboot的监听器）
@@ -128,7 +128,7 @@ applicationEventMulticaster（spring上下文监听器）
 
 ## Spring Aop
 
-![image-20211210103842874](./noteImg/image-20211210103842874.png)
+![image-20211210103842874](noteImg/image-20211210103842874.png)
 
 
 
@@ -140,11 +140,11 @@ applicationEventMulticaster（spring上下文监听器）
 
 
 
-![image-20211210134538464](./noteImg/image-20211210134538464.png)
+![image-20211210134538464](noteImg/image-20211210134538464.png)
 
 
 
-![image-20211210173929956](./noteImg/image-20211210173929956.png)
+![image-20211210173929956](noteImg/image-20211210173929956.png)
 
 ```java
 1.创建AspectJPointcutAdvisor#0-4，先使用其带参的构造方法进行对象的创建，但是想使用带参数的构造方法，必须要把参数对象准备好，因此要准备创建内置包含的对象AspectJAroundAdvice
@@ -182,11 +182,11 @@ ExposeInvocationInterceptor
 
 适配器是以Interceptor结尾的 其他的是直接继承自MethodInterceptor
 
-![image-20211213210833775](./noteImg/image-20211213210833775.png)
+![image-20211213210833775](noteImg/image-20211213210833775.png)
 
-![image-20211213225426346](./noteImg/image-20211213225426346.png)
+![image-20211213225426346](noteImg/image-20211213225426346.png)
 
-![image-20211213225442536](./noteImg/image-20211213225442536.png)
+![image-20211213225442536](noteImg/image-20211213225442536.png)
 
 ![AnnatationAwareAspectJAutoProxyCreator.png](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/11/8/16e4ad7b38872724~tplv-t2oaga2asx-watermark.awebp)
 
@@ -196,9 +196,9 @@ ExposeInvocationInterceptor
 
 
 
-![image-20211216155602502](./noteImg/image-20211216155602502.png)
+![image-20211216155602502](noteImg/image-20211216155602502.png)
 
-![image-20211216220650964](./noteImg/image-20211216220650964.png)
+![image-20211216220650964](noteImg/image-20211216220650964.png)
 
 
 
@@ -206,13 +206,13 @@ ExposeInvocationInterceptor
 
 ## 事务传播行为
 
-![image-20211216223303217](./noteImg/image-20211216223303217.png)
+![image-20211216223303217](noteImg/image-20211216223303217.png)
 
-![image-20211216223807073](./noteImg/image-20211216223807073.png)
+![image-20211216223807073](noteImg/image-20211216223807073.png)
 
 
 
 ## RestTemplate的Ribbon
 
-![image-20220119111513269](./noteImg/image-20220119111513269.png)
+![image-20220119111513269](noteImg/image-20220119111513269.png)
 

@@ -529,15 +529,15 @@ typedef struct redisObject {
 
 https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/redis/redis%E7%9F%A5%E8%AF%86%E7%82%B9&%E9%9D%A2%E8%AF%95%E9%A2%98%E6%80%BB%E7%BB%93.md
 
-![image-20220119225736048](./noteImg/image-20220119225736048.png)
+![image-20220119225736048](noteImg/image-20220119225736048.png)
 
-![image-20220119225835339](./noteImg/image-20220119225835339.png)
+![image-20220119225835339](noteImg/image-20220119225835339.png)
 
 type命令相当于输出值的类型
 
 object encoding 相当于输出的是底层具体的实现
 
-![image-20220119230320108](./noteImg/image-20220119230320108.png)
+![image-20220119230320108](noteImg/image-20220119230320108.png)
 
 
 
@@ -553,7 +553,7 @@ object encoding 相当于输出的是底层具体的实现
 
 对于longdouble类型浮点数也是用字符串表示的，如果对浮点数有操作的时候先转换为浮点数做运算，然后再转换为字符串。
 
-![image-20220120103501737](./noteImg/image-20220120103501737.png)
+![image-20220120103501737](noteImg/image-20220120103501737.png)
 
 
 
@@ -630,7 +630,7 @@ List-max-ziplist-value
 
 List-max-ziplist-entries
 
-![image-20220120105433559](./noteImg/image-20220120105433559.png)
+![image-20220120105433559](noteImg/image-20220120105433559.png)
 
 
 
@@ -663,7 +663,7 @@ hash-max-ziplist-value    64      //  单个元素大小超过 64 byte时，将�
 hash-max-ziplist-entries 512
 hash-max-ziplist-value 64
 
-![image-20220120112243824](./noteImg/image-20220120112243824.png)
+![image-20220120112243824](noteImg/image-20220120112243824.png)
 
 
 
@@ -686,7 +686,7 @@ hash-max-ziplist-value 64
 
 set-max-intset-entries 512
 
-![image-20220120113626025](./noteImg/image-20220120113626025.png)
+![image-20220120113626025](noteImg/image-20220120113626025.png)
 
 
 
@@ -712,7 +712,7 @@ set-max-intset-entries 512
 zset-max-ziplist-entries 128
 zset-max-ziplist-value 64
 
-![image-20220120115248702](./noteImg/image-20220120115248702.png)
+![image-20220120115248702](noteImg/image-20220120115248702.png)
 
 
 
@@ -1135,7 +1135,7 @@ Redis 基于 [Reactor 模式](http://en.wikipedia.org/wiki/Reactor_pattern)开�
 
 虽然文件事件处理器以单线程方式运行， 但通过使用 I/O 多路复用程序来监听多个套接字， 文件事件处理器既实现了高性能的网络通信模型， 又可以很好地与 Redis 服务器中其他同样以单线程方式运行的模块进行对接， 这保持了 Redis 内部单线程设计的简单性。
 
-![image-20220121170554295](./noteImg/image-20220121170554295.png)
+![image-20220121170554295](noteImg/image-20220121170554295.png)
 
 
 

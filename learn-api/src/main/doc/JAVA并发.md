@@ -2,7 +2,7 @@
 
 ## ThreadPoolExecutor类继承关系
 
-![image-20211119112015735](./noteImg/image-20211119112015735.png)
+![image-20211119112015735](noteImg/image-20211119112015735.png)
 
 
 
@@ -10,7 +10,7 @@
 
 
 
-![image-20211119112153576](./noteImg/image-20211119112153576.png)
+![image-20211119112153576](noteImg/image-20211119112153576.png)
 
 ## 
 
@@ -52,23 +52,23 @@ volatile long completedTasks;
 
 ### run方法运行使用的是方法调用，线程是main线程
 
-![image-20211119143751822](./noteImg/image-20211119143751822.png)
+![image-20211119143751822](noteImg/image-20211119143751822.png)
 
 
 
 ### start方法运行使用的是线程调用，线程是新建的线程
 
-![image-20211119143915735](./noteImg/image-20211119143915735.png)
+![image-20211119143915735](noteImg/image-20211119143915735.png)
 
-![image-20211119143928425](./noteImg/image-20211119143928425.png)
+![image-20211119143928425](noteImg/image-20211119143928425.png)
 
 
 
 ## Thread和Runnable的关系？
 
-![image-20211119144917262](./noteImg/image-20211119144917262.png)
+![image-20211119144917262](noteImg/image-20211119144917262.png)
 
-![image-20211119144924285](./noteImg/image-20211119144924285.png)
+![image-20211119144924285](noteImg/image-20211119144924285.png)
 
 
 
@@ -98,15 +98,15 @@ CachedThreadPool 和 ScheduledThreadPool:
 
 
 
-![image-20211123000009816](./noteImg/image-20211123000009816.png)
+![image-20211123000009816](noteImg/image-20211123000009816.png)
 
-![image-20211123000535170](./noteImg/image-20211123000535170.png)
+![image-20211123000535170](noteImg/image-20211123000535170.png)
 
 JAVA1.8时间
 
 **LocalDate**、**LocalTime**、**Instant**、**Duration**、**Period**
 
-![image-20211123202933236](./noteImg/image-20211123202933236.png)
+![image-20211123202933236](noteImg/image-20211123202933236.png)
 
 ## 3O定义
 
@@ -122,7 +122,7 @@ Future接口代表一个异步执行的任务。
 
 FutureTask类代表一个可取消的异步计算任务。
 
-![image-20211123210912275](./noteImg/image-20211123210912275.png)
+![image-20211123210912275](noteImg/image-20211123210912275.png)
 
 
 
@@ -184,9 +184,9 @@ DiscardPolicy
 
 ## 内核模式(Kernel Mode)vs 用户模式(User Mode)
 
-![image-20211119171822365](./noteImg/image-20211119171822365.png?lastModify=1637759459)
+![image-20211119171822365](noteImg/image-20211119171822365.png?lastModify=1637759459)
 
-![image-20211119172038780](./noteImg/image-20211119172038780.png?lastModify=1637759459)
+![image-20211119172038780](noteImg/image-20211119172038780.png?lastModify=1637759459)
 
 应用程序一般会在以下几种情况下切换到内核模式：
 
@@ -202,7 +202,7 @@ DiscardPolicy
 
 初始状态，可运行状态，运行状态，休眠状态，终止状态
 
-![image-20211119174100771](./noteImg/image-20211119174100771.png?lastModify=1637759459)
+![image-20211119174100771](noteImg/image-20211119174100771.png?lastModify=1637759459)
 
 ## java线程定义(六种)
 
@@ -270,11 +270,11 @@ thread.run();
 
 ### 方式3:使用有返回值的 Callable
 
-![image-20211119184416387](./noteImg/image-20211119184416387.png?lastModify=1637759459)
+![image-20211119184416387](noteImg/image-20211119184416387.png?lastModify=1637759459)
 
 Future.java
 
-![image-20211119184654846](./noteImg/image-20211119184654846.png?lastModify=1637759459)
+![image-20211119184654846](noteImg/image-20211119184654846.png?lastModify=1637759459)
 
 java thread >> jvm javathread >> os thread
 
@@ -586,7 +586,7 @@ inline void OrderAccess::fence() {
 
 Thread.Sleep也会调用内存屏障保证可见行
 
-![image-20211124215432332](./noteImg/image-20211124215432332.png)
+![image-20211124215432332](noteImg/image-20211124215432332.png)
 
 
 
@@ -1016,7 +1016,7 @@ https://blog.csdn.net/weixin_30587025/article/details/96339354
 
 
 
-<img src="./noteImg/image-20211230163617464.png" alt="image-20211230163617464" style="zoom:50%;" />
+<img src="noteImg/image-20211230163617464.png" alt="image-20211230163617464" style="zoom:50%;" />
 
 ## lock 与 lockInterruptibly比较区别在于：
 
