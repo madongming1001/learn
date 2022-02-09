@@ -1,7 +1,215 @@
+# 目录
+
+## Explain（执行计划）
+
+**Table 8.1 EXPLAIN Output Columns**
+
+| Column                                                       | JSON Name       | Meaning                                        |
+| :----------------------------------------------------------- | :-------------- | :--------------------------------------------- |
+| [`id`](https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_id) | `select_id`     | The `SELECT` identifier                        |
+| [`select_type`](https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_select_type) | None            | The `SELECT` type                              |
+| [`table`](https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_table) | `table_name`    | The table for the output row                   |
+| [`partitions`](https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_partitions) | `partitions`    | The matching partitions                        |
+| [`type`](https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_type) | `access_type`   | The join type                                  |
+| [`possible_keys`](https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_possible_keys) | `possible_keys` | The possible indexes to choose                 |
+| [`key`](https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_key) | `key`           | The index actually chosen                      |
+| [`key_len`](https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_key_len) | `key_length`    | The length of the chosen key                   |
+| [`ref`](https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_ref) | `ref`           | The columns compared to the index              |
+| [`rows`](https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_rows) | `rows`          | Estimate of rows to be examined                |
+| [`filtered`](https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_filtered) | `filtered`      | Percentage of rows filtered by table condition |
+| [`Extra`](https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_extra) | None            | Additional information                         |
+
 explain 通过执行计划可以模拟优化器执行sql语句，查询sql的课优化空间
 
 set session optimizer_switch='derived_merge=off'; #关闭mysql5.7新特性对衍生表的合并优化
 set session optimizer_switch='derived_merge=on'; #关闭mysql5.7新特性对衍生表的合并优化
+
+1. **explain**：会在 explain 的基础上额外提供一些查询优化的信息。紧随其后通过 show warnings 命令可 以得到优化后的查询语句，从而看出优化器优化了什么。额外还有 filtered 列，是一个半分比的值，rows * filtered/100 可以**估算**出将要和 explain 中前一个表进行连接的行数（前一个表指 explain 中的id值比当前表id值小的 表）
+2. **explain partitions**：相比 explain 多了个 partitions 字段，如果查询是基于分区表的话，会显示查询将访问的分 区。
+
+## 不走索引例子
+
+**1、联合索引第一个字段用范围不会走索引** 
+
+**2**、**in和or在表数据量比较大的情况会走索引，在表记录不多的情况下会选择全表扫描** 
+
+**3**、**like kk% 一般情况下会走索引 5.6所有下推优化**
+
+**4**、**不在索引列上做任何操作（计算、函数、（自动or手动）类型转换），会导致索引失效而转向全表扫描** 
+
+**5**、**（！=或者<>），**not in **，**not exists **的时候无法使用索引会导致全表扫描**
+
+**6**、**<** **小于、** **>** **大于、** **<=**、**>=** **这些，mysql内部优化器会根据检索比例、表大小等多个因素整体评估是否使用索引**
+
+**7**、**is null,is not null 一般情况下也无法使用索引** 
+
+**8**、**.like以通配符开头（**'$abc...'）mysql索引失效会变成全表扫描操作
+
+
+
+### **数据溢出**
+
+​		如果我们定义一个表，表中只有一个 VARCHAR 字段，如下：CREATE TABLE test_varchar( c VARCHAR(60000) )然后往这个字段插入 60000 个字符，会发生什么？前边说过，MySQL 中磁盘和内存交互的基本单位是页，也就是说 MySQL 是以页为基本单位来管理存储空间的，我们的记录都会被分配到某个页中存储。而一个页的大小一般是 16KB，也就是 16384 字节，而一个 VARCHAR(M)类型的列就最多可以存储 65532 个字节，这样就可能造成一个页存放不了一条记录的情况。
+
+​		在 Compact 和 Redundant 行格式中，对于占用存储空间非常大的列，在记录的真实数据处只会存储该列的该列的前 768 个字节的数据，然后把剩余的数据分散存储在几个其他的页中，记录的真实数据处用 20 个字节存储指向这些页的地址。这个过程也叫做行溢出，存储超出 768 字节的那些页面也被称为溢出页。
+
+​		Dynamic 和 Compressed 行格式，不会在记录的真实数据处存储字段真实数据的前 768 个字节，而是把所有的字节都存储到其他页面中，只在记录的真实数据处存储其他页面的地址。
+
+
+
+### **索引页格式**
+
+​		前边我们简单提了一下页的概念，它是 InnoDB 管理存储空间的基本单位，一个页的大小一般是 16KB。
+
+​		InnoDB 为了不同的目的而设计了许多种不同类型的页，存放我们表中记录的那种类型的页自然也是其中的一员，官方称这种存放记录的页为索引（INDEX）页，不过要理解成数据页也没问题，毕竟存在着聚簇索引这种索引和数据混合的东西。
+
+![image-20220208190217690](noteImg/image-20220208190217690.png)
+
+![InnoDB architecture diagram showing in-memory and on-disk structures. In-memory structures include the buffer pool, adaptive hash index, change buffer, and log buffer. On-disk structures include tablespaces, redo logs, and doublewrite buffer files.](noteImg/innodb-architecture.png)
+
+**区（**extent**）**
+
+​		表空间中的页可以达到 2^32个页，实在是太多了，为了更好的管理这些页面，InnoDB 中还有一个区（英文名：extent）的概念。对于 16KB 的页来说，连续的64 个页就是一个区，也就是说一个区默认占用 1MB 空间大小。不论是系统表空间还是独立表空间，都可以看成是由若干个区组。
+
+​		每 256个区又被划分成一个**组**
+
+
+
+## Innodb三大特性
+
+### doublewrite buffer
+
+​		 InnoDB 在表空间上的 128 个页（2 个区，extend1 和extend2），大小是 2MB。
+
+​		InnoDB 的页大小一般是 16KB，其数据校验也是针对这 16KB 来计算的，将数据写入到磁盘是以页为单位进行操作的。而操作系统写文件是以 4KB 作为单位的，那么每写一个 InnoDB 的页到磁盘上，操作系统需要写 4 个块。
+
+​		而计算机硬件和操作系统，在极端情况下（比如断电）往往并不能保证这一操作的原子性，16K 的数据，写入 4K 时，发生了系统断电或系统崩溃，只有一部分写是成功的，这种情况下会产生 partial page write（部分页写入）问题。
+
+​		为了解决部分页写入问题，当 MySQL 将脏数据 flush到数据文件的时候, 先使用 memcopy 将脏数据复制到内存中的一个区域（也是2M），之后通过这个内存区域再分 2 次，每次写入 1MB 到系统表空间，然后马上调用 fsync 函数，同步到磁盘上。在这个过程中是顺序写，开销并不大，在完成 doublewrite 写入后，再将数据写入各数据文件文件，这时是离散写入。所以在正常的情况下, MySQL 写数据页时，会写两遍到磁盘上，第一遍是写到doublewrite buffer，第二遍是写到真正的数据文件中。如果发生了极端情况（断电），InnoDB 再次启动后，发现了一个页数据已经损坏，那么此时就可以从doublewrite buffer 中进行数据恢复了。
+
+### Buffer Pool
+
+​		我们知道，对于使用 InnoDB 作为存储引擎的表来说，不管是用于存储用户数据的索引（包括聚簇索引和二级索引），还是各种系统数据，都是以页的形式存放在表空间中的，而所谓的表空间只不过是 InnoDB 对文件系统上一个或几个实际文件的抽象，也就是说我们的数据说到底还是存储在磁盘上的。但是磁盘的速度慢，所以 InnoDB 存储引擎在处理客户端的请求时，当需要访问某个页的数据时，就会把完整的页的数据全部加载到内存中，也就是说即使我们只需要访问一个页的一条记录，那也需要先把整个页的数据加载到内存中。将整个页加载到内存中后就可以进行读写访问了，在进行完读写访问之后并不着急把该页对应的内存空间释放掉，而是将其缓存起来，这样将来有请求再次访问该页面时，就可以省去磁盘 IO 的开销了。
+
+**free链表**	
+
+​	buffer存储格式都是按照每个存储页都对应一个控制块而所有的控制块在前，存储页在后，如果新来一个页如何辨别哪里是空位置可以存放呢，就用到了**free链表**会把空闲的所有控制块都放入到**free链表**
+
+![image-20220208201845717](noteImg/image-20220208201845717.png)
+
+我们其实是根据表空间号 + 页号来定位一个页的，所以我们可以用表空间号 + 页号作为 key，缓存页作为 value 创建一个哈希表，在需要访问某个页的数据时，先从哈希表中根据表空间号 + 页号看看有没有应的缓存页，如果有，直接使用该缓存页就好，如果没有，那就从 free 链表中选一个空闲的缓存页，然后把磁盘中对应的页加载到该缓存页的位置。
+
+**flush链表**
+
+​		如果我们修改了 Buffer Pool 中某个缓存页的数据，那它就和磁盘上的页不一致了，这样的缓存页也被称为脏页（英文名：dirty page）所以，需要再创建一个存储脏页的链表，凡是修改过的缓存页对应的控制块都会作为一个节点加入到一个链表中，因为这个链表节点对应的缓存页都是需要被刷新到磁盘上的，所以也叫 flush 链表。
+
+​		如果非常多的使用频率偏低的页被同时加载到 Buffer Pool 时，可能会把那些使用频率非常高的页从 Buffer Pool 中淘汰掉。
+
+因为有这两种情况的存在，所以 InnoDB 把这个 LRU 链表按照一定比例分成两截，
+
+分别是：
+
+一部分存储使用频率非常高的缓存页，所以这一部分链表也叫做热数据，或者称 young 区域。
+
+另一部分存储使用频率不是很高的缓存页，所以这一部分链表也叫做冷数据，或者称 old 区域。
+
+![image-20220208203449226](noteImg/image-20220208203449226.png)
+
+所以在对某个处在 old 区域的缓存页进行第一次访问时就在它对应的控制块中记录下来这个访问时间，如果后续的访问时间与第一次访问的时间在某个时间间隔内，那么该页面就不会被从 old 区域移动到 young 区域的头部，否则将它移动到 young 区域的头部。上述的这个间隔时间是由系统变量innodb_old_blocks_time 控制的：
+
+![image-20220208203815265](noteImg/image-20220208203815265.png)
+
+这个 innodb_old_blocks_time 的默认值是 1000，它的单位是毫秒，也就意味着对于从磁盘上被加载到 LRU 链表的 old 区域的某个页来说，如果第一次和最后一次访问该页面的时间间隔小于 1s（很明显在一次全表扫描的过程中，多次访问一个页面中的时间不会超过 1s），那么该页是不会被加入到 young 区域的，当然，像 innodb_old_blocks_pct 一样，我们也可以在服务器启动或运行时设置innodb_old_blocks_time 的值，这里需要注意的是，如果我们把innodb_old_blocks_time 的值设置为 0，那么每次我们访问一个页面时就会把该页面放到 young 区域的头部。
+
+​		综上所述，正是因为将 LRU 链表划分为 young 和 old 区域这两个部分，又添加了 innodb_old_blocks_time 这个系统变量，才使得预读机制和全表扫描造成的缓存命中率降低的问题得到了遏制，因为用不到的预读页面以及全表扫描的页面都只会被放到 old 区域，而不影响 young 区域中的缓存页。
+
+**刷新脏页到磁盘**
+
+后台有专门的线程每隔一段时间负责把脏页刷新到磁盘，这样可以不影响用户线程处理正常的请求。主要有两种刷新路径：
+
+1、从 LRU 链表的冷数据中刷新一部分页面到磁盘。
+
+2、从 flush 链表中刷新一部分页面到磁盘。
+
+
+
+### 自适应哈希索引
+
+​		InnoDB存储引擎除了我们前面所说的各种索引，还有一种自适应哈希索引，我们知 道B+树的查找次数,取决于B+树的高度,在生产环境中,B+树的高度一般为3~4层,故 需要3~4次的IO查询。 
+
+​		所以在InnoDB存储引擎内部自己去监控索引表，如果监控到某个索引经常用，那么 就认为是热数据，然后内部自己创建一个hash索引，称之为自适应哈希索引( Adaptive Hash Index,AHI)，创建以后，如果下次又查询到这个索引，那么直接通 过hash算法推导出记录的地址，直接一次就能查到数据，比重复去B+tree索引中查 询三四次节点的效率高了不少。 
+
+必须得是等值查询。
+
+### 预读
+
+​		InnoDB 提供了预读（英文名：read ahead）。所谓预读，就是 InnoDB认为执行当前的请求可能之后会读取某些页面，就预先把它们加载到 Buffer Pool中。根据触发方式的不同，预读又可以细分为下边两种：
+
+*线性预读*
+
+InnoDB 提供了一个系统变量 innodb_read_ahead_threshold，如果顺序访问了某个区（extent）的页面超过这个系统变量的值，**就会触发一次异步读取下一个区中全部的页面到 Buffer Pool 的请求**。这个 innodb_read_ahead_threshold 系统变量的值默认是 56，我们可以在服务器启动时通过启动参数或者服务器运行过程中直接调整该系统变量的值，取值范围是 0~64。
+
+*随机预读*
+
+如果 Buffer Pool 中已经缓存了某个区的 13 个连续的页面，不论这些页面是不是顺序读取的，都会触发一次异步读取本区中所有其他的页面到 Buffer Pool 的请求。InnoDB同时提供了innodb_random_read_ahead 系统变量，它的默认值为OFF。
+
+**show variables like '%_read_ahead%';**
+
+## 数据库范式
+
+目前关系数据库有六种范式：第一范式（
+
+1NF）、第二范式（2NF）、第三范式（3NF）、 巴斯-科德范式（BCNF）、第四范式(4NF）和第五范式（5NF，又称完美范式）。
+
+**数据库设计的第一范式** 
+
+定义： 属于第一范式关系的所有属性都不可再分，即数据项不可分。 
+
+![image-20220208213231317](noteImg/image-20220208213231317.png)
+
+**数据库设计的第二范式** 
+
+第二范式（2NF）要求数据库表中的每个实例或行必须可以被惟一地区分。通常在实现来 
+
+说，需要为表加上一个列，以存储各个实例的惟一标识。主键ID。
+
+
+
+**数据库设计的第三范式** 
+
+指每一个非主属性既不部分依赖于也不传递依赖于业务主键，也就是在第二范式的基础 上消除了非主键对主键的传递依赖。
+
+
+
+### **反范式设计**
+
+​		所谓得反范式化就是为了性能和读取效率得考虑而适当得对数据库设计范式得要求进行 违反。允许存在少量得冗余，换句话来说反范式化就是使用空间来换取时间。
+
+
+
+### 三星索引
+
+索引将相关的记录放到一起则获得一星； （索引的扫描范围越小越好）
+
+如果索引中的数据顺序和查找中的排列顺序一致则获得二星； 
+
+如果索引中的列包含了查询中需要的全部列则获得三星。 （覆盖索引）
+
+
+
+## Mysql内部优化策略
+
+1、移除不必要的括号 
+
+2、常量传递（constant_propagation） 
+
+3、移除没用的条件（trivial_condition_removal） 
+
+4、表达式计算 
+
+
+
+
 
 #### ID列
 
@@ -680,15 +888,7 @@ MVCC机制的实现就是通过read-view机制与undo版本链比对机制，使
 
 **为什么Mysql不能直接更新磁盘上的数据而且设置这么一套复杂的机制来执行SQL了？**
 
-因为来一个请求就直接对磁盘文件进行随机读写，然后更新磁盘文件里的数据性能可能相当差。
-
-因为磁盘随机读写的性能是非常差的，所以直接更新磁盘文件是不能让数据库抗住很高并发的。
-
-Mysql这套机制看起来复杂，但它可以保证每个更新请求都是**更新内存BufferPool**，然后**顺序写日志文件**，同时还能保证各种异常情况下的数据一致性。
-
-更新内存的性能是极高的，然后顺序写磁盘上的日志文件的性能也是非常高的，要远高于随机读写磁盘文件。
-
-正是通过这套机制，才能让我们的MySQL数据库在较高配置的机器上每秒可以抗下几干甚至上万的读写请求。
+因为来一个请求就直接对磁盘文件进行随机读写，然后更新磁盘文件里的数据性能可能相当差。因为磁盘随机读写的性能是非常差的，所以直接更新磁盘文件是不能让数据库抗住很高并发的。Mysql这套机制看起来复杂，但它可以保证每个更新请求都是**更新内存BufferPool**，然后**顺序写日志文件**，同时还能保证各种异常情况下的数据一性。更新内存的性能是极高的，然后顺序写磁盘上的日志文件的性能也是非常高的，要远高于随机读写磁盘文件。正是通过这套机制，才能让我们的MySQL数据库在较高配置的机器上每秒可以抗下几干甚至上万的读写请求。
 
 
 
