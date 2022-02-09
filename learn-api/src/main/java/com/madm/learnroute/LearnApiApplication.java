@@ -13,7 +13,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
         "com.madm.learnroute"
 })
 @EnableAspectJAutoProxy
-@EnableFeignClients
+//@EnableFeignClients
 public class LearnApiApplication {
 
     public static void main(String[] args) {

@@ -209,6 +209,29 @@ InnoDB 提供了一个系统变量 innodb_read_ahead_threshold，如果顺序访
 
 
 
+## Mysql性能优化
+
+1、硬件优化
+
+2、Mysql调优
+
+1. 业务层-请求了不需要的数据
+2. 选择合适的存储引擎 Innodb MyISAM
+3. 查询性能优化 通过慢查询日志 slow_query_log
+4. 根据相爱年供应时间
+
+3、架构调优
+
+
+
+
+
+
+
+
+
+
+
 
 
 #### ID列
