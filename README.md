@@ -1,4 +1,4 @@
-1. [数据库相关知识](learn-api/src/main/doc/Mysql.md)
+1. [Mysql相关知识](learn-api/src/main/doc/Mysql.md)
 5. [Redis相关知识](learn-api/src/main/doc/Redis.md)
 6. [Spring相关知识](learn-api/src/main/doc/spring.md)
 7. [JMM相关知识](learn-api/src/main/doc/JMM.md)
