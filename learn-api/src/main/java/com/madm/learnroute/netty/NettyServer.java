@@ -22,7 +22,8 @@ public class NettyServer {
             //使用链式编程来配置参数
             bootstrap.group(bossGroup, workerGroup) //设置两个线程组
                     //先写入到一个工程里面
-                    .channel(NioServerSocketChannel.class)//使用NioServerSocketChannel作为服务器的通道实现
+                    //使用NioServerSocketChannel作为服务器的通道实现
+                    .channel(NioServerSocketChannel.class)
                     // 初始化服务器连接队列大小，服务端处理客户端连接请求是顺序处理的,所以同一时间只能处理一个客户端连接。
                     // 多个客户端同时来的时候,服务端将不能处理的客户端连接请求放在队列中等待处理
                     .option(ChannelOption.SO_BACKLOG, 1024)
