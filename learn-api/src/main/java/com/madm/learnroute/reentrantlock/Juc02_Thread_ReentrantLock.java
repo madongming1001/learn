@@ -1,4 +1,4 @@
-package com.madm.learnroute.edu.lock;
+package com.madm.learnroute.reentrantlock;
 
 import lombok.extern.slf4j.Slf4j;
 

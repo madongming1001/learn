@@ -1,4 +1,4 @@
-package com.madm.learnroute.edu.lock;
+package com.madm.learnroute.reentrantlock;
 
 import java.util.concurrent.locks.ReentrantLock;
 

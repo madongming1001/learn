@@ -13,7 +13,7 @@ package com.madm.learnroute.edu.jmm;
  * @author ：杨过
  * @date ：Created in 2020/4/29 13:58
  * @version: V1.0
- * @slogan: 天下风云出我辈，一入代码岁月催
+ * @slogan: 不待扬鞭自奋蹄
  * @description: 
  **/
 public class Jmm01_HappensBefore {

@@ -2,6 +2,7 @@ package com.madm.learnroute.javaee;
 
 
 import net.sf.cglib.core.DebuggingClassWriter;
+import org.springframework.cglib.proxy.Callback;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
@@ -74,7 +75,7 @@ public class ProxyPractice {
     public static void main(String[] args) throws Exception {
 
         //JDK代理生成
-        jdkProxyGenerate();
+//        jdkProxyGenerate();
 
         //CGLIB代理生成
 		cglibProxyGenerate();
@@ -82,16 +83,24 @@ public class ProxyPractice {
 
     private static void cglibProxyGenerate() {
         saveGeneratedCGlibProxyFile(System.getProperty("user.dir") + "/proxy");
-        //通过cglib动态代理获取代理对象的过程，创建调用的对象，在后续创建过程中Enhancekey的对象，所以在进行enhancer对象创建的时候需要把EnhancerKey（newInstance）对象准备好
+        //DebuggingClassWriter.traceEnabled 打印cdlib代理文件
+        //通过cglib动态代理获取代理对象的过程，创建调用的对象，在后续创建过程中Enhancekey的对象，
+        //所以在进行enhancer对象创建的时候需要把EnhancerKey（newInstance）对象准备好
         //恰好这个对象也需要动态代理生成
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(Cat.class);
         enhancer.setCallback(new MethodInterceptor() {
             @Override
             public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-                return methodProxy.invokeSuper(o, objects);
+                System.out.println("before");
+//                Object result = methodProxy.invokeSuper(o, objects);//不报错
+                Object result = methodProxy.invoke(o, objects);//报错 由于o是创建的代理对象 他还是会调用你代理的方法 所以递归循环了 objects 是参数
+//                Object result = method.invoke(o, objects);//报错 由于o是创建的代理对象 他还是会调用你代理的方法 所以递归循环了 objects 是参数
+                System.out.println("after");
+                return result;
             }
         });
+
         Cat cat = (Cat) enhancer.create();
         cat.call();
     }
