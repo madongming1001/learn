@@ -75,10 +75,10 @@ public class ProxyPractice {
     public static void main(String[] args) throws Exception {
 
         //JDK代理生成
-//        jdkProxyGenerate();
+        jdkProxyGenerate();
 
         //CGLIB代理生成
-		cglibProxyGenerate();
+//		cglibProxyGenerate();
     }
 
     private static void cglibProxyGenerate() {
@@ -106,7 +106,7 @@ public class ProxyPractice {
     }
 
     private static void jdkProxyGenerate() throws Exception {
-        System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles","true");
+//        System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles","true");
         Cat cat = new Cat();
         Animal proxy = (Animal) TargetInvoker.getProxy(cat);
         proxy.call();
