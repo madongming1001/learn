@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+/**
+ * 大文件排序
+ */
 public class BiggestElementsSort {
 
     private static final Map<String,Object> cache = new ConcurrentHashMap<String,Object>();
