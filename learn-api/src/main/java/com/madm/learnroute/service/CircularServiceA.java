@@ -3,6 +3,7 @@ package com.madm.learnroute.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CircularServiceA {
@@ -11,6 +12,7 @@ public class CircularServiceA {
 	@Autowired
 	private CircularServiceB circularServiceB;
 
+	@Transactional
 	public void methodA() {
 		System.out.println("方法 A 执行");
 	}

@@ -36,7 +36,6 @@ public class RedisConfig {
     @ConfigurationProperties(prefix="spring.redis")
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(host, port);
-        configuration.setPassword("foobared");
         return new JedisConnectionFactory(configuration);
     }
 

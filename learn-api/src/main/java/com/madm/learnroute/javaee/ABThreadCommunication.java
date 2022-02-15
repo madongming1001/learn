@@ -2,6 +2,7 @@ package com.madm.learnroute.javaee;
 
 public class ABThreadCommunication {
 
+    private volatile static boolean a = false;
     private volatile static boolean b = false;
 
     public static void main(String[] args) {
