@@ -3,6 +3,7 @@ package com.madm.learnroute.javaee;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import javax.annotation.concurrent.NotThreadSafe;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -35,6 +36,20 @@ public class ThreadCreationPractice {
             } catch (Exception e) {
             }
         });
+    }
+
+    public class ExpensiveObject{};
+
+    @NotThreadSafe
+    public class LazyInitRaceO{
+        private ExpensiveObject instance = null;
+
+        public ExpensiveObject getInstance() {
+            if(instance == null){
+                instance = new ExpensiveObject();
+            }
+            return instance;
+        }
     }
 }
 
