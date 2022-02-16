@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee;
+package com.madm.learnroute.algorithm;
 
 import java.util.Arrays;
 
