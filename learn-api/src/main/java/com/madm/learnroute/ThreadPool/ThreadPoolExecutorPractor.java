@@ -6,6 +6,7 @@ import java.util.concurrent.*;
 
 public class ThreadPoolExecutorPractor {
     public static void main(String[] args) {
+        ExecutorService ws = Executors.newWorkStealingPool();
         // 线程池的对应状态：
         // RUNNING
         // SHUTDOWN
