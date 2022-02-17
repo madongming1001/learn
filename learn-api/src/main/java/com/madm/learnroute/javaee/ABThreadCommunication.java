@@ -22,8 +22,8 @@ public class ABThreadCommunication {
                 while (!a) {
                 }
                 System.out.println("收到a线程的信号");
-                b = true;
                 System.out.println("发送b线程的信号");
+                b = true;
             }
         });
         t1.start();

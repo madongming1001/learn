@@ -17,7 +17,7 @@ public class ThreadPrintDemo {
     }
 
     private static Thread printNumber1() {
-        Thread t1 = new Thread(() -> {
+        return new Thread(() -> {
             for (; 100 > cxsNum.get(); ) {
                 if (!flag && (cxsNum.get() == 0 || cxsNum.incrementAndGet() % 2 == 0)) {
                     try {
@@ -29,11 +29,10 @@ public class ThreadPrintDemo {
                 }
             }
         });
-        return t1;
     }
 
     private static Thread printNumber2() {
-        Thread t2 = new Thread(() -> {
+        return new Thread(() -> {
             for (; 100 > cxsNum.get(); ) {
                 if (flag && (cxsNum.incrementAndGet() % 2 != 0)) {
                     try {
@@ -45,7 +44,6 @@ public class ThreadPrintDemo {
                 }
             }
         });
-        return t2;
     }
 
 
