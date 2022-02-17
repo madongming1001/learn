@@ -10,7 +10,7 @@ public class ABThreadCommunication {
             @Override
             public void run() {
                 System.out.println("发送a线程的信号");
-                b = true;
+                a = true;
                 while (!b) {
                 }
                 System.out.println("收到b线程的信号");
@@ -19,9 +19,10 @@ public class ABThreadCommunication {
         Thread t2 = new Thread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("收到a线程的信号");
-                while (!b) {
+                while (!a) {
                 }
+                System.out.println("收到a线程的信号");
+                b = true;
                 System.out.println("发送b线程的信号");
             }
         });
