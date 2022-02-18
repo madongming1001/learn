@@ -9,8 +9,8 @@ import java.util.function.Supplier;
 public class ConsumerPractice {
 
     public static void main(String[] args) {
-//        test();
-//        test02();
+        test();
+        test02();
         test03();
     }
 
