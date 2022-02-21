@@ -1,8 +1,6 @@
 package com.madm.learnroute.javaee;
 
 import org.redisson.Redisson;
-import org.redisson.RedissonReadLock;
-import org.redisson.RedissonWriteLock;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -10,7 +8,7 @@ import org.redisson.config.Config;
 public class RedissonBloomFilterTest {
     public static void main(String[] args) {
         Config config = new Config();
-        config.useSingleServer().setAddress("redis://47.95.220.43:6379").setPassword("foobared");
+        config.useSingleServer().setAddress("redis://47.95.220.43:6379").setPassword("badguy").setTimeout(5000);
         RedissonClient redisson = Redisson.create(config);
         RBloomFilter<String> bloomFilter = redisson.getBloomFilter("nameList");
         //初始化布隆过滤器：预计元素为100000000L,误差率为3%,根据这两个参数会计算出底层的bit数组大小 18
