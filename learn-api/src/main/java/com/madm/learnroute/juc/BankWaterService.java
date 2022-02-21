@@ -3,6 +3,9 @@ package com.madm.learnroute.juc;
 import java.util.Map;
 import java.util.concurrent.*;
 
+/**
+ *
+ */
 public class BankWaterService implements Runnable {
 
     /*** 创建4个屏障，处理完之后执行当前类的run方法 */
