@@ -35,7 +35,6 @@ public class WaitNotify {
     }
 
     static class Notify implements Runnable {
-
         @SneakyThrows
         @Override
         public void run() {
