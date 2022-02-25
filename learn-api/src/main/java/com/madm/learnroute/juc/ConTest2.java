@@ -4,6 +4,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ *
+ */
 public class ConTest2 {
     private int queueSize = 10;
     private PriorityQueue<Integer> queue = new PriorityQueue<Integer>(queueSize);
