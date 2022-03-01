@@ -1,8 +1,5 @@
 package com.madm.learnroute.design;
 
-/**
- *
- */
 public class Animal extends TemplateMethodeHandler{
 
     @Override
