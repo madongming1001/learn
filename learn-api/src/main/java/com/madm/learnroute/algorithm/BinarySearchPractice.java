@@ -12,14 +12,15 @@ public class BinarySearchPractice {
 //        int right = 1500_0000_00;
 //        int mid = (right + left) + 2;
 //        System.out.println(mid);
-        int[] arr = {3,5,6,8,9,10};
-        System.out.println(binarySearchLastLessForValue(arr,arr.length,7));
+        int[] arr = {3, 5, 6, 8, 9, 10};
+        System.out.println(binarrySort(arr, 10));
+//        System.out.println(binarySearchLastLessForValue(arr, arr.length, 7));
     }
 
     private static int binarrySort(int[] arr, int target) {
         int left = 0, right = arr.length - 1;
         while (left < right) {
-            int mid = left + ((right - left) / 2);
+            int mid = left + ((right - left) >> 1);
 //            int mid = (right + left) + 2;
             if (arr[mid] < target) {
                 left = mid + 1;
@@ -118,6 +119,23 @@ public class BinarySearchPractice {
             } else {
                 if ((mid == n - 1) || (a[mid + 1] > value)) return mid;
                 else low = mid + 1;
+            }
+        }
+        return -1;
+    }
+
+
+    public static int binarySearch(int[] ints, int target) {
+        int left = 0;
+        int right = ints.length - 1;
+        while (left < right) {
+            int mid = left + ((right - left) >> 1);
+            if (ints[mid] == target) {
+                return mid;
+            } else if (ints[mid] < target) {
+                left = mid + 1;
+            } else {
+                right = mid;
             }
         }
         return -1;
