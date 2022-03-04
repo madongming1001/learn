@@ -1,22 +1,13 @@
 package com.madm.learnroute.javaee;
 
-import cn.hutool.core.lang.func.Func1;
-import com.madm.learnroute.pojo.Apple;
-import com.madm.learnroute.pojo.Teacher;
+import com.madm.learnroute.pojo.User;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import static java.util.Comparator.comparingLong;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toCollection;
 
 public class ListStreamPractice {
 
@@ -58,19 +49,38 @@ public class ListStreamPractice {
 //        System.out.println(teacher);
         //存放apple对象集合
 
-        Apple apple1 = new Apple(1, "苹果1", new BigDecimal("3.25"), 10);
-        Apple apple12 = new Apple(1, "苹果2", new BigDecimal("1.35"), 20);
-        Apple apple2 = new Apple(2, "香蕉", new BigDecimal("2.89"), 30);
-        Apple apple3 = new Apple(3, "荔枝", new BigDecimal("9.99"), 40);
+//        Apple apple1 = new Apple(1, "苹果1", new BigDecimal("3.25"), 10);
+//        Apple apple12 = new Apple(1, "苹果2", new BigDecimal("1.35"), 20);
+//        Apple apple2 = new Apple(2, "香蕉", new BigDecimal("2.89"), 30);
+//        Apple apple3 = new Apple(3, "荔枝", new BigDecimal("9.99"), 40);
+        List<User> users = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            users.add(new User(new Double(Math.floor(Math.random() * 10 + 1)).intValue(), "user"));
+        }
+        System.out.println(users);
+        for (int i = 0; i < users.size(); i++) {
+            User user = users.get(i);
+            if(user.getId() > 5){
+                users.remove(i);
+                i--;
+            }
+        }
+        System.out.println(users);
 
-        List<Apple> appleList = new ArrayList();
-        appleList.add(apple1);
-        appleList.add(apple12);
-        appleList.add(apple2);
-        appleList.add(apple3);
-        // 去重
-        List<Integer> collect = appleList.stream().map(list -> list.getId()).distinct().collect(Collectors.toList());
-        appleList.stream().collect(Collectors.groupingBy(x->x.getId())).entrySet().stream().distinct().collect(Collectors.toList()).forEach(x-> System.out.println(x.getValue()));
+
+
+
+
+
+
+//        List<Apple> appleList = new ArrayList();
+//        appleList.add(apple1);
+//        appleList.add(apple12);
+//        appleList.add(apple2);
+//        appleList.add(apple3);
+//        // 去重
+//        List<Integer> collect = appleList.stream().map(list -> list.getId()).distinct().collect(Collectors.toList());
+//        appleList.stream().collect(Collectors.groupingBy(x -> x.getId())).entrySet().stream().distinct().collect(Collectors.toList()).forEach(x -> System.out.println(x.getValue()));
 //        collect.stream().forEach(System.out::println);
 
     }

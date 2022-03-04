@@ -7,12 +7,15 @@ import java.util.concurrent.TimeUnit;
 
 public class ScheduleThreadPoolExecutorExample {
     public static void main(String[] args) {
-        ScheduledThreadPoolExecutor schedule = (ScheduledThreadPoolExecutor)Executors.newScheduledThreadPool(5);
-        Task task = new Task("任务");
+//        ScheduledThreadPoolExecutor schedule = (ScheduledThreadPoolExecutor)Executors.newScheduledThreadPool(5);
+//        Task task = new Task("任务");
 //        schedule.schedule(task,2, TimeUnit.SECONDS);
 //        schedule.scheduleWithFixedDelay(task,0,2,TimeUnit.SECONDS);//任务+延迟
-        schedule.scheduleAtFixedRate(task,0,2,TimeUnit.SECONDS);//任务延迟取最大值，稳定定时器
+//        schedule.scheduleAtFixedRate(task,0,2,TimeUnit.SECONDS);//任务延迟取最大值，稳定定时器
+        System.out.println(Math.random() * 10 + 1);
     }
+
+
 }
 
 class Task implements Runnable{
