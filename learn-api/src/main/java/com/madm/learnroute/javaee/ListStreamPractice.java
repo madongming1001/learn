@@ -66,13 +66,6 @@ public class ListStreamPractice {
             }
         }
         System.out.println(users);
-
-
-
-
-
-
-
 //        List<Apple> appleList = new ArrayList();
 //        appleList.add(apple1);
 //        appleList.add(apple12);
