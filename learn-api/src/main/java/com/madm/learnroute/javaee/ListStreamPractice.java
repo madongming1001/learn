@@ -55,14 +55,15 @@ public class ListStreamPractice {
 //        Apple apple3 = new Apple(3, "荔枝", new BigDecimal("9.99"), 40);
         List<User> users = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            users.add(new User(new Double(Math.floor(Math.random() * 10 + 1)).intValue(), "user"));
+            int idAndName = new Double(Math.floor(Math.random() * 10 + 1)).intValue();
+            users.add(new User(idAndName, idAndName + ""));
         }
         System.out.println(users);
         for (int i = 0; i < users.size(); i++) {
             User user = users.get(i);
-            if(user.getId() > 5){
+            if(user.getId() >= 5){
                 users.remove(i);
-                i--;
+//                i--;
             }
         }
 
