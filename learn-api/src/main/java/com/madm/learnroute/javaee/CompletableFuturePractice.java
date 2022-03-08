@@ -5,6 +5,9 @@ import java.util.concurrent.CompletableFuture;
 public class CompletableFuturePractice {
 
     public static void main(String[] args) {
+
+
+
         try {
             CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
                 int i = 1/0;
