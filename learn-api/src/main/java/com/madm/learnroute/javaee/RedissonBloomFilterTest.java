@@ -3,7 +3,11 @@ package com.madm.learnroute.javaee;
 import org.redisson.Redisson;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
+import org.redisson.api.RScript;
 import org.redisson.config.Config;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 public class RedissonBloomFilterTest {
     public static void main(String[] args) {
@@ -14,6 +18,7 @@ public class RedissonBloomFilterTest {
         RLock lock = redisson.getLock("lock");
         lock.lock();
         lock.unlock();
+        redisson.getScript().eval(RScript.Mode.READ_ONLY,"", RScript.ReturnType.BOOLEAN);
 
 
         RBloomFilter<String> bloomFilter = redisson.getBloomFilter("nameList");
