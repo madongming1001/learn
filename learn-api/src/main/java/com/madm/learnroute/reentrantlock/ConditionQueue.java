@@ -45,7 +45,6 @@ public class ConditionQueue {
                 try {
                     log.debug("没有饭，歇一会");
                     noTakeOutFood.await();
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -75,8 +74,6 @@ public class ConditionQueue {
             } finally {
                 lock.unlock();
             }
-
-
         }, "t1").start();
 
         new Thread(() -> {
