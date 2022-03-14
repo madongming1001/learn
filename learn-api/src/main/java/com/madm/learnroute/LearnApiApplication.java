@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         "com.madm.learnroute"
 })
 @EnableFeignClients
+
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
 public class LearnApiApplication {

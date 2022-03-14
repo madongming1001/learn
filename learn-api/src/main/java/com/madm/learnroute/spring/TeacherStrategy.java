@@ -1,7 +1,6 @@
 package com.madm.learnroute.spring;
 
 import com.madm.learnroute.pojo.Teacher;
-import com.sun.media.sound.SoftTuning;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.LockSupport;
 
 @Component
 public class TeacherStrategy implements InitializingBean, ApplicationContextAware {
