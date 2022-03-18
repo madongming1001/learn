@@ -1,4 +1,4 @@
-package com.madm.learnroute;
+package com.madm.learnroute.javaee;
 
 import lombok.SneakyThrows;
 
