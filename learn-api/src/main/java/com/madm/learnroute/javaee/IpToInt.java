@@ -53,23 +53,23 @@ public class IpToInt {
      * @return int
      */
     public static int bytesToInt(byte[] bytes) {
-        int addr = 0;               //初始化Int变量addr=0
-        addr |= (bytes[0] & 0xFF);  //强制转化为8位二进制码，比如原码是101，强转后00000101
-        addr = addr << 8;           //左移8位，得到00000101 00000000，给下个字节的拼接创造环境（预留8位0，方便用|进行拼接）
-        addr |= (bytes[1] & 0xFF);   //强制转化为8位二进制码，比如原码是10101，强转后00010101,和00000101 00000000进行或运算后得到00000101 00010101
-        addr = addr << 8;           //左移8位，得到00000101 00010101 00000000
-        addr |= (bytes[2] & 0xFF);  //强制转化为8位二进制码，比如原码是111，强转后00000111,和00000101 00010101 00000000进行或运算后得到00000101 00010101 00000111
-        addr = addr << 8;           //左移8位，得到00000101 00010101 00000111 00000000
-        addr |= ((bytes[3]) & 0xFF);//强制转化为8位二进制码，比如原码是1，强转后00000001,和00000101 00010101 00000111 00000000进行或运算后得到00000101 00010101 00000111 00000001
-        return addr;                //拼接结束，返回int变量
+//        int addr = 0;               //初始化Int变量addr=0
+//        addr |= (bytes[0] & 0xFF);  //强制转化为8位二进制码，比如原码是101，强转后00000101
+//        addr = addr << 8;           //左移8位，得到00000101 00000000，给下个字节的拼接创造环境（预留8位0，方便用|进行拼接）
+//        addr |= (bytes[1] & 0xFF);   //强制转化为8位二进制码，比如原码是10101，强转后00010101,和00000101 00000000进行或运算后得到00000101 00010101
+//        addr = addr << 8;           //左移8位，得到00000101 00010101 00000000
+//        addr |= (bytes[2] & 0xFF);  //强制转化为8位二进制码，比如原码是111，强转后00000111,和00000101 00010101 00000000进行或运算后得到00000101 00010101 00000111
+//        addr = addr << 8;           //左移8位，得到00000101 00010101 00000111 00000000
+//        addr |= ((bytes[3]) & 0xFF);//强制转化为8位二进制码，比如原码是1，强转后00000001,和00000101 00010101 00000111 00000000进行或运算后得到00000101 00010101 00000111 00000001
+//        return addr;                //拼接结束，返回int变量
 
 //      优化之后的写法，原理相同，不过是先移位后直接强转的同时指定位数
-//      int addr = bytes[3] & 0xFF;
-//      addr |= ((bytes[2] << 8) & 0xFF00);
-//      addr |= ((bytes[1] << 16) & 0xFF0000);
-//      addr |= ((bytes[0] << 24) & 0xFF000000);
-//      return addr;
-
+//        [-84,-71,-1,-23]
+        int addr = bytes[3] & 0xFF;
+        addr |= ((bytes[2] << 8) & 0xFF00);
+        addr |= ((bytes[1] << 16) & 0xFF0000);
+        addr |= ((bytes[0] << 24) & 0xFF000000);
+        return addr;
     }
 
     /**
@@ -79,20 +79,20 @@ public class IpToInt {
      * @return String
      */
     public static String intToIp(int ipInt) {
-        return new StringBuilder()
-                .append(((ipInt >> 24) & 0xFF)).append('.')   //右移3个字节（24位），得到IP地址的第一段也就是int变量的第一个字节（从左边算起）
-                .append((ipInt >> 16) & 0xFF).append('.')     //右移2字节（16位），得到int变量的第一和第二个字节（从左边算起），经过&0xFF处理得到后8位也就是byte[1]
-                .append((ipInt >> 8) & 0xFF).append('.')      //同理如上
-                .append((ipInt & 0xFF))                       //同理如上
-                .toString();
+//        return new StringBuilder()
+//                .append(((ipInt >> 24) & 0xFF)).append('.')   //右移3个字节（24位），得到IP地址的第一段也就是int变量的第一个字节（从左边算起）
+//                .append((ipInt >> 16) & 0xFF).append('.')     //右移2字节（16位），得到int变量的第一和第二个字节（从左边算起），经过&0xFF处理得到后8位也就是byte[1]
+//                .append((ipInt >> 8) & 0xFF).append('.')      //同理如上
+//                .append((ipInt & 0xFF))                       //同理如上
+//                .toString();
 
 //        第二种，先强转二进制，再进行移位处理
-//        return new StringBuilder()
-//                .append(((ipInt & 0xFF000000) >> 24) & 0xFF).append('.')   //右移3个字节（24位），得到IP地址的第一段也就是byte[0],为了防止符号位是1也就是负数，最后再一次& 0xFF
-//                .append((ipInt & 0xFF0000) >> 16).append('.')
-//                .append((ipInt & 0xFF00) >> 8).append('.')
-//                .append((ipInt & 0xFF))
-//                .toString();
+        return new StringBuilder()
+                .append(((ipInt & 0xFF000000) >> 24) & 0xFF).append('.')   //右移3个字节（24位），得到IP地址的第一段也就是byte[0],为了防止符号位是1也就是负数，最后再一次& 0xFF
+                .append((ipInt & 0xFF0000) >> 16).append('.')
+                .append((ipInt & 0xFF00) >> 8).append('.')
+                .append((ipInt & 0xFF))
+                .toString();
     }
 
 }
