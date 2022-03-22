@@ -3,7 +3,7 @@ package com.madm.learnroute.auth;
 import java.lang.annotation.*;
 
 @Target(ElementType.PARAMETER)
-@Retention(value = RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface UserAuthenticate
 {
