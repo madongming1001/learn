@@ -2,7 +2,7 @@ package com.madm.learnroute.auth;
 
 import java.lang.annotation.*;
 
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target(ElementType.PARAMETER)
 @Retention(value = RetentionPolicy.RUNTIME)
 @Documented
 public @interface UserAuthenticate
