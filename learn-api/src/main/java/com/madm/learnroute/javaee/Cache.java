@@ -40,5 +40,6 @@ public class Cache {
 
     public static void main(String[] args) {
         System.out.println(Integer.toBinaryString(0x0000FFFF));
+        System.out.println(Long.toBinaryString(0xFFFFFFFF));
     }
 }

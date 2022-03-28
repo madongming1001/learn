@@ -20,8 +20,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class LearnApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication sa = (SpringApplication) SpringApplication.run(LearnApiApplication.class, args);
-        sa.setAddCommandLineProperties(false);
+        SpringApplication run = (SpringApplication) SpringApplication.run(LearnApiApplication.class, args);
+        run.setAddCommandLineProperties(false);
     }
 
 }

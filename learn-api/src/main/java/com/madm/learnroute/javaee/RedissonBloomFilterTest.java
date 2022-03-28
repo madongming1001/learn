@@ -6,9 +6,6 @@ import org.redisson.api.RLock;
 import org.redisson.api.RScript;
 import org.redisson.config.Config;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 public class RedissonBloomFilterTest {
     public static void main(String[] args) {
         Config config = new Config();
