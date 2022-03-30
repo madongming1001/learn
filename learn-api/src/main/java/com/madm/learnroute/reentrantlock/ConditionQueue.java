@@ -22,7 +22,7 @@ public class ConditionQueue {
     public void cigratee() {
         lock.lock();
         try {
-            while (!hasCig) {
+//            while (!hasCig) {
                 try {
                     log.debug("没有烟，歇一会");
                     noCig.await();
@@ -30,7 +30,7 @@ public class ConditionQueue {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
+//            }
             log.debug("有烟了，干活");
         } finally {
             lock.unlock();
@@ -41,14 +41,14 @@ public class ConditionQueue {
     public void takeout() {
         lock.lock();
         try {
-            while (!hasTakeOutFood) {
+//            while (!hasTakeOutFood) {
                 try {
                     log.debug("没有饭，歇一会");
                     noTakeOutFood.await();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
+//            }
             log.debug("有饭了，干活");
         } finally {
             lock.unlock();
@@ -68,7 +68,7 @@ public class ConditionQueue {
         new Thread(() -> {
             lock.lock();
             try {
-                hasCig = true;
+//                hasCig = true;
                 //唤醒送烟的等待线程
                 noCig.signal();
             } finally {
@@ -79,7 +79,7 @@ public class ConditionQueue {
         new Thread(() -> {
             lock.lock();
             try {
-                hasTakeOutFood = true;
+//                hasTakeOutFood = true;
                 //唤醒送饭的等待线程
                 noTakeOutFood.signal();
             } finally {
