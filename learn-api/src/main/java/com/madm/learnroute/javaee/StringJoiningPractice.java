@@ -8,9 +8,7 @@ public class StringJoiningPractice {
         sj.add("1").add("222").add("222");
         System.out.println(sj);
 //        List<String> strings = Arrays.asList("abc", "", "de", "efg", "abcd", "", "jkl");
-//
 //        String mergeString = strings.stream().filter(string -> !string.isEmpty()).collect(Collectors.joining(","));
-
 //        System.err.println("合并字符串 : "+mergeString);
     }
 }
