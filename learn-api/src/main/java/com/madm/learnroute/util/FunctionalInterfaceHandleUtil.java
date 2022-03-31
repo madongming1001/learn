@@ -1,7 +1,7 @@
 package com.madm.learnroute.util;
 
-import com.madm.learnroute.design.BranchHandle;
-import com.madm.learnroute.design.PresentOrElseHandler;
+import com.madm.learnroute.funcationinterface.BranchHandle;
+import com.madm.learnroute.funcationinterface.PresentOrElseHandler;
 import org.apache.commons.lang3.StringUtils;
 
 public class FunctionalInterfaceHandleUtil {

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * @Author MaDongMing
  * @Date 2022/3/30 6:53 PM
  */
-@Component
+//@Component
 public class AuthParamResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {

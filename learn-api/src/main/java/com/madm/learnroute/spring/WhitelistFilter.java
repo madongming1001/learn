@@ -22,5 +22,6 @@ public class WhitelistFilter implements javax.servlet.Filter {
     @Override
     public void destroy() {
         // 被销毁时调用一次
+
     }
 }

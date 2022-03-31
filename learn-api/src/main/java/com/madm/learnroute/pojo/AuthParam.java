@@ -1,7 +1,8 @@
 package com.madm.learnroute.pojo;
 
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * @Author MaDongMing
@@ -9,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @Data
 public class AuthParam {
+    @NotNull(message = "学生身高不能为空")
     private String appId;
     private String appKey;
 }

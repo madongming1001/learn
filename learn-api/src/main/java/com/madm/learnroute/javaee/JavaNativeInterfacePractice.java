@@ -1,17 +1,27 @@
 package com.madm.learnroute.javaee;
 
 public class JavaNativeInterfacePractice {
-    public native void displayHelloWorld();//所有native关键词修饰的都是对本地的声明
+
+    public JavaNativeInterfacePractice() {
+        System.out.println("构造方法");
+    }
+
+    //所有native关键词修饰的都是对本地的声明
+    public void displayHelloWorld() {
+        System.out.println("displayHelloWorld");
+    }
 
     static {
+        System.out.println("静态代码块输出");
+    }
 
-        System.loadLibrary("hello");//载入本地库
-
+    {
+        System.out.println("空代码块输出");
     }
 
     public static void main(String[] args) {
-
         new JavaNativeInterfacePractice().displayHelloWorld();
-
+        new JavaNativeInterfacePractice().displayHelloWorld();
     }
+
 }

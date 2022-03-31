@@ -16,7 +16,7 @@ import java.util.List;
 
 //继承WebMvcConfigurationSupport
 //extends WebMvcConfigurationSupport
-@Configuration
+//@Configuration
 public class MvcConfiguration extends WebMvcConfigurationSupport {
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
