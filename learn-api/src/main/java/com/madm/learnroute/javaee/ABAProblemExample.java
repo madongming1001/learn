@@ -1,5 +1,7 @@
 package com.madm.learnroute.javaee;
 
+import com.madm.learnroute.pojo.AuthParam;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
@@ -55,7 +57,6 @@ public class ABAProblemExample {
 
     }
     public static void main(String[] args) throws InterruptedException {
-
         Stack stack = new Stack();
         Stack.Node a = new Stack.Node("A");
         Stack.Node b = new Stack.Node("B");

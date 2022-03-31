@@ -12,7 +12,6 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @ToString
-@Builder
 public class Teacher {
     private String name;
     private Integer age;
