@@ -1,5 +1,6 @@
 package com.madm.learnroute.pojo;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -11,6 +12,7 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @ToString
+@Builder
 public class Teacher {
     private String name;
     private Integer age;
