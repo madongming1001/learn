@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableAspectJAutoProxy
 public class LearnApiApplication {
 
-
     public static void main(String[] args) {
         SpringApplication.run(LearnApiApplication.class, args);
     }
