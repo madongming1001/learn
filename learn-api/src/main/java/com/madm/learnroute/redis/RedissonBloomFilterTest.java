@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee;
+package com.madm.learnroute.redis;
 
 import org.redisson.Redisson;
 import org.redisson.api.RBloomFilter;
@@ -11,7 +11,7 @@ public class RedissonBloomFilterTest {
         Config config = new Config();
         config.useSingleServer().setAddress("redis://47.95.220.43:6379").setPassword("badguy").setTimeout(5000);
         Redisson redisson = (Redisson) Redisson.create(config);
-
+        redisson.getAtomicLong("");
         RLock lock = redisson.getLock("lock");
         lock.lock();
         lock.unlock();
