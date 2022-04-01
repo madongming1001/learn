@@ -1,6 +1,5 @@
 package madm.data_structure;
 
-
 public class Pattern {
     private boolean matched = false;
     private char[] pattern; // 正则表达式
@@ -24,14 +23,15 @@ public class Pattern {
             return;
         }
         if (pattern[pj] == '*') { // *匹配任意个字符
-            for (int k = 0; k <= tlen-ti; ++k) {
-                rmatch(ti+k, pj+1, text, tlen);
+            for (int k = 0; k <= tlen - ti; ++k) {
+                rmatch(ti + k, pj + 1, text, tlen);
             }
         } else if (pattern[pj] == '?') { // ?匹配0个或者1个字符
-            rmatch(ti, pj+1, text, tlen);
-            rmatch(ti+1, pj+1, text, tlen);
+            rmatch(ti, pj + 1, text, tlen);
+            rmatch(ti + 1, pj + 1, text, tlen);
         } else if (ti < tlen && pattern[pj] == text[ti]) { // 纯字符匹配才行
-            rmatch(ti+1, pj+1, text, tlen);
+            rmatch(ti + 1, pj + 1, text, tlen);
         }
     }
+
 }
