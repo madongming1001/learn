@@ -1,7 +1,5 @@
 package com.madm.learnroute.spring;
 
-import lombok.Data;
-
 import java.lang.reflect.Constructor;
 
 /**
