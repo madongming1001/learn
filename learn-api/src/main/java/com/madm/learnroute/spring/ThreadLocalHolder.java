@@ -1,5 +1,9 @@
 package com.madm.learnroute.spring;
 
+import lombok.Data;
+
+import java.lang.reflect.Constructor;
+
 /**
  * @Author MaDongMing
  * @Date 2022/3/31 11:36 AM
@@ -34,5 +38,41 @@ public class ThreadLocalHolder {
 
     public static void clearScene() {
         initScene(null);
+    }
+
+    static class Singleton {
+        private static volatile Singleton instance = null;
+
+        private Singleton() {
+        }
+
+        public static Singleton getInstance() {        // 两层判空，第一层是为了避免不必要的同步
+            if (instance == null) {
+                synchronized (Singleton.class) {
+                    if (instance == null) {// 第二层是为了在null的情况下创建实例
+                        instance = new Singleton();
+                    }
+                }
+            }
+            return instance;
+        }
+
+        public static void main(String[] args) throws Exception {
+            Singleton instance = Singleton.getInstance();
+            Constructor<Singleton> constructor = Singleton.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            Singleton refInstance = constructor.newInstance();
+            System.out.println(instance);
+            System.out.println(refInstance);
+            System.out.println(instance == refInstance);
+        }
+    }
+
+    public enum SingletonEnum {
+        INSTANCE;
+
+        public void execute() {
+            System.out.println("begin execute");
+        }
     }
 }
