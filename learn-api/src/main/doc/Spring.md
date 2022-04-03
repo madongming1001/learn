@@ -285,3 +285,7 @@ ConfigurationClassPostprocessor.java加载的类多了3个
 
 ![image-20220301125446023](/Users/madongming/notes/noteImg/image-20220301125446023.png)
 
+![image-20220401224937167](/Users/madongming/notes/noteImg/image-20220401224937167.png)
+
+![image-20220401225005587](/Users/madongming/notes/noteImg/image-20220401225005587.png)
+

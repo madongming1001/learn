@@ -78,7 +78,7 @@ public class ProxyPractice {
         jdkProxyGenerate();
 
         //CGLIB代理生成
-//		cglibProxyGenerate();
+		cglibProxyGenerate();
     }
 
     private static void cglibProxyGenerate() {

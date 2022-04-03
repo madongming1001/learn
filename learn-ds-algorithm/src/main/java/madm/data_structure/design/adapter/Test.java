@@ -1,10 +1,12 @@
 package madm.data_structure.design.adapter;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Test {
     public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
@@ -18,7 +20,7 @@ public class Test {
         link01.put("bizId", "number");
         link01.put("bizTime", "accountDate");
         link01.put("desc", "desc");
-        RebateInfo rebateInfo01 = MQAdapter.filter(create_account.toString(),
+        RebateInfo rebateInfo01 = MQAdapter.filter(JSONObject.toJSONString(create_account),
                 link01);
         System.out.println("mq.create_account(适配前)" +
                 create_account.toString());
@@ -34,7 +36,7 @@ public class Test {
         link02.put("userId", "uid");
         link02.put("bizId", "orderId");
         link02.put("bizTime", "createOrderTime");
-        RebateInfo rebateInfo02 = MQAdapter.filter(orderMq.toString(),
+        RebateInfo rebateInfo02 = MQAdapter.filter(JSON.toJSONString(orderMq),
                 link02);
         System.out.println("mq.orderMq(适配前)" + orderMq.toString());
         System.out.println("mq.orderMq(适配后)" +

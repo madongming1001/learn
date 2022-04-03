@@ -1,5 +1,6 @@
 package com.madm.learnroute.javaee;
 
+import lombok.SneakyThrows;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.util.Assert;
 
@@ -15,6 +16,7 @@ public class LocalDateTimePractice {
 
     static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    @SneakyThrows
     public static void main(String[] args) {
 //        Assert.isTrue(LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8")) == System.currentTimeMillis(),
 //                "比较的数是不相等的");

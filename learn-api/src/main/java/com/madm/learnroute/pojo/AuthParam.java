@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 /**
  * @Author MaDongMing
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotNull;
 @Accessors(chain = true)
 @Data
 public class AuthParam {
+    @Pattern(regexp = "(^[0-9][-UA-])([0-9],)")
     @NotNull(message = "学生身高不能为空")
     private String appId;
     private String appKey;
