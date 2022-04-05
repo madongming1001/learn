@@ -8,6 +8,7 @@ public class UniqueIDGenerationPractice {
         //参数1为终端ID
         //参数2为数据中心ID
         Snowflake snowflake = IdUtil.getSnowflake(1, 1);
+        snowflake.nextId();
     }
 }
 
