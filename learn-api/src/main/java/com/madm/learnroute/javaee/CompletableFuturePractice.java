@@ -14,5 +14,4 @@ public class CompletableFuturePractice {
             System.out.println(e.toString());
         }
     }
-
 }
