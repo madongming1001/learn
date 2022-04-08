@@ -1,8 +1,11 @@
 package com.madm.learnroute.javaee;
 
+import com.madm.learnroute.pojo.User;
+
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.stream.Collectors;
 
 /**
  * @author madongming
@@ -13,6 +16,15 @@ public class HashMapPractice {
     static final HashMap<String, String> map = new HashMap<String, String>(2);
 
     public static void main(String[] args) {
+        List<User> lists = Arrays.asList(new User(1, "group 1"), new User(2, "group 1"),
+                new User(3, "group 2"), new User(4, "group 2"));
+        Collection<List<User>> values = lists.stream().collect(Collectors.groupingBy(s -> {
+            return s.getName();
+        })).values();
+        values.stream().forEach(System.out::println);
+        System.out.println(values.size());
+
+
 //        Map<String, Long> masterId = new HashMap<>();
 //        ArrayList<Map<String, Long>> mapArrayList = new ArrayList<Map<String, Long>>();
 //        HashMap<String, Long> hashMap1 = new HashMap<>();
