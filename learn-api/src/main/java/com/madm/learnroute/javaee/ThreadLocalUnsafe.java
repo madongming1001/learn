@@ -13,11 +13,9 @@ import java.util.concurrent.TimeUnit;
 public class ThreadLocalUnsafe<T> implements Runnable {
     //因为是static的,就被几个线程共享了,所以就产生了线程不安全的情况
     public static Number number = new Number(0);
-    public static ThreadLocal<Number> value = new ThreadLocal();
-
     //把static去掉就正确了,让每个线程都拥有自己独立的number.此时十个线程的输出都是1
-//	public Number number = new Number(0);
-
+//    public Number number = new Number(0);
+    public static ThreadLocal<Number> value = new ThreadLocal();
     @Override
     public void run() {
         //每个线程计数加一
