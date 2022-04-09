@@ -4,7 +4,7 @@ import java.util.concurrent.*;
 
 public class FutureTaskTest {
 
-    private final ConcurrentMap<Object, Future<String>> taskCache = new ConcurrentHashMap<Object, Future<String>>();
+    private static final ConcurrentMap<Object, Future<String>> taskCache = new ConcurrentHashMap<Object, Future<String>>();
 
     private String executionTask(final String taskName) throws ExecutionException, InterruptedException {
         while (true) {
@@ -17,6 +17,7 @@ public class FutureTaskTest {
                 }; // 1.2创建任务
                 FutureTask<String> futureTask = new FutureTask<String>(task);
                 future = taskCache.putIfAbsent(taskName, futureTask); // 1.3
+                System.out.println(futureTask);
                 if (future == null) {
                     future = futureTask;
                     futureTask.run(); // 1.4执行任务
@@ -28,5 +29,7 @@ public class FutureTaskTest {
                 taskCache.remove(taskName, future);
             }
         }
+    }
+    public static void main(String[] args) {
     }
 }
