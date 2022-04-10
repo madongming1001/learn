@@ -7,8 +7,11 @@ public class Test {
     public static void main(String[] args) {
         DataView dataView = new DataView();
         log.info("\r\n家长视角访问：");
-        dataView.show(new Parent()); // 家长
+        // 家长
+        dataView.show(new Parent());
         log.info("\r\n校长视角访问：");
-        dataView.show(new Principal()); // 校长
+        // 校长
+        dataView.show(new Principal());
+
     }
 }
