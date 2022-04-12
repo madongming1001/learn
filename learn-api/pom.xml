@@ -14,6 +14,7 @@
     <properties>
         <mybatis-plus-boot-starter.version>3.1.2</mybatis-plus-boot-starter.version>
         <pagehelper.version>5.1.9</pagehelper.version>
+        <spring-cloud-starter-alibaba-nacos.version>2021.1</spring-cloud-starter-alibaba-nacos.version>
     </properties>
 
     <dependencies>
@@ -191,7 +192,7 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-            <version>2021.1</version>
+            <version>${spring-cloud-starter-alibaba-nacos.version}</version>
         </dependency>
         <!--爬虫-->
         <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
@@ -199,6 +200,12 @@
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.14.3</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.alibaba.cloud/spring-cloud-starter-alibaba-nacos-discovery -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+            <version>${spring-cloud-starter-alibaba-nacos.version}</version>
         </dependency>
     </dependencies>
 

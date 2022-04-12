@@ -13,6 +13,6 @@ public class Test {
 
         JsoupPractice.parseProvinceName(map, "http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2018");
 
-//        System.out.println(JSON.toJSONString(map));
+        System.out.println(JSON.toJSONString(map));
     }
 }
