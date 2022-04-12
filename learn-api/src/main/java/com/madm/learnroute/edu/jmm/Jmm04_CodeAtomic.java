@@ -1,5 +1,7 @@
 package com.madm.learnroute.edu.jmm;
 
+import java.util.concurrent.atomic.AtomicStampedReference;
+
 /**
  * ,;,,;
  * ,;;'(    社
@@ -23,7 +25,6 @@ public class Jmm04_CodeAtomic {
     static Object object = new Object();
 
     public static void main(String[] args) {
-
         for (int i = 0; i < 10; i++) {
             Thread thread = new Thread(() -> {
                 for (int j = 0; j < 1000; j++) {
