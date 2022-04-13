@@ -83,7 +83,7 @@ HMSET  user  1:name  zhuge  1:balance  1888
 HMGET  user  1:name  1:balance  
 
 
-    
+​    
 电商购物车
 1）以用户id为key
 2）商品id为field
