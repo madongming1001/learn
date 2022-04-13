@@ -1023,3 +1023,4 @@ https://blog.csdn.net/weixin_30587025/article/details/96339354
 lock 优先考虑获取锁，待获取锁成功后，才响应中断。
 lockInterruptibly 优先考虑响应中断，而不是响应锁的普通获取或重入获取。
 
+![img.png](noteImg/img.png)

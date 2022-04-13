@@ -382,3 +382,6 @@ Java HotSpot(TM) 64-Bit Server VM warning: Option UseConcMarkSweepGC was depreca
 
 CMS使用针对于三色标级使用的是增量更新
 
+什么是 JMX
+
+JMX 全称为 Java Management Extensions，翻译过来就是 Java 管理扩展，用来管理和监测 Java 程序。最常用到的就是对于 JVM 的监测和管理，比如 JVM 内存、CPU 使用率、线程数、垃圾收集情况等等。
