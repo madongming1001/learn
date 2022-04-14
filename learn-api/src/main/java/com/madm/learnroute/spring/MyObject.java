@@ -10,7 +10,7 @@ public class MyObject {
     }
 
     public static void main(String[] args) {
-//        String name = "Lisa";
+        String name = "Lisa";
 //        getObject(() -> getObjectByName(name));
 //
 //        Supplier<String> getObject = () -> {
