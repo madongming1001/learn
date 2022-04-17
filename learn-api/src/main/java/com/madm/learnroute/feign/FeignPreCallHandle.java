@@ -7,8 +7,9 @@ import feign.RequestTemplate;
  * feign调用之前回掉
  */
 public class FeignPreCallHandle implements RequestInterceptor {
-    @Override
-    public void apply(RequestTemplate requestTemplate) {
 
+    @Override
+    public void apply(RequestTemplate rs) {
     }
+
 }

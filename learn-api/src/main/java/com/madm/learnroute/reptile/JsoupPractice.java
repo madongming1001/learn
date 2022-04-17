@@ -88,7 +88,7 @@ public class JsoupPractice {
         Map<String, String> cityMap = new HashMap<>();
 
         for (Element element1 : childrens) {
-
+            System.out.println(element1);
             Elements citytrs = element1.getElementsByClass("citytr");
 
             for (Element cityTag : citytrs) {
