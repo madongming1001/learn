@@ -75,7 +75,6 @@ public class JsoupPractice {
      * @date 2019/11/4 19:26
      */
     public static void parseCityName(Map<String, Map<String, String>> map, String url, String provinceName) throws IOException {
-
         Document doc = Jsoup.connect(url).get();
         Elements elements = doc.getElementsByTag("tbody");
         Element element = elements.get(4);
