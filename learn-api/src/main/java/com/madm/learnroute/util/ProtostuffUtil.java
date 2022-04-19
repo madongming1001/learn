@@ -1,5 +1,6 @@
 package com.madm.learnroute.util;
 
+import com.google.common.collect.Lists;
 import com.madm.learnroute.pojo.User;
 import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtostuffIOUtil;
@@ -63,7 +64,7 @@ public class ProtostuffUtil {
     }
 
     public static void main(String[] args) {
-        byte[] userBytes = ProtostuffUtil.serializer(new User(1, "zhuge"));
+        byte[] userBytes = ProtostuffUtil.serializer(new User(1, "zhuge", Lists.newArrayList()));
         User user = ProtostuffUtil.deserializer(userBytes, User.class);
         System.out.println(user);
     }

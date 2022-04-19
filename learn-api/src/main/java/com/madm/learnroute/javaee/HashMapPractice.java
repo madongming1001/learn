@@ -1,6 +1,7 @@
 package com.madm.learnroute.javaee;
 
 import com.madm.learnroute.pojo.User;
+import org.apache.curator.shaded.com.google.common.collect.Lists;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,16 +17,15 @@ public class HashMapPractice {
     static final HashMap<String, String> map = new HashMap<String, String>(2);
 
     public static void main(String[] args) {
-        List<User> lists = Arrays.asList(new User(1, "group 1"), new User(2, "group 1"),
-                new User(3, "group 2"), new User(4, "group 2"));
+        List<User> lists = Arrays.asList(new User(1, "group 1", Lists.newArrayList()), new User(2, "group 1", Lists.newArrayList()),
+                new User(3, "group 2", Lists.newArrayList()), new User(4, "group 2", Lists.newArrayList()));
         Collection<List<User>> values = lists.stream().collect(Collectors.groupingBy(s -> {
             return s.getName();
         })).values();
         values.stream().forEach(System.out::println);
         System.out.println(values.size());
 
-
-//        Map<String, Long> masterId = new HashMap<>();
+        Map<String, Long> masterId = new HashMap<>();
 //        ArrayList<Map<String, Long>> mapArrayList = new ArrayList<Map<String, Long>>();
 //        HashMap<String, Long> hashMap1 = new HashMap<>();
 //        hashMap1.put("1", 1L);

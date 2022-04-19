@@ -1,8 +1,10 @@
 package com.madm.learnroute.javaee;
 
-import com.madm.learnroute.pojo.User;
+import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.madm.learnroute.pojo.Invitee;
+import org.apache.curator.shaded.com.google.common.collect.Lists;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -53,21 +55,25 @@ public class ListStreamPractice {
 //        Apple apple12 = new Apple(1, "苹果2", new BigDecimal("1.35"), 20);
 //        Apple apple2 = new Apple(2, "香蕉", new BigDecimal("2.89"), 30);
 //        Apple apple3 = new Apple(3, "荔枝", new BigDecimal("9.99"), 40);
-        List<User> users = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            int idAndName = new Double(Math.floor(Math.random() * 10 + 1)).intValue();
-            users.add(new User(idAndName, idAndName + ""));
-        }
-        System.out.println(users);
-        for (int i = 0; i < users.size(); i++) {
-            User user = users.get(i);
-            if(user.getId() >= 5){
-                users.remove(i);
-//                i--;
-            }
-        }
+        List<Invitee> invitees = Lists.newArrayList(new Invitee("1", "1", "1"), new Invitee("2", "2", "2"));
+        List<String> str = Lists.newArrayList("1", "1", "1");
+        HttpUtil.createPost("http://localhost:8081/saveMeeting").body("").execute();
+        System.out.println(JSONObject.toJSONString(invitees));
 
-        System.out.println(users);
+//        for (int i = 0; i < 10; i++) {
+//            int idAndName = new Double(Math.floor(Math.random() * 10 + 1)).intValue();
+//            users.add(new User(idAndName, idAndName + ""));
+//        }
+//        System.out.println(users);
+//        for (int i = 0; i < users.size(); i++) {
+//            User user = users.get(i);
+//            if(user.getId() >= 5){
+//                users.remove(i);
+////                i--;
+//            }
+//        }
+//
+//        System.out.println(users);
 //        List<Apple> appleList = new ArrayList();
 //        appleList.add(apple1);
 //        appleList.add(apple12);

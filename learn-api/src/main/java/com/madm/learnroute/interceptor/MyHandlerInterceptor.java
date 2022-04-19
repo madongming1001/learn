@@ -15,15 +15,15 @@ public class MyHandlerInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        System.out.println("preHandle方法运行");
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
-        Method method = handlerMethod.getMethod();
-        UserAuthenticate userAuthenticate = method.getAnnotation(UserAuthenticate.class);
-        //如果没有加注解则userAuthenticate为null
-        if (Objects.nonNull(userAuthenticate)) {
-        }else{
-            System.out.println("没有传入userAuthenticate注解");
-        }
+//        System.out.println("preHandle方法运行");
+//        HandlerMethod handlerMethod = (HandlerMethod) handler;
+//        Method method = handlerMethod.getMethod();
+//        UserAuthenticate userAuthenticate = method.getAnnotation(UserAuthenticate.class);
+//        //如果没有加注解则userAuthenticate为null
+//        if (Objects.nonNull(userAuthenticate)) {
+//        }else{
+//            System.out.println("没有传入userAuthenticate注解");
+//        }
         return true;
     }
 
