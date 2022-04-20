@@ -16,20 +16,19 @@
 - commit之后又改了一个小bug，但是又不想增加一个commit，可以用：`git commit --amend --no-edit`，直接将改动添加到上一次的commit中
 - `git push`
 - `git pull`
-- `touch .gitignore`
-- 
+- `touch .gitignore` 
 
-##修改分支名称
+####修改分支名称
 
-1、执行命令git checkout br_rename_old   //切换到br_rename_old分支 （如果已经在这个分支下，可以不执行此步骤）
+1. 执行命令git checkout br_rename_old   //切换到br_rename_old分支 （如果已经在这个分支下，可以不执行此步骤）
 
-2、执行命令git pull origin br_rename_old  //将代码更新到和远程仓库一致
+2. 执行命令git pull origin br_rename_old  //将代码更新到和远程仓库一致
 
-3、执行命令git branch -m br_rename_old br_rename_new  //将本地仓库的br_rename_old的名称修改为br_rename_new
+3. 执行命令git branch -m br_rename_old br_rename_new  //将本地仓库的br_rename_old的名称修改为br_rename_new
 
-4、执行命令git push origin --delete br_rename_old  //将远程分支br_rename_old删除
+4. 执行命令git push origin --delete br_rename_old  //将远程分支br_rename_old删除
 
-5、执行命令git push --set-upstream origin br_rename_new   //将本地分支push到远程仓库
+5. 执行命令git push --set-upstream origin br_rename_new   //将本地分支push到远程仓库
 
 
 
