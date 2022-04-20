@@ -17,12 +17,20 @@
 - `git push`
 - `git pull`
 - `touch .gitignore`
-- 修改原称分支名称
+- 
+
+##修改分支名称
+
 1、执行命令git checkout br_rename_old   //切换到br_rename_old分支 （如果已经在这个分支下，可以不执行此步骤）
+
 2、执行命令git pull origin br_rename_old  //将代码更新到和远程仓库一致
+
 3、执行命令git branch -m br_rename_old br_rename_new  //将本地仓库的br_rename_old的名称修改为br_rename_new
+
 4、执行命令git push origin --delete br_rename_old  //将远程分支br_rename_old删除
+
 5、执行命令git push --set-upstream origin br_rename_new   //将本地分支push到远程仓库
+
 
 
 #### Git 标签管理

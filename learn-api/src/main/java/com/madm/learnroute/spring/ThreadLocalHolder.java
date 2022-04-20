@@ -11,7 +11,6 @@ public class ThreadLocalHolder {
     private Long currentTime;
 
     /**
-     * ·
      * 不同业务设置不同的业务场景，如：业务A设置值为1，业务B设置值为2...
      */
     private static class InnerClass {
@@ -68,7 +67,6 @@ public class ThreadLocalHolder {
 
     public enum SingletonEnum {
         INSTANCE;
-
         public void execute() {
             System.out.println("begin execute");
         }
