@@ -13,7 +13,7 @@ public class Response<T> {
     private String message;
 
     public Response() {
-        this(200, SUCCESS_STR, null);
+        this(200, SUCCESS_STR, (T) "");
     }
 
     public Response(Integer code, String message, T data) {
@@ -32,7 +32,7 @@ public class Response<T> {
     }
 
     public static Response success() {
-        return new Response(null);
+        return new Response("");
     }
 
     public static <T> Response<T> error(int code, String msg) {

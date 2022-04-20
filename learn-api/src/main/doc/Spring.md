@@ -289,3 +289,8 @@ ConfigurationClassPostprocessor.java加载的类多了3个
 
 ![image-20220401225005587](/Users/madongming/notes/noteImg/image-20220401225005587.png)
 
+##@Valid与@Validated注解
+
+@Valid常见用在方法，类中字段上进行校验,java的核心包
+
+@Validated是spring提供的对@Valid的封装，常见用在方法上进行校验
