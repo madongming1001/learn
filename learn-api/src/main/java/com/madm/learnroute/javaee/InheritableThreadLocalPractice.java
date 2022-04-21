@@ -1,19 +1,16 @@
 package com.madm.learnroute.javaee;
 
 public class InheritableThreadLocalPractice {
-    public static ThreadLocal<String> InheritableThreadLocal = new ThreadLocal<>();
-    public static ThreadLocal<String> threadLocal = new InheritableThreadLocal<>();
+    public static ThreadLocal<String> threadLocal = new ThreadLocal<>();
+    public static ThreadLocal<String> inheritableThreadLocal = new InheritableThreadLocal<>();
+
     public static void main(String[] args) {
         threadLocal.set("hello world");
-        threadLocal.set("hello world1");
-        InheritableThreadLocal.set("hello world");
-        InheritableThreadLocal.set("hello world1");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("子线程："+threadLocal.get());
-            }
+        inheritableThreadLocal.set("hello world");
+        new Thread(() -> {
+            System.out.println("线程内部主线程：" + threadLocal.get());
+            System.out.println("子线程：" + inheritableThreadLocal.get());
         }).start();
-        System.out.println("主线程："+threadLocal.get());
+        System.out.println("主线程：" + threadLocal.get());
     }
 }
