@@ -25,7 +25,7 @@ public class PracticeController {
         return Response.success(authParam);
     }
 
-    @GetMapping("/getSuccess")
+    @GetMapping("/success")
     public Response restSuccess() {
         CompletableFuture.runAsync(() -> {
             try {
