@@ -31,6 +31,7 @@ public class PracticeController {
             try {
                 TimeUnit.SECONDS.sleep(10);
             } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         });
         return Response.success();
