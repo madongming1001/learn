@@ -29,7 +29,7 @@ public class ThreadPrintDemo {
                     flag = true;
                 }
             }
-        });
+        },"thread 1");
     }
 
     private static Thread printNumber2() {
@@ -44,7 +44,7 @@ public class ThreadPrintDemo {
                     flag = false;
                 }
             }
-        });
+        },"thread 2");
     }
 
 

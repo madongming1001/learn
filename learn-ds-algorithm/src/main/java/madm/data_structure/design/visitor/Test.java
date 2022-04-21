@@ -40,7 +40,7 @@ public class Test {
 
         System.out.println("转化后的结果为：" + result);
 
-        System.out.println(toUTF8("\\u957f\\u5ea6\\u9700\\u8981\\u5728"));
+        System.out.println(toUTF8("\\u5B57\\u8282\\u957F\\u5EA6\\u9700\\u8981\\u5728{min}\\u5230{max}\\u4E4B\\u95F4"));
     }
 
     /**
