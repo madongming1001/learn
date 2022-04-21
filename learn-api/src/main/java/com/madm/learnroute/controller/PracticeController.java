@@ -1,7 +1,5 @@
 package com.madm.learnroute.controller;
 
-import com.madm.learnroute.annotation.UserAuthenticate;
-import com.madm.learnroute.annotation.Whitelist;
 import com.madm.learnroute.common.Response;
 import com.madm.learnroute.pojo.AuthParam;
 import org.springframework.validation.annotation.Validated;
