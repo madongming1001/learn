@@ -98,3 +98,10 @@
   - 也可以直接用`git stash pop`恢复并删除内容
 
 - 如果在其它分支上做了一个修改（比如修复了一个bug，这次修改有一个commitID），想要将这次修改应用到当前分支上，可以使用：`git cherry-pick commitID`，可以复制一个特定的提交到当前分支
+
+##Git每次clone都是同一项目问题
+https://blog.csdn.net/liuxiao723846/article/details/83113317
+因为git运行的时候会默认读取三个文件
+Git的三个重要配置文件分别是/etc/gitconfig，${HOME}/.gitconfig，.git/config。这三个配置文件都是Git运行时所需要读取的，但是它们分别作用于不同的范围。
+其中${HOME}/.gitconfig我默认设置了每次取得地址，所有每次读取都是同一个项目
+
