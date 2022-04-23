@@ -30,7 +30,7 @@ public class NioSelectorServer {
             // 它不同与select()是在监听事件时告诉内核要监听什么类型的事件，而是在这里先注册要监听的事件类型。
             // epoll_wait方法返回的事件必然是通过epoll_ctl添加到epoll中的。
             // 阻塞等待需要处理的事件发生，epoll_ctl进行事件绑定。
-            // epoll_wait当socket收到数据后，中断程序调用回调函数回给epoll实例的时间就绪列表rdlist里添加该socket引用（这块是操作系统实现linux的，当程序执行到epoll_wait时，
+            // epoll_wait当socket收到数据后，中断程序调用回调函数回给epoll实例的时间就绪列表 rdlist 里添加该socket引用（这块是操作系统实现linux的，当程序执行到epoll_wait时，
             // 如果rdlist已经引用了socket，那么epoll_wait直接返回，如果rdlist为空，阻塞线程）
             // 中断是系统用来响应硬件设备请求的一种机制，操作系统收到硬件的中断请求，会打断正在执行的进程，然后调用内核中的中断处理程序来响应请求
             // 第一个参数是epoll_create()的返回值，
