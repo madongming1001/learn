@@ -1,0 +1,64 @@
+package com.madm.learnroute.javaee;
+
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+
+import java.util.UUID;
+
+/**
+ * MDC 全称是 Mapped Diagnostic Context，可以粗略的理解成是一个线程安全的存放诊断日志的容器。
+ */
+
+@Slf4j
+public class SimpleMDC {
+    //    private static final log log = logFactory.getlog(SimpleMDC.class);
+    public static final String REQ_ID = "REQ_ID";
+
+    public static void main(String[] args) {
+//        singleThreadLog();
+        multiThreadLog();
+    }
+
+    private static void multiThreadLog() {
+        new BizHandle("F0000").start();
+        new BizHandle("F9999").start();
+    }
+
+    private static void singleThreadLog() {
+        MDC.put(REQ_ID, UUID.randomUUID().toString());
+        log.info("开始调用服务A，进行业务处理");
+        log.info("业务处理完毕，可以释放空间了，避免内存泄露");
+        MDC.remove(REQ_ID);
+        log.info("REQ_ID 还有吗？{}", MDC.get(REQ_ID) != null);
+    }
+}
+
+@Slf4j
+class BizHandle extends Thread {
+
+
+//    private static final log log = logFactory.getlog(SimpleMDC.class);
+    public static final String REQ_ID = "REQ_ID";
+
+
+    private String funCode;
+
+
+    public BizHandle(String funCode) {
+        this.funCode = funCode;
+    }
+
+
+    @Override
+    public void run() {
+        MDC.put(REQ_ID, UUID.randomUUID().toString());
+        log.info("开始调用服务{}，进行业务处理", funCode);
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            log.info(e.getMessage());
+        }
+        log.info("服务{}处理完毕，可以释放空间了，避免内存泄露", funCode);
+        MDC.remove(REQ_ID);
+    }
+}
