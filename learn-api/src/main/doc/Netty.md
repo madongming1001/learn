@@ -96,12 +96,14 @@ protected void implRegister(SelectionKeyImpl ski) {
     SelChImpl ch = ski.channel;
     int fd = Integer.valueOf(ch.getFDVal());
     fdToKey.put(fd, ski);
-    pollWrapper.add(fd);
+    pollWra
+        pper.add(fd);
     keys.add(ski);
 }
 
 int poll(long timeout) throws IOException {
-        updateRegistrations();
+        updateRegistra
+        tions();
         updated = epollWait(pollArrayAddress, NUM_EPOLLEVENTS, timeout, epfd);
         for (int i=0; i<updated; i++) {
             if (getDescriptor(i) == incomingInterruptFD) {

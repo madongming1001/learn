@@ -15,6 +15,9 @@ public class UniqueIDGenerationPractice {
         System.out.println(uuid);
         uuid = uuid < 0 ? -uuid : uuid;//String.hashCode() 值会为空
         System.out.println(uuid);
+        System.out.println(IdUtil.fastSimpleUUID());
+        System.out.println(IdUtil.fastUUID());
+        System.out.println(UUID.randomUUID());
     }
 }
 
