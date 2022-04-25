@@ -207,6 +207,24 @@
 <!--            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>-->
 <!--            <version>${spring-cloud-starter-alibaba-nacos.version}</version>-->
 <!--        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.19.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "com.madm.learnroute.proto";
+
+message MessageUserLoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message MessageUserLoginResponse {
+  string access_token = 1;
+  string username = 2;
+}
+
+//protoc --java_out=/Users/madongming/IdeaProjects/learn/learn-api/src/main/java  ./learn-api/src/main/resources/proto/MessageUserLogin.proto

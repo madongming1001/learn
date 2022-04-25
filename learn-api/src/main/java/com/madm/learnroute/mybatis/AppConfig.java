@@ -40,7 +40,7 @@ public class AppConfig {
 //	@Bean
 //	public DataSource dataSource() {
 //		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-//		dataSource.setUrl("jdbc:mysql://127.0.0.1:3306/tuling?characterEncoding=utf-8&amp;useSSL=false");
+//		dataSource.setUrl("jdbc:mysql://127.0.0.1:4000/tuling?characterEncoding=utf-8&amp;useSSL=false");
 //		dataSource.setUsername("root");
 //		dataSource.setPassword("Zhouyu123456***");
 //		return dataSource;
