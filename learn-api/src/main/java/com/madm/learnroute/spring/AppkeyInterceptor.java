@@ -13,11 +13,11 @@ import javax.servlet.http.HttpServletResponse;
  * @Date 2022/3/30 6:43 PM
  */
 public class AppkeyInterceptor implements HandlerInterceptor {
+
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        Whitelist whitelist = ((HandlerMethod) handler).getMethodAnnotation(Whitelist.class);
-        // whitelist.values(); 通过 request 获取请求参数，通过 whitelist 变量获取注解参数
-        return true;
+        return HandlerInterceptor.super.preHandle(request, response, handler);
     }
 
     @Override

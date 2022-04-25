@@ -40,6 +40,5 @@ public class RedisTemplatePractice {
         }).limit(1).forEach(n -> {
             aLong[0] = Long.valueOf(String.valueOf(n.get("1")));
         });
-        System.out.println(Objects.isNull(aLong[0]));
     }
 }
