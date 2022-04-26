@@ -27,20 +27,6 @@ class Cat implements Animal {
     }
 }
 
-class StaticProxyAnimal implements Animal {
-    private Animal impl;
-
-    public StaticProxyAnimal(Animal impl) {
-        this.impl = impl;
-    }
-
-    @Override
-    public void call() {
-        System.out.println("猫饥饿");
-        impl.call();
-    }
-}
-
 class TargetInvoker implements InvocationHandler {
     // 代理中持有的目标类
     private Object target;
@@ -71,15 +57,6 @@ class TargetInvoker implements InvocationHandler {
 }
 
 public class ProxyPractice {
-
-    public static void main(String[] args) throws Exception {
-
-        //JDK代理生成
-        jdkProxyGenerate();
-
-        //CGLIB代理生成
-		cglibProxyGenerate();
-    }
 
     private static void cglibProxyGenerate() {
         saveGeneratedCGlibProxyFile(System.getProperty("user.dir") + "/proxy");
@@ -122,5 +99,14 @@ public class ProxyPractice {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        //JDK代理生成 InvocationHandler
+        jdkProxyGenerate();
+
+        //CGLIB代理生成 MethodInterceptor
+        cglibProxyGenerate();
     }
 }
