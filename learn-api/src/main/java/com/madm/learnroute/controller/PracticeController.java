@@ -1,11 +1,16 @@
 package com.madm.learnroute.controller;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.util.JsonFormat;
 import com.madm.learnroute.common.Response;
 import com.madm.learnroute.pojo.AuthParam;
 import com.madm.learnroute.pojo.User;
 import com.madm.learnroute.proto.MessageUserLogin;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.UUID;
@@ -37,17 +42,24 @@ public class PracticeController {
     }
 
     @RequestMapping(value = "/protobufShow")
-    public Response getPersonProto(@RequestBody User user) {
+    public Response getPersonProto(@RequestBody User user){
         MessageUserLogin.MessageUserLoginResponse.Builder builder = MessageUserLogin.MessageUserLoginResponse.newBuilder();
-        builder.setAccessToken(UUID.randomUUID().toString());
+        String token = UUID.randomUUID().toString();
+        builder.setAccessToken(token);
         builder.setUsername(user.getName());
         localCache.set(builder);
         MessageUserLogin.MessageUserLoginResponse.Builder localCaches = localCache.get();
-        localCaches.setUsername("修改之后的userName");
-        localCaches.setAccessToken("修改之后的access_token");
-        System.out.println(builder.toString());
-        return new Response(builder.build().toByteString());
+        localCaches.setAccessToken(UUID.randomUUID().toString());
+        if (localCaches.getAccessToken().equals(token)) {
+            new Response("ThreadLocal存储pb值get之后修改之前设置的pb值也会修改，无需重新set。");
+        }
+        try {
+            return new Response(JsonFormat.printer().includingDefaultValueFields().print(builder));
+        } catch (InvalidProtocolBufferException e) {
+        }
+        return Response.error(1,"builder未知字段");
     }
 
 }
+
 
