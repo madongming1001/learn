@@ -33,9 +33,9 @@ public class FunctionalInterfaceHandleUtil {
     public static PresentOrElseHandler<?> isBlankOrNoBlank(String str) {
         return (consumer, runnable) -> {
             if (StringUtils.isBlank(str)) {
-                runnable.run();
-            } else {
                 consumer.accept(str);
+            } else {
+                runnable.run();
             }
         };
     }
