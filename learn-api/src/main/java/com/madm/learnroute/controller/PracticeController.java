@@ -6,6 +6,8 @@ import com.madm.learnroute.common.Response;
 import com.madm.learnroute.pojo.AuthParam;
 import com.madm.learnroute.pojo.User;
 import com.madm.learnroute.proto.MessageUserLogin;
+import org.jsondoc.core.annotation.Api;
+import org.jsondoc.core.annotation.ApiMethod;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,18 +21,13 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping(value = "/practice")
+@Api(description = "练习接口", name = "PracticeController")
 public class PracticeController {
 
     private ThreadLocal<MessageUserLogin.MessageUserLoginResponse.Builder> localCache = new ThreadLocal();
 
-    //    @UserAuthenticate(permission = true)
-    @GetMapping(value = "/practiceAccess")
-//    @Whitelist
-    public Response practiceAccess(@RequestBody @Valid @Validated AuthParam authParam) {
-        return Response.success(authParam);
-    }
-
     @RequestMapping("/success")
+    @ApiMethod(description = "成功响应")
     public Response restSuccess() {
         CompletableFuture.runAsync(() -> {
             try {
@@ -42,6 +39,7 @@ public class PracticeController {
     }
 
     @RequestMapping(value = "/protobufShow")
+    @ApiMethod(description = "获取用户pb信息")
     public Response getPersonProto(@RequestBody User user){
         MessageUserLogin.MessageUserLoginResponse.Builder builder = MessageUserLogin.MessageUserLoginResponse.newBuilder();
         String token = UUID.randomUUID().toString();
