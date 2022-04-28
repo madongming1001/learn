@@ -6,14 +6,14 @@ import com.madm.learnroute.pojo.Invitee;
 import org.apache.curator.shaded.com.google.common.collect.Lists;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class ListStreamPractice {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 //        int init = 0;
 //        List<String> userIds = new ArrayList<>();
 //        userIds.add("11");
@@ -56,9 +56,11 @@ public class ListStreamPractice {
 //        Apple apple2 = new Apple(2, "香蕉", new BigDecimal("2.89"), 30);
 //        Apple apple3 = new Apple(3, "荔枝", new BigDecimal("9.99"), 40);
         List<Invitee> invitees = Lists.newArrayList(new Invitee("1", "1", "1"), new Invitee("2", "2", "2"));
-        List<String> str = Lists.newArrayList("1", "1", "1");
-        HttpUtil.createPost("http://localhost:8081/saveMeeting").body("").execute();
-        System.out.println(JSONObject.toJSONString(invitees));
+        List<CompletableFuture> collect = invitees.stream().map(i -> parallelSleep(i)).collect(Collectors.toList());
+        CompletableFuture.allOf(collect.toArray(new CompletableFuture[collect.size()]));
+//        List<String> str = Lists.newArrayList("1", "1", "1");
+//        HttpUtil.createPost("http://localhost:8081/saveMeeting").body("").execute();
+//        System.out.println(JSONObject.toJSONString(invitees));
 
 //        for (int i = 0; i < 10; i++) {
 //            int idAndName = new Double(Math.floor(Math.random() * 10 + 1)).intValue();
@@ -86,8 +88,19 @@ public class ListStreamPractice {
 
     }
 
+    private static CompletableFuture parallelSleep(Invitee invitee) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (InterruptedException e) {
+            }
+        });
+    }
+
     private static <T> Predicate<T> distinctBuMasterId(Function<? super T, ?> masterId) {
         ConcurrentMap<Object, Object> map = new ConcurrentHashMap<>();
         return m -> map.putIfAbsent(masterId.apply(m), Boolean.TRUE) == null;
     }
+
+
 }

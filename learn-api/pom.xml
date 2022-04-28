@@ -232,6 +232,18 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.jsondoc/spring-boot-starter-jsondoc -->
+        <dependency>
+            <groupId>org.jsondoc</groupId>
+            <artifactId>spring-boot-starter-jsondoc</artifactId>
+            <version>1.2.23</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.jsondoc/jsondoc-ui-webjar -->
+        <dependency>
+            <groupId>org.jsondoc</groupId>
+            <artifactId>jsondoc-ui-webjar</artifactId>
+            <version>1.2.23</version>
+        </dependency>
     </dependencies>
 
 </project>
