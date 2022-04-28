@@ -105,3 +105,7 @@ https://blog.csdn.net/liuxiao723846/article/details/83113317
 Git的三个重要配置文件分别是/etc/gitconfig，${HOME}/.gitconfig，.git/config。这三个配置文件都是Git运行时所需要读取的，但是它们分别作用于不同的范围。
 其中${HOME}/.gitconfig我默认设置了每次取得地址，所有每次读取都是同一个项目
 
+
+
+####设置别名
+git config --global alias.logp "log  --pretty=oneline --abbrev-commit"
