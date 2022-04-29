@@ -10,13 +10,13 @@ public class Response<T> {
 
     private T data;
     private Integer code;
-    private String message;
+    private Object message;
 
     public Response() {
         this(200, SUCCESS_STR, null);
     }
 
-    public Response(Integer code, String message, T data) {
+    public Response(Integer code, Object message, T data) {
         this.message = message;
         this.code = code;
         this.data = data;
@@ -35,8 +35,12 @@ public class Response<T> {
         return new Response(null);
     }
 
-    public static <T> Response<T> error(int code, String msg) {
+    public static <T> Response<T> error(int code, Object msg) {
         return new Response(code, msg, null);
+    }
+
+    public static <T> Response<T> exception(Object msg) {
+        return new Response(505, msg.toString(), null);
     }
 
     @Override

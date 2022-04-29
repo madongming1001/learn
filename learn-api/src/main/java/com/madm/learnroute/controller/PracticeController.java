@@ -1,20 +1,19 @@
 package com.madm.learnroute.controller;
 
-import com.google.protobuf.InvalidProtocolBufferException;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.protobuf.util.JsonFormat;
 import com.madm.learnroute.common.Response;
-import com.madm.learnroute.pojo.AuthParam;
 import com.madm.learnroute.pojo.User;
 import com.madm.learnroute.proto.MessageUserLogin;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.jsondoc.core.annotation.ApiResponseObject;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -38,24 +37,27 @@ public class PracticeController {
         return Response.success();
     }
 
-    @RequestMapping(value = "/protobufShow")
+    @PostMapping(value = "/protobufShow")
     @ApiMethod(description = "获取用户pb信息")
-    public Response getPersonProto(@RequestBody User user){
-        MessageUserLogin.MessageUserLoginResponse.Builder builder = MessageUserLogin.MessageUserLoginResponse.newBuilder();
-        String token = UUID.randomUUID().toString();
-        builder.setAccessToken(token);
-        builder.setUsername(user.getName());
-        localCache.set(builder);
-        MessageUserLogin.MessageUserLoginResponse.Builder localCaches = localCache.get();
-        localCaches.setAccessToken(UUID.randomUUID().toString());
-        if (localCaches.getAccessToken().equals(token)) {
-            new Response("ThreadLocal存储pb值get之后修改之前设置的pb值也会修改，无需重新set。");
-        }
+    public @ApiResponseObject
+    Response getPersonProto(@RequestBody User user) {
         try {
-            return new Response(JsonFormat.printer().includingDefaultValueFields().print(builder));
-        } catch (InvalidProtocolBufferException e) {
+            MessageUserLogin.MessageUserLoginResponse.Builder builder = MessageUserLogin.MessageUserLoginResponse.newBuilder();
+            String token = UUID.randomUUID().toString();
+            builder.setAccessToken(token);
+            builder.setUsername(user.getName());
+            localCache.set(builder);
+            MessageUserLogin.MessageUserLoginResponse.Builder localCaches = localCache.get();
+            localCaches.setAccessToken(UUID.randomUUID().toString());
+            if (localCaches.getAccessToken().equals(token)) {
+                return new Response("ThreadLocal存储pb值get之后修改之前设置的pb值也会修改，无需重新set。");
+            }
+            JSON json = (JSON) JSONObject.toJSON(JsonFormat.printer().includingDefaultValueFields().print(builder));
+            return new Response(JSONObject.toJavaObject(json, User.class));
+        } catch (Exception e) {
+            return Response.exception(e);
         }
-        return Response.error(1,"builder未知字段");
+
     }
 
 }

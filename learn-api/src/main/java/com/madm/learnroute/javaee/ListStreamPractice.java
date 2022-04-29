@@ -67,6 +67,10 @@ public class ListStreamPractice {
 //            users.add(new User(idAndName, idAndName + ""));
 //        }
 //        System.out.println(users);
+
+
+
+
 //        for (int i = 0; i < users.size(); i++) {
 //            User user = users.get(i);
 //            if(user.getId() >= 5){
