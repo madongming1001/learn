@@ -336,3 +336,8 @@ Logback与SLF4J结合起来用,两个组件的官方网站如下：
 13、自动去除旧的日志文件 通过设置TimeBasedRollingPolicy或者SizeAndTimeBasedFNATP的maxHistory属性，你可以控制已经产生日志文件的最大数量。如果设置maxHistory 12，那那些log文件超过12个月的都会被自动移除。
 
 总之，logback比log4j优秀，可以取代之。
+
+
+
+##详解Spring的事务管理PlatformTransactionManager
+https://www.jianshu.com/p/903c01cb2a77

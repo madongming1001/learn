@@ -6,6 +6,7 @@ import com.google.protobuf.util.JsonFormat;
 import com.madm.learnroute.common.Response;
 import com.madm.learnroute.pojo.User;
 import com.madm.learnroute.proto.MessageUserLogin;
+import com.madm.learnroute.service.PracticeService;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +24,9 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping(value = "/practice")
 @Api(description = "练习接口", name = "PracticeController")
 public class PracticeController {
+
+    @Resource
+    PracticeService practiceService;
 
     private ThreadLocal<MessageUserLogin.MessageUserLoginResponse.Builder> localCache = new ThreadLocal();
 
