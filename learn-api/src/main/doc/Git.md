@@ -109,3 +109,9 @@ Git的三个重要配置文件分别是/etc/gitconfig，${HOME}/.gitconfig，.gi
 
 ####设置别名
 git config --global alias.logp "log  --pretty=oneline --abbrev-commit"
+
+
+##隐藏敏感文件
+在.gitignore文件添加想要隐藏的文件 然后git rm -r --cached 相对路径 然后 add commit push 远程就可以隐藏敏感文件了
+
+
