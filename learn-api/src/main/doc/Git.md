@@ -114,4 +114,6 @@ git config --global alias.logp "log  --pretty=oneline --abbrev-commit"
 ##隐藏敏感文件
 在.gitignore文件添加想要隐藏的文件 然后git rm -r --cached 相对路径 然后 add commit push 远程就可以隐藏敏感文件了
 
-
+##删除github历史敏感提交数据
+git filter-branch -f  --index-filter 'git rm -rf --cached --ignore-unmatch 文件相对路径' HEAD
+git push origin --force --all
