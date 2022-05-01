@@ -1,7 +1,5 @@
 package com.madm.learnroute.javaee;
 
-import java.util.concurrent.TimeUnit;
-
 public class Join {
     public static void main(String[] args) throws InterruptedException {
         Thread previous = Thread.currentThread();
@@ -10,7 +8,7 @@ public class Join {
             thread.start();
             previous = thread;
         }
-        TimeUnit.SECONDS.sleep(5);
+//        TimeUnit.SECONDS.sleep(5);
         System.out.println(Thread.currentThread().getName() + " terminate.");
     }
     static class Domino implements Runnable{
@@ -22,6 +20,7 @@ public class Join {
         @Override
         public void run() {
             try {
+                //被等待的线程
                 thread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
