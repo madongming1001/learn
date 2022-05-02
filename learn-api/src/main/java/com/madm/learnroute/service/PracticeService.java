@@ -1,4 +1,7 @@
 package com.madm.learnroute.service;
 
-public class PracticeService {
+public abstract class PracticeService {
+
+    public abstract void saveData();
+
 }
