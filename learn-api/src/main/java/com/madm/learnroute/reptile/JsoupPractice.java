@@ -19,7 +19,7 @@ public class JsoupPractice {
     public static void parseProvinceName(Map<String, Map<String, String>> map, String url) throws IOException {
 
         /**
-         * 获取页面文档数据
+         * 获取页面文档data
          */
         Document doc = Jsoup.connect(url).get();
 
