@@ -11,9 +11,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @author madongming
  */
 
-@SpringBootApplication(scanBasePackages = {
-        "com.madm.learnroute"
-})
+@SpringBootApplication(scanBasePackages = {"com.madm.learnroute"})
 @EnableFeignClients
 @EnableTransactionManagement
 @EnableAspectJAutoProxy

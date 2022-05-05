@@ -25,8 +25,8 @@ import java.util.concurrent.TimeUnit;
 @Api(description = "练习接口", name = "PracticeController")
 public class PracticeController {
 
-    @Resource
-    PracticeService practiceService;
+//    @Resource
+//    PracticeService practiceService;
 
     private ThreadLocal<MessageUserLogin.MessageUserLoginResponse.Builder> localCache = new ThreadLocal();
 
