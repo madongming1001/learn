@@ -9,4 +9,5 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class MdConfig {
     private Integer dataCenterId;
+    private Integer workerId;
 }
