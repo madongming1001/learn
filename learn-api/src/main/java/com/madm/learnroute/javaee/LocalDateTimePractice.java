@@ -14,7 +14,7 @@ public class LocalDateTimePractice {
     public static void main(String[] args) {
 //        Assert.isTrue(LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8")) == System.currentTimeMillis(),
 //                "比较的数是不相等的");
-
+        System.out.println(System.currentTimeMillis());
         //创建多个线程2
         for (int i = 0; i < 10; i++) {
             new Thread(() -> {
