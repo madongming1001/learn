@@ -28,6 +28,7 @@ target/
 
 
 # hide server password
+/config/*
 application.yml
 RedissonBloomFilterPractice.java
 JedisClientPractice.java
