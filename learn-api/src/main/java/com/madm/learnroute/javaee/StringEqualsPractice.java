@@ -17,6 +17,7 @@ public class StringEqualsPractice {
         if(Objects.isNull(str)){
             System.out.println("结果是null");
         }
+        System.out.println();
 
         System.out.println(1 & -1);
         System.out.println(2 & -2);
