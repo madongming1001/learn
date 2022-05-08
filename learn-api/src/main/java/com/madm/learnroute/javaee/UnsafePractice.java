@@ -21,6 +21,7 @@ public class UnsafePractice {
         try {
             Field field = Unsafe.class.getDeclaredField("theUnsafe");
             field.setAccessible(true);
+            //
             return (Unsafe) field.get(null);
         } catch (Exception e) {
             return null;
