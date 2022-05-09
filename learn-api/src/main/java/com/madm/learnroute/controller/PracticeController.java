@@ -51,6 +51,7 @@ public class PracticeController {
             String token = UUID.randomUUID().toString();
             builder.setAccessToken(token);
             builder.setUsername(user.getName());
+
             localCache.set(builder);
             MessageUserLogin.MessageUserLoginResponse.Builder localCaches = localCache.get();
             localCaches.setAccessToken(UUID.randomUUID().toString());
