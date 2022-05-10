@@ -17,6 +17,7 @@
 - `git push`
 - `git pull`
 - `touch .gitignore` 
+-  git commit --amend --date "Mon Sep 2 16:21:24 2021 +0800" 指定提交日期
 
 ####修改分支名称
 
