@@ -35,5 +35,5 @@ JedisClientPractice.java
 RedissonClientPractice.java
 application-local.yml
 
-build-docker.sh
-Dockerfile
+*/build-docker.sh
+*/Dockerfile
