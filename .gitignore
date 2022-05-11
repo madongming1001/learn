@@ -34,3 +34,6 @@ RedissonBloomFilterPractice.java
 JedisClientPractice.java
 RedissonClientPractice.java
 application-local.yml
+
+build-docker.sh
+Dockerfile
