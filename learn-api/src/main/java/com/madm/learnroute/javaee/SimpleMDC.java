@@ -7,6 +7,7 @@ import java.util.UUID;
 
 /**
  * MDC 全称是 Mapped Diagnostic Context，可以粗略的理解成是一个线程安全的存放诊断日志的容器。
+ * MDC 全拼 Mapped Diagnostic Contexts，是SLF4J类日志系统中实现分布式多线程日志数据传递的重要工具（不同的系统有不同的实现方式，下文中会有介绍）；同时，用户也可利用MDC将一些运行时的上下文数据打印出来。
  */
 
 @Slf4j

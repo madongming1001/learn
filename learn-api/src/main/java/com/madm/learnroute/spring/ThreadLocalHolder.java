@@ -56,7 +56,7 @@ public class ThreadLocalHolder {
 
         public static void main(String[] args) throws Exception {
             Singleton instance = Singleton.getInstance();
-            Constructor<Singleton> constructor = Singleton.class.getDeclaredConstructor();
+            Constructor<Singleton> constructor = (Constructor<Singleton>) instance.getClass().getDeclaredConstructor();
             constructor.setAccessible(true);
             Singleton refInstance = constructor.newInstance();
             System.out.println(instance);
