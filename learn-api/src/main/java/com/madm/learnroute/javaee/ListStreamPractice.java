@@ -3,8 +3,10 @@ package com.madm.learnroute.javaee;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.madm.learnroute.pojo.Invitee;
+import com.madm.learnroute.pojo.User;
 import org.apache.curator.shaded.com.google.common.collect.Lists;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.function.Function;
@@ -56,8 +58,13 @@ public class ListStreamPractice {
 //        Apple apple2 = new Apple(2, "香蕉", new BigDecimal("2.89"), 30);
 //        Apple apple3 = new Apple(3, "荔枝", new BigDecimal("9.99"), 40);
 //        List<Invitee> invitees = Lists.newArrayList(new Invitee("1", "1", "1"), new Invitee("2", "2", "2"));
-        List<String> invitees = Lists.newArrayList("1","2","3","4");
+        List<String> invitees = Lists.newArrayList("1", "2", "3", "4");
         System.out.println(JSONObject.toJSONString(invitees));
+        List<Integer> participants = Lists.newArrayList(111);
+        List<User> users = Lists.newArrayList(new User(111, "666"), new User(222, "777"), new User(333, "888"), new User(444, "999"), new User(555, "101"));
+        List<User> userRps = users.stream().filter(iv -> !participants.contains(iv.getId())).map(User::new).collect(Collectors.toList());
+        System.out.println(userRps);
+
 //        List<CompletableFuture> collect = invitees.stream().map(i -> parallelSleep(i)).collect(Collectors.toList());
 //        CompletableFuture.allOf(collect.toArray(new CompletableFuture[collect.size()]));
 //        List<String> str = Lists.newArrayList("1", "1", "1");
@@ -69,8 +76,6 @@ public class ListStreamPractice {
 //            users.add(new User(idAndName, idAndName + ""));
 //        }
 //        System.out.println(users);
-
-
 
 
 //        for (int i = 0; i < users.size(); i++) {
