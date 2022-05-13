@@ -37,3 +37,5 @@ application-local.yml
 
 */build-docker.sh
 */Dockerfile
+
+bootstrap.yml
