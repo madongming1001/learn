@@ -3,6 +3,7 @@ package com.madm.learnroute.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.protobuf.util.JsonFormat;
+import com.madm.learnroute.annotation.UserAuthenticate;
 import com.madm.learnroute.common.Response;
 import com.madm.learnroute.pojo.User;
 import com.madm.learnroute.proto.MessageUserLogin;
@@ -30,6 +31,7 @@ public class PracticeController {
 
     private ThreadLocal<MessageUserLogin.MessageUserLoginResponse.Builder> localCache = new ThreadLocal();
 
+    @UserAuthenticate
     @RequestMapping("/success")
     @ApiMethod(description = "成功响应")
     public Response restSuccess() {

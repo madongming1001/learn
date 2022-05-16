@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
  * @Date 2022/3/31 4:52 PM
  */
 @Slf4j
-public class LoginSsoDecorator implements HandlerInterceptor{
+public class LoginSsoDecorator implements HandlerInterceptor {
     @Override
     public boolean preHandle(String request, String response, Object handler) {
         // 模拟获取cookie
