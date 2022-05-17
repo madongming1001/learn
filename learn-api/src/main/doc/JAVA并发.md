@@ -1048,4 +1048,9 @@ lockInterruptibly 优先考虑响应中断，而不是响应锁的普通获取�
   -绿色线程，用户管理的(而不是OS管理的)线程
 
 
+线程等待与计算时间估算工具 profiler 性能分析工具 jprofiler
+线上可以使用 arthas 
+
+线程池线程计算方式
+![img.png](noteImg/img11.png)
 
