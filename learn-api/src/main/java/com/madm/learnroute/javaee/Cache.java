@@ -1,5 +1,7 @@
 package com.madm.learnroute.javaee;
 
+import sun.misc.Contended;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -10,6 +12,11 @@ public class Cache {
     static ReentrantReadWriteLock rw = new ReentrantReadWriteLock();
     static Lock readLock = rw.readLock();
     static Lock writeLock = rw.writeLock();
+    /**
+     * 加运行参数，-XX:-RestrictContended 保证和其他数据不在同一缓存行
+     */
+    @Contended
+    private Long l1 = 0L;
 
     public static final Object get(String key) {
         readLock.lock();
