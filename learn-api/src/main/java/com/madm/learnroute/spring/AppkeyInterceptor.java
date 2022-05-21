@@ -1,7 +1,7 @@
 package com.madm.learnroute.spring;
 
-import com.madm.learnroute.annotation.Whitelist;
-import org.springframework.messaging.handler.HandlerMethod;
+import cn.hutool.extra.spring.SpringUtil;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -14,9 +14,11 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class AppkeyInterceptor implements HandlerInterceptor {
 
+    private ApplicationContext applicationContext;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        applicationContext = SpringUtil.getApplicationContext();
         return HandlerInterceptor.super.preHandle(request, response, handler);
     }
 
