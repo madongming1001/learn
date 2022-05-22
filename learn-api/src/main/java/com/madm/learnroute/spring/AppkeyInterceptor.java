@@ -1,6 +1,7 @@
 package com.madm.learnroute.spring;
 
 import cn.hutool.extra.spring.SpringUtil;
+import com.alibaba.cloud.nacos.NacosConfigProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -19,6 +20,7 @@ public class AppkeyInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         applicationContext = SpringUtil.getApplicationContext();
+        String applicationName = applicationContext.getApplicationName();
         return HandlerInterceptor.super.preHandle(request, response, handler);
     }
 
