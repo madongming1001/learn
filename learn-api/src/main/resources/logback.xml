@@ -1,11 +1,60 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+
 <configuration>
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="consoleLog" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>[%t] [%X{REQ_ID}] - %m%n</Pattern>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread][%X{MEETING_TRACE_LOG_ID}] %-5level %logger [%file:%line] [%X{logid}]- %msg%n
+            </pattern>
         </layout>
     </appender>
+    <!--打印INFO日志-->
+    <appender name="fileinfoLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--配置输出INFO 日志-->
+        <file>logs/learn-api.log</file>
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread][%X{MEETING_TRACE_LOG_ID}] %-5level %logger [%file:%line] [%X{logid}]- %msg%n
+            </pattern>
+        </encoder>
+        <!--滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>
+                logs/learn-api.log.%d{yyyy-MM-dd}.gz
+            </fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!--打印错误日志-->
+    <appender name="fileerrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--配置输出ERROR 日志-->
+        <file>logs/learn-api.err.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread][%X{MEETING_TRACE_LOG_ID}] %-5level %logger [%file:%line] [%X{logid}]- %msg%n
+            </pattern>
+        </encoder>
+        <!--滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>
+                logs/learn-api.err.log.%d{yyyy-MM-dd}.gz
+            </fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+
+    </appender>
+
+    <!--引入配置项-->
     <root level="info">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="consoleLog"/>
+        <appender-ref ref="fileinfoLog"/>
+        <appender-ref ref="fileerrorLog"/>
+        <!--        <appender-ref ref="SOCKET"/>-->
     </root>
 </configuration>

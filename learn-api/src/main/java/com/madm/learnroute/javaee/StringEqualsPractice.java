@@ -1,6 +1,7 @@
 package com.madm.learnroute.javaee;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.openjdk.jol.info.ClassLayout;
 
 import java.util.Objects;
@@ -13,16 +14,19 @@ public class StringEqualsPractice {
 //        String abc = new String("abc");
 //        String abc1 = new String("abc");
 //        System.out.println(abc == abc1);
-        String str = "null";
-        if(Objects.isNull(str)){
-            System.out.println("结果是null");
-        }
-        System.out.println();
-
-        System.out.println(1 & -1);
-        System.out.println(2 & -2);
-        System.out.println(3 & -3);
-        System.out.println(4 & -4);
+        Integer i = null;
+        System.out.println(i.toString());
+        System.out.println(StringUtils.isBlank(i.toString()));
+//        String str = "null";
+//        if(Objects.isNull(str)){
+//            System.out.println("结果是null");
+//        }
+//        System.out.println();
+//
+//        System.out.println(1 & -1);
+//        System.out.println(2 & -2);
+//        System.out.println(3 & -3);
+//        System.out.println(4 & -4);
 //        System.out.println(Integer.toBinaryString(1));
 //        System.out.println(Integer.toBinaryString(-1));
 //        System.out.println(Integer.toBinaryString(-2));

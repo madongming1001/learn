@@ -1343,3 +1343,6 @@ Redis的SORT命令可以对列表键（List）、集合键（Set）、或者有�
 **LIMIT选项的实现**
 
 默认情况下，SORT命令总会将排序后的所有元素都返回给客户端。
+
+./redis-server redis.conf
+./redis-cli -p 6379 shutdown

@@ -7,16 +7,15 @@ import com.madm.learnroute.annotation.UserAuthenticate;
 import com.madm.learnroute.common.Response;
 import com.madm.learnroute.pojo.User;
 import com.madm.learnroute.proto.MessageUserLogin;
-import com.madm.learnroute.service.PracticeService;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +26,10 @@ import java.util.concurrent.TimeUnit;
 public class PracticeController {
 
     private ThreadLocal<MessageUserLogin.MessageUserLoginResponse.Builder> localCache = new ThreadLocal();
+
+    @Value("${config.info}")
+    private String city;
+
 
     @UserAuthenticate
     @RequestMapping("/success")
@@ -63,6 +66,12 @@ public class PracticeController {
             return Response.exception(e);
         }
 
+    }
+
+    @PostMapping("/getNacosConfig")
+    @ApiMethod(description = "获取nacos配置信息")
+    public Response getNacosConfig() {
+        return Response.success(city);
     }
 
 }
