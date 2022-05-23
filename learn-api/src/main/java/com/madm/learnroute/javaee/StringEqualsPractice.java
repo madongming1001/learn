@@ -1,9 +1,13 @@
 package com.madm.learnroute.javaee;
 
 
+import com.alibaba.fastjson.JSONObject;
+import com.madm.learnroute.pojo.User;
 import org.apache.commons.lang3.StringUtils;
 import org.openjdk.jol.info.ClassLayout;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -14,9 +18,13 @@ public class StringEqualsPractice {
 //        String abc = new String("abc");
 //        String abc1 = new String("abc");
 //        System.out.println(abc == abc1);
-        Integer i = null;
-        System.out.println(i.toString());
-        System.out.println(StringUtils.isBlank(i.toString()));
+
+        String tags = "{\"name\":\"2\",\"id\":1}";
+        Map map = new HashMap();
+        if (StringUtils.isNotEmpty(tags)) {
+            map = JSONObject.parseObject(tags,HashMap.class);
+        }
+        System.out.println(map);
 //        String str = "null";
 //        if(Objects.isNull(str)){
 //            System.out.println("结果是null");

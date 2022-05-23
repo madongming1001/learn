@@ -341,3 +341,9 @@ Logback与SLF4J结合起来用,两个组件的官方网站如下：
 
 ##详解Spring的事务管理PlatformTransactionManager
 https://www.jianshu.com/p/903c01cb2a77
+
+springboot提供加载资源.properties .yml
+PropertySourceLoader.java
+
+SpringApplication&run&prepareEnvironment去加载bootstrap.yml文件
+读取nacos配置文件是在SpringApplication&run&prepareContext方法&applyInitializers&PropertySourceBootstrapConfiguration&PropertySourceLocator.locateCollection&NacosPropertySourceLocator.locate

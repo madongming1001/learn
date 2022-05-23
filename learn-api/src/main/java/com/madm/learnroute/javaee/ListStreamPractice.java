@@ -60,10 +60,10 @@ public class ListStreamPractice {
 //        List<Invitee> invitees = Lists.newArrayList(new Invitee("1", "1", "1"), new Invitee("2", "2", "2"));
         List<String> invitees = Lists.newArrayList("1", "2", "3", "4");
         System.out.println(JSONObject.toJSONString(invitees));
-        List<Integer> participants = Lists.newArrayList(111);
-        List<User> users = Lists.newArrayList(new User(111, "666"), new User(222, "777"), new User(333, "888"), new User(444, "999"), new User(555, "101"));
-        List<User> userRps = users.stream().filter(iv -> !participants.contains(iv.getId())).map(User::new).collect(Collectors.toList());
-        System.out.println(userRps);
+//        List<Integer> participants = Lists.newArrayList(111);
+//        List<User> users = Lists.newArrayList(new User(111, "666"), new User(222, "777"), new User(333, "888"), new User(444, "999"), new User(555, "101"));
+//        List<User> userRps = users.stream().filter(iv -> !participants.contains(iv.getId())).map(User::new).collect(Collectors.toList());
+//        System.out.println(userRps);
 
 //        List<CompletableFuture> collect = invitees.stream().map(i -> parallelSleep(i)).collect(Collectors.toList());
 //        CompletableFuture.allOf(collect.toArray(new CompletableFuture[collect.size()]));

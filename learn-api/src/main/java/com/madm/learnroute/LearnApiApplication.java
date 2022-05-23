@@ -1,5 +1,6 @@
 package com.madm.learnroute;
 
+import com.alibaba.nacos.api.annotation.NacosProperties;
 import org.jsondoc.spring.boot.starter.EnableJSONDoc;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
