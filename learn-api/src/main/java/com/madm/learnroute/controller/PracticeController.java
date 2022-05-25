@@ -27,7 +27,7 @@ public class PracticeController {
 
     private ThreadLocal<MessageUserLogin.MessageUserLoginResponse.Builder> localCache = new ThreadLocal();
 
-    @Value("${config.info}")
+    @Value("${config.info:If the current value does not use the default value}")
     private String city;
 
 
