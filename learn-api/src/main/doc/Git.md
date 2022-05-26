@@ -105,7 +105,9 @@ https://blog.csdn.net/liuxiao723846/article/details/83113317
 因为git运行的时候会默认读取三个文件
 Git的三个重要配置文件分别是/etc/gitconfig，${HOME}/.gitconfig，.git/config。这三个配置文件都是Git运行时所需要读取的，但是它们分别作用于不同的范围。
 其中${HOME}/.gitconfig我默认设置了每次取得地址，所有每次读取都是同一个项目
-
+- /etc/gitconfig: 系统范围内的配置文件，适用于系统所有的用户； 使用 git config 时， 加 --system 选项，Git将读写这个文件。
+- ${HOME}/.gitconfig: 用户级的配置文件，只适用于当前用户； 使用 git config 时， 加 --global 选项，Git将读写这个文件。
+- .git/config: Git项目级的配置文件，位于当前Git工作目录下，只适用于当前Git项目； 使用 git config 时，不加选项（ --system 和 --global  ），Git将读写这个文件。
 
 
 ####设置别名
