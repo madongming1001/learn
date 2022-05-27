@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <name>learn-common</name>
-    <artifactId>common</artifactId>
+    <artifactId>learn-common</artifactId>
 
     <dependencies>
         <dependency>
