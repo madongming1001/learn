@@ -19,10 +19,10 @@
     <name>learn</name>
 
     <modules>
-        <module>learn-api</module>
-        <module>learn-discovery</module>
-        <module>learn-common</module>
-        <module>learn-algorithm</module>
+        <module>api</module>
+        <module>discovery</module>
+        <module>common</module>
+        <module>algorithm</module>
     </modules>
 
     <properties>
