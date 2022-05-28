@@ -6,7 +6,7 @@ import java.io.Serializable;
  * @author dongming.ma
  * @date 2022/5/28 18:23
  */
-public class RestResult<T> implements Serializable {
+public class RestResponse<T> implements Serializable {
 
     private static final long serialVersionUID = 6095433538316185017L;
 
@@ -16,21 +16,21 @@ public class RestResult<T> implements Serializable {
 
     private T data;
 
-    public RestResult() {
+    public RestResponse() {
     }
 
-    public RestResult(int code, String message, T data) {
+    public RestResponse(int code, String message, T data) {
         this.code = code;
         this.setMessage(message);
         this.data = data;
     }
 
-    public RestResult(int code, T data) {
+    public RestResponse(int code, T data) {
         this.code = code;
         this.data = data;
     }
 
-    public RestResult(int code, String message) {
+    public RestResponse(int code, String message) {
         this.code = code;
         this.setMessage(message);
     }
@@ -65,7 +65,7 @@ public class RestResult<T> implements Serializable {
 
     @Override
     public String toString() {
-        return "RestResult{" + "code=" + code + ", message='" + message + '\'' + ", data=" + data + '}';
+        return "RestResponse{" + "code=" + code + ", message='" + message + '\'' + ", data=" + data + '}';
     }
 
     public static <T> ResResultBuilder<T> builder() {
@@ -103,12 +103,12 @@ public class RestResult<T> implements Serializable {
          *
          * @return result
          */
-        public RestResult<T> build() {
-            RestResult<T> restResult = new RestResult<T>();
-            restResult.setCode(code);
-            restResult.setMessage(errMsg);
-            restResult.setData(data);
-            return restResult;
+        public RestResponse<T> build() {
+            RestResponse<T> RestResponse = new RestResponse<T>();
+            RestResponse.setCode(code);
+            RestResponse.setMessage(errMsg);
+            RestResponse.setData(data);
+            return RestResponse;
         }
     }
 }
