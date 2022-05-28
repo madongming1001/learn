@@ -19,9 +19,12 @@ public class JavaNativeInterfacePractice {
         System.out.println("空代码块输出");
     }
 
+    public static String getSelfIP() {
+        return "selfIP";
+    }
+
     public static void main(String[] args) {
-        new JavaNativeInterfacePractice().displayHelloWorld();
-        new JavaNativeInterfacePractice().displayHelloWorld();
+        System.out.println(JavaNativeInterfacePractice.getSelfIP());
     }
 
 }
