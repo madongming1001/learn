@@ -1,13 +1,10 @@
 package madm.design.adapter;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.mdm.util.GsonObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
-import java.util.HashMap;
 
 public class Test {
     public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
