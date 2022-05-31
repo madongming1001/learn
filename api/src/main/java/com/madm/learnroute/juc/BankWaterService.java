@@ -45,6 +45,7 @@ public class BankWaterService implements Runnable {
 
     public static void main(String[] args) {
         BankWaterService bankWaterCount = new BankWaterService();
+        
         bankWaterCount.count();
     }
 }
