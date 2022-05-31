@@ -44,9 +44,9 @@ public class BankWaterService implements Runnable {
     }
 
     public static void main(String[] args) {
-//        BankWaterService bankWaterCount = new BankWaterService();
-//
-//        bankWaterCount.count();
+        BankWaterService bankWaterCount = new BankWaterService();
+        bankWaterCount.count();
+
         long two_day = TimeUnit.DAYS.toMillis(2);
         System.out.println(two_day);
     }
