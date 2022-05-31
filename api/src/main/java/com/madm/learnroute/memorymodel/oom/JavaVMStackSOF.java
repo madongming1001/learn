@@ -1,4 +1,4 @@
-package com.madm.learnroute.MemoryModel.oom;
+package com.madm.learnroute.memorymodel.oom;
 
 /**
  * VM args: -Xss160k 根据操作系统和jdk版本的因素决定了默认初始化大小 current environment jdk 1.8 mac Catalina
