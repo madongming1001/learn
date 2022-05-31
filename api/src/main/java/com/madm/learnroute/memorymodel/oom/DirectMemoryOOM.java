@@ -1,4 +1,4 @@
-package com.madm.learnroute.MemoryModel.oom;
+package com.madm.learnroute.memorymodel.oom;
 
 import sun.misc.Unsafe;
 

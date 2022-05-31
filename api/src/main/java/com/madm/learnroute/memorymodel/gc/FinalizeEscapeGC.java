@@ -1,4 +1,4 @@
-package com.madm.learnroute.MemoryModel.gc;
+package com.madm.learnroute.memorymodel.gc;
 
 public class FinalizeEscapeGC {
     public static FinalizeEscapeGC SAVE_HOOK = null;
