@@ -2,6 +2,7 @@ package com.madm.learnroute.common;
 
 
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 
 @Data
 public class Response<T> {
@@ -37,6 +38,10 @@ public class Response<T> {
 
     public static <T> Response<T> error(int code, Object msg) {
         return new Response(code, msg, null);
+    }
+
+    public static <T> Response<T> error(Object msg) {
+        return error(HttpStatus.INTERNAL_SERVER_ERROR.value(),msg);
     }
 
     public static <T> Response<T> exception(Object msg) {
