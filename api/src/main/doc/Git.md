@@ -120,3 +120,6 @@ git config --global alias.logp "log  --pretty=oneline --abbrev-commit"
 ##删除github历史敏感提交数据
 git filter-branch -f  --index-filter 'git rm -rf --cached --ignore-unmatch 文件相对路径' HEAD
 git push origin --force --all
+
+####maven下载依赖源码
+mvn dependency:resolve -Dclassifier=sources

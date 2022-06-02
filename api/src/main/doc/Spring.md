@@ -347,3 +347,41 @@ PropertySourceLoader.java
 
 SpringApplication&run&prepareEnvironment去加载bootstrap.yml文件
 读取nacos配置文件是在SpringApplication&run&prepareContext方法&applyInitializers&PropertySourceBootstrapConfiguration&PropertySourceLocator.locateCollection&NacosPropertySourceLocator.locate
+
+### Feign底层实现细节
+
+https://www.cnblogs.com/rickiyang/p/11802487.html
+
+@EnableFeignClients -> @Import(FeignClientsRegistrar.class)
+
+```java
+class FeignClientsRegistrar
+		implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
+
+}
+
+```
+
+**通过import注解来注册bean有几种方式**
+
+1. 实现ImportSelector接口，spring容器就会实例化类，并且调用其selectImports方法；
+2. 实现ImportBeanDefinitionRegistrar接口，spring容器就会调用其registerBeanDefinitions方法；
+
+3. 带有Configuration注解的配置类。
+
+```java
+	@Override
+	public void registerBeanDefinitions(AnnotationMetadata metadata,
+			BeanDefinitionRegistry registry) {
+    //把EnableFeignClients的属性信息根据主启动类名称和信息绑定到FeignClientSpecification并注入到容器中，在FeignAutoConfiguration类中，FeignContext会使用
+		registerDefaultConfiguration(metadata, registry);
+    //生成FeignClient对应的bean，注入到Spring 的IOC容器。
+		registerFeignClients(metadata, registry);
+	}
+```
+
+在registerFeignClient方法中构造了一个BeanDefinitionBuilder对象，BeanDefinitionBuilder的主要作用就是构建一个AbstractBeanDefinition，AbstractBeanDefinition类最终被构建成一个BeanDefinitionHolder 然后注册到Spring中。
+
+beanDefinition类为FeignClientFactoryBean，故在Spring获取类的时候实际返回的是FeignClientFactoryBean类。
+
+`FeignClientFactoryBean`作为一个实现了`FactoryBean`的工厂类，那么每次在Spring Context 创建实体类的时候会调用它的`getObject()`方法。

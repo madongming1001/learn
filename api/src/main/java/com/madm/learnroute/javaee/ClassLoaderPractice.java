@@ -7,9 +7,6 @@ public class ClassLoaderPractice {
 //        System.out.println(ClassLoaderPractice.class.getClassLoader());
 //        System.out.println(7 / 2);
 //        System.out.println(7 >>> 1);
-
-
         System.out.println(ClassLoaderPractice.class.getName());
-
     }
 }
