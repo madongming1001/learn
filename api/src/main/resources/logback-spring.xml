@@ -15,7 +15,7 @@
         <!-- layout代表输出格式 -->
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>
-                %d{yyyy-MM-dd HH:mm:ss.SSS} %green(%-5level) %highlight([%15.15t])[%X{MEETING_TRACE_LOG_ID}] %cyan(%logger) [%file:%line] [%X{logid}]- %m%n
+                %d{yyyy-MM-dd HH:mm:ss.SSS} %green(%-5level) %magenta(${PID:- }) [%15.15t] [%X{MEETING_TRACE_LOG_ID}] %cyan(%logger) [%file:%line] [%X{logid}]- %m%n
             </pattern>
         </layout>
     </appender>
@@ -79,6 +79,9 @@
         </rollingPolicy>
 
     </appender>
+    <!--关闭Version类的log-->
+    <logger name="org.hibernate.validator.internal.util.Version" level="OFF">
+    </logger>
 
     <!-- 根节点，表名基本的日志级别，里面可以由多个appender规则 -->
     <!-- level="info"代表基础日志级别为info -->
