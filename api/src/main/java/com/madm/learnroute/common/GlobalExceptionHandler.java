@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
      * @throws IllegalArgumentException IllegalArgumentException.
      */
     @ExceptionHandler(IllegalArgumentException.class)
-    public RestResponse<String> handleIllegalArgumentException(Exception ex) throws IOException {
+    public RestResponse<String> handleIllegalArgumentException(Exception ex){
         return RestResponse.code(500).withMsg(ExceptionUtil.getCauseMsg(ex)).build();
     }
 }
