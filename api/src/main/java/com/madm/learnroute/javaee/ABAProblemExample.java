@@ -1,6 +1,6 @@
 package com.madm.learnroute.javaee;
 
-import com.madm.learnroute.pojo.AuthParam;
+import com.mdm.pojo.AuthParam;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;

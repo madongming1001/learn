@@ -1,7 +1,7 @@
 package com.madm.learnroute.util;
 
 import com.google.common.collect.Lists;
-import com.madm.learnroute.pojo.User;
+import com.mdm.pojo.User;
 import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtostuffIOUtil;
 import io.protostuff.Schema;

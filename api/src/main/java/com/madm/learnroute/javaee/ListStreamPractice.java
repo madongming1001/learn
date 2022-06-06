@@ -2,11 +2,12 @@ package com.madm.learnroute.javaee;
 
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.madm.learnroute.pojo.Invitee;
-import com.madm.learnroute.pojo.User;
+import com.mdm.pojo.Invitee;
+import com.mdm.pojo.User;
 import org.apache.curator.shaded.com.google.common.collect.Lists;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;

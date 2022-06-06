@@ -2,7 +2,7 @@ package com.madm.learnroute.feign;
 
 import com.madm.learnroute.common.Response;
 import com.madm.learnroute.feign.callback.UserInfoCallbackFactory;
-import com.madm.learnroute.pojo.User;
+import com.mdm.pojo.User;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;

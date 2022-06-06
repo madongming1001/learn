@@ -1,7 +1,7 @@
 package com.madm.learnroute.spring;
 
 import com.madm.learnroute.annotation.Whitelist;
-import com.madm.learnroute.pojo.AuthParam;
+import com.mdm.pojo.AuthParam;
 import org.springframework.core.MethodParameter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;

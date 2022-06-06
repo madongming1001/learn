@@ -1,6 +1,6 @@
 package com.madm.learnroute.spring;
 
-import com.madm.learnroute.pojo.Teacher;
+import com.mdm.pojo.Teacher;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
