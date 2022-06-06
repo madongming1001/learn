@@ -1287,3 +1287,6 @@ XMLConfigBuilder.java //解析xml文件
 XmlMapperBuilder.java //解析mapper文件
 ```
 
+
+####添加唯一索引 
+alter table account add unique (appId, accountId)
