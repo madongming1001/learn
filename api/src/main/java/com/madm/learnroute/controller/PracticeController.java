@@ -1,5 +1,6 @@
 package com.madm.learnroute.controller;
 
+import cn.hutool.core.lang.Assert;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.protobuf.util.JsonFormat;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +47,7 @@ public class PracticeController {
             } catch (InterruptedException e) {
             }
         });
-        return Response.success(userInfoFeignClient.getNacosConfig().getData());
+        return Response.success(userInfoFeignClient.getNacosConfig().getBody());
     }
 
     @PostMapping(value = "/protobufShow")
@@ -78,6 +78,12 @@ public class PracticeController {
     @ApiMethod(description = "获取nacos配置信息")
     public Response getNacosConfig() {
         return Response.success(city);
+    }
+
+    @PostMapping("/getCauseMsg")
+    @ApiMethod(description = "获取错误原因信息")
+    public void getCauseMsg() {
+        Assert.isNull(city,"city should not be empty");
     }
 
 }

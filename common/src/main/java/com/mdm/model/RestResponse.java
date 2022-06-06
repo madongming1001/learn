@@ -14,20 +14,20 @@ public class RestResponse<T> implements Serializable {
 
     private String message;
 
-    private T data;
+    private T body;
 
     public RestResponse() {
     }
 
-    public RestResponse(int code, String message, T data) {
+    public RestResponse(int code, String message, T body) {
         this.code = code;
         this.setMessage(message);
-        this.data = data;
+        this.body = body;
     }
 
-    public RestResponse(int code, T data) {
+    public RestResponse(int code, T body) {
         this.code = code;
-        this.data = data;
+        this.body = body;
     }
 
     public RestResponse(int code, String message) {
@@ -51,21 +51,25 @@ public class RestResponse<T> implements Serializable {
         this.message = message;
     }
 
-    public T getData() {
-        return data;
+    public T getBody() {
+        return body;
     }
 
-    public void setData(T data) {
-        this.data = data;
+    public void setBody(T body) {
+        this.body = body;
     }
 
     public boolean ok() {
         return this.code == 0 || this.code == 200;
     }
 
+    public static ResResultBuilder code(int code) {
+        return new ResResultBuilder(code);
+    }
+
     @Override
     public String toString() {
-        return "RestResponse{" + "code=" + code + ", message='" + message + '\'' + ", data=" + data + '}';
+        return "RestResponse{" + "code=" + code + ", message='" + message + '\'' + ", body=" + body + '}';
     }
 
     public static <T> ResResultBuilder<T> builder() {
@@ -78,9 +82,13 @@ public class RestResponse<T> implements Serializable {
 
         private String errMsg;
 
-        private T data;
+        private T body;
 
         private ResResultBuilder() {
+        }
+
+        public ResResultBuilder(int code) {
+            this.code = code;
         }
 
         public ResResultBuilder<T> withCode(int code) {
@@ -93,8 +101,8 @@ public class RestResponse<T> implements Serializable {
             return this;
         }
 
-        public ResResultBuilder<T> withData(T data) {
-            this.data = data;
+        public ResResultBuilder<T> withBody(T body) {
+            this.body = body;
             return this;
         }
 
@@ -107,7 +115,7 @@ public class RestResponse<T> implements Serializable {
             RestResponse<T> RestResponse = new RestResponse<T>();
             RestResponse.setCode(code);
             RestResponse.setMessage(errMsg);
-            RestResponse.setData(data);
+            RestResponse.setBody(body);
             return RestResponse;
         }
     }

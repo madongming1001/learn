@@ -9,7 +9,7 @@ public class Response<T> {
 
     public transient static final String SUCCESS_STR = "SUCCESS";
 
-    private T data;
+    private T body;
     private Integer code;
     private Object message;
 
@@ -17,19 +17,19 @@ public class Response<T> {
         this(200, SUCCESS_STR, null);
     }
 
-    public Response(Integer code, Object message, T data) {
+    public Response(Integer code, Object message, T body) {
         this.message = message;
         this.code = code;
-        this.data = data;
+        this.body = body;
     }
 
-    public Response(T data) {
+    public Response(T body) {
         this();
-        this.data = data;
+        this.body = body;
     }
 
-    public static <T> Response<T> success(T data) {
-        return new Response(data);
+    public static <T> Response<T> success(T body) {
+        return new Response(body);
     }
 
     public static Response success() {
@@ -53,7 +53,7 @@ public class Response<T> {
         final StringBuilder sb = new StringBuilder("Response{");
         sb.append("code=").append(code);
         sb.append(", msg='").append(message).append('\'');
-        sb.append(", data=").append(data);
+        sb.append(", body=").append(body);
         sb.append('}');
         return sb.toString();
     }
