@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#pom版本回退脚本
 #还原到之前版本
 ./mvnw versions:revert
 #清除暂存区
