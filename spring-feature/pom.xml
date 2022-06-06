@@ -11,7 +11,7 @@
     <groupId>com.mdm.feature</groupId>
     <artifactId>spring-feature</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>spring-feature</name>
+    <name>learn-spring-feature</name>
     <description>spring-feature</description>
     <properties>
         <java.version>1.8</java.version>
