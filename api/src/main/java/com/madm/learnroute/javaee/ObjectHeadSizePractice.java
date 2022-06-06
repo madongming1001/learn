@@ -1,6 +1,6 @@
 package com.madm.learnroute.javaee;
 
-import com.madm.learnroute.pojo.Teacher;
+import com.mdm.pojo.Teacher;
 import org.openjdk.jol.info.ClassLayout;
 
 public class ObjectHeadSizePractice {

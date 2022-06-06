@@ -1,4 +1,4 @@
-package com.madm.learnroute.pojo;
+package com.mdm.pojo;
 
 import lombok.*;
 import lombok.experimental.Accessors;

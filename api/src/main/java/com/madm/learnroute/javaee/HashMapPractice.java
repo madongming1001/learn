@@ -1,6 +1,6 @@
 package com.madm.learnroute.javaee;
 
-import com.madm.learnroute.pojo.User;
+import com.mdm.pojo.User;
 import org.apache.curator.shaded.com.google.common.collect.Lists;
 
 import java.util.*;
