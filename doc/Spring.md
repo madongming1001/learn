@@ -386,6 +386,21 @@ beanDefinition类为FeignClientFactoryBean，故在Spring获取类的时候实�
 
 `FeignClientFactoryBean`作为一个实现了`FactoryBean`的工厂类，那么每次在Spring Context 创建实体类的时候会调用它的`getObject()`方法。
 
+##Springboot对于配置文件的解析关键类（）
 
-##Springboot对于配置文件的解析关键类（ConfigFileApplicationListener、YamlPropertySourceLoader、PropertiesPropertySourceLoader）
-https://blog.csdn.net/xby7437/article/details/115010642?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522165452814216782350967629%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=165452814216782350967629&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-2-115010642-null-null.142^v11^pc_search_result_control_group,157^v13^control&utm_term=ConfigFileApplicationListener&spm=1018.2226.3001.4187
+**ConfigFileApplicationListener、YamlPropertySourceLoader、PropertiesPropertySourceLoader**
+
+
+
+**参照网址：**https://blog.csdn.net/xby7437/article/details/115010642?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522165452814216782350967629%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=165452814216782350967629&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-2-115010642-null-null.142
+
+
+
+## Spring实例化bean的5种方式
+
+1. 通过BeanPostProcessor实现InstantiationBeanPostProcessor来返回一个cglib执行的bean，resolveBeforeInstantiation(beanName, mbdToUse);
+2. 通过无参构造器实例化bean
+3. 通过实例供应器创建bean，mbd.getInstanceSupplier()
+4. 通过factoryMethod工厂方法创建bean，getFactoryMethodName
+5. 通过factoryBean创建对象
+
