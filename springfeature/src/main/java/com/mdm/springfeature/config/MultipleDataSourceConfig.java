@@ -35,7 +35,6 @@ public class MultipleDataSourceConfig {
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource.druid.goodguy")
     public DataSource goodguyDataSource() {
-//        return DataSourceBuilder.create().build();
         return DruidDataSourceBuilder.create().build();
     }
 
