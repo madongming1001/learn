@@ -19,7 +19,7 @@ public class SwitchDataSourceServiceImpl implements SwitchDataSourceService {
     DepartmentMapper departmentMapper;
 
     @Override
-    @SwitchSource
+    @SwitchSource("goodbuyDataSource")
     public Object showAfterSwitchData() {
         QueryWrapper<Department> queryWrapper = new QueryWrapper<>();
         Department department = departmentMapper.selectOne(queryWrapper.eq("id", 1));

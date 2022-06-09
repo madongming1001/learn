@@ -4,11 +4,9 @@ import com.mdm.springfeature.config.MultipleDataSourceConfig;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@EnableAspectJAutoProxy
 @Import({MultipleDataSourceConfig.class})
 @MapperScan("com.mdm.springfeature.mapper")
 public class SpringfeatureApplication {
