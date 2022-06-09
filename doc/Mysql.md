@@ -496,17 +496,18 @@ show master status; 查看最后一个bin‐log日志的相关信息
 
 reset master; 清空所有的bin‐log日志 
 
-statmenent：update 表 set 字段 = 值 where id = 1 记录的就是他 记录的是产生经过的过程 资源损耗小 有可能产生主丛不一致
+1. **statement**
 
-update 表 set 字段 = 值 where id = 1 or age = 20 limit 1 
+   当binlog=statement时，binlog记录的是SQL本身的语句，语句中可能有函数，比如uuid每次获取都是不一样的，这样同步slave的时候就会出现数据不一致问题
 
-优化器就不确定走的是哪个索引了
+2. **row**会记录比如删除delete from table where id < 100,会记录100条删除每条id的语句，内容占用空间大
 
-row ： update 表 set 字段 = 值 where id = 1 记录的就是修改完之后的结果 记录的是产生的结果 数据量大 数据同步量也大 安全性高
+3. **mixed**
 
-trace工具分析sql执行计划
-
-
+​		statement格式记录sql原句，可能会导致主备不一致，所以出现了row格式
+但是row格式也有一个缺点，就是很占空间，比如你delete语句删除1万行记录，statement格式会记录一个sql删除1万行就没了；但是使用row格式会把这1万要删除的记录都写到binlog中，这样会导致binlog占用了大量空间，同时写binlog也要耗费大量IO，影响mysql的整体速度
+所以MySQL出了个mixed格式，它是前面两种格式的混合。意思是MySQL自己会判断这条SQL语句是否会引起主备不一致，是的话就会使用row，否则就用statement格式
+也就是说上面delete语句加上了limit 1，MySQL认为会引起主备不一致，它就会使用row格式记录到binlog；如果delete 1万行记录，MySQL认为不会引起主备不一致，它就会使用statement格式记录到binlog。
 
 #### 索引使用情况（mysql5.6引入索引下推）
 
@@ -1290,3 +1291,11 @@ XmlMapperBuilder.java //解析mapper文件
 
 ####添加唯一索引 
 alter table account add unique (appId, accountId)
+
+
+
+####MySQL与redis缓存的同步方案
+参考文章：https://blog.csdn.net/androidstarjack/article/details/115191588
+方案1：通过MySQL自动同步刷新Redis，MySQL触发器+UDF函数实现
+方案2：解析MySQL的binlog实现，将数据库中的数据同步到Redis
+canal是阿里巴巴旗下的一款开源项目，纯Java开发。基于数据库增量日志解析
