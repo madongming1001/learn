@@ -404,3 +404,9 @@ beanDefinition类为FeignClientFactoryBean，故在Spring获取类的时候实�
 4. 通过factoryMethod工厂方法创建bean，getFactoryMethodName
 5. 通过factoryBean创建对象
 
+
+
+### 常用类类图
+
+![image-20220609215903471](/Users/madongming/notes/noteImg/image-20220609215903471.png)
+
