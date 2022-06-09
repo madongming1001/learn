@@ -289,15 +289,31 @@ ConfigurationClassPostprocessor.java加载的类多了3个
 
 ![image-20220401225005587](/Users/madongming/notes/noteImg/image-20220401225005587.png)
 
-##@Valid与@Validated注解
+
+
+### @Valid与@Validated注解
 
 @Valid常见用在方法，类中字段上进行校验,java的核心包
 
 @Validated是spring提供的对@Valid的封装，常见用在方法上进行校验
 
+但在分组、注解位置、嵌套验证等功能上有所不同，这里主要就这几种情况进行说明。
+
+- `@Validated`：用在类型、方法和方法参数上。但不能用于成员属性（field）
+- `@Valid`：可以用在方法、构造函数、方法参数和成员属性（field）上
+
+## **[分组校验]**
+
+- `@Validated`：提供分组功能，可以在参数验证时，根据不同的分组采用不同的验证机制
+- `@Valid`：没有分组功能
+
+## **[嵌套校验]**
+
+一个待验证的pojo类，其中还包含了待验证的对象，需要在待验证对象上注解`@Valid`，才能验证待验证对象中的成员属性，这里不能使用`@Validated`。
+
+
+xi
 MDC 全称是 Mapped Diagnostic Context，可以粗略的理解成是一个线程安全的存放诊断日志的容器。
-
-
 
 log4j
 log4j可以控制日志信息输送的目的地是控制台、文件、GUI组件，甚至是套接口服务器、NT的时间记录器、UNIX Syslog护进程等。
