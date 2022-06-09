@@ -12,6 +12,7 @@ public class CircularServiceA {
 	@Autowired
 	private CircularServiceB circularServiceB;
 
+	@Transactional
 	public void methodA() {
 		System.out.println("方法 A 执行");
 	}

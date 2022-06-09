@@ -11,6 +11,6 @@ public class Test {
         String request = "1successhuahua";
         boolean success = ssoDecorator.preHandle(request, "ewcdqwt40liuiu",
                 "t");
-        System.out.println("登录校验" + request + (success ? "放行" : "拦截"));
+        System.out.println("登录校验：" + request +"="+ (success ? "放行" : "拦截"));
     }
 }

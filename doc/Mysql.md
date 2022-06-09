@@ -1288,14 +1288,25 @@ XMLConfigBuilder.java //解析xml文件
 XmlMapperBuilder.java //解析mapper文件
 ```
 
+### 添加唯一索引 
 
-####添加唯一索引 
 alter table account add unique (appId, accountId)
 
 
 
-####MySQL与redis缓存的同步方案
+### MySQL与redis缓存的同步方案
+
 参考文章：https://blog.csdn.net/androidstarjack/article/details/115191588
 方案1：通过MySQL自动同步刷新Redis，MySQL触发器+UDF函数实现
 方案2：解析MySQL的binlog实现，将数据库中的数据同步到Redis
 canal是阿里巴巴旗下的一款开源项目，纯Java开发。基于数据库增量日志解析
+
+### **Mysql分页**
+
+总页数公式：totalRecord是总记录数；pageSize是一页分多少条记录
+
+```sql
+int totalPageNum = (totalRecord + pageSize - 1) / pageSize;
+```
+
+参考文章：https://blog.csdn.net/m0_45899013/article/details/107357641
