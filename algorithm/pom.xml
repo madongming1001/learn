@@ -11,6 +11,7 @@
 
     <name>learn-algorithm</name>
     <artifactId>learn-algorithm</artifactId>
+    <groupId>madm</groupId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
