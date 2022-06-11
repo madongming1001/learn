@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.protobuf.util.JsonFormat;
 import com.madm.learnroute.annotation.UserAuthenticate;
-import com.madm.learnroute.common.Response;
+import com.mdm.model.Response;
 import com.madm.learnroute.feign.UserInfoFeignClient;
 import com.mdm.pojo.User;
 import com.madm.learnroute.proto.MessageUserLogin;

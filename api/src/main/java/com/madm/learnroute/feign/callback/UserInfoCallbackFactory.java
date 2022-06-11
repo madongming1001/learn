@@ -1,6 +1,6 @@
 package com.madm.learnroute.feign.callback;
 
-import com.madm.learnroute.common.Response;
+import com.mdm.model.Response;
 import com.madm.learnroute.feign.UserInfoFeignClient;
 import com.mdm.pojo.User;
 import lombok.extern.slf4j.Slf4j;

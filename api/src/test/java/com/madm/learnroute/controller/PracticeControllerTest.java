@@ -4,14 +4,9 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.madm.learnroute.common.Response;
+import com.mdm.model.Response;
 import com.madm.learnroute.proto.MessageUserLogin;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import java.nio.charset.StandardCharsets;
 
 //@RunWith(SpringRunner.class)
 //@SpringBootTest
