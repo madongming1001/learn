@@ -1,4 +1,4 @@
-package com.mdm.utils;
+package com.mdm.utils.memorysafe;
 
 import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;

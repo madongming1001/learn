@@ -1,4 +1,4 @@
-package com.mdm.utils;
+package com.mdm.utils.memorysafe;
 
 import java.lang.instrument.Instrumentation;
 import java.util.concurrent.TimeUnit;
