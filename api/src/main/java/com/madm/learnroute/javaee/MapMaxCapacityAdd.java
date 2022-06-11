@@ -1,8 +1,7 @@
 package com.madm.learnroute.javaee;
 
-import com.madm.learnroute.netty.codec.User;
+import com.madm.learnroute.technology.netty.codec.User;
 import org.apache.lucene.util.RamUsageEstimator;
-import org.aspectj.weaver.ast.Var;
 
 import java.util.HashMap;
 

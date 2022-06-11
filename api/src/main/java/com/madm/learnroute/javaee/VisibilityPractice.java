@@ -1,6 +1,6 @@
 package com.madm.learnroute.javaee;
 
-import com.madm.learnroute.util.UnsafeFactory;
+import com.mdm.utils.UnsafeFactory;
 
 import java.util.concurrent.locks.LockSupport;
 

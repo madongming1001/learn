@@ -1,7 +1,7 @@
 package madm.design.adapter;
 
 import com.google.gson.Gson;
-import com.mdm.util.GsonObject;
+import com.mdm.utils.GsonObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;

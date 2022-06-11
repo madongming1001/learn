@@ -1,11 +1,9 @@
 package com.madm.learnroute.common;
 
 import com.mdm.model.RestResponse;
-import com.mdm.util.ExceptionUtil;
+import com.mdm.utils.ExceptionUtil;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.io.IOException;
 
 /**
  * @author dongming.ma

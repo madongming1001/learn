@@ -1,6 +1,6 @@
 package com.madm.learnroute.javaee;
 
-import com.madm.learnroute.constant.CacheEnum;
+import com.madm.learnroute.constant.CacheMethod;
 
 /**
  * @author dongming.ma
@@ -8,6 +8,6 @@ import com.madm.learnroute.constant.CacheEnum;
  */
 public class CacheEnumPractice {
     public static void main(String[] args) {
-        CacheEnum getMenu = CacheEnum.GET_MENU;
+        CacheMethod getMenu = CacheMethod.GET_MENU;
     }
 }
