@@ -7,5 +7,4 @@ package madm.design.listener;
 public interface EventListener {
 
     void doEvent(LotteryResult result);
-
 }
