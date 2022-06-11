@@ -12,7 +12,7 @@ import java.math.BigDecimal;
  * 是因为小数点转二进制丢失精度。
  * https://mp.weixin.qq.com/s/DKeolr_mtkoxDdxeejeYUg
  */
-public class BigDecimalUtils {
+public class BigDecimalUtil {
     public static BigDecimal doubleAdd(double v1, double v2) {
         BigDecimal b1 = new BigDecimal(Double.toString(v1));
         BigDecimal b2 = new BigDecimal(Double.toString(v2));
