@@ -1,6 +1,4 @@
-package com.madm.learnroute.ThreadPool;
-
-import lombok.Data;
+package com.madm.learnroute.jvm.juc.threadPool;
 
 public class ThreadExecutionPractice extends Thread{
 
