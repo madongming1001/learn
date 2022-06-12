@@ -4,6 +4,7 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.mdm.pojo.Invitee;
 import com.mdm.pojo.User;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.curator.shaded.com.google.common.collect.Lists;
 
 import java.util.ArrayList;
@@ -63,6 +64,11 @@ public class ListStreamPractice {
         List<String> invitees = Lists.newArrayList("1", "2", "3", "4", "5", "6", "1");
         Map<String, Integer> collect = invitees.stream().collect(Collectors.toMap(key -> key, value -> 1, Integer::sum));
         System.out.println(collect);
+
+        if(!CollectionUtils.containsAny(null,2)){
+            System.out.println("不包含");
+        }
+
 //        System.out.println(JSONObject.toJSONString(invitees));
 //        List<Integer> participants = Lists.newArrayList(111);
 //        List<User> users = Lists.newArrayList(new User(111, "666"), new User(222, "777"), new User(333, "888"), new User(444, "999"), new User(555, "101"));
