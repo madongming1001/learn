@@ -1,4 +1,4 @@
-package com.madm.learnroute.ThreadPool;
+package com.madm.learnroute.jvm.juc.threadPool;
 
 import org.apache.commons.lang3.RandomUtils;
 
