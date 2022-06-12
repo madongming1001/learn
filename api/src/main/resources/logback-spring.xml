@@ -9,7 +9,7 @@
     <!-- 定义日志文件 输入位置 -->
     <property name="logPath" value="logs/learn.log" />
     <!-- 日志最大的历史 30天 -->
-    <property name="maxHistory" value="1"/>
+    <property name="maxHistory" value="7"/>
 
     <appender name="consoleLog" class="ch.qos.logback.core.ConsoleAppender">
         <!-- layout代表输出格式 -->
