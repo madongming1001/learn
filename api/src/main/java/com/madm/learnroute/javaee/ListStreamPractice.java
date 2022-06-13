@@ -61,13 +61,17 @@ public class ListStreamPractice {
 //        Apple apple2 = new Apple(2, "香蕉", new BigDecimal("2.89"), 30);
 //        Apple apple3 = new Apple(3, "荔枝", new BigDecimal("9.99"), 40);
 //        List<Invitee> invitees = Lists.newArrayList(new Invitee("1", "1", "1"), new Invitee("2", "2", "2"));
-        List<String> invitees = Lists.newArrayList("1", "2", "3", "4", "5", "6", "1");
-        Map<String, Integer> collect = invitees.stream().collect(Collectors.toMap(key -> key, value -> 1, Integer::sum));
-        System.out.println(collect);
+        List<String> newInstance = Lists.newArrayList("1", "2", "3", "4", "5", "6", "1");
+        List<String> oldInstance = Lists.newArrayList("3", "232", "35", "24", "5", "6", "1");
+        System.out.println(CollectionUtils.intersection(newInstance, oldInstance));
 
-        if(!CollectionUtils.containsAny(null,2)){
-            System.out.println("不包含");
-        }
+
+//        Map<String, Integer> collect = invitees.stream().collect(Collectors.toMap(key -> key, value -> 1, Integer::sum));
+//        System.out.println(collect);
+//
+//        if(!CollectionUtils.containsAny(null,2)){
+//            System.out.println("不包含");
+//        }
 
 //        System.out.println(JSONObject.toJSONString(invitees));
 //        List<Integer> participants = Lists.newArrayList(111);
