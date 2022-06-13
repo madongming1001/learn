@@ -12,13 +12,13 @@ import java.util.Set;
 
 public class NioSelectorServer {
     public static void main(String[] args) throws IOException, InterruptedException {
-        // 打开Selector处理Channel，即创建epoll epoll_create命令创建
-        Selector selector = Selector.open();
         // 创建NIO ServerSocketChannel
         ServerSocketChannel serverSocket = ServerSocketChannel.open();
         serverSocket.socket().bind(new InetSocketAddress(9000));
         // 设置ServerSocketChannel为非阻塞
         serverSocket.configureBlocking(false);
+        // 打开Selector处理Channel，即创建epoll epoll_create命令创建
+        Selector selector = Selector.open();
         // 把ServerSocketChannel注册到selector上，并且selector对客户端accept连接操作感兴趣
         // 并没有把事件和selector绑定
         serverSocket.register(selector, SelectionKey.OP_ACCEPT);
