@@ -1,6 +1,7 @@
 package com.madm.learnroute.javaee;
 
 import cn.hutool.core.util.RandomUtil;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,6 +10,31 @@ import java.sql.SQLException;
 
 /**
  * jdbc插入mysql数据库表100万条数据 开事务和不事务 22秒左右
+ */
+
+/**
+ * truncate department;
+ *
+ * SET GLOBAL log_bin_trust_function_creators=TRUE; -- 创建函数一定要写这个
+ * DELIMITER $$   -- 写函数之前必须要写，该标志
+ *
+ * CREATE FUNCTION mock_data()		-- 创建函数（方法）
+ * RETURNS INT 						-- 返回类型
+ * BEGIN								-- 函数方法体开始
+ * 	DECLARE num INT DEFAULT 1000000; 		-- 定义一个变量num为int类型。默认值为100 0000
+ * 	DECLARE i INT DEFAULT 0;
+ *
+ * 	WHILE i < num DO 				-- 循环条件
+ * 		 INSERT INTO department(depno,depname,memo)
+ * 		 VALUES(i,concat('depname',i),concat('memo',i));
+ * 		SET i =  i + 1;	-- i自增
+ * 	END WHILE;		-- 循环结束
+ * 	RETURN i;
+ * END;
+ *
+ * # drop function mock_data;
+ *
+ * select mock_data();
  */
 public class JDBCBatchInsertPractice {
     private long begin = 1;//起始id
