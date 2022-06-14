@@ -24,24 +24,24 @@ explain 通过执行计划可以模拟优化器执行sql语句，查询sql的课
 set session optimizer_switch='derived_merge=off'; #关闭mysql5.7新特性对衍生表的合并优化
 set session optimizer_switch='derived_merge=on'; #关闭mysql5.7新特性对衍生表的合并优化
 
-1. **explain**：会在 explain 的基础上额外提供一些查询优化的信息。紧随其后通过 show warnings 命令可 以得到优化后的查询语句，从而看出优化器优化了什么。额外还有 filtered 列，是一个半分比的值，rows * filtered/100 可以**估算**出将要和 explain 中前一个表进行连接的行数（前一个表指 explain 中的id值比当前表id值小的 表）
+1. **explain**：会在 explain 的基础上额外提供一些查询优化的信息。紧随其后通过 show warnings 命令可 以得到优化后的查询语句，从而看出优化器优化了什么。额外还有 filtered 列，是一个半分比的值，rows filtered/100 可以**估算**出将要和 explain 中前一个表进行连接的行数（前一个表指 explain 中的id值比当前表id值小的 表）
 2. **explain partitions**：相比 explain 多了个 partitions 字段，如果查询是基于分区表的话，会显示查询将访问的分 区。
 
 ## 不走索引例子
 
-**1、联合索引第一个字段用范围不会走索引** 
+**1、联合索引第一个字段用范围不会走索引*
 
-**2**、**in和or在表数据量比较大的情况会走索引，在表记录不多的情况下会选择全表扫描** 
+**2**、**in和or在表数据量比较大的情况会走索引，在表记录不多的情况下会选择全表扫描*
 
 **3**、**like kk% 一般情况下会走索引 5.6所有下推优化**
 
-**4**、**不在索引列上做任何操作（计算、函数、（自动or手动）类型转换），会导致索引失效而转向全表扫描** 
+**4**、**不在索引列上做任何操作（计算、函数、（自动or手动）类型转换），会导致索引失效而转向全表扫描*
 
 **5**、**（！=或者<>），**not in **，**not exists **的时候无法使用索引会导致全表扫描**
 
-**6**、**is null,is not null 一般情况下也无法使用索引** 
+**6**、**is null,is not null 一般情况下也无法使用索引*
 
-**7**、**<** **小于、** **>** **大于、** **<=**、**>=** **这些，mysql内部优化器会根据检索比例、表大小等多个因素整体评估是否使用索引**
+**7**、**<***小于、***>***大于、***<=**、**>=***这些，mysql内部优化器会根据检索比例、表大小等多个因素整体评估是否使用索引**
 
 **8**、**.like以通配符开头（**'$abc...'）mysql索引失效会变成全表扫描操作
 
@@ -161,13 +161,13 @@ InnoDB 提供了一个系统变量 innodb_read_ahead_threshold，如果顺序访
 
 1NF）、第二范式（2NF）、第三范式（3NF）、 巴斯-科德范式（BCNF）、第四范式(4NF）和第五范式（5NF，又称完美范式）。
 
-**数据库设计的第一范式** 
+**数据库设计的第一范式*
 
 定义： 属于第一范式关系的所有属性都不可再分，即数据项不可分。 
 
 ![image-20220208213231317](noteImg/image-20220208213231317.png)
 
-**数据库设计的第二范式** 
+**数据库设计的第二范式*
 
 第二范式（2NF）要求数据库表中的每个实例或行必须可以被惟一地区分。通常在实现来 
 
@@ -175,7 +175,7 @@ InnoDB 提供了一个系统变量 innodb_read_ahead_threshold，如果顺序访
 
 
 
-**数据库设计的第三范式** 
+**数据库设计的第三范式*
 
 指每一个非主属性既不部分依赖于也不传递依赖于业务主键，也就是在第二范式的基础 上消除了非主键对主键的传递依赖。
 
@@ -245,7 +245,7 @@ id列越大执行优先级越高，id相同则从上往下执行，id为NULL最�
 #derived 包含在select中的子查询（不在from子句中）
 #subquery 包含在 from 子句中的子查询。MySQL会将结果存放在一个临时表中，也称为派生表（derived的英文含义）
 #union 在union中的第二个和随后的select
-explain select (select 1 from actor where id = 1) from (select * from film where id = 1) der;
+explain select (select 1 from actor where id = 1) from (select from film where id = 1) der;
 
 #### table列
 
@@ -266,7 +266,7 @@ explain select (select 1 from actor where id = 1) from (select * from film where
 ##### 2.const,system
 
 ​	mysql能对查询的某部分进行优化并将其转化成一个常量,用于 primary key 或 unique key 的所有列与常数比较时，所以表最多有一个匹配行，读取1次，速度比较快。system是 const的特例，表里只有一条元组匹配时为system
-explain select * from (select * from film where id = 1) tmp;
+explain select from (select from film where id = 1) tmp;
 
 ##### 3.eq_ref
 
@@ -448,7 +448,7 @@ SQL语句的分析分为词法分析与语法分析，mysql的词法分析由MyS
 
 外，Java当中也有开源的词法结构分析工具例如Antlr4，ANTLR从语法生成一个解析器，可以构建和遍历解析树，可以在IDEA 
 
-工具当中安装插件：**antlr v4 grammar plugin。插件使用详见课程** 
+工具当中安装插件：**antlr v4 grammar plugin。插件使用详见课程*
 
 
 
@@ -523,7 +523,7 @@ reset master; 清空所有的bin‐log日志
 
 ​		索引下推（Index Condition Pushdown）可以在索引遍历过程中，对索引中包含的所有字段先做判断，过滤掉不符合条件的记录之后再回表，可 以有效的减少回表次数。
 
-**为什么范围查找Mysql没有用索引下推优化？** 
+**为什么范围查找Mysql没有用索引下推优化？*
 
 估计应该是Mysql认为**范围查找过滤的结果集过大**，like KK% 在绝大多数情况来看，过滤后的结果集比较小，所以这里Mysql选择给 like 
 
@@ -536,7 +536,7 @@ order by根据where和order by字段的情况 再根据联合索引或者其他�
 排序方式也是决定一部分因素之一
 
 ```mysql
-explain select * from employees where name in ('LiLei','zhuge')  order by age,position;
+explain select from employees where name in ('LiLei','zhuge')  order by age,position;
 ```
 
 对于排序来说多个相等条件也是范围查询
@@ -635,7 +635,7 @@ MySQL提供了日志分析工具`mysqldumpslow`
 
 当使用left join时，左表是驱动表，右表是被驱动表，当使用right join时，右表时驱动表，左表是被驱动表，当使用join时，mysql会选择数据量比较小的表作为驱动表，大表作为被驱动表。
 
-使用了 NLJ算法。一般 join 语句中，如果执行计划 Extra 中未出现 **Using join buffer** 则表示使用的 join 算法是 NLJ。
+使用了 NLJ算法。一般 join 语句中，如果执行计划 Extra 中未出现 **Using join buffer*则表示使用的 join 算法是 NLJ。
 
 **上面sql的大致流程如下：**
 
@@ -662,11 +662,11 @@ Extra 中 的Using join buffer (Block Nested Loop)说明该关联查询使用的
 
 **上面sql的大致流程如下：**
 
-1. 把 t2 的所有数据放入到 **join_buffer** 中
+1. 把 t2 的所有数据放入到 **join_buffer*中
 2. 把表 t1 中每一行取出来，跟 join_buffer 中的数据做对比
 3. 返回满足 join 条件的数据
 
-整个过程对表 t1 和 t2 都做了一次全表扫描，因此扫描的总行数为10000(表 t1 的数据总量) + 100(表 t2 的数据总量) = **10100**。并且 join_buffer 里的数据是无序的，因此对表 t1 中的每一行，都要做 100 次判断，所以内存中的判断次数是 100 * 10000= **100 万次**。
+整个过程对表 t1 和 t2 都做了一次全表扫描，因此扫描的总行数为10000(表 t1 的数据总量) + 100(表 t2 的数据总量) = **10100**。并且 join_buffer 里的数据是无序的，因此对表 t1 中的每一行，都要做 100 次判断，所以内存中的判断次数是 100 10000= **100 万次**。
 
 这个例子里表 t2 才 100 行，要是表 t2 是一个大表，join_buffer 放不下怎么办呢？·
 
@@ -698,7 +698,7 @@ join_buffer 的大小是由参数 join_buffer_size 设定的，默认值是 2621
 
 **四个sql的执行计划一样，说明这四个sql执行效率应该差不多**
 
-**字段有索引：count(\*)≈count(1)>count(字段)>count(主键 id)    //字段有索引，count(字段)统计走二级索引，二级索引存储数据比主键索引少，所以count(字段)>count(主键 id)** 
+**字段有索引：count(\*)≈count(1)>count(字段)>count(主键 id)    //字段有索引，count(字段)统计走二级索引，二级索引存储数据比主键索引少，所以count(字段)>count(主键 id)*
 
 **字段无索引：count(\*)≈count(1)>count(主键 id)>count(字段)    //字段没有索引count(字段)统计走不了索引，count(主键 id)还可以走主键索引，所以count(主键 id)>count(字段)**
 
@@ -764,7 +764,7 @@ count(**) 是例外，mysql并不会把全部字段取出来，而是专门做�
 
   锁是计算机协调多个进程货线程并发访问某一资源的机制。
 
-  ##### **锁分类** 
+  ##### **锁分类*
 
   - 从性能上分为乐观锁(用版本对比来实现)和悲观锁
 
@@ -844,7 +844,7 @@ session2 对该表任一行操作都会阻塞住
 
 **InnoDB的行锁是针对索引加的锁，不是针对记录加的锁。并且该索引不能失效，否则都会从行锁升级为表锁**。
 
-锁定某一行还可以用lock in share mode(共享锁) 和for update(排它锁)，例如：select * from test_innodb_lock where a = 2 for update; 这样其他session只能读这行数据，修改则会被阻塞，直到锁定行的session提交
+锁定某一行还可以用lock in share mode(共享锁) 和for update(排它锁)，例如：select from test_innodb_lock where a = 2 for update; 这样其他session只能读这行数据，修改则会被阻塞，直到锁定行的session提交
 
 
 
@@ -852,13 +852,13 @@ session2 对该表任一行操作都会阻塞住
 
 **set tx_isolation='**repeatable-read**';**
 
-Session_1执行：select * from account where id=1 for update;
+Session_1执行：select from account where id=1 for update;
 
-Session_2执行：select * from account where id=2 for update;
+Session_2执行：select from account where id=2 for update;
 
-Session_1执行：select * from account where id=2 for update;
+Session_1执行：select from account where id=2 for update;
 
-Session_2执行：select * from account where id=1 for update;
+Session_2执行：select from account where id=1 for update;
 
 查看近期死锁日志信息：show engine innodb status\G; 
 
@@ -954,19 +954,19 @@ mysql主从
 
 #### 索引失效
 
-1.mysql在使用不等于**（！=，<>，not in **，**not exists,（is null,is not null）一般不走索引 ）** 的时候无法使用索引会导致全表扫描 
+1.mysql在使用不等于**（！=，<>，not in **，**not exists,（is null,is not null）一般不走索引 ）*的时候无法使用索引会导致全表扫描 
 
 2.不在索引列上做任何操作（计算、函数、（自动or手动）类型转换），会导致索引失效而转向全表扫描
 
-EXPLAIN SELECT * FROM employees WHERE **left(name,3)** = 'LiLei'; 
+EXPLAIN SELECT FROM employees WHERE **left(name,3)*= 'LiLei'; 
 
 3.存储引擎不能使用索引中范围条件右边的列
 
-4.**<** **小于、** **>** **大于、** **<=**、**>=** 这些，mysql内部优化器会根据检索比例、表大小等多个因素整体评估是否使用索引
+4.**<***小于、***>***大于、***<=**、**>=*这些，mysql内部优化器会根据检索比例、表大小等多个因素整体评估是否使用索引
 
 5.**字符串不加单引号索引失效**
 
-6.**少用or或in，用它查询时，mysql不一定使用索引，mysql内部优化器会根据检索比例、表大小等多个因素整体评** 
+6.**少用or或in，用它查询时，mysql不一定使用索引，mysql内部优化器会根据检索比例、表大小等多个因素整体评*
 
 **估是否使用索引，详见范围查询优化**
 
@@ -1084,15 +1084,15 @@ explain format=json <SQL语句>  /G
 
 MySQL在一般情况下执行一个查询时最多只会用到单个二级索引，但存在有特殊情况，在这样特殊情况下也可能在一个查询中使用到多个二级索引，MySQL种这种使用到多个索引来完成一次查询的执行方法称之为：索引合并/index merge
 
-1. intersection合并 select * from order_exp WHERE order_no = 'a' AND expire_time = 'b'
+1. intersection合并 select from order_exp WHERE order_no = 'a' AND expire_time = 'b'
 
-   等值匹配 select * from order_exp WHERE order_no>'a' AND insert_time = 'a' AND order_status = 'b' AND expire_time = 'c'
+   等值匹配 select from order_exp WHERE order_no>'a' AND insert_time = 'a' AND order_status = 'b' AND expire_time = 'c'
 
-   主键列可以是范围匹配 select * from order_exp WHERE id > 100 AND insert_time = 'a'
+   主键列可以是范围匹配 select from order_exp WHERE id > 100 AND insert_time = 'a'
 
-2. Union合并 select * from order_exp WHERE insert_time = 'a' AND order_status = 'b' AND expire_time = 'c' OR (order_no = 'a' AND expire_time = 'b')
+2. Union合并 select from order_exp WHERE insert_time = 'a' AND order_status = 'b' AND expire_time = 'c' OR (order_no = 'a' AND expire_time = 'b')
 
-3. Sort—Union合并 select * from order_exp WHERE order_no < 'a' OR expire_time > 'z'
+3. Sort—Union合并 select from order_exp WHERE order_no < 'a' OR expire_time > 'z'
 
 
 
@@ -1309,4 +1309,47 @@ canal是阿里巴巴旗下的一款开源项目，纯Java开发。基于数据�
 int totalPageNum = (totalRecord + pageSize - 1) / pageSize;
 ```
 
-参考文章：https://blog.csdn.net/m0_45899013/article/details/107357641
+参考文章：https://blog.csdn.net/m0_45899013/article/details/10735764
+
+
+
+### 查看SQL执行时间
+
+```sql
+show variables like '%profiling%';
+
+set profiling = on;
+
+执行语句
+
+show profiles;查看执行时间
+```
+
+
+
+### 生成数据脚本
+
+```sql
+truncate department;
+
+SET GLOBAL log_bin_trust_function_creators=TRUE; -- 创建函数一定要写这个
+DELIMITER $$   -- 写函数之前必须要写，该标志
+
+CREATE FUNCTION mock_data()     -- 创建函数（方法）
+RETURNS INT                 -- 返回类型
+BEGIN                         -- 函数方法体开始
+ DECLARE num INT DEFAULT 1000000;      -- 定义一个变量num为int类型。默认值为100 0000
+ DECLARE i INT DEFAULT 0;
+
+ WHILE i < num DO            -- 循环条件
+     INSERT INTO department(depno,depname,memo)
+     VALUES(i,concat('depname',i),concat('memo',i));
+    SET i =  i + 1;    -- i自增
+ END WHILE;    -- 循环结束
+ RETURN i;
+END;
+
+# drop function mock_data;
+
+select mock_data();
+```

@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class LocalDateTimePractice {
 
@@ -39,7 +40,9 @@ public class LocalDateTimePractice {
             Long tu = timeUnitTable.get(ch);
 
             long num = Long.parseLong(value.substring(0, value.length() - 1));
-            System.out.println(num);
+//            System.out.println(num);
         }
+
+        System.out.println(TimeUnit.MINUTES.toMillis(1L));
     }
 }

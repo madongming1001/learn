@@ -1,9 +1,12 @@
 package com.madm.learnroute.javaee;
 
 import cn.hutool.core.util.ReUtil;
+import com.mdm.pojo.Teacher;
+import com.mdm.pojo.User;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * jdk6:‐Xms6M ‐Xmx6M ‐XX:PermSize=6M ‐XX:MaxPermSize=6M
@@ -18,9 +21,17 @@ public class RuntimeConstantPoolOOMPractice {
 //            String str = String.valueOf(i).intern();
 //            list.add(str);
 //        }
-        if(Objects.equals(1338, new Long(1338))){
-            System.out.println("所穿参数相等");
+//        if(Objects.equals(1338, new Long(1338))){
+//            System.out.println("所穿参数相等");
+//        }
+
+        Teacher user = new Teacher();
+        if (Objects.equals(user.getName(),0)) {
+            System.out.println("ssss");
         }
+        System.out.println(user);
+
+
 
 
     }

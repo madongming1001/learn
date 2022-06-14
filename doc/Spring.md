@@ -24,6 +24,14 @@
 
 如果单纯为了解决循环依赖问题，那么使用二级缓存足够解决问题，三级缓存存在的意义是为了避免代理，如果没有代理对象，二级缓存足够解决问题。
 
+### 2.6默认去除循环依赖
+
+circular refernences prohibited by default，也可以通过参数开启
+
+```java
+spring.main.allow-circular-references=true  
+```
+
 
 
 ## 循环依赖+动态代理
@@ -310,7 +318,6 @@ ConfigurationClassPostprocessor.java加载的类多了3个
 ## **[嵌套校验]**
 
 一个待验证的pojo类，其中还包含了待验证的对象，需要在待验证对象上注解`@Valid`，才能验证待验证对象中的成员属性，这里不能使用`@Validated`。
-
 
 xi
 MDC 全称是 Mapped Diagnostic Context，可以粗略的理解成是一个线程安全的存放诊断日志的容器。
