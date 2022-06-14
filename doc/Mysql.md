@@ -1298,8 +1298,16 @@ alter table account add unique (appId, accountId)
 
 参考文章：https://blog.csdn.net/androidstarjack/article/details/115191588
 方案1：通过MySQL自动同步刷新Redis，MySQL触发器+UDF函数实现
+
+- 在MySQL中对要操作的数据设置触发器Trigger，监听操作
+- 客户端（NodeServer）向MySQL中写入数据时，触发器会被触发，触发之后调用MySQL的UDF函数
+- UDF函数可以把数据写入到Redis中，从而达到同步的效果
+
+- 这种方案适合于读多写少，并且不存并发写的场景
+- 因为MySQL触发器本身就会造成效率的降低，如果一个表经常被操作，这种方案显示是不合适的
+
 方案2：解析MySQL的binlog实现，将数据库中的数据同步到Redis
-canal是阿里巴巴旗下的一款开源项目，纯Java开发。基于数据库增量日志解析
+canal是阿里巴巴旗下的一款开源项目，纯Java开发。基于数据库增量日志解析提供增量数据订阅&消费，目前主要支持了MySQL（也支持mariaDB）
 
 ### **Mysql分页**
 
