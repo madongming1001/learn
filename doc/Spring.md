@@ -433,3 +433,18 @@ beanDefinition类为FeignClientFactoryBean，故在Spring获取类的时候实�
 
 ![image-20220609215903471](/Users/madongming/notes/noteImg/image-20220609215903471.png)
 
+
+
+![image-20220614234842826](/Users/madongming/notes/noteImg/image-20220614234842826.png)
+
+![image-20220615010019655](/Users/madongming/notes/noteImg/image-20220615010019655.png)
+
+![image-20220615010055719](/Users/madongming/notes/noteImg/image-20220615010055719.png)
+
+
+
+### spring-Expression
+
+SpelExpressionParser、EvaluationContext、rootObject
+
+参考文章：未读 https://blog.51cto.com/u_3631118/3121519
