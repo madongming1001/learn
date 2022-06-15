@@ -26,8 +26,7 @@ package madm.leetcode;
  */
 public class Topic_11 {
     public int maxArea(int[] height) {
-        int size = height.length;
-        int left = 0, right = size - 1;
+        int left = 0, right = height.length - 1;
         int ans = 0;
         while (left < right) {
             //这里为什么使用最低的最为选择，因为最低的才能代表所能容纳的水，如果要是最高的，一个是最低的代表不了所能容纳的水。
@@ -42,7 +41,6 @@ public class Topic_11 {
     }
 
     public static void main(String[] args) {
-        System.out.println(new Topic_11().maxArea(new int[]{
-                1, 8, 6, 2, 5, 4, 8, 3, 7}));
+        System.out.println(new Topic_11().maxArea(new int[]{1, 8, 6, 2, 5, 4, 8, 3, 7}));
     }
 }
