@@ -1292,6 +1292,10 @@ XmlMapperBuilder.java //解析mapper文件
 
 alter table account add unique (appId, accountId)
 
+### 添加字段
+
+alter table 表名 add字段 类型 其他;
+
 
 
 ### MySQL与redis缓存的同步方案
