@@ -36,6 +36,9 @@ public class PracticeController {
     @Value("${config.info:If the current value does not use the default value}")
     private String city;
 
+    @Value("${faultToleranceTime:"+"#"+"{60 * 1000}}")
+    private long faultToleranceTime;
+
 
     @UserAuthenticate
     @RequestMapping("/success")
@@ -83,9 +86,19 @@ public class PracticeController {
     @PostMapping("/getCauseMsg")
     @ApiMethod(description = "获取错误原因信息")
     public void getCauseMsg() {
-        Assert.isNull(city,"city should not be empty");
+        Assert.isNull(city, "city should not be empty");
+
     }
 
+    @PostMapping("/getFaultToleranceTime")
+    @ApiMethod(description = "获取错误原因信息")
+    public Response getFaultToleranceTime() {
+        return Response.success(faultToleranceTime);
+    }
+
+
 }
+
+
 
 

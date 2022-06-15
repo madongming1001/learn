@@ -1060,7 +1060,7 @@ lockInterruptibly 优先考虑响应中断，而不是响应锁的普通获取�
 
 
 
-# ThreadLocal、InheritableThreadLocal、TransmittableThreadLocal三者之间区别
+# ThreadLocal、InheritableThreadLocal、TransmittableThreadLocal 三者之间区别
 
 参考文章：https://blog.csdn.net/weixin_43954303/article/details/113837928?spm=1001.2014.3001.5501
 

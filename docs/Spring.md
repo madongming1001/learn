@@ -446,3 +446,11 @@ beanDefinition类为FeignClientFactoryBean，故在Spring获取类的时候实�
 SpelExpressionParser、EvaluationContext、rootObject
 
 参考文章：未读 https://blog.51cto.com/u_3631118/3121519
+
+关于SpEL的几个概念：
+
+- 表达式（“干什么”）：SpEL的核心，所以表达式语言都是围绕表达式进行的
+- 解析器（“谁来干”）：用于将字符串表达式解析为表达式对象
+- 上下文（“在哪干”）：表达式对象执行的环境，该环境可能定义变量、定义自定义函数、提供类型转换等等
+- root根对象及活动上下文对象（“对谁干”）：root根对象是默认的活动上下文对象，活动上下文对象表示了当前表达式操作的对象
+

@@ -10,6 +10,7 @@ public class FeignPreCallHandle implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate rs) {
+        String method = rs.method();
     }
 
 }
