@@ -1,8 +1,10 @@
 package com.madm.learnroute.javaee;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.curator.shaded.com.google.common.collect.Lists;
 import org.slf4j.MDC;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -11,13 +13,16 @@ import java.util.UUID;
  */
 
 @Slf4j
-public class SimpleMDC {
+public class MDCSimple {
     //    private static final log log = logFactory.getlog(SimpleMDC.class);
     public static final String REQ_ID = "REQ_ID";
 
     public static void main(String[] args) {
 //        singleThreadLog();
-        multiThreadLog();
+//        multiThreadLog();
+        ArrayList<String> meetingList = Lists.newArrayList("1", "2", "3");
+        log.info("save batch meeting OK, size [{}] , data : {}", 1, meetingList);
+
     }
 
     private static void multiThreadLog() {
@@ -38,7 +43,7 @@ public class SimpleMDC {
 class BizHandle extends Thread {
 
 
-//    private static final log log = logFactory.getlog(SimpleMDC.class);
+    //    private static final log log = logFactory.getlog(SimpleMDC.class);
     public static final String REQ_ID = "REQ_ID";
 
 
