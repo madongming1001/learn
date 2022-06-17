@@ -22,5 +22,9 @@ public class MultiThread {
          * [2]Reference Handler 清楚reference的线程
          * [1]main main线程，用户程序入口
          */
+        String in = "All";
+        System.out.println(Integer.parseInt(in));
+
+
     }
 }

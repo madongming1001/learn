@@ -19,12 +19,12 @@ public class StringEqualsPractice {
 //        String abc1 = new String("abc");
 //        System.out.println(abc == abc1);
 
-        String tags = "{\"name\":\"2\",\"id\":1}";
-        Map map = new HashMap();
-        if (StringUtils.isNotEmpty(tags)) {
-            map = JSONObject.parseObject(tags,HashMap.class);
-        }
-        System.out.println(map);
+//        String tags = "{\"name\":\"2\",\"id\":1}";
+//        Map map = new HashMap();
+//        if (StringUtils.isNotEmpty(tags)) {
+//            map = JSONObject.parseObject(tags,HashMap.class);
+//        }
+//        System.out.println(map);
 //        String str = "null";
 //        if(Objects.isNull(str)){
 //            System.out.println("结果是null");
@@ -41,6 +41,8 @@ public class StringEqualsPractice {
 //        System.out.println(Integer.toBinaryString(-3));
 
 //        System.out.println(abc1 == abc.intern());
+        System.out.println(Long.parseLong("0x7fffffff"));
+//
     }
 
     private static boolean isPowerOfTwo(int val) {
