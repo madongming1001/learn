@@ -1,4 +1,4 @@
-## spring假设去掉二级缓存？
+## dspring假设去掉二级缓存？
 
 如果去掉了二级缓存，则需要直接在 `singletonFactory.getObject()` 阶段初始化完毕，并放到一级缓存中。
 
@@ -453,4 +453,18 @@ SpelExpressionParser、EvaluationContext、rootObject
 - 解析器（“谁来干”）：用于将字符串表达式解析为表达式对象
 - 上下文（“在哪干”）：表达式对象执行的环境，该环境可能定义变量、定义自定义函数、提供类型转换等等
 - root根对象及活动上下文对象（“对谁干”）：root根对象是默认的活动上下文对象，活动上下文对象表示了当前表达式操作的对象
+
+![image-20220616213358868](/Users/madongming/notes/noteImg/image-20220616213358868.png)
+
+![image-20220616213510808](/Users/madongming/notes/noteImg/image-20220616213510808.png)
+
+![image-20220616213948252](/Users/madongming/notes/noteImg/image-20220616213948252.png)
+
+## SPel主要对象：
+
+```java
+Expression :表示的是表达式对象。能够根据上下文对象对自身进行计算的表达式。
+ExpressionParser：表达式解析器，将表达式字符串解析为可计算的已编译表达式。支持分析模板（Template）和标准表达式字符串。
+EvaluationContext：评估/计算的上下文，表达式在计算上下文中执行。在表达式计算期间遇到引用时，正是在这种上下文中解析引用。它的默认实现为：StandardEvaluationContext。
+```
 
