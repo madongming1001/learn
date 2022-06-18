@@ -1,22 +1,22 @@
 package com.madm.learnroute.jvm.juc.threadPool;
 
-public class ThreadExecutionPractice extends Thread{
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+public class ThreadExecutionPractice extends Thread {
 
     private String name;
+    private Runnable task;
 
-    public ThreadExecutionPractice(String name) {
-        this.name = name;
+    public ThreadExecutionPractice(Runnable task) {
+        this.task = task;
     }
 
     @Override
     public void run() {
         System.out.println(name);
-    }
-
-    public static void main(String[] args) {
-        // 方法调用
-//        new ThreadExecutionPractice("thread1").run();
-        // 线程启动
-        new ThreadExecutionPractice("thread2").start();
+        task.run();
     }
 }
