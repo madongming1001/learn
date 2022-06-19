@@ -6,7 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class LinkedBlockingQueuePractice {
-    private static LinkedBlockingQueue<Object> objects1 = new LinkedBlockingQueue<>();
+    static LinkedBlockingQueue<Object> objects1 = new LinkedBlockingQueue<>();
 
     public static void main(String[] args) throws InterruptedException {
         new ThreadExecutionPractice("asyncThread", () -> {
