@@ -13,10 +13,7 @@ import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.UUID;
@@ -77,7 +74,7 @@ public class PracticeController {
 
     }
 
-    @PostMapping("/getNacosConfig")
+    @GetMapping("/getNacosConfig")
     @ApiMethod(description = "获取nacos配置信息")
     public Response getNacosConfig() {
         return Response.success(city);
