@@ -236,3 +236,26 @@ Heartbeat timeout 心跳超市机制
 连接密码
 
 Nginx
+
+
+
+docker启动nacos命令
+
+```sh
+docker run -d \
+    -e PREFER_HOST_MODE=ip \
+    -e MODE=standalone \
+    -e SPRING_DATASOURCE_PLATFORM=mysql \
+    -e MYSQL_SERVICE_HOST=47.95.220.43 \
+    -e MYSQL_SERVICE_PORT=4000 \
+    -e MYSQL_SERVICE_USER=root \
+    -e MYSQL_SERVICE_PASSWORD=badguy \
+    -e MYSQL_SERVICE_DB_NAME=nacos_config \
+    -p 8848:8848 \
+    -p 9848:9848 \
+    -p 9849:9849 \
+    --name nacos \
+    --restart=always \
+nacos/nacos-server:2.0.3
+```
+
