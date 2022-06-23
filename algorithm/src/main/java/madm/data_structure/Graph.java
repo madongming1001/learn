@@ -22,7 +22,7 @@ public class Graph { // 无向图
     }
 
     /**
-     * O(V+E) 顶点的数量+边的数量
+     * O(V+E) 顶点的数量+边的数量，Breadth-First Search 广度优先搜索算法
      * @param s 起点
      * @param t 终点
      */
@@ -67,6 +67,11 @@ public class Graph { // 无向图
 
     boolean found = false; // 全局变量或者类成员变量
 
+    /**
+     * Depth-First-Search 深度优先搜索算法
+     * @param s
+     * @param t
+     */
     public void dfs(int s, int t) {
         found = false;
         boolean[] visited = new boolean[v];
