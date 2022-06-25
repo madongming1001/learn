@@ -1,0 +1,25 @@
+package com.mdm.headfirst.factory.pizzas;
+
+import com.mdm.headfirst.factory.pizzas.SimplePizzaFactory;
+
+public class PizzaStore {
+	SimplePizzaFactory factory;
+ 
+	public PizzaStore(SimplePizzaFactory factory) { 
+		this.factory = factory;
+	}
+ 
+	public Pizza orderPizza(String type) {
+		Pizza pizza;
+ 
+		pizza = factory.createPizza(type);
+ 
+		pizza.prepare();
+		pizza.bake();
+		pizza.cut();
+		pizza.box();
+
+		return pizza;
+	}
+
+}
