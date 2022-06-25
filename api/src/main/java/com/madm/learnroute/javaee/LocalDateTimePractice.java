@@ -27,7 +27,7 @@ public class LocalDateTimePractice {
 //                //线程启动 3
 //            }).start();
 //        }
-        HashMap<String, Long> timeUnitTable = new HashMap<String, Long>();
+        HashMap<String, Long> timeUnitTable = new HashMap();
         timeUnitTable.put("s", 1000L);
         timeUnitTable.put("m", 1000L * 60);
         timeUnitTable.put("h", 1000L * 60 * 60);
@@ -40,7 +40,7 @@ public class LocalDateTimePractice {
             Long tu = timeUnitTable.get(ch);
 
             long num = Long.parseLong(value.substring(0, value.length() - 1));
-//            System.out.println(num);
+            System.out.println(num);
         }
 
         System.out.println(TimeUnit.MINUTES.toMillis(1L));
