@@ -1,10 +1,7 @@
 package com.mdm.headfirst.djview;
 
-import com.mdm.headfirst.djview.BPMObserver;
-import com.mdm.headfirst.djview.BeatObserver;
-import com.mdm.headfirst.djview.HeartModelInterface;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class HeartModel implements HeartModelInterface, Runnable {
 	ArrayList<BeatObserver> beatObservers = new ArrayList<BeatObserver>();
