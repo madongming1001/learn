@@ -546,3 +546,12 @@ nio通过多路复用的方式可以同事处理多请求 并且经过多reactor
 2、连接的效率问题
 
 3、消息传递的方式问题
+
+
+
+epoll_ctl添加或删除所要监听的socket
+
+epoll_create会创建一个eventpoll实例
+
+![image-20220626170912982](/Users/madongming/notes/noteImg/image-20220626170912982.png)
+
