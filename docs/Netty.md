@@ -555,3 +555,28 @@ epoll_create会创建一个eventpoll实例
 
 ![image-20220626170912982](/Users/madongming/notes/noteImg/image-20220626170912982.png)
 
+### 基于Netty的知名项目
+
+数据库：Cassandra
+
+大数据处理：Spark、Hadoop
+
+消息中间件：RocketMQ
+
+检索：Elasticsearch
+
+框架：GRPC，Apache Dubbo、Spring5 WebFlux
+
+分布式协调器： Zookeeper
+
+
+
+
+
+### Netty核心组件初步了解
+
+Bootstrap、EventLoop（Group）、Channel
+
+事件和ChannelHandler、ChannelPipeline
+
+ChannelFuture
