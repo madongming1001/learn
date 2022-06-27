@@ -31,6 +31,9 @@ public class MyObject {
         System.out.println(-1 << 29);
 
         System.out.println(-536870912 | 0);
+
+        //11111111
+        System.out.println(Integer.toBinaryString(255));
     }
 
     private static Object getObjectByName(String name) {
