@@ -1372,6 +1372,14 @@ select mock_data();
 
 
 
+
+
+然而，当查询的索引含有唯一属性时，InnoDB存储引擎对Next-Key Lock进行优化，将其降级为Record Lock，即仅锁住索引本身，而不是范围。
+
+很明显，这时SQL语句通过索引列b进行查询，因此其使用传统的Next-Key Locking技术加锁，并且由于有两个索引，其需要分别进行锁定。对于聚集索引，其仅对列a等于5的索引加上Record Lock。而对于辅助索引，其加上的是Next-Key Lock，锁定的范围是(1，3)，特别需要注意的是，InnoDB存储引擎还会对辅助索引下一个键值加上Gap Lock，既还有一个辅助索引范围为(3，6)
+
+
+
 ## 锁
 
 ![img](https://upload-images.jianshu.io/upload_images/18392321-0cea8be39189fb12.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/598/format/webp)
@@ -1413,35 +1421,102 @@ SELECT * FROM `test` WHERE `id`=1 FOR UPDATE;
 
 #### 临键锁（Next-Key Locks）
 
-**Next-key锁是记录锁和间隙锁的组合，它指的是加在某条记录以及这条记录前面间隙上的锁**。
+**Next-key总是会去锁定索引记录，如果InnoDB存储引擎表在建立的时候没有设置任何一个索引，那么这时InnoDB存储引擎会使用隐式的主键来进行锁定。**
 
-也可以理解为一种特殊的**间隙锁**。通过**临建锁**可以解决`幻读`的问题。 每个数据行上的**非唯一索引列**上都会存在一把**临键锁**，当某个事务持有该数据行的**临键锁**时，会锁住一段**左开右闭区间**的数据。需要强调的一点是，InnoDB 中**行级锁**是基于索引实现的，**临键锁**只与**非唯一索引列**有关，在`唯一索引列（包括主键列）上不存在临键锁`。
+**锁的是一个区间，例如一个索引有10，11，13和20这四个值，那么该索引可能被Next-Key Locking的区间为：**
 
-该表中 age 列潜在的临键锁有：
- (-∞, 10],
- (10, 24],
- (24, 32],
- (32, 45],
- (45, +∞],
- 在事务 A 中执行如下命令：
+【Negative infinity，10】
 
+【10，11】
 
+【11，13】
+
+【13，20】
+
+【20，Positive infinity】
+
+采用Next-Key Lock的锁定技术称为Next-key Locking。其设计的目的是为了解决Phantom Problem，锁定的不是单个值，而是一个范围，是谓词锁（predict lock）的一种改进。除了next-key locking，还有previous-key locking技术。同样上述的索引10、11、13和20，若采用previous-key locking技术，那么可锁定的区间为：
+
+【negative infinity，10】
+
+【10，11】
+
+【11，13】
+
+【13，20】
+
+【20，positive infinity】
+
+当查询的索引还有唯一属性时，InnoDB存储引擎会对Next-key Lock进行优化，将其降级为Record Lock，即仅锁住索引本身，而不是范围。
 
 ```sql
--- 根据非唯一索引列 UPDATE 某条记录 
-UPDATE table SET name = Vladimir WHERE age = 24; 
--- 或根据非唯一索引列 锁住某条记录 
-SELECT * FROM table WHERE age = 24 FOR UPDATE; 
+DROP TABLE IF EXISTS t；
+CREATE TABLE T (a INT PRIMARY KEY);
+INSERT INTO t SELECT 1；
+INSERT INTO t SELECT 2；
+INSERT INTO t SELECT 5；
 ```
 
-不管执行了上述 SQL 中的哪一句，之后如果在事务 B 中执行以下命令，则该命令会被阻塞：
+| 时间 | 会话A                                 | 会话B                    |
+| ---- | ------------------------------------- | ------------------------ |
+| 1    | BEGIN;                                |                          |
+| 2    | SELECT * FROM t WHERE a=5 FOR UPDATE; |                          |
+| 3    |                                       | BEGIN；                  |
+| 4    |                                       | INSERT INTO t SELECT 4； |
+| 5    |                                       | COMMIT；成功，不需要等待 |
+| 6    | COMMIT                                |                          |
 
-
+**由于a是主键且唯一，Next-Key Lock算法降级为了Record Lock，从而提高应用的并发性。正如前面所介绍的，Next-Key Lock降级为Record Lock仅在查询的列是唯一索引的情况下。若是辅助索引，则情况会完全不同。同样，首先根据如下代码创建测试表z：**
 
 ```sql
-INSERT INTO table VALUES(100, 26, 'tianqi'); 
+CREATE TABLE z （a INT，b INT，PRIMARY KEY（a），KEY（b））；
+INSERT INTO z SELECT 1，1；
+INSERT INTO z SELECT 3，1；
+INSERT INTO z SELECT 5，3；
+INSERT INTO z SELECT 7，6；
+INSERT INTO z SELECT 10，8；
 ```
 
-很明显，事务 A 在对 age 为 24 的列进行 UPDATE 操作的同时，也获取了 (24, 32] 这个区间内的临键锁。
+表z的列b是辅助索引，若在会话A中执行下面的SQL语句：
 
-**测试24和32全部不能操作**
+```sql
+SELECT * FROM z WHERE b =3 FOR UPDATE；
+```
+
+很明显，这时SQL语句通过索引列b进行查询，因此其使用传统的Next-Key Locking技术加锁，并且由于有两个索引，其需要分别进行锁定。对于聚集索引，其仅对列a等于5的索引加上Record Lock。而对于辅助索引，其加上的是Next-Key Lock，锁定的范围是（1，3），特别注意的是，**InnoDB存储引擎还会对辅助索引下一个键值加上Gap Lock**，既还有一个辅助索引范围为（3，6）的锁。因此，若在新会话B中运行下面的SQL语句，都会被阻塞：
+
+```sql
+SELECT * FROM z WHERE a = 5 LOCK IN SHARE MODE;
+INSERT INTO z SELECT 4,2;
+INSERT INTO z SELECT 6,5;
+```
+
+第一个SQL语句不能执行，因为在会话A种执行的SQL语句已经对聚集索引中列a = 5的值加上X锁，因此执行会被阻塞。第二个SQL语句，主键插入4，没有问题，但是插入的辅助索引值2在锁定的范围（1，3）中，因此执行同样会被阻塞。第三个SQL语句，插入的主键6没有被锁定，5也不在范围（1，3）之间。但插入的值在另一个锁定的范围（3，6）中，故同样需要等待。而下面的SQL语句，不会被阻塞，可以立即执行：
+
+```sql
+INSERT INTO z SELECT 8,6;
+INSERT INTO z SELECT 2,0;
+INSERT INTO z SELECT 6,7;
+```
+
+在InnoDB存储引擎中，对于INSERT的操作，其会检查插入记录的下一条记录是否被锁定，若已经被锁定，则不允许查询。对于上面的例子，会话A已经锁定了表z中b=3的记录，即已经锁定了（1，3）的范围，这时若在其他会话中进行如下的插入同样会导致阻塞：
+
+```sql
+INSERT INTO z SELECT 2,2;
+```
+
+因为在辅助索引列b上插入值为2的记录时，会检测到下一个记录3已经被索引。而将插入修改为如下的值，可以立即执行：
+
+```sql
+INSERT INTO z SELECT 2，0；
+```
+
+最后需再次提醒的是，对于唯一键值的锁定，Next-Key Lock降级为Record Lock仅存于查询所有的唯一索引列。**若唯一索引有多个列组成，而查询是查找多个唯一索引列中的其中一个，**那么查询其实是range类型查询，而不是point类型查询，故InnoDB存储引擎**依然适用Next-Key Lock进行锁定。**
+
+#### **总结：**
+
+1、锁唯一索引会降级为Record Lock
+
+2、锁辅助索引会先锁定聚集索引一条记录用**Record Lock**，对于辅助索引其加上的是**Next-Key Lock**，还有对于辅助索引下一键值加上**Gap Lock**
+
+3、唯一索引有多个列组成，查询唯一索引列中的其中一个，依然会使用Next-Key Lock进行锁定

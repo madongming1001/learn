@@ -1,4 +1,4 @@
-package com.mdm.headfirst.templatemethod.applet;
+package com.mdm.headfirst.template.applet;
 
 import java.applet.Applet;
 import java.awt.Graphics;

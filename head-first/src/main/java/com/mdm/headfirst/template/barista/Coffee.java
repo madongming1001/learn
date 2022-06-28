@@ -1,6 +1,4 @@
-package com.mdm.headfirst.templatemethod.barista;
-
-import com.mdm.headfirst.templatemethod.barista.CaffeineBeverage;
+package com.mdm.headfirst.template.barista;
 
 public class Coffee extends CaffeineBeverage {
 	public void brew() {

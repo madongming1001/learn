@@ -1,4 +1,4 @@
-package com.mdm.headfirst.templatemethod.barista;
+package com.mdm.headfirst.template.barista;
 
 public class BeverageTestDrive {
 	public static void main(String[] args) {

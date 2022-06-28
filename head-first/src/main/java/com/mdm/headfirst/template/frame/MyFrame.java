@@ -1,4 +1,4 @@
-package com.mdm.headfirst.templatemethod.frame;
+package com.mdm.headfirst.template.frame;
 
 import java.awt.*;
 import javax.swing.*;
