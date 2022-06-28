@@ -1,35 +1,41 @@
 package com.madm.learnroute.jvm.juc;
 
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
-class A implements Runnable{
 
-    @Override
-    public void run() {
-        System.out.println(3);
-    }
-}
 public class CyclicBarrierTest {
-    static CyclicBarrier barrier = new CyclicBarrier(2,new A());
+    // 自定义工作线程
+    private static class Worker extends Thread {
+        private CyclicBarrier cyclicBarrier;
 
-    public static void main(String[] args) {
-        new Thread(() -> {
+        public Worker(CyclicBarrier cyclicBarrier) {
+            this.cyclicBarrier = cyclicBarrier;
+        }
+
+        @Override
+        public void run() {
+            super.run();
+
             try {
-                barrier.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (BrokenBarrierException e) {
+                System.out.println(Thread.currentThread().getName() + "开始等待其他线程");
+                cyclicBarrier.await();
+                System.out.println(Thread.currentThread().getName() + "开始执行");
+                // 工作线程开始处理，这里用Thread.sleep()来模拟业务处理
+                Thread.sleep(1000);
+                System.out.println(Thread.currentThread().getName() + "执行完毕");
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-            System.out.println(1);
-        }).start();
-        try {
-            barrier.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (BrokenBarrierException e) {
-            e.printStackTrace();
         }
-        System.out.println(2);
+    }
+
+    public static void main(String[] args) {
+        int threadCount = 3;
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(threadCount);
+
+        for (int i = 0; i < threadCount; i++) {
+            System.out.println("创建工作线程" + i);
+            Worker worker = new Worker(cyclicBarrier);
+            worker.start();
+        }
     }
 }
