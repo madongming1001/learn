@@ -10,24 +10,21 @@ class A implements Runnable{
     }
 }
 public class CyclicBarrierTest {
-    static CyclicBarrier c = new CyclicBarrier(2,new A());
+    static CyclicBarrier barrier = new CyclicBarrier(2,new A());
 
     public static void main(String[] args) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    c.await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (BrokenBarrierException e) {
-                    e.printStackTrace();
-                }
-                System.out.println(1);
+        new Thread(() -> {
+            try {
+                barrier.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (BrokenBarrierException e) {
+                e.printStackTrace();
             }
+            System.out.println(1);
         }).start();
         try {
-            c.await();
+            barrier.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (BrokenBarrierException e) {
