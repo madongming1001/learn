@@ -1,6 +1,9 @@
 package com.madm.learnroute.jvm.synchronize;
 
 /**
+ * 查看JIT编译结果
+ * java -XX:+UnlockDiagnosticVMOptions -XX:PrintAssemblyOptions=hsdis-print-bytes -XX:CompileCommand=print,*AtomicInteger.incrementAndGet
+ *
  * @author ：图灵-杨过
  * @date：2019/7/26
  * @version: V1.0
