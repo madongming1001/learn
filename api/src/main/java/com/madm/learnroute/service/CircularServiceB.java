@@ -1,5 +1,7 @@
 package com.madm.learnroute.service;
 
+import org.springframework.aop.framework.AopContext;
+import org.springframework.aop.framework.AopProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +11,7 @@ public class CircularServiceB {
 	private CircularServiceA circularServiceA;
 
 	public void methodB() {
+		AopProxy aopProxy = (AopProxy) AopContext.currentProxy();
 		System.out.println("方法 B 执行");
 	}
 }

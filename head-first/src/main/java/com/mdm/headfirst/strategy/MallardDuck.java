@@ -1,7 +1,5 @@
 package com.mdm.headfirst.strategy;
 
-import com.mdm.headfirst.strategy.FlyWithWings;
-
 public class MallardDuck extends Duck {
 
 	public MallardDuck() {
