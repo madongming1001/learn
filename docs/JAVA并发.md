@@ -751,6 +751,24 @@ private volatile static DoubleCheckLock instance;
 
 前面提到过重排序分为**编译器重排序**和**处理器重排序**。为来实现 volatile 内存语义，JMM 会分别限制这两种类型的重排序类型。
 
+读：
+
+```java
+      volatile int a, b; if(a == 1 && b == 2)
+      JIT通过load acquire依赖保证读顺序：
+      0x2000000001de819c:  adds r37=597,r36;;  ;...84112554
+      0x2000000001de81a0:  ld1.acq r38=[r37];;  ;...0b30014a a010
+```
+
+写：
+
+```java
+      volatile A a; a = new A();
+      JIT通过lock addl使CPU的cache line失效：
+      0x01a3de1d: movb $0x0,0x1104800(%esi);
+      0x01a3de24: lock addl $0x0,(%esp);
+```
+
 下面是JMM针对编译器制定的 volatile 重排序规则表。
 
 | 第一个操作 | 第二个操作：普通读写 | 第二个操作：volatile读 | 第二个操作：volatile写 |
