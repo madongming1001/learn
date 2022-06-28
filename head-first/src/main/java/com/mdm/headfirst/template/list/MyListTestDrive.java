@@ -1,4 +1,4 @@
-package com.mdm.headfirst.templatemethod.list;
+package com.mdm.headfirst.template.list;
 
 import java.util.List;
 

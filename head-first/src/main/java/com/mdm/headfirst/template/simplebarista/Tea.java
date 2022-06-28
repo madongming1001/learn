@@ -1,4 +1,4 @@
-package com.mdm.headfirst.templatemethod.simplebarista;
+package com.mdm.headfirst.template.simplebarista;
 
 public class Tea {
  
