@@ -83,7 +83,7 @@ public class ProxyPractice {
     }
 
     private static void jdkProxyGenerate() throws Exception {
-//        System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles","true");
+        System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles","true");
         Cat cat = new Cat();
         Animal proxy = (Animal) TargetInvoker.getProxy(cat);
         proxy.call();
