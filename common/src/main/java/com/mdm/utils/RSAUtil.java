@@ -1,5 +1,6 @@
 package com.mdm.utils;
 
+import com.mdm.exception.RsaException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 
@@ -23,7 +24,7 @@ import java.util.Map;
  * 而解密密钥（即秘密密钥）SK是需要保密的。加密算法E和解密算法D也都是公开的。虽然解密密钥SK是由公开密钥PK决定的，
  * 由于无法计算出大数n的欧拉函数phi(N)，所以不能根据PK计算出SK。
  * 非对称算法的在应用的过程如下:
- *
+ * <p>
  * 接收方生成公钥和私钥，公钥公开，私钥保留；
  * 发送方将要发送的消息采用公钥加密，得到密文，然后将密文发送给接收方；
  * 接收方收到密文后，用自己的私钥进行解密，获得明文。
@@ -58,7 +59,7 @@ public class RSAUtil {
             rs.put(PRIVATE_KEY, privateKeyString);
         } catch (Exception e) {
             log.error("RsaUtils invoke genKeyPair failed.", e);
-            throw new RuntimeException("RsaUtils invoke genKeyPair failed.");
+            throw new RsaException("RsaUtils invoke genKeyPair failed.");
         }
         return rs;
     }
@@ -75,7 +76,7 @@ public class RSAUtil {
             return Base64.encodeBase64String(cipher.doFinal(str.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
             log.error("RsaUtils invoke encrypt failed.", e);
-            throw new RuntimeException("RsaUtils invoke encrypt failed.");
+            throw new RsaException("RsaUtils invoke encrypt failed.");
         }
     }
 
@@ -94,7 +95,7 @@ public class RSAUtil {
             return new String(cipher.doFinal(inputByte));
         } catch (Exception e) {
             log.error("RsaUtils invoke decrypt failed.", e);
-            throw new RuntimeException("RsaUtils invoke decrypt failed.");
+            throw new RsaException("RsaUtils invoke decrypt failed.");
         }
 
     }
