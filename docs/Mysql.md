@@ -565,19 +565,102 @@ by的优化如果不需要排序的可以加上**order by null禁止排序**。�
 
 #### **filesort文件排序方式**
 
-##### 单路排序：
+参考文章：http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/16%20%20%E2%80%9Corder%20by%E2%80%9D%E6%98%AF%E6%80%8E%E4%B9%88%E5%B7%A5%E4%BD%9C%E7%9A%84%EF%BC%9F.md
 
-是一次性取出满足条件行的所有字段，然后在sort buffer中进行排序；用trace工具可以看到sort_mode信息里显示< sort_key, additional_fields >或者< sort_key, packed_additional_fields >
+```sql
+CREATE TABLE `t` (
+  `id` int(11) NOT NULL,
+  `city` varchar(16) NOT NULL,
+  `name` varchar(16) NOT NULL,
+  `age` int(11) NOT NULL,
+  `addr` varchar(128) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `city` (`city`)
+) ENGINE=InnoDB;
+create index cityIndex ON t (city);
+select city,name,age from t where city='杭州' order by name limit 1000  ;
+```
 
-##### 双路排序（又叫**回表**排序模式）：
+在 city 字段上创建索引之后，我们用 explain 命令来看看这个语句的执行情况。
 
-是首先根据相应的条件取出相应的**排序字段**和**可以直接定位行数据的行 ID**，然后在 sort buffer 中进行排序，排序完后需要再次取回其它需要的字段；用trace工具可以看到sort_mode信息里显示< sort_key, rowid >
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/826579b63225def812330ef6c344a303.png)
 
-mysql通过比较系统变量 max_length_for_sort_data(默认4096字节，mysql 8.0.27)的大小和需要查询的字段总大小判断使用哪种排序方式
+图 1 使用 explain 命令查看语句的执行情况
 
-如果 字段的总长度小于max_length_for_sort_data ，那么使用 单路排序模式；
+Extra 这个字段中的“Using filesort”表示的就是需要排序，MySQL 会给每个线程分配一块内存用于排序，称为 sort_buffer。
 
-如果 字段的总长度大于max_length_for_sort_data ，那么使用 双路排序模式
+#### 全字段排序：
+
+##### **使用sort_buffer的大体执行流程：**
+
+1. 初始化 sort_buffer，确定放入 name、city、age 这三个字段；
+2. 从索引 city 找到第一个满足 city='杭州’条件的主键 id，也就是图中的 ID_X；
+3. 到主键 id 索引取出整行，取 name、city、age 三个字段的值，存入 sort_buffer 中；
+4. 从索引 city 取下一个记录的主键 id；
+5. 重复步骤 3、4 直到 city 的值不满足查询条件为止，对应的主键 id 也就是图中的 ID_Y；
+6. 对 sort_buffer 中的数据按照字段 name 做快速排序；
+7. 按照排序结果取前 1000 行返回给客户端。
+
+**“按 name 排序”这个动作，可能在内存中完成，也可能需要使用外部排序，这取决于排序所需的内存和参数 sort_buffer_size。sort_buffer_size，就是 MySQL 为排序开辟的内存（sort_buffer）的大小。如果要排序的数据量小于 sort_buffer_size，排序就在内存中完成。但如果排序数据量太大，内存放不下，则不得不利用磁盘临时文件辅助排序。**
+
+你可以用下面介绍的方法，来确定一个排序语句是否使用了临时文件。
+
+```sql
+/* 打开 optimizer_trace，只对本线程有效 */
+SET optimizer_trace='enabled=on'; 
+/* @a 保存 Innodb_rows_read 的初始值 */
+select VARIABLE_VALUE into @a from  performance_schema.session_status where variable_name = 'Innodb_rows_read';
+/* 执行语句 */
+select city, name,age from t where city='杭州' order by name limit 1000; 
+/* 查看 OPTIMIZER_TRACE 输出 */
+SELECT * FROM `information_schema`.`OPTIMIZER_TRACE`\G
+/* @b 保存 Innodb_rows_read 的当前值 */
+select VARIABLE_VALUE into @b from performance_schema.session_status where variable_name = 'Innodb_rows_read';
+/* 计算 Innodb_rows_read 差值 */
+select @b-@a;
+```
+
+这个方法是通过查看 OPTIMIZER_TRACE 的结果来确认的，你可以从 number_of_tmp_files 中看到是否使用了临时文件。
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/89baf99cdeefe90a22370e1d6f5e6495.png)
+
+图 4 全排序的 OPTIMIZER_TRACE 部分结果
+
+**number_of_tmp_files** 表示的是，排序过程中使用的临时文件数。你一定奇怪，为什么需要 12 个文件？内存放不下时，就需要使用外部排序，外部排序一般使用归并排序算法。可以这么简单理解，**MySQL 将需要排序的数据分成 12 份，每一份单独排序后存在这些临时文件中。然后把这 12 个有序文件再合并成一个有序的大文件。**
+
+```sql
+#定在创建 InnoDB 索引期间用于对数据进行排序的排序缓冲区的大小。
+innodb_sort_buffer_size,1048576 1M
+#每个语句进行排序的缓冲区大小
+sort_buffer_size,786432 0.75M
+```
+
+#### rowId排序
+
+​		如果单行长度太大，存放到内存的数据就会很少，这样要分成很多个临时文件，排序的性能会很差。mysql通过比较系统变量 max_length_for_sort_data(默认4096字节，mysql 8.0.27)的大小和需要查询的字段总大小判断使用哪种排序方式（全字段还是rowid排序）
+
+**排序的执行过程变成如下的样子：**
+
+1. 初始化 sort_buffer，确定放入两个字段，即 name 和 id；
+2. 从索引 city 找到第一个满足 city='杭州’条件的主键 id，也就是图中的 ID_X；
+3. 到主键 id 索引取出整行，取 name、id 这两个字段，存入 sort_buffer 中；
+4. 从索引 city 取下一个记录的主键 id；
+5. 重复步骤 3、4 直到不满足 city='杭州’条件为止，也就是图中的 ID_Y；
+6. 对 sort_buffer 中的数据按照字段 name 进行排序；
+7. 遍历排序结果，取前 1000 行，并按照 id 的值回到原表中取出 city、name 和 age 三个字段返回给客户端。
+
+#### 全字段排序 VS rowid 排序
+
+如果 MySQL 实在是担心排序内存太小，会影响排序效率，才会采用 rowid 排序算法，这样排序过程中一次可以排序更多行，但是需要再回到原表去取数据。
+
+如果 MySQL 认为内存足够大，会优先选择全字段排序，把需要的字段都放到 sort_buffer 中，这样排序后就会直接从内存里面返回查询结果了，不用再回到原表去取数据。
+
+这也就体现了 MySQL 的一个设计思想：**如果内存够，就要多利用内存，尽量减少磁盘访问。**对于 InnoDB 表来说，rowid 排序会要求回表多造成磁盘读，因此不会被优先选择。
+
+#### 优化：
+
+1. 可以利用添加索引来避免排序。
+2. 也可利用索引覆盖来直接返回结果，跟利用索引来避免排序相比好处是不需要上聚集索引里找到另一个缺失的字段然后返回。
 
 
 
