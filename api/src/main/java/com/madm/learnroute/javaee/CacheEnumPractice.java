@@ -9,5 +9,8 @@ import com.madm.learnroute.constant.CacheMethod;
 public class CacheEnumPractice {
     public static void main(String[] args) {
         CacheMethod getMenu = CacheMethod.GET_MENU;
+        int corePoolSize = Runtime.getRuntime().availableProcessors();
+        System.out.println(corePoolSize);
+        System.out.println(getMenu);
     }
 }
