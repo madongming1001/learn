@@ -7,6 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.log.LogFormatUtils;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.concurrent.TimeUnit;
@@ -20,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
 @EnableJSONDoc
+@EnableScheduling
 public class LearnApiApplication {
 
     public static void main(String[] args) {
