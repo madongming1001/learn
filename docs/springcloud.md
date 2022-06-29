@@ -4,3 +4,4 @@
 
 ![spring-cloud-gateway-work.png](https://segmentfault.com/img/remote/1460000019101832)
 
+Spring Cloud Gateway 的Filter的种类有两种，一：GatewayFilter (单一的过滤器)。二：GlobalFilter(全局过滤器)
