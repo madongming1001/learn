@@ -16,10 +16,9 @@ import java.util.concurrent.TimeUnit;
  * @author madongming
  */
 
-@SpringBootApplication(scanBasePackages = {"com.madm.learnroute"})
+@SpringBootApplication
 @EnableFeignClients
 @EnableTransactionManagement
-@EnableAspectJAutoProxy
 @EnableJSONDoc
 @EnableScheduling
 public class LearnApiApplication {
