@@ -265,7 +265,7 @@ public class UserServiceImpl implements UserService{
 
 ## 事务传播行为
 
-![image-20211216223303217](noteImg/image-20211216223303217.png)
+参考文章：https://juejin.cn/post/6844903608224333838
 
 ![image-20211216223807073](noteImg/image-20211216223807073.png)
 
@@ -280,6 +280,87 @@ public class UserServiceImpl implements UserService{
 - `TransactionDefinition.PROPAGATION_NEVER`：以非事务方式运行，如果当前存在事务，则抛出异常。
 - `TransactionDefinition.PROPAGATION_MANDATORY`：如果当前存在事务，则加入该事务；如果当前没有事务，则抛出异常。
 - `TransactionDefinition.PROPAGATION_NESTED`：如果当前存在事务，则创建一个事务作为当前事务的嵌套事务来运行；如果当前没有事务，则该取值等价于`TransactionDefinition.PROPAGATION_REQUIRED`。
+
+## Spring事务管理接口介绍
+
+Spring 框架中，事务管理相关最重要的 3 个接口如下：
+
+- **PlatformTransactionManager**： （平台）事务管理器，Spring 事务策略的核心。
+- **TransactionDefinition**： 事务定义信息(事务隔离级别、传播行为、超时、只读、回滚规则)。
+- **TransactionStatus**： 事务运行状态。
+
+我们可以把 **PlatformTransactionManager** 接口可以被看作是事务上层的管理者，而 **TransactionDefinition** 和 **TransactionStatus** 这两个接口可以看作是事务的描述。
+
+**PlatformTransactionManager** 会根据 **TransactionDefinition** 的定义比如事务超时时间、隔离级别、传播行为等来进行事务管理 ，而 **TransactionStatus** 接口则提供了一些方法来获取事务相应的状态比如是否新事务、是否可以回滚等等。
+
+
+
+## spring支持两种事务
+
+### 编程式事务管理
+
+通过 `TransactionTemplate`或者`TransactionManager`手动管理事务，实际应用中很少使用，但是对于你理解 Spring 事务管理原理有帮助。
+
+使用`TransactionTemplate` 进行编程式事务管理的示例代码如下：
+
+```java
+@Autowired
+private TransactionTemplate transactionTemplate;
+public void testTransaction() {
+
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+
+                try {
+
+                    // ....  业务代码
+                } catch (Exception e){
+                    //回滚
+                    transactionStatus.setRollbackOnly();
+                }
+
+            }
+        });
+}
+```
+
+使用 `TransactionManager` 进行编程式事务管理的示例代码如下：
+
+```java
+@Autowired
+private PlatformTransactionManager transactionManager;
+
+public void testTransaction() {
+
+  TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+          try {
+               // ....  业务代码
+              transactionManager.commit(status);
+          } catch (Exception e) {
+              transactionManager.rollback(status);
+          }
+}
+```
+
+### 非编程式事务
+
+#### 声明式事务管理
+
+推荐使用（代码侵入性最小），实际是通过 AOP 实现（基于`@Transactional` 的全注解方式使用最多）。
+
+使用 `@Transactional`注解进行事务管理的示例代码如下：
+
+```java
+@Transactional(propagation=propagation.PROPAGATION_REQUIRED)
+public void aMethod {
+  //do something
+  B b = new B();
+  C c = new C();
+  b.bMethod();
+  c.cMethod();
+}
+```
 
 
 
