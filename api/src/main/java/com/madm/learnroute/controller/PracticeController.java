@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.protobuf.util.JsonFormat;
 import com.madm.learnroute.annotation.UserAuthenticate;
+import com.madm.learnroute.service.CircularServiceA;
 import com.mdm.model.Response;
 import com.madm.learnroute.feign.UserInfoFeignClient;
 import com.mdm.pojo.User;
@@ -12,9 +13,11 @@ import com.madm.learnroute.proto.MessageUserLogin;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -28,6 +31,10 @@ public class PracticeController {
     @Resource
     UserInfoFeignClient userInfoFeignClient;
 
+    @Autowired
+    CircularServiceA circularServiceA;
+
+
     private ThreadLocal<MessageUserLogin.MessageUserLoginResponse.Builder> localCache = new ThreadLocal();
 
     @Value("${config.info:If the current value does not use the default value}")
@@ -36,6 +43,11 @@ public class PracticeController {
     @Value("${faultToleranceTime:"+"#"+"{60 * 1000}}")
     private long faultToleranceTime;
 
+
+    @PostConstruct
+    public void fireAopMethod(){
+        circularServiceA.methodA();
+    }
 
     @UserAuthenticate
     @RequestMapping("/success")
@@ -59,7 +71,6 @@ public class PracticeController {
             String token = UUID.randomUUID().toString();
             builder.setAccessToken(token);
             builder.setUsername(user.getName());
-
             localCache.set(builder);
             MessageUserLogin.MessageUserLoginResponse.Builder localCaches = localCache.get();
             localCaches.setAccessToken(UUID.randomUUID().toString());
