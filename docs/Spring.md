@@ -1,4 +1,4 @@
-# spring假设去掉二级缓存？
+# espring假设去掉二级缓存？
 
 如果去掉了二级缓存，则需要直接在 `singletonFactory.getObject()` 阶段初始化完毕，并放到一级缓存中。
 
@@ -61,8 +61,6 @@ spring.main.allow-circular-references=true
 * <li>{@code postProcessAfterInitialization} methods of BeanPostProcessors
 * </ol>
 ```
-
-
 
 ```java
 // Invoke factory processors registered as beans in the context.
@@ -130,8 +128,6 @@ applicationEventMulticaster（spring上下文监听器）
 
 
 
-## SPI（service provider interface）
-
 ## Spring Aop
 
 ![image-20211210103842874](noteImg/image-20211210103842874.png)
@@ -196,7 +192,7 @@ SpringAop运行过程
 //initializeBean&postProcessAfterInitialization
 ```
 
-## spring创建对象的五种方式
+# spring创建对象的五种方式
 
 
 
@@ -204,9 +200,68 @@ SpringAop运行过程
 
 ![image-20211216220650964](noteImg/image-20211216220650964.png)
 
+## 通过BeanPostProcess实现InstantiationBeanPostProcessor创建对象
+
+```java
+public class CustomTargetSource extends AbstractBeanFactoryBasedTargetSource {
+
+    private static final long serialVersionUID = 1231212121L;
+
+    @Override
+    public Object getTarget() throws Exception {
+        return getBeanFactory().getBean(getTargetBeanName());
+    }
+}
+public class CustomTargetSourceCreator extends AbstractBeanFactoryBasedTargetSourceCreator {
+    @Override
+    protected AbstractBeanFactoryBasedTargetSource createBeanFactoryBasedTargetSource(Class<?> beanClass, String beanName) {
+        if (getBeanFactory() instanceof ConfigurableListableBeanFactory) {
+            if (beanClass.isAssignableFrom(UserServiceImpl.class)) {
+                return new CustomTargetSource();
+            }
+        }
+        return null;
+    }
+}
+@Component
+public class SetCustomTargetSourceCreator implements PriorityOrdered, BeanFactoryAware, InitializingBean {
+
+    private BeanFactory beanFactory;
+    private boolean load = false;
+
+    @Override
+    public int getOrder() {
+        return 45;
+    }
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        this.beanFactory = beanFactory;
+    }
 
 
-
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (!load) {
+            AnnotationAwareAspectJAutoProxyCreator annotationAwareAspectJAutoProxyCreator = beanFactory.getBean(AnnotationAwareAspectJAutoProxyCreator.class);
+            CustomTargetSourceCreator customTargetSourceCreator = new CustomTargetSourceCreator();
+            customTargetSourceCreator.setBeanFactory(beanFactory);
+            annotationAwareAspectJAutoProxyCreator.setCustomTargetSourceCreators(customTargetSourceCreator);
+            load = !load;
+        }
+    }
+}
+public interface UserService {
+    void userInfo();
+}
+@Service
+public class UserServiceImpl implements UserService{
+    @Override
+    public void userInfo() {
+        System.out.println("打印了用户信息 UserServiceImpl1");
+    }
+}
+```
 
 ## 事务传播行为
 
@@ -260,7 +315,9 @@ AnnotationConfigUtils.java类的
 2. CommonAnnotationBeanPostProcessor.java
 3. ConfigurationClassPostProcessor.java
 
+# springboot2.0默认创建什么代理？
 
+参考文章：https://note.youdao.com/ynoteshare/index.html?id=ca8cc5711375e0fd4e605aa4f5aa4be3&type=note&_time=1656590927414
 
 
 
@@ -470,3 +527,45 @@ Logback与SLF4J结合起来用,两个组件的官方网站如下：
 13、自动去除旧的日志文件 通过设置TimeBasedRollingPolicy或者SizeAndTimeBasedFNATP的maxHistory属性，你可以控制已经产生日志文件的最大数量。如果设置maxHistory 12，那那些log文件超过12个月的都会被自动移除。
 
 总之，logback比log4j优秀，可以取代之。
+
+
+
+
+
+## 解析@Service、@Repository、@Controller等注解
+
+参考文章：https://blog.csdn.net/m0_68615056/article/details/124371422?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522165658284316782391839919%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=165658284316782391839919&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~baidu_landing_v2~default-2-124371422-null-null.142^v27^pc_search_result_control_group,157^v15^new_3&utm_term=MergedAnnotationsCollection&spm=1018.2226.3001.4187
+
+```java
+ConfigurationClassPostProcessor&processConfigBeanDefinitions -> ConfigurationClassParser&doProcessConfigurationClass -> 
+ComponentScanAnnotationParser&parse ->
+ClassPathBeanDefinitionScanner&doScan ->
+ClassPathScanningCandidateComponentProvider&scanCandidateComponents ->
+
+ConfigurationClassPostProcessor ==》ConfigurationClassParser ==》ComponentScanAnnotationParser ==》ClassPathBeanDefinitionScanne ==》ClassPathScanningCandidateComponentProvider
+
+//通过指定的包路径，扫描所有的class文件，asm字节码解析获取class的注解信息封装成MetadataReader，并通过   MergedAnnotationsCollection 递归合并父级的注解，最后判断class是否满足注入ico容器，即有没有@Component注解。
+
+
+SimpleAnnotationMetadataReadingVisitor
+CachingMetdataReaderFactory
+SimpleMetadataReader 构造方法构建了一个 SimpleAnnotationMetadataReadingVisitor
+SimpleAnnotationMetadataReadingVisitor&visitEnd 回掉方法
+MergedAnnotationsCollection
+```
+
+
+
+
+
+# @Import注解
+
+支持注入：
+
+```java
+//@Configuration
+//实现ImportSelector接口的类
+//实现ImportBeanDefinitionRegistrar接口的类
+//@component类
+```
+
