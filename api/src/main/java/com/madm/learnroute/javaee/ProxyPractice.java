@@ -14,6 +14,11 @@ import java.lang.reflect.Proxy;
 import java.util.Properties;
 
 /**
+ * 代理模式是一种设计模式，提供了对目标对象额外的访问方式，
+ * 即通过代理对象访问目标对象，这样可以在不修改原目标对象的前提下，
+ * 提供额外的功能操作，扩展目标对象的功能。
+ * jdk代理对象的缺点：被代理对象必须实现一个或多个接口
+ * Cglib代理对象的缺点：目标不能是final类
  * Created by YangTao
  */
 interface Animal {
@@ -66,16 +71,13 @@ public class ProxyPractice {
         //恰好这个对象也需要动态代理生成
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(Cat.class);
-        enhancer.setCallback(new MethodInterceptor() {
-            @Override
-            public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-                System.out.println("before");
-//                Object result = methodProxy.invokeSuper(o, objects);//不报错
-                Object result = methodProxy.invoke(o, objects);//报错 由于o是创建的代理对象 他还是会调用你代理的方法 所以递归循环了 objects 是参数
-//                Object result = method.invoke(o, objects);//报错 由于o是创建的代理对象 他还是会调用你代理的方法 所以递归循环了 objects 是参数
-                System.out.println("after");
-                return result;
-            }
+        //o是代理子类实例，method是父类方法，args是方法如入参，proxy是代理子类方法，用于委托基类中的原方法。
+        enhancer.setCallback((MethodInterceptor) (obj, method, args, proxy) -> {
+            System.out.println("before");
+                Object result = proxy.invokeSuper(obj, args);//不报错
+//            Object result = proxy.invoke(obj, args);//报错 由于obj是创建的代理对象 他还是会调用你代理的方法 所以递归循环了 args 是参数
+            System.out.println("after");
+            return result;
         });
 
         Cat cat = (Cat) enhancer.create();
@@ -104,7 +106,7 @@ public class ProxyPractice {
     public static void main(String[] args) throws Exception {
 
         //JDK代理生成 InvocationHandler
-        jdkProxyGenerate();
+//        jdkProxyGenerate();
 
         //CGLIB代理生成 MethodInterceptor
         cglibProxyGenerate();
