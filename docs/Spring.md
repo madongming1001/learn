@@ -188,7 +188,13 @@ SpringAop运行过程
 
 ![AnnatationAwareAspectJAutoProxyCreator.png](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/11/8/16e4ad7b38872724~tplv-t2oaga2asx-watermark.awebp)
 
-
+```java
+@EnableAspectJAutoProxy 
+//注入了一个关键的类 AnnotationAwareAspectJAutoProxyCreator
+//两种方式创建代理类
+//resolveBeforeInstantiation&postProcessBeforeInstantiation
+//initializeBean&postProcessAfterInitialization
+```
 
 ## spring创建对象的五种方式
 
