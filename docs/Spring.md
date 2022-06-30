@@ -1,4 +1,4 @@
-## dspring假设去掉二级缓存？
+# spring假设去掉二级缓存？
 
 如果去掉了二级缓存，则需要直接在 `singletonFactory.getObject()` 阶段初始化完毕，并放到一级缓存中。
 
@@ -12,9 +12,7 @@
 
 
 
-
-
-## spring假设去掉三级缓存？
+# spring假设去掉三级缓存？
 
 去掉三级缓存之后，Bean 直接创建 **earlySingletonObjects**， 看着好像也可以。如果有代理的时候，在 earlySingletonObjects 直接放代理对象就行了。但是会导致一个问题：**在实例化阶段就得执行后置处理器，判断有AnnotationAwareAspectJAutoProxyCreator 并创建代理对象**。这么一想，是不是会对 Bean 的生命周期有影响。同样，先创建 singletonFactory 的好处就是：在真正需要实例化的时候，再使用 singletonFactory.getObject() 获取 Bean 或者 Bean 的代理。相当于是延迟实例化。
 
@@ -24,7 +22,7 @@
 
 如果单纯为了解决循环依赖问题，那么使用二级缓存足够解决问题，三级缓存存在的意义是为了避免代理，如果没有代理对象，二级缓存足够解决问题。
 
-### 2.6默认去除循环依赖
+### Spring 2.6默认去除循环依赖
 
 circular refernences prohibited by default，也可以通过参数开启
 

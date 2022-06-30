@@ -28,31 +28,4 @@ public class TeacherStrategy implements InitializingBean, ApplicationContextAwar
         this.applicationContext = applicationContext;
     }
 
-    public static void main(String[] args) {
-        System.out.println(1 & 3);
-//
-//        // 数相同返回零
-//        System.out.println(1 ^ 1);
-//        // 数不同就是相加
-//        System.out.println(1 | 2);
-//
-//        boolean isZero = true;
-//        boolean isNotZero = true;
-//        if(isZero){
-//            // 两个数相等的话用^返回为零
-//            System.out.println(1 ^ 1);
-//            // 不同就为0
-//            System.out.println(1 & 3);
-//        }
-//        if(isNotZero){
-//            // ｜ 的话就是数的本身
-//            System.out.println(1 | 1);
-//            // & 的话就是数的本身
-//            System.out.println(1 & 1);
-//            // 数不同就是相加
-//            System.out.println(1 | 2);
-//            // 数不同就是相加
-//            System.out.println(1 ^ 2);
-//        }
-    }
 }
