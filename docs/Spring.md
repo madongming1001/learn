@@ -400,6 +400,9 @@ public interface TransactionStatus{
     boolean isRollbackOnly(); // 是否为只回滚
     boolean isCompleted; // 是否已完成
 }
+DataSourceTransactionObject
+设置保存点
+设置通过TransactionSynchronizationManager&resource属性获取 key DataSource value为ConnectionHolder
 ```
 
 
@@ -454,7 +457,7 @@ public void testTransaction() {
 
 ### 非编程式事务
 
-#### 声明式事务管理
+### 声明式事务管理
 
 推荐使用（代码侵入性最小），实际是通过 AOP 实现（基于`@Transactional` 的全注解方式使用最多）。
 
@@ -477,7 +480,25 @@ public void aMethod {
 
 ### 事务失效几种方式
 
-如果你在方法中有`try{}catch(Exception e){}`处理，那么try里面的代码块就脱离了事务的管理，若要事务生效需要在catch中`throw new RuntimeException ("xxxxxx");`这一点也是面试中会问到的事务失效的场景。
+1. 数据库引擎是否支持事务（Mysql 的 MyIsam引擎不支持事务）
+
+2. 注解所在的类是否被加载为 Bean（是否被Spring 管理）
+
+3. 注解所在的方法是否为 public 修饰的
+
+4. 是否存在自身调用的问题
+
+5. 所用数据源是否加载了事务管理器
+
+6. @Transactional的扩展配置propagation是否正确
+
+7. 异常没有被抛出, 或异常类型错误
+
+8. 方法用final修饰或static修饰
+
+9. 多线程调用
+
+   如果你在方法中有`try{}catch(Exception e){}`处理，那么try里面的代码块就脱离了事务的管理，若要事务生效需要在catch中`throw new RuntimeException ("xxxxxx");`这一点也是面试中会问到的事务失效的场景。
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/JdLkEI9sZfebk1L685vAHGkJrjc4fDWYVgKvBtfoDS5Im3FibV2PbIkoMtnbqXE9ia2qknGBZ7D5YOStXbP6iaYjQ/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
 
@@ -489,7 +510,9 @@ public void aMethod {
 
 3、this.本方法的调用，被调用方法上注解是不生效的，因为无法再次进行切面增强
 
+## mybatis使用spring事务创建的数据库连接
 
+参考文章：https://qiuyadongsite.github.io/2019/01/15/mybatis-sources-code-6/
 
 # Feign底层实现细节
 
