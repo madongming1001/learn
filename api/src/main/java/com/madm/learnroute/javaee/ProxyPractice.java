@@ -2,10 +2,7 @@ package com.madm.learnroute.javaee;
 
 
 import net.sf.cglib.core.DebuggingClassWriter;
-import org.springframework.cglib.proxy.Callback;
-import org.springframework.cglib.proxy.Enhancer;
-import org.springframework.cglib.proxy.MethodInterceptor;
-import org.springframework.cglib.proxy.MethodProxy;
+import org.springframework.cglib.proxy.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -55,8 +52,7 @@ class TargetInvoker implements InvocationHandler {
                 // 代理需要实现的接口，可指定多个，这是一个数组
                 target.getClass().getInterfaces(),
                 // 代理对象处理器
-                new TargetInvoker(target)
-        );
+                new TargetInvoker(target));
         return proxy;
     }
 }
@@ -72,20 +68,23 @@ public class ProxyPractice {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(Cat.class);
         //o是代理子类实例，method是父类方法，args是方法如入参，proxy是代理子类方法，用于委托基类中的原方法。
-        enhancer.setCallback((MethodInterceptor) (obj, method, args, proxy) -> {
+        enhancer.setCallbacks(new Callback[]{(MethodInterceptor) (obj, method, args, proxy) -> {
             System.out.println("before");
-                Object result = proxy.invokeSuper(obj, args);//不报错
+            Object result = proxy.invokeSuper(obj, args);//不报错
+//            Object result = method.invoke(new Cat(), args);
 //            Object result = proxy.invoke(obj, args);//报错 由于obj是创建的代理对象 他还是会调用你代理的方法 所以递归循环了 args 是参数
             System.out.println("after");
             return result;
-        });
+        }, NoOp.INSTANCE});
+        enhancer.setCallbackFilter(method -> 0 );
+
 
         Cat cat = (Cat) enhancer.create();
         cat.call();
     }
 
     private static void jdkProxyGenerate() throws Exception {
-        System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles","true");
+        System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
         Cat cat = new Cat();
         Animal proxy = (Animal) TargetInvoker.getProxy(cat);
         proxy.call();

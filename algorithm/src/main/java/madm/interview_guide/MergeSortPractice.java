@@ -1,13 +1,13 @@
 package madm.interview_guide;
 
-import madm.util.PrintUtils;
+import com.mdm.utils.PrintUtil;
 
 public class MergeSortPractice {
     public static void main(String[] args) {
 //        int[] arr = {5,8,6,3,9,2,1,7};
         int[] arr = {5, 2, 3, 1, 4};
         group(arr, 0, arr.length - 1);
-        PrintUtils.printArray(arr);
+        PrintUtil.printArray(new int[][]{arr});
     }
 
     public static int[] group(int[] arr, int start, int end) {

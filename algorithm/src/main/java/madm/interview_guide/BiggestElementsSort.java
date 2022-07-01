@@ -1,6 +1,6 @@
 package madm.interview_guide;
 
-import madm.util.RandomGeneratorNumber;
+import com.mdm.utils.RandomGeneratorNumber;
 
 import java.util.Arrays;
 import java.util.List;

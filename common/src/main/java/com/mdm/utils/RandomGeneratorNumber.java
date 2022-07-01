@@ -1,4 +1,4 @@
-package madm.util;
+package com.mdm.utils;
 
 public class RandomGeneratorNumber {
 
