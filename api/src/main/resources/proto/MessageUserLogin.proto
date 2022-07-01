@@ -12,4 +12,4 @@ message MessageUserLoginResponse {
   string username = 2;
 }
 
-//protoc --java_out=/Users/madongming/IdeaProjects/learn/learn-api/src/main/java  ./learn-api/src/main/resources/proto/MessageUserLogin.proto
+//protoc --java_out=/Users/madongming/IdeaProjects/learn/api/src/main/java  ./api/src/main/resources/proto/MessageUserLogin.proto
