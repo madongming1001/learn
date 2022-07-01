@@ -9,19 +9,20 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 @Service
 public class CircularServiceA {
-	private String fieldA = "字段 A";
+    private String fieldA = "字段 A";
 
-	@Autowired
-	private CircularServiceB circularServiceB;
+    @Autowired
+    private CircularServiceB circularServiceB;
 
-	@Transactional
-	public void methodA() {
-		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-			@Override
-			public void suspend() {
+    @Transactional
+    public void methodA() {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void suspend() {
 
-			}
-		});
-		System.out.println("方法 A 执行");
-	}
+            }
+        });
+        int i = 1 / 0;//测试 @AfterThrowing 通知
+        System.out.println("方法 A 执行");
+    }
 }

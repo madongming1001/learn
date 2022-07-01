@@ -10,8 +10,6 @@ public class AspectB {
 
 	@Before("execution(public void com.madm.learnroute.service.CircularServiceB.methodB())")
 	public void beforeB() {
-
 		System.out.println("beforeB 执行");
-
 	}
 }
