@@ -152,9 +152,11 @@ throwable
 // Around advice end exec ...
 ```
 
+**注：可以通过Order注解或者实现Order接口修改优先级，数越大优先级越低**
 
+## 注解对应Advice接口
 
-注：可以通过Order注解或者实现Order接口修改优先级，数越大优先级越低**
+![image-20220701190744135](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220701190744135.png)
 
 ## DefaultListableBeanFactory类图
 
@@ -184,11 +186,9 @@ throwable
 
 
 
+## SpringAop运行过程
 
-
-# SpringAop运行过程
-
-1.调用被代理的方法
+## 1.调用被代理的方法
 
 2.找到cglib文件
 
@@ -531,12 +531,6 @@ public void aMethod {
 2、方法必须是public修饰符。否则注解不会生效，但是加了注解也没啥毛病，不会报错，只是没卵用而已。
 
 3、this.本方法的调用，被调用方法上注解是不生效的，因为无法再次进行切面增强
-
-### 注解对应Advice接口
-
-![image-20220701190744135](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220701190744135.png)
-
-
 
 ## mybatis使用spring事务创建的数据库连接
 
