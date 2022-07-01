@@ -263,123 +263,6 @@ public class UserServiceImpl implements UserService{
 }
 ```
 
-## 事务传播行为
-
-参考文章：https://juejin.cn/post/6844903608224333838
-
-![image-20211216223807073](noteImg/image-20211216223807073.png)
-
-**先简单介绍一下Spring事务的传播行为：**
-
-所谓事务的传播行为是指，如果在开始当前事务之前，一个事务上下文已经存在，此时有若干选项可以指定一个事务性方法的执行行为。在`TransactionDefinition`定义中包括了如下几个表示传播行为的常量：
-
-- `TransactionDefinition.PROPAGATION_REQUIRED`：如果当前存在事务，则加入该事务；如果当前没有事务，则创建一个新的事务。这是默认值。
-- `TransactionDefinition.PROPAGATION_REQUIRES_NEW`：创建一个新的事务，如果当前存在事务，则把当前事务挂起。
-- `TransactionDefinition.PROPAGATION_SUPPORTS`：如果当前存在事务，则加入该事务；如果当前没有事务，则以非事务的方式继续运行。
-- `TransactionDefinition.PROPAGATION_NOT_SUPPORTED`：以非事务方式运行，如果当前存在事务，则把当前事务挂起。
-- `TransactionDefinition.PROPAGATION_NEVER`：以非事务方式运行，如果当前存在事务，则抛出异常。
-- `TransactionDefinition.PROPAGATION_MANDATORY`：如果当前存在事务，则加入该事务；如果当前没有事务，则抛出异常。
-- `TransactionDefinition.PROPAGATION_NESTED`：如果当前存在事务，则创建一个事务作为当前事务的嵌套事务来运行；如果当前没有事务，则该取值等价于`TransactionDefinition.PROPAGATION_REQUIRED`。
-
-## Spring事务管理接口介绍
-
-Spring 框架中，事务管理相关最重要的 3 个接口如下：
-
-- **PlatformTransactionManager**： （平台）事务管理器，Spring 事务策略的核心。
-- **TransactionDefinition**： 事务定义信息(事务隔离级别、传播行为、超时、只读、回滚规则)。
-- **TransactionStatus**： 事务运行状态。
-
-我们可以把 **PlatformTransactionManager** 接口可以被看作是事务上层的管理者，而 **TransactionDefinition** 和 **TransactionStatus** 这两个接口可以看作是事务的描述。
-
-**PlatformTransactionManager** 会根据 **TransactionDefinition** 的定义比如事务超时时间、隔离级别、传播行为等来进行事务管理 ，而 **TransactionStatus** 接口则提供了一些方法来获取事务相应的状态比如是否新事务、是否可以回滚等等。
-
-
-
-## spring支持两种事务
-
-### 编程式事务管理
-
-通过 `TransactionTemplate`或者`TransactionManager`手动管理事务，实际应用中很少使用，但是对于你理解 Spring 事务管理原理有帮助。
-
-使用`TransactionTemplate` 进行编程式事务管理的示例代码如下：
-
-```java
-@Autowired
-private TransactionTemplate transactionTemplate;
-public void testTransaction() {
-
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
-
-                try {
-
-                    // ....  业务代码
-                } catch (Exception e){
-                    //回滚
-                    transactionStatus.setRollbackOnly();
-                }
-
-            }
-        });
-}
-```
-
-使用 `TransactionManager` 进行编程式事务管理的示例代码如下：
-
-```java
-@Autowired
-private PlatformTransactionManager transactionManager;
-
-public void testTransaction() {
-
-  TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
-          try {
-               // ....  业务代码
-              transactionManager.commit(status);
-          } catch (Exception e) {
-              transactionManager.rollback(status);
-          }
-}
-```
-
-### 非编程式事务
-
-#### 声明式事务管理
-
-推荐使用（代码侵入性最小），实际是通过 AOP 实现（基于`@Transactional` 的全注解方式使用最多）。
-
-使用 `@Transactional`注解进行事务管理的示例代码如下：
-
-```java
-@Transactional(propagation=propagation.PROPAGATION_REQUIRED)
-public void aMethod {
-  //do something
-  B b = new B();
-  C c = new C();
-  b.bMethod();
-  c.cMethod();
-}
-```
-
-
-
-### 事务失效几种方式
-
-如果你在方法中有`try{}catch(Exception e){}`处理，那么try里面的代码块就脱离了事务的管理，若要事务生效需要在catch中`throw new RuntimeException ("xxxxxx");`这一点也是面试中会问到的事务失效的场景。
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/JdLkEI9sZfebk1L685vAHGkJrjc4fDWYVgKvBtfoDS5Im3FibV2PbIkoMtnbqXE9ia2qknGBZ7D5YOStXbP6iaYjQ/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/JdLkEI9sZfebk1L685vAHGkJrjc4fDWYzO10TRrKd4Dyk9syXnpYPE74K98MoSwaLahoysfMKJFHutV3Vns4uw/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
-
-1、就是`@Transactional`注解保证的是每个方法处在一个事务，如果有try一定在catch中抛出运行时异常。
-
-2、方法必须是public修饰符。否则注解不会生效，但是加了注解也没啥毛病，不会报错，只是没卵用而已。
-
-3、this.本方法的调用，被调用方法上注解是不生效的，因为无法再次进行切面增强。
-
-
-
 ## RestTemplate的Ribbon
 
 ![image-20220119111513269](noteImg/image-20220119111513269.png)
@@ -467,6 +350,144 @@ SpringApplication&run&prepareEnvironment去加载bootstrap.yml文件
 读取nacos配置文件是在SpringApplication&run&prepareContext方法&applyInitializers&PropertySourceBootstrapConfiguration&PropertySourceLocator.locateCollection&NacosPropertySourceLocator.locate
 
 源码参考文章：https://juejin.cn/post/6887751198737170446
+
+## 事务传播行为
+
+参考文章：https://juejin.cn/post/6844903608224333838
+
+![image-20211216223807073](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20211216223807073.png)
+
+**先简单介绍一下Spring事务的传播行为：**
+
+所谓事务的传播行为是指，如果在开始当前事务之前，一个事务上下文已经存在，此时有若干选项可以指定一个事务性方法的执行行为。在`TransactionDefinition`定义中包括了如下几个表示传播行为的常量：
+
+- `TransactionDefinition.PROPAGATION_REQUIRED`：如果当前存在事务，则加入该事务；如果当前没有事务，则创建一个新的事务。这是默认值。
+- `TransactionDefinition.PROPAGATION_REQUIRES_NEW`：创建一个新的事务，如果当前存在事务，则把当前事务挂起。
+- `TransactionDefinition.PROPAGATION_SUPPORTS`：如果当前存在事务，则加入该事务；如果当前没有事务，则以非事务的方式继续运行。
+- `TransactionDefinition.PROPAGATION_NOT_SUPPORTED`：以非事务方式运行，如果当前存在事务，则把当前事务挂起。
+- `TransactionDefinition.PROPAGATION_NEVER`：以非事务方式运行，如果当前存在事务，则抛出异常。
+- `TransactionDefinition.PROPAGATION_MANDATORY`：如果当前存在事务，则加入该事务；如果当前没有事务，则抛出异常。
+- `TransactionDefinition.PROPAGATION_NESTED`：如果当前存在事务，则创建一个事务作为当前事务的嵌套事务来运行；如果当前没有事务，则该取值等价于`TransactionDefinition.PROPAGATION_REQUIRED`。
+
+
+
+## Spring事务管理接口介绍
+
+Spring 框架中，事务管理相关最重要的 3 个接口如下：
+
+- **PlatformTransactionManager**： （平台）事务管理器，Spring 事务策略的核心。
+- **TransactionDefinition**： 事务定义信息(事务隔离级别、传播行为、超时、只读、回滚规则)。
+- **TransactionStatus**： 事务运行状态。
+
+我们可以把 **PlatformTransactionManager** 接口可以被看作是事务上层的管理者，而 **TransactionDefinition** 和 **TransactionStatus** 这两个接口可以看作是事务的描述。
+
+**PlatformTransactionManager** 会根据 **TransactionDefinition** 的定义比如事务超时时间、隔离级别、传播行为等来进行事务管理 ，而 **TransactionStatus** 接口则提供了一些方法来获取事务相应的状态比如是否新事务、是否可以回滚等等。
+
+![image-20220701104752560](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220701104752560.png)
+
+```java
+//TransactionDefinition
+//隔离级别
+//传播行为
+//回滚规则
+//是否只读
+//事务超时
+
+public interface TransactionStatus{
+    boolean isNewTransaction(); // 是否是新的事务
+    boolean hasSavepoint(); // 是否有恢复点
+    void setRollbackOnly();  // 设置为只回滚
+    boolean isRollbackOnly(); // 是否为只回滚
+    boolean isCompleted; // 是否已完成
+}
+```
+
+
+
+## spring支持两种事务
+
+### 编程式事务管理
+
+通过 `TransactionTemplate`或者`TransactionManager`手动管理事务，实际应用中很少使用，但是对于你理解 Spring 事务管理原理有帮助。
+
+使用`TransactionTemplate` 进行编程式事务管理的示例代码如下：
+
+```java
+@Autowired
+private TransactionTemplate transactionTemplate;
+public void testTransaction() {
+
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+
+                try {
+
+                    // ....  业务代码
+                } catch (Exception e){
+                    //回滚
+                    transactionStatus.setRollbackOnly();
+                }
+
+            }
+        });
+}
+```
+
+使用 `TransactionManager` 进行编程式事务管理的示例代码如下：
+
+```java
+@Autowired
+private PlatformTransactionManager transactionManager;
+
+public void testTransaction() {
+
+  TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+          try {
+               // ....  业务代码
+              transactionManager.commit(status);
+          } catch (Exception e) {
+              transactionManager.rollback(status);
+          }
+}
+```
+
+### 非编程式事务
+
+#### 声明式事务管理
+
+推荐使用（代码侵入性最小），实际是通过 AOP 实现（基于`@Transactional` 的全注解方式使用最多）。
+
+使用 `@Transactional`注解进行事务管理的示例代码如下：
+
+```java
+@Transactional(propagation=propagation.PROPAGATION_REQUIRED)
+public void aMethod {
+  //do something
+  B b = new B();
+  C c = new C();
+  b.bMethod();
+  c.cMethod();
+}
+```
+
+
+**如果内层事务需要回滚，他会在rollack里面判断globalrollack是不是true 如果是true就是记录在threadlocal里面一个true的变量，**
+**外层事务由于catch了异常，就会在commit的时候判断threadlocal是否有这个变量，然后决定是否会滚**
+
+### 事务失效几种方式
+
+如果你在方法中有`try{}catch(Exception e){}`处理，那么try里面的代码块就脱离了事务的管理，若要事务生效需要在catch中`throw new RuntimeException ("xxxxxx");`这一点也是面试中会问到的事务失效的场景。
+
+![图片](https://mmbiz.qpic.cn/mmbiz_png/JdLkEI9sZfebk1L685vAHGkJrjc4fDWYVgKvBtfoDS5Im3FibV2PbIkoMtnbqXE9ia2qknGBZ7D5YOStXbP6iaYjQ/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
+
+![图片](https://mmbiz.qpic.cn/mmbiz_png/JdLkEI9sZfebk1L685vAHGkJrjc4fDWYzO10TRrKd4Dyk9syXnpYPE74K98MoSwaLahoysfMKJFHutV3Vns4uw/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
+
+1、就是`@Transactional`注解保证的是每个方法处在一个事务，如果有try一定在catch中抛出运行时异常。
+
+2、方法必须是public修饰符。否则注解不会生效，但是加了注解也没啥毛病，不会报错，只是没卵用而已。
+
+3、this.本方法的调用，被调用方法上注解是不生效的，因为无法再次进行切面增强
 
 
 
