@@ -128,11 +128,33 @@ applicationEventMulticaster（spring上下文监听器）
 
 
 
-## Spring Aop
+# Spring Aop
 
 ![image-20211210103842874](noteImg/image-20211210103842874.png)
 
+## Advice的执行顺序
 
+```java
+success
+// Around advice start exec ...
+// Before advice exec ...
+// 方法 A 执行
+// AfterReturning advice exec ...
+// After advice exec ...
+// Around advice end exec ...
+
+throwable
+// Around advice start exec ...
+// Before advice exec ...
+// AfterThrowing advice exec ...
+// After advice exec ...
+// java.lang.ArithmeticException: / by zero
+// Around advice end exec ...
+```
+
+
+
+注：可以通过Order注解或者实现Order接口修改优先级，数越大优先级越低**
 
 ## DefaultListableBeanFactory类图
 
@@ -164,15 +186,13 @@ applicationEventMulticaster（spring上下文监听器）
 
 
 
-SpringAop运行过程
+# SpringAop运行过程
 
 1.调用被代理的方法
 
 2.找到cglib文件
 
 3.根据var00000找到DynamicAdvisedInterceptor#intercept方法ExposeInvocationInterceptor中间的调用循环结构
-
-
 
 适配器是以Interceptor结尾的 其他的是直接继承自MethodInterceptor
 
@@ -191,6 +211,8 @@ SpringAop运行过程
 //resolveBeforeInstantiation&postProcessBeforeInstantiation
 //initializeBean&postProcessAfterInitialization
 ```
+
+
 
 # spring创建对象的五种方式
 
@@ -510,6 +532,12 @@ public void aMethod {
 
 3、this.本方法的调用，被调用方法上注解是不生效的，因为无法再次进行切面增强
 
+### 注解对应Advice接口
+
+![image-20220701190744135](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220701190744135.png)
+
+
+
 ## mybatis使用spring事务创建的数据库连接
 
 参考文章：https://qiuyadongsite.github.io/2019/01/15/mybatis-sources-code-6/
@@ -657,7 +685,7 @@ Logback与SLF4J结合起来用,两个组件的官方网站如下：
 
 
 
-## 解析@Service、@Repository、@Controller等注解
+# 解析@Service、@Repository、@Controller等注解
 
 参考文章：https://blog.csdn.net/m0_68615056/article/details/124371422?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522165658284316782391839919%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=165658284316782391839919&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~baidu_landing_v2~default-2-124371422-null-null.142^v27^pc_search_result_control_group,157^v15^new_3&utm_term=MergedAnnotationsCollection&spm=1018.2226.3001.4187
 
