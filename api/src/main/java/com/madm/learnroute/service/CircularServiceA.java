@@ -15,14 +15,14 @@ public class CircularServiceA {
     private CircularServiceB circularServiceB;
 
     @Transactional
-    public void methodA() {
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void suspend() {
-
-            }
-        });
-        int i = 1 / 0;//测试 @AfterThrowing 通知
+    public void methodA(String a, String b) {
+//        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+//            @Override
+//            public void suspend() {
+//
+//            }
+//        });
+//        int i = 1 / 0;//测试 @AfterThrowing 通知
         System.out.println("方法 A 执行");
     }
 }

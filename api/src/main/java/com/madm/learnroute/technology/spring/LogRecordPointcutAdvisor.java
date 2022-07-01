@@ -1,9 +1,12 @@
 package com.madm.learnroute.technology.spring;
 
+import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.Pointcut;
+import org.springframework.aop.PointcutAdvisor;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
@@ -11,9 +14,9 @@ import java.lang.reflect.Method;
  * @author dongming.ma
  * @date 2022/6/15 00:49
  */
-public class LogRecordPointcutAdvisor extends AbstractBeanFactoryPointcutAdvisor implements MethodInterceptor {
+public class LogRecordPointcutAdvisor extends AbstractBeanFactoryPointcutAdvisor implements MethodInterceptor, PointcutAdvisor {
 
-    // LogRecord 的解析类 解析有没有@LogRecord注解
+//     LogRecord 的解析类 解析有没有@LogRecord注解
 //    private LogRecordOperationSource logRecordOperationSource;
 
 
@@ -32,4 +35,5 @@ public class LogRecordPointcutAdvisor extends AbstractBeanFactoryPointcutAdvisor
     private Object execute(MethodInvocation invocation, Object target, Method method, Object[] args) {
         return null;
     }
+
 }
