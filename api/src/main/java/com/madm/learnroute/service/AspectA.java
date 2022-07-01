@@ -8,35 +8,36 @@ import org.springframework.stereotype.Component;
 @Component
 public class AspectA {
 
-    @Before("execution(public void com.madm.learnroute.service.CircularServiceA.methodA())")
-    public void before() {
+    @Before(value = "execution(public void com.madm.learnroute.service.CircularServiceA.methodA(..)) && args(a, b)", argNames = "a,b")
+    public void before(String a, String b) {
+        System.out.println(a + ":" + b);
         System.out.println("Before advice exec ...");
     }
 
-    @Around("execution(public void com.madm.learnroute.service.CircularServiceA.methodA())")
-    public void around(ProceedingJoinPoint pjp) throws Throwable {
-        System.out.println("Around advice start exec ...");
-        try {
-            pjp.proceed();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-        System.out.println("Around advice end exec ...");
-    }
-
-    @After("execution(public void com.madm.learnroute.service.CircularServiceA.methodA())")
-    public void after() {
-        System.out.println("After advice exec ...");
-    }
-
-    @AfterThrowing("execution(public void com.madm.learnroute.service.CircularServiceA.methodA())")
-    public void afterThrowing() {
-        System.out.println("AfterThrowing advice exec ...");
-    }
-
-    @AfterReturning("execution(public void com.madm.learnroute.service.CircularServiceA.methodA())")
-    public void afterReturning() {
-        System.out.println("AfterReturning advice exec ...");
-    }
+//    @Around("execution(public void com.madm.learnroute.service.CircularServiceA.methodA())")
+//    public void around(ProceedingJoinPoint pjp) throws Throwable {
+//        System.out.println("Around advice start exec ...");
+//        try {
+//            pjp.proceed();
+//        } catch (Exception e) {
+//            System.out.println(e);
+//        }
+//        System.out.println("Around advice end exec ...");
+//    }
+//
+//    @After("execution(public void com.madm.learnroute.service.CircularServiceA.methodA())")
+//    public void after() {
+//        System.out.println("After advice exec ...");
+//    }
+//
+//    @AfterThrowing("execution(public void com.madm.learnroute.service.CircularServiceA.methodA())")
+//    public void afterThrowing() {
+//        System.out.println("AfterThrowing advice exec ...");
+//    }
+//
+//    @AfterReturning("execution(public void com.madm.learnroute.service.CircularServiceA.methodA())")
+//    public void afterReturning() {
+//        System.out.println("AfterReturning advice exec ...");
+//    }
 
 }

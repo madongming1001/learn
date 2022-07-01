@@ -46,7 +46,7 @@ public class PracticeController {
 
     @PostConstruct
     public void fireAopMethod(){
-        circularServiceA.methodA();
+        circularServiceA.methodA("aaaaaa","bbbbbb");
     }
 
     @UserAuthenticate
