@@ -39,3 +39,5 @@ application-local.yml
 */Dockerfile
 
 bootstrap.yml
+
+*/proxy
