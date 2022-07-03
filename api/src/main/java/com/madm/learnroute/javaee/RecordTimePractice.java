@@ -1,6 +1,7 @@
 package com.madm.learnroute.javaee;
 
 import cn.hutool.core.date.StopWatch;
+import cn.hutool.core.date.SystemClock;
 
 /**
  * 记录时间的另一个种方式
@@ -20,5 +21,6 @@ public class RecordTimePractice {
         Thread.sleep(200);
         sw.stop();
         System.out.println(sw.prettyPrint());
+        System.out.println(SystemClock.now());
     }
 }
