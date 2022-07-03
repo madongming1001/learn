@@ -1603,3 +1603,7 @@ INSERT INTO z SELECT 2，0；
 2、锁辅助索引会先锁定聚集索引一条记录用**Record Lock**，对于辅助索引其加上的是**Next-Key Lock**，还有对于辅助索引下一键值加上**Gap Lock**
 
 3、唯一索引有多个列组成，查询唯一索引列中的其中一个，依然会使用Next-Key Lock进行锁定
+
+
+
+NativeSession.execSQL () 方法里，和 MySQL Server 交互的所有指令，最终都会调用这个方法执行。

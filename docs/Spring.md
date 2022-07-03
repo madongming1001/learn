@@ -836,3 +836,49 @@ MergedAnnotationsCollection
 //@component类
 ```
 
+
+
+# 为什么sprinboot启动服务就不退出？
+
+参考文章：https://cloud.tencent.com/developer/article/1590215
+
+我们知道**System.exit()**`或`**Runtime.exit()** 可以退出JVM进程，我们以SpringBoot默认使用的Tomcat[容器](https://cloud.tencent.com/product/tke?from=10680)为例，在我之前SpringBoot源码分析的文章中也提到过，在启动Tomcat的时候，会调用`TomcatWebServer`的`initialize`方法，在这个方法中会调用一个`startDaemonAwaitThread`方法
+
+```javascript
+ private void startDaemonAwaitThread() {
+        Thread awaitThread = new Thread("container-" + containerCounter.get()) {
+            public void run() {
+                TomcatWebServer.this.tomcat.getServer().await();
+            }
+        };
+        awaitThread.setContextClassLoader(this.getClass().getClassLoader());
+        awaitThread.setDaemon(false);
+        awaitThread.start();
+    }
+```
+
+下面我们在深挖一下，在Tomcat的`this.tomcat.getServer().await()`这个方法中，线程是如何实现不退出的。这里为了阅读方便，去掉了不相关的代码。
+
+```javascript
+public void await() {
+        // ...
+        if( port==-1 ) {
+            try {
+                awaitThread = Thread.currentThread();
+                while(!stopAwait) {
+                    try {
+                        Thread.sleep( 10000 );
+                    } catch( InterruptedException ex ) {
+                        // continue and check the flag
+                    }
+                }
+            } finally {
+                awaitThread = null;
+            }
+            return;
+        }
+        // ...
+    }
+```
+
+在await方法中，实际上当前线程在一个while循环中每10秒检查一次 stopAwait这个变量，它是一个volatile类型变量，用于确保被另一个线程修改后，当前线程能够立即看到这个变化。如果没有变化，就会一直处于while循环中。这就是该线程不退出的原因，也就是整个spring-boot应用不退出的原因。
