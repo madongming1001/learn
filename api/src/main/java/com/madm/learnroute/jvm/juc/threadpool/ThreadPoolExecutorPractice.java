@@ -1,4 +1,4 @@
-package com.madm.learnroute.jvm.juc.threadPool;
+package com.madm.learnroute.jvm.juc.threadpool;
 
 import lombok.SneakyThrows;
 
