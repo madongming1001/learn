@@ -1,5 +1,6 @@
 package com.mdm.springfeature.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,4 +26,15 @@ public class Employee {
     private BigDecimal sal;
     private BigDecimal comn;
     private Integer depno;
+
+    @JsonIgnore
+    private String firstName;
+    @JsonIgnore
+    private String lastName;
+
+    public Employee(Long id, String firstName, String lastName) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 }
