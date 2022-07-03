@@ -41,11 +41,37 @@ public class StringEqualsPractice {
 //        System.out.println(Integer.toBinaryString(-3));
 
 //        System.out.println(abc1 == abc.intern());
-        System.out.println(Long.parseLong("0x7fffffff"));
-//
+//        System.out.println(Long.parseLong("0x7fffffff"));
+
+        // 这个就是那个音符字符，只不过由于当前的网页没支持这种编码，所以没显示。
+        // 这个就是音符字符的UTF-16编码
+        //代码单元**指一种转换格式（UTF）中最小的一个分隔，称为一个代码单元（Code Unit）
+//        String B = "𝄞";
+//        String C = "\uD834\uDD1E";
+//        System.out.println(C);
+//        System.out.println(B.length());
+//        System.out.println(B.codePointCount(0, B.length()));
+
+        System.out.println(Integer.toBinaryString(4));
+        System.out.println(Integer.toBinaryString(-4));
+
+
     }
 
+    /**
+     * 判断一个数是不是2的幂
+     *
+     * @param val
+     * @return
+     */
     private static boolean isPowerOfTwo(int val) {
-        return (val & -val) == val;
+        /**
+         * val： -4
+         * positive number： 100
+         * negative number： 11111111111111111111111111111100
+         */
+//        return (val & -val) == val;
+        return (val & (val - 1)) == 0;
     }
 }
+
