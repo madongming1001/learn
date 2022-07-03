@@ -1,11 +1,10 @@
-package com.madm.learnroute.jvm.juc.threadPool;
+package com.madm.learnroute.jvm.juc.threadpool;
 
 import org.apache.commons.lang3.RandomUtils;
 
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class ScheduleThreadPoolExecutorExample{

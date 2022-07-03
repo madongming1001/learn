@@ -1,6 +1,6 @@
 package com.madm.learnroute.javaee;
 
-import com.madm.learnroute.jvm.juc.threadPool.ThreadExecutionPractice;
+import com.madm.learnroute.jvm.juc.threadpool.ThreadExecutionPractice;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
