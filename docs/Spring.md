@@ -128,9 +128,11 @@ applicationEventMulticaster（spring上下文监听器）
 
 
 
-# Spring Aop
+# spring-configuration-metadata.json配置文件用来在配置文件输入的时候提示
 
-![image-20211210103842874](noteImg/image-20211210103842874.png)
+
+
+# Spring Aop
 
 ## Advice的执行顺序
 
@@ -147,12 +149,106 @@ throwable
 // Around advice start exec ...
 // Before advice exec ...
 // AfterThrowing advice exec ...
-// After advice exec ...
+// After advice exec ...d
 // java.lang.ArithmeticException: / by zero
 // Around advice end exec ...
 ```
 
 **注：可以通过Order注解或者实现Order接口修改优先级，数越大优先级越低**
+
+
+
+## Aop调用链条组装
+
+```java
+由于cglib代理创建的时候callback数组0的位置是 DynamicAdvisedInterceptor，而在调用目标方法的时候都会走到 DynamicAdvisedInterceptor.intercept()，而里面最终就会创建一个 CglibMethodInvocation 对象，把符合的list<Advice>传给构造方法，还有其他参数，代理对象等，接着就会调用 proceed(),由于 CglibMethodInvocation 的 proceed()就是调用父类的 ReflectiveMethodInvocation.proceed(),而父类就会有一个计数器不断的调用list<advice>对应坐标的类，当前 ReflectiveMethodInvocation.proceed()最后面会调用每个advice的invoke方法，并会把当前对象传过去，因为当前proceed()是 CglibMethodInvocation 调用过来的，所以this对象就是他( CglibMethodInvocation),接下来调用的第一个invoke()坑定是 ExposeInvocationInterceptor 的（AbstractAdvisorAutoProxyCreator&findEligibleAdvisors()extendAdvisors()添加的，是从AbstractAutoProxyCreator的warpIfNecessary方法来的），首先会把 CglibMethodInvocation 方到一个threadlocal里面，以保证同线程其他位置可以使用，proceed(this(代指 CglibMethodInvocation))最后会调用
+CglibMethodInvocation.proceed()，由于里面是调用父类的proceed(),这是父类的计数器每次调用就会+1，然后还有走到invoke(this),周而复始。各通知类的方法不尽相同，就是会在调用方法的前后穿插自己的逻辑比如 MethodBeforeAdviceInterceptor（）。
+
+XML的时候Advice是以下表作为顺序的，最终在拼出来的chain按照这个顺序
+对于拓扑排序结果 只会在Before Around After会出现，现在都是按照默认值来排序的，getAdvisors()方法声明了顺序都是0，默认顺序是 getAdvisorMethods() 
+  Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class
+先按照注解比较，相同在按照方法名比较
+
+
+0 = {ExposeInvocationInterceptor@2024} 
+1 = AspectJAroundAdvice
+	@Override
+	public Object invoke(MethodInvocation mi) throws Throwable {
+		if (!(mi instanceof ProxyMethodInvocation)) {
+			throw new IllegalStateException("MethodInvocation is not a Spring ProxyMethodInvocation: " + mi);
+		}
+		ProxyMethodInvocation pmi = (ProxyMethodInvocation) mi;
+		// MethodInvocationProceedingJoinPoint.proceed()
+		ProceedingJoinPoint pjp = lazyGetProceedingJoinPoint(pmi);
+		JoinPointMatch jpm = getJoinPointMatch(pmi);
+		return invokeAdviceMethod(pjp, jpm, null, null);
+	}
+
+	/**
+	 * Return the ProceedingJoinPoint for the current invocation,
+	 * instantiating it lazily if it hasn't been bound to the thread already.
+	 * @param rmi the current Spring AOP ReflectiveMethodInvocation,
+	 * which we'll use for attribute binding
+	 * @return the ProceedingJoinPoint to make available to advice methods
+	 */
+	protected ProceedingJoinPoint lazyGetProceedingJoinPoint(ProxyMethodInvocation rmi) {
+		return new MethodInvocationProceedingJoinPoint(rmi);
+	}
+2 = MethodBeforeAdviceInterceptor
+	@Override
+	public Object invoke(MethodInvocation mi) throws Throwable {
+		this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis());
+		return mi.proceed();
+	}
+3 = AspectJAfterAdvice
+	@Override
+	public Object invoke(MethodInvocation mi) throws Throwable {
+		try {
+			//调用 ReflectiveMethodInvocation 的proceed()方法
+			return mi.proceed();
+		}
+		finally {
+			invokeAdviceMethod(getJoinPointMatch(), null, null);
+		}
+	}
+	@Nullable
+	protected JoinPointMatch getJoinPointMatch() {
+		MethodInvocation mi = ExposeInvocationInterceptor.currentInvocation();//取出 CglibaMethodInvocation
+		if (!(mi instanceof ProxyMethodInvocation)) {
+			throw new IllegalStateException("MethodInvocation is not a Spring ProxyMethodInvocation: " + mi);
+		}
+		return getJoinPointMatch((ProxyMethodInvocation) mi);
+	}
+4 = AfterReturningAdviceInterceptor
+	@Override
+	public Object invoke(MethodInvocation mi) throws Throwable {
+		Object retVal = mi.proceed();
+		this.advice.afterReturning(retVal, mi.getMethod(), mi.getArguments(), mi.getThis());
+		return retVal;
+	}
+5 = AspectJAfterThrowingAdvice
+	@Override
+	public Object invoke(MethodInvocation mi) throws Throwable {
+		try {
+			//执行下一个通知/拦截器 methodInvocation 通过调用joinpoint接口的proceed
+			return mi.proceed();
+		}
+		catch (Throwable ex) {
+			if (shouldInvokeOnThrowing(ex)) {
+				invokeAdviceMethod(getJoinPointMatch(), null, ex);
+			}
+			throw ex;
+		}
+	}
+```
+
+
+
+
+
+
+
+
 
 ## 注解对应Advice接口
 
@@ -167,10 +263,6 @@ AtAfter -> AspectJAfterAdvice
 AtAfterReturning -> AspectJAfterReturningAdvice
 AtAfterThrowing -> AspectJAfterThrowingAdvice
 ```
-
-
-
-
 
 ## DefaultListableBeanFactory类图
 
@@ -321,7 +413,21 @@ AnnotationConfigUtils.java类的
 
 
 
+
+
 # Spring事务
+
+**EnableTransactionManagement的selector 注册类**
+
+```java
+AutoProxyRegistrar -> InfrastructureAdvisorAutoProxyCreator
+
+ProxyTransactionManagementConfiguration -> BeanFactoryTransactionAttributeSourceAdvisor
+																					 TransactionAttributeSource
+																					 TransactionInterceptor
+```
+
+
 
 ## 五种Advice
 
@@ -349,7 +455,7 @@ MethodMatcher getMethodMatcher();
 //ThrowsAdviceAdapter
 ```
 
-spirng boot项目的@EnableAspectJAutoProxy 最终会通过Import注册一个AnnotationAwareAspectJAutoProxyCreator类
+spirng boot项目的@EnableAspectJAutoProxy 最终会通过Import注册一个AnnotationAwareAspectJAutoProxyCreator类d
 
 ```java
 			//AfterReturningAdviceAdapter AfterReturningAdviceInterceptor
