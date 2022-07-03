@@ -833,7 +833,7 @@ count(**) 是例外，mysql并不会把全部字段取出来，而是专门做�
 
   ![https://note.youdao.com/yws/public/resource/354ae85f3519bac0581919a458278a59/xmlnote/74624CB778F948349A31BA0A40430F51/98786](https://note.youdao.com/yws/public/resource/354ae85f3519bac0581919a458278a59/xmlnote/74624CB778F948349A31BA0A40430F51/98786)
 
-  **不可重复度和幻读区别：**
+  **不可重复读和幻读区别：**
 
   不可重复读的重点是修改，幻读的重点在于新增或者删除
 
