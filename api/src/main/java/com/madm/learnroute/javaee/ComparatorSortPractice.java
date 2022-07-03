@@ -4,8 +4,8 @@ import com.mdm.springfeature.entity.Employee;
 import com.mdm.utils.GsonObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * @author dongming.ma
@@ -13,12 +13,10 @@ import java.util.Comparator;
  */
 public class ComparatorSortPractice {
     public static void main(String[] args) {
-        ArrayList<Employee> employees = getUnsortedEmployeeList();
-
-        //Compare by first name and then last name
+        List<Employee> employees = getUnsortedEmployeeList();
+//
+//        Compare by first name and then last name
         Comparator<Employee> compareByName = Comparator.comparing(Employee::getFirstName).thenComparing(Employee::getLastName);
-
-        Collections.sort(employees, compareByName);
 
         System.out.println(GsonObject.createGson().toJson(employees));
     }

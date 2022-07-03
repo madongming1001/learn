@@ -397,15 +397,32 @@ public class UserServiceImpl implements UserService{
 
 
 
-
+# SpringBoot启动流程
 
 ## Spring默认启动的时候就会创建几个BeanDefinition
 
-AnnotationConfigUtils.java类的
+```
+new SpringApplication()的时候构造方法完成了几件事情，本地设置从spring.factories加载的 ApplicationContextInitializer.class相关的类，本地设置从spring.factories加载的 ApplicationListener.class相关的类。
+执行run方法（）主要步骤
+1、获取 SpringApplicationRunListener
+2、prepareEnvironment 发布事件 ApplicationEnvironmentPreparedEvent去加载 bootstrap.yml 文件
+3、createApplicationContext，根据 webApplicationType 类型不同创建 ConfigurableApplicationContext，这个时候就会通过其创建对象的构造方法，创建两个对象，一个是 AnnotatedBeanDefinitionReader，一个是ClassPathBeanDefinitionScanner对象，其中AnnotatedBeanDefinitionReader 在new对象的时候就是往容器里面注册几个beandefinition，其中比较重要的是，
+	1. AutowiredAnnotationBeanPostProcessor.java
+	2. CommonAnnotationBeanPostProcessor.java
+	3. ConfigurationClassPostProcessor.java
+4、准备上下文 
+	nacos config 整合 springboot 位置
+  1、applyInitializers
+  2、PropertySourceBootstrapConfiguration
+  3、PropertySourceLocator.locateCollection
+  4、NacosPropertySourceLocator.locate
+```
 
-1. AutowiredAnnotationBeanPostProcessor.java
-2. CommonAnnotationBeanPostProcessor.java
-3. ConfigurationClassPostProcessor.java
+nacos divcovery是通过事件发布的方式注册的
+
+```text
+finishRefresh() -> ServletWebServerInitializedEvent 事件发布的，AbstractAutoServiceRegistration 监听了这个事件，通过他的 onApplicationEvent 方法就会走到，NacosServiceRegistry 最后就会走到这个的register
+```
 
 # springboot2.0默认创建什么代理？
 
@@ -482,7 +499,7 @@ ConfigurationClassPostprocessor.java加载的类多了3个
 
 
 
-##详解Spring的事务管理PlatformTransactionManager
+##Springboot整合Naocs Config位置
 https://www.jianshu.com/p/903c01cb2a77
 
 springboot提供加载资源.properties .yml
