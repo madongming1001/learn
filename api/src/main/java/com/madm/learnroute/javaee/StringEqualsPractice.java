@@ -6,6 +6,7 @@ import com.mdm.pojo.User;
 import org.apache.commons.lang3.StringUtils;
 import org.openjdk.jol.info.ClassLayout;
 
+import javax.xml.bind.SchemaOutputResolver;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -45,7 +46,7 @@ public class StringEqualsPractice {
 
         // 这个就是那个音符字符，只不过由于当前的网页没支持这种编码，所以没显示。
         // 这个就是音符字符的UTF-16编码
-        //代码单元**指一种转换格式（UTF）中最小的一个分隔，称为一个代码单元（Code Unit）
+        // 代码单元指一种转换格式（UTF）中最小的一个分隔，称为一个代码单元（Code Unit）
 //        String B = "𝄞";
 //        String C = "\uD834\uDD1E";
 //        System.out.println(C);
@@ -55,6 +56,7 @@ public class StringEqualsPractice {
         System.out.println(Integer.toBinaryString(4));
         System.out.println(Integer.toBinaryString(-4));
 
+        System.out.println(Integer.valueOf("11111",2));
 
     }
 
