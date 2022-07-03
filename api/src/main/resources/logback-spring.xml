@@ -82,6 +82,8 @@
     <!--关闭Version类的log-->
     <logger name="org.hibernate.validator.internal.util.Version" level="OFF"/>
     <logger name="org.reflections.Reflections" level="OFF"/>
+    <logger name="org.springframework.transaction" level="DEBUG"/>
+    <logger name="org.mybatis.spring" level="DEBUG"/>
 
     <!-- 根节点，表名基本的日志级别，里面可以由多个appender规则 -->
     <!-- level="info"代表基础日志级别为info -->
@@ -89,6 +91,5 @@
         <appender-ref ref="consoleLog"/>
         <appender-ref ref="fileinfoLog"/>
         <appender-ref ref="fileerrorLog"/>
-        <!--        <appender-ref ref="SOCKET"/>-->
     </root>
 </configuration>
