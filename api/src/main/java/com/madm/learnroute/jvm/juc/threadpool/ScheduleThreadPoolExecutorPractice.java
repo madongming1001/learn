@@ -1,18 +1,33 @@
 package com.madm.learnroute.jvm.juc.threadpool;
 
+import cn.hutool.core.date.StopWatch;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Java结束线程的三种方法
+ * 1.设置退出标志，使线程正常退出，也就是当run()方法完成后线程终止
+ * 2.使用interrupt()方法中断线程
+ * 3.使用stop方法强行终止线程（不推荐使用，Thread.stop, Thread.suspend, Thread.resume 和Runtime.runFinalizersOnExit 这些终止线程运行的方法已经被废弃，使用它们是极端不安全的！）
+ */
 public class ScheduleThreadPoolExecutorPractice {
+    private static final int COUNT_BITS = Integer.SIZE - 3;
+    private static final int RUNNING = -1 << COUNT_BITS;
+    private final static AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
+
     public static void main(String[] args) {
+//        System.out.println(ctl.get());
+
+        ThreadPoolExecutor fixedThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
         LinkedList<Long> numOfMinute = new LinkedList<>();
+
+        long start = System.currentTimeMillis();
         Thread calculation = new Thread(() -> {
             Thread cthread = Thread.currentThread();
             while (!cthread.isInterrupted()) {
@@ -21,11 +36,14 @@ public class ScheduleThreadPoolExecutorPractice {
             System.out.println(numOfMinute.size());
         }, "计算线程");
         calculation.start();
+        long end = System.currentTimeMillis();
+        long totalTime = (end - start) / 1000;
+        System.out.println(totalTime);
+
         ScheduledExecutorService schedule = Executors.newScheduledThreadPool(1);
         schedule.schedule(() -> {
             calculation.interrupt();
         }, 1, TimeUnit.SECONDS);
-
 //        Task task = new Task("任务");
 //        // one-shot
 //        schedule.schedule(task, 2, TimeUnit.SECONDS);
@@ -33,7 +51,9 @@ public class ScheduleThreadPoolExecutorPractice {
 //        schedule.scheduleAtFixedRate(task, 0, 2, TimeUnit.SECONDS);//任务延迟取最大值，稳定定时器
     }
 
-
+    private static int ctlOf(int rs, int wc) {
+        return rs | wc;
+    }
 }
 
 class Task implements Runnable {
