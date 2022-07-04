@@ -21,7 +21,18 @@ public class ThreadPoolExecutorPractice {
         // CallerRunPolicy
         // AbortPolicy
         // DiscardOldestPolicy
-        // DiscardPolicy 第五种什么也没做
+
+
+        //线程池线程预热，线程池的预热仅仅针对核心线程 ⚠️
+        ThreadPoolExecutor fixedThreadPool = (ThreadPoolExecutor)Executors.newFixedThreadPool(10);
+        //启动所有的核心线程
+        fixedThreadPool.prestartAllCoreThreads();
+        //仅启动一个核心线程
+        fixedThreadPool.prestartCoreThread();
+        // allowCoreThreadTimeOut，线程池中 corePoolSize 线程空闲时间达到keepAliveTime也将关闭
+        // shutdownNow
+
+
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(5, 5, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(1), Executors.defaultThreadFactory(), new RejectedExecutionHandler() {
             @SneakyThrows
             @Override

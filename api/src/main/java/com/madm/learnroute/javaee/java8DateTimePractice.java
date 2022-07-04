@@ -25,7 +25,7 @@ import java.time.temporal.TemporalAdjusters;
  * 时区
  * 从格林威治本初子午线起，经度每向东或者向西间隔15°，就划分一个时区，在这个区域内，大家使用同样的标准时间
  *
- * 常用操作参考文章：https://www.cnblogs.com/theRhyme/p/9756154.html
+ * 参考文章：https://www.cnblogs.com/theRhyme/p/9756154.html
  *
  */
 public class java8DateTimePractice {

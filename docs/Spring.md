@@ -421,7 +421,7 @@ new SpringApplication()的时候构造方法完成了几件事情，本地设置
 nacos divcovery是通过事件发布的方式注册的
 
 ```text
-finishRefresh() -> ServletWebServerInitializedEvent 事件发布的，AbstractAutoServiceRegistration 监听了这个事件，通过他的 onApplicationEvent 方法就会走到，NacosServiceRegistry 最后就会走到这个的register
+finishRefresh() -> WebServerInitializedEvent 事件发布的，AbstractAutoServiceRegistration 监听了这个事件，通过他的 onApplicationEvent 方法就会走到，NacosServiceRegistry 最后就会走到这个的register
 ```
 
 # springboot2.0默认创建什么代理？
@@ -508,7 +508,7 @@ PropertySourceLoader.java
 SpringApplication&run&prepareEnvironment去加载bootstrap.yml文件
 读取nacos配置文件是在SpringApplication&run&prepareContext方法&applyInitializers&PropertySourceBootstrapConfiguration&PropertySourceLocator.locateCollection&NacosPropertySourceLocator.locate
 
-源码参考文章：https://juejin.cn/post/6887751198737170446
+参考文章：https://juejin.cn/post/6887751198737170446
 
 ## 事务传播行为
 
