@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee;
+package com.madm.learnroute.javaee.blockqueue;
 
 import com.madm.learnroute.jvm.juc.threadpool.ThreadExecutionPractice;
 

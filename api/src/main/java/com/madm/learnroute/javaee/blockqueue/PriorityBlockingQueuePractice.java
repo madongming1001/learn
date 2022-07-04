@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee;
+package com.madm.learnroute.javaee.blockqueue;
 
 import java.util.concurrent.PriorityBlockingQueue;
 

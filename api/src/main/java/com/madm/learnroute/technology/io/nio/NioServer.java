@@ -38,6 +38,7 @@ public class NioServer {
                 SocketChannel sc = iterator.next();
                 ByteBuffer byteBuffer = ByteBuffer.allocate(128);
                 // 非阻塞模式read方法不会阻塞，否则会阻塞
+                // 从通道里读取数据，然后写入buffer
                 int len = sc.read(byteBuffer);
                 // 如果有数据，把数据打印出来
                 if (len > 0) {

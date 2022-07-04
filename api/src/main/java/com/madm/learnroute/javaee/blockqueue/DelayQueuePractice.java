@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee;
+package com.madm.learnroute.javaee.blockqueue;
 
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
@@ -42,8 +42,7 @@ public class DelayQueuePractice {
         @Override
         public long getDelay(TimeUnit unit) {
             //延迟时间小于0就出队列
-            long aa = time - System.currentTimeMillis();
-            return aa;
+            return time - System.currentTimeMillis();
         }
 
         @Override
