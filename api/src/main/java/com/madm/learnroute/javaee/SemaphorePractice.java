@@ -40,7 +40,7 @@ public class SemaphorePractice {
         }
         boolean timeout = !countDownLatch.await(5000, TimeUnit.MILLISECONDS);
         if(timeout){
-
+            System.out.println("!11");
         }
     }
 

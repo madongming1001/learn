@@ -10,7 +10,7 @@ public class ThreadPrintDemo {
     static AtomicInteger cxsNum = new AtomicInteger(0);
     static volatile boolean flag = false;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Thread t1 = printNumber1();
         Thread t2 = printNumber2();
         t1.start();

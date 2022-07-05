@@ -1016,7 +1016,7 @@ HASH算法的基本要求
 
 
 
-
+# HashMap版本问题
 
 ## HashMap1.7问题
 
@@ -1065,6 +1065,12 @@ HASH算法的基本要求
 ## HashMap1.8ConcurrentModificationException问题
 
 https://blog.csdn.net/weixin_30587025/article/details/96339354
+
+## hashmap流程图
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200331123933241.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzI3Njg2Nzc5,size_16,color_FFFFFF,t_70)
+
+
 
 ## lock 与 lockInterruptibly比较区别在于：
 
@@ -1154,6 +1160,14 @@ lockInterruptibly 优先考虑响应中断，而不是响应锁的普通获取�
 
 ​		**而当一个对象当前正处于偏向锁状态，又收到需要计算其一致性哈希码请求时，他的偏向状态会被立即撤销，并且锁会膨胀为重量级锁。**
 
+采用了一种等到竞争出现才释放锁的机制。
+
+![image-20220705210448594](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220705210448594.png)
+
+​		偏向锁在Java 6和Java 7里是默认启用的，但是它在应用程序启动几秒钟之后才激活，如有必要可以使用JVM参数来关闭延迟：-XX:BiasedLockingStartupDelay=0。如果你确定应用程序里所有的锁通常情况下处于竞争状态，可以通过JVM参数关闭偏向锁：-XX:- UseBiasedLocking=false，那么程序默认会进入轻量级锁状态。 
+
+
+
 ## 对象内置锁（ObjectMonitor）
 
 参考文章：https://www.cnblogs.com/hongdada/p/14513036.html
@@ -1179,4 +1193,10 @@ ObjectMonitor::ObjectMonitor() {
   OwnerIsThread = 0 ;  
 }  
 ```
+
+
+
+
+
+
 
