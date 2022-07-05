@@ -24,7 +24,16 @@ public class CreationObjectPractice {
      * @param args
      * @throws CloneNotSupportedException
      */
-    public static void main(String[] args) throws CloneNotSupportedException {
+    public static void main(String[] args) throws Exception {
+        Class<?> classz = Class.forName("com.madm.learnroute.javaee.MaxMemoryPractice.java");
+        MaxMemoryPractice mmp = (MaxMemoryPractice)classz.newInstance();
+        System.out.println(mmp.compute());
+
+
+//        compareOfCloneAndNewToCreateObject();
+    }
+
+    private static void compareOfCloneAndNewToCreateObject() throws CloneNotSupportedException {
         long s1 = System.currentTimeMillis();
         for (int i = 0; i < COUNT; i++) {
             Bean bean = new Bean("ylWang");
