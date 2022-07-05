@@ -36,10 +36,9 @@ public class MaxMemoryPractice {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("MaxMemoryPractice {");
+        final StringBuilder sb = new StringBuilder("MaxMemoryPractice[");
         sb.append("name=").append(name);
-        sb.append(", age='").append(age).append('\'');
-        sb.append('}');
-        return sb.toString();
+        sb.append(", age=").append(age);
+        return sb.append("]").toString();
     }
 }
