@@ -1024,17 +1024,47 @@ HASH算法的基本要求
 2. **get方法的不可见性；（即上一秒put完值，下一秒get值，所get到的值不是最新值。）**
 3. **put方法值如果index一致，多线程环境下可能会造成数据丢失，导致后一个插入的覆盖前一个的值。**
 
+参考文章：https://segmentfault.com/a/1190000024510131
 
+
+
+![image-20220705171706167](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220705171706167.png)
+
+第一轮
+
+```java
+ //next= 7   e = 3
+ Entry<K,V> next = e.next;
+ // i=3
+ int i = indexFor(e.hash, newCapacity);
+ //e.next = null ，刚初始化时新数组的元素为null
+ e.next = newTable[i];
+ //给新数组i位置 赋值 3
+ newTable[i] = e;
+ // e = 7
+ e = next;
+```
+
+第二轮
+
+```java
+ //next= 5   e = 7
+ Entry<K,V> next = e.next;
+ // i=3
+ int i = indexFor(e.hash, newCapacity);
+ //e.next = 3 ，此时相同位置上已经有key=3的值了，将该值赋值给当前元素的next
+ e.next = newTable[i];
+ //给新数组i位置 赋值 7
+ newTable[i] = e;
+ // e = 5
+ e = next;
+```
+
+**头插法**
 
 ## HashMap1.8ConcurrentModificationException问题
 
 https://blog.csdn.net/weixin_30587025/article/details/96339354
-
-
-
-
-
-<img src="noteImg/image-20211230163617464.png" alt="image-20211230163617464" style="zoom:50%;" />
 
 ## lock 与 lockInterruptibly比较区别在于：
 
@@ -1081,4 +1111,72 @@ lockInterruptibly 优先考虑响应中断，而不是响应锁的普通获取�
 # ThreadLocal、InheritableThreadLocal、TransmittableThreadLocal 三者之间区别
 
 参考文章：https://blog.csdn.net/weixin_43954303/article/details/113837928?spm=1001.2014.3001.5501
+
+
+
+# Syhchronized和ReentrantLock的区别
+
+**1、等待可中断**
+
+**2、公平锁**
+
+**3、锁绑定多个条件**
+
+## 为什么synchronized与ReentrantLock都可满足需要时优先使用synchronized？
+
+1、synchronized在语法上清晰，简单易用
+
+2、Lock对于释放锁还是得由程序员自己保证，synchronized的话则可以由java虚拟机来确保即使出现异常，所也能被自动释放。
+
+3、对于长远来看，synchronized优化的空间的可能性更大，因为锁是记录在对象头里面
+
+![image-20220705193309158](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220705193309158.png)
+
+## 锁优化
+
+**自适应自旋锁**：根据前一次在同一个锁上的自旋时间及锁的拥有者的状态来决定的，如果再同一个锁对象上，自旋等待刚刚成功获得过锁，并且持有锁的线程正在运行中，那么虚拟机就会认为这次自旋也很有可能再次成功。
+
+**锁消除：**锁消除是指虚拟机即使编译器在运行时检测到某段需要同步的代码根本不可能存在共享数据竞争而实施的一种对锁进行消除的优化策略。
+
+**锁粗化：**如果一系列的连续操作都对同一个对象反复加锁和解锁，设置加锁操作是出现在循环体中，如果虚拟机检探测到有这样一串零碎的操作都对同一个对象加锁，将会把枷锁同步的范围扩展（粗化）到整个操作序列的外部。
+
+**轻量级锁：**在代码即将进入同步块的时候，如果此同步对象没有被锁定（锁标志位为'01'状态），虚拟机首先将在当前线程的栈帧中建立一个名为锁记录(Lock Record)的空间，用于存储锁对象目前的mark work的拷贝（官方为这份拷贝加了一个Displaced前缀，即Displaced Mark Work）。
+
+​		然后，虚拟机将使用CAS操作尝试把对象的Mark Word更新为指向Lock Record的指针。如果这个更新动作成功了，即代表该线程拥有了这个对象的锁，并且对象Mark Word的锁标志位（Mark Word的最后两个比特）将转变为“00”，表示此对象处于轻量级锁定状态。
+
+​		如果这个更新操作失败了，那就意味着至少存在一条线程与当前线程竞争获取该对象的锁。虚拟机首先会检查对象的Mark Word是否指向当前线程的栈帧，如果是，说明当前线程已经拥有了这个对象的锁，那直接进入同步块继续执行就可以了，否则就说明这个锁对象已经被其他线程抢占了。如果出现两条以上的线程争用同一个锁的情况，那轻量级锁就不再有效，必须要膨胀为重量级锁，锁标志的状态值变为“10”，此时Mark Word中存储的就是指向重量级锁（互斥量）的指针，后面等待锁的线程也必须进入阻塞状态。
+
+**偏向锁：**
+
+​		它的目的是消除数据在无竞争情况下的同步原语，进一步提高程序的运行性能。
+
+​		**当一个对象已经计算过抑制性哈希码后，他就再也无法进入偏向锁状态了，因为储存了hashcode，**
+
+​		**而当一个对象当前正处于偏向锁状态，又收到需要计算其一致性哈希码请求时，他的偏向状态会被立即撤销，并且锁会膨胀为重量级锁。**
+
+## 对象内置锁（ObjectMonitor）
+
+参考文章：https://www.cnblogs.com/hongdada/p/14513036.html
+
+```c++
+//结构体如下
+ObjectMonitor::ObjectMonitor() {  
+  _header       = NULL;  
+  _count       = 0;  
+  _waiters      = 0,  
+  _recursions   = 0;       //线程的重入次数
+  _object       = NULL;  
+  _owner        = NULL;    //标识拥有该monitor的线程
+  _WaitSet      = NULL;    //等待线程组成的双向循环链表，_WaitSet是第一个节点
+  _WaitSetLock  = 0 ;  
+  _Responsible  = NULL ;  
+  _succ         = NULL ;  
+  _cxq          = NULL ;    //多线程竞争锁进入时的单向链表
+  FreeNext      = NULL ;  
+  _EntryList    = NULL ;    //_owner从该双向循环链表中唤醒线程结点，_EntryList是第一个节点
+  _SpinFreq     = 0 ;  
+  _SpinClock    = 0 ;  
+  OwnerIsThread = 0 ;  
+}  
+```
 
