@@ -7,6 +7,17 @@ import com.mdm.pojo.Teacher;
  */
 public class MaxMemoryPractice {
 
+    private String name;
+    private Integer age;
+
+    public MaxMemoryPractice() {
+    }
+
+    public MaxMemoryPractice(String name, Integer age) {
+        this.name = name;
+        this.age = age;
+    }
+
     public static final int initData = 666;
     public static Teacher user = new Teacher();
 
@@ -23,10 +34,12 @@ public class MaxMemoryPractice {
         return c;
     }
 
-    public static void main(String[] args) {
-//        MaxMemoryPractice match = new MaxMemoryPractice();
-//        while (true) {
-//            match.compute();
-//        }
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("MaxMemoryPractice {");
+        sb.append("name=").append(name);
+        sb.append(", age='").append(age).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

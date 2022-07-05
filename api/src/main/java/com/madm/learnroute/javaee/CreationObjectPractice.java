@@ -1,13 +1,16 @@
 package com.madm.learnroute.javaee;
 
+import java.lang.reflect.Constructor;
+
 /**
  * 创建对象的 4 种方法如下
  * <p>
  * 1、使用 new 关键字
  * 2、反射机制
+ *      1、Class.newInstance()
+ *      2、Constructor.newInstance()
  * 3、实现 Cloneable 接口，使用 clone 方法创建对象
  * 4、序列化和反序列化
- * 5、使用Constructor类的newInstance()方法创建对象
  *
  * JVM 对使用 new 方法创建对象的方式进行了优化，默认情况下，new 的效率更高。
  * new 方式创建对象时，会调用类的构造函数。若构造函数中有耗时操作，则会影响 new 方法创建对象的效率。
@@ -25,12 +28,28 @@ public class CreationObjectPractice {
      * @throws CloneNotSupportedException
      */
     public static void main(String[] args) throws Exception {
-        Class<?> classz = Class.forName("com.madm.learnroute.javaee.MaxMemoryPractice.java");
-        MaxMemoryPractice mmp = (MaxMemoryPractice)classz.newInstance();
-        System.out.println(mmp.compute());
+        Class<?> classz = Class.forName("com.madm.learnroute.javaee.MaxMemoryPractice");
+        //没有无参构造器默认创建一个
+//        MaxMemoryPractice mmp = (MaxMemoryPractice)classz.newInstance();
+//        MaxMemoryPractice mmp = MaxMemoryPractice.class.newInstance();
+        // 包括public的和非public的，当然也包括private的
+        Constructor<?>[] declaredConstructors = MaxMemoryPractice.class.getDeclaredConstructors();
+        // 只返回public的~~~~~~(返回结果是上面的子集)
+        Constructor<?>[] constructors = MaxMemoryPractice.class.getConstructors();
+
+        Constructor<?> noArgsConstructor = declaredConstructors[0];
+        Constructor<?> haveArgsConstructor = declaredConstructors[1];
+
+        //noArgsConstructor.setAccessible(true); // 非public的构造必须设置true才能用于创建实例
+        Object mmp1 = noArgsConstructor.newInstance();
+        Object mmp2 = haveArgsConstructor.newInstance("fsx", 18);
+
+        System.out.println(mmp1);
+        System.out.println(mmp2);
 
 
-//        compareOfCloneAndNewToCreateObject();
+
+
     }
 
     private static void compareOfCloneAndNewToCreateObject() throws CloneNotSupportedException {
