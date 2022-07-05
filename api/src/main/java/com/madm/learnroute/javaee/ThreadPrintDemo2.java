@@ -4,15 +4,24 @@ package com.madm.learnroute.javaee;
  * 交叉打印
  */
 class ThreadPrintDemo2 {
+    private volatile boolean lock = false;
+
     public static void main(String[] args) {
         final ThreadPrintDemo2 demo2 = new ThreadPrintDemo2();
         Thread t1 = new Thread(demo2::print2);
         Thread t2 = new Thread(demo2::print1);
-        t1.start();
         t2.start();
+        t1.start();
     }
 
     public synchronized void print1() {
+        while (!lock) {
+            try {
+                Thread.currentThread().sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
         for (int i = 1; i <= 100; i += 2) {
             System.out.println(i);
             this.notify();
@@ -25,6 +34,7 @@ class ThreadPrintDemo2 {
     }
 
     public synchronized void print2() {
+        lock = true;
         for (int i = 0; i <= 100; i += 2) {
             System.out.println(i);
             this.notify();
