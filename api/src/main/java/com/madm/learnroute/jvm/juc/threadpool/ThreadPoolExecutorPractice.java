@@ -24,7 +24,7 @@ public class ThreadPoolExecutorPractice {
 
 
         System.out.println(Integer.toBinaryString(~(-5)));
-//        executeSchedule();
+        executeSchedule();
     }
 
     private static void executeSchedule() {
