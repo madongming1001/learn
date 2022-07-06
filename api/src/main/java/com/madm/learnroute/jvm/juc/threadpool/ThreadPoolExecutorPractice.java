@@ -3,9 +3,31 @@ package com.madm.learnroute.jvm.juc.threadpool;
 import lombok.SneakyThrows;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThreadPoolExecutorPractice {
+
+    private static final int COUNT_BITS = Integer.SIZE - 3; // 29 11101
+    private static final int CAPACITY   = (1 << COUNT_BITS) - 1; // 11111111111111111111111111111
+    private static final int RUNNING    = -1 << COUNT_BITS;
+
+    private static int runStateOf(int c)     { return c & ~CAPACITY; }
+    private static int workerCountOf(int c)  { return c & CAPACITY; }
+    private static int ctlOf(int rs, int wc) { return rs | wc; }
+
     public static void main(String[] args) {
+        AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
+//        System.out.println(ctl.get());
+//        System.out.println(RUNNING);
+//        System.out.println(Integer.toBinaryString( -1));
+//        System.out.println(-1 << 29);
+
+
+        System.out.println(Integer.toBinaryString(~(-5)));
+//        executeSchedule();
+    }
+
+    private static void executeSchedule() {
         ExecutorService ws = Executors.newWorkStealingPool();
         // 线程池的对应状态：
         // RUNNING
@@ -13,12 +35,9 @@ public class ThreadPoolExecutorPractice {
         // STOP
         // TIDYING 整理
         // TERMINATED
-        // private static final int CAPACITY   = (1 << COUNT_BITS) - 1;
-        // private static int runStateOf(int c)     { return c & ~CAPACITY; }
-        // private static int workerCountOf(int c)  { return c & CAPACITY; }
-        // private static int ctlOf(int rs, int wc) { return rs | wc; }
-        // DiscardPolicy
-        // CallerRunPolicy
+
+//         DiscardPolicy
+//         CallerRunPolicy
         // AbortPolicy
         // DiscardOldestPolicy
 
