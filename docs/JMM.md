@@ -703,3 +703,16 @@ class VolatileBarrierExample {
 
 
 链接：https://juejin.cn/post/6893430262084927496
+
+
+
+
+
+
+
+
+
+# MESI
+
+参考文章：https://zhuanlan.zhihu.com/p/84500221
+
