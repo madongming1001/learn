@@ -17,10 +17,10 @@ public class ThreadPoolExecutorPractice {
 
     public static void main(String[] args) {
         AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
-//        System.out.println(ctl.get());
-//        System.out.println(RUNNING);
-//        System.out.println(Integer.toBinaryString( -1));
-//        System.out.println(-1 << 29);
+        System.out.println(ctl.get());
+        System.out.println(RUNNING);
+        System.out.println(Integer.toBinaryString( -1));
+        System.out.println(-1 << 29);
 
 
         System.out.println(Integer.toBinaryString(~(-5)));
