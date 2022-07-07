@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Java结束线程的三种方法
- * 1.设置退出标志，使线程正常退出，也就是当run()方法完成后线程终止
+ * 1.设置退出标志，使线程正常退出，也就是当run()方法完成后线程终止 通过volatile变量控制
  * 2.使用interrupt()方法中断线程
  * 3.使用stop方法强行终止线程（不推荐使用，Thread.stop, Thread.suspend, Thread.resume 和Runtime.runFinalizersOnExit 这些终止线程运行的方法已经被废弃，使用它们是极端不安全的！）
  */

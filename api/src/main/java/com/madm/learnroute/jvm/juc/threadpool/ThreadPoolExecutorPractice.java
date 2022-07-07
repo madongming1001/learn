@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ThreadPoolExecutorPractice {
 
     private static final int COUNT_BITS = Integer.SIZE - 3; // 29 11101
-    private static final int CAPACITY   = (1 << COUNT_BITS) - 1; // 11111111111111111111111111111
+    private static final int CAPACITY   = (1 << COUNT_BITS) - 1; // 29个1 10011111111111111111111111111111
     private static final int RUNNING    = -1 << COUNT_BITS;
 
     private static int runStateOf(int c)     { return c & ~CAPACITY; }
@@ -21,10 +21,14 @@ public class ThreadPoolExecutorPractice {
         System.out.println(RUNNING);
         System.out.println(Integer.toBinaryString( -1));
         System.out.println(-1 << 29);
-
-
-        System.out.println(Integer.toBinaryString(~(-5)));
-        executeSchedule();
+        System.out.println(Integer.toBinaryString(-536870912));
+//        System.out.println(CAPACITY);
+//        executeSchedule();
+        System.out.println(Integer.toBinaryString(-1 - 1));//11111111111111111111111111111110
+        System.out.println(-1 -1 );
+        System.out.println(Long.valueOf("10100000000000000000000000000000", 2));
+        System.out.println(Integer.toBinaryString(~3) + 1);//按位取反
+        System.out.println((~3) + 1);
     }
 
     private static void executeSchedule() {
