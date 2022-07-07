@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Double Check Lock的单例为什么要用Volatile?
+ * 指令重排问题
  *
  * @Author: madongming
  * @DATE: 2022/6/22 17:11

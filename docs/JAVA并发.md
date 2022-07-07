@@ -1214,6 +1214,7 @@ ObjectMonitor::ObjectMonitor() {
 ## 二进制的三种表达形式
 
 ```text
+负数
 << 左移 补位0
 >> 右移 补位1
 ```
@@ -1234,6 +1235,8 @@ ObjectMonitor::ObjectMonitor() {
 
 
 
+都是先移位在减一，然后取反得到数。
+
 -8 >> 2
 
 1、1111 1110 -1 = 1111 1101
@@ -1246,8 +1249,17 @@ ObjectMonitor::ObjectMonitor() {
 
 -8 << 2
 
-1、1110 0000 -1 = 1101 1111
+1、1110 0000 -1 = 1101 1111 (先移位再减)
 
-2、1101 1111取反 1010 0000
+2、1101 1111取反 1010 0000 （符号为不参与）
 
 3、1010 0000 = -32
+
+
+
+
+
+# CycliBarriar和CountdownLatch的区别？
+
+![img](https://ask.qcloudimg.com/http-save/7256485/3uwx6izita.png?imageView2/2/w/1620)
+
