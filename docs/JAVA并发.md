@@ -1263,3 +1263,20 @@ ObjectMonitor::ObjectMonitor() {
 
 ![img](https://ask.qcloudimg.com/http-save/7256485/3uwx6izita.png?imageView2/2/w/1620)
 
+
+
+
+
+# 线程通信
+
+1、使用volatile关键字
+
+2、使用Object类的wait() / notify() （需要结合Synchronized使用）
+
+3、使用JUC工具类CountDownLatch
+
+4、使用ReetrantLock结合Condition
+
+5、基本LockSupport实现线程间的阻塞和唤醒
+
+其中2、4在线程A唤醒B的时候，线程B不是立马获取到锁，只是通知可以参与锁竞争了
