@@ -1,5 +1,6 @@
 package com.madm.learnroute.javaee;
 
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
 
@@ -21,7 +22,42 @@ public class ABThreadCommunication {
     private volatile static boolean a = false;
     private volatile static boolean b = false;
 
+    private static SynchronousQueue bq = new SynchronousQueue();
+
     public static void main(String[] args) {
+//        ABCommunicationForVolatile();
+        ABCommunicationForBlockingQueue();
+    }
+
+    private static void ABCommunicationForBlockingQueue() {
+        Thread t1 = new Thread(() -> {
+            try {
+                System.out.println("发送a线程的信号");
+                bq.put("a");
+                bq.put("b");
+                String el = (String) bq.take();
+                System.out.println("收到" + el + "线程的信号");
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+        });
+        Thread t2 = new Thread(() -> {
+            try {
+                String el = (String) bq.take();
+                System.out.println("收到" + el + "线程的信号");
+                bq.put("b");
+                System.out.println("发送线" + "b" + "程的信号");
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+        });
+        t1.start();
+        t2.start();
+    }
+
+    private static void ABCommunicationForVolatile() {
         Thread t1 = new Thread(() -> {
             System.out.println("发送a线程的信号");
             a = true;

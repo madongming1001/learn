@@ -139,12 +139,11 @@
             <artifactId>pagehelper</artifactId>
             <version>${pagehelper.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.openjdk.jol/jol-core -->
+        <!--查看对象头工具-->
         <dependency>
             <groupId>org.openjdk.jol</groupId>
             <artifactId>jol-core</artifactId>
-            <version>0.16</version>
-            <scope>provided</scope>
+            <version>0.9</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop -->
         <dependency>
