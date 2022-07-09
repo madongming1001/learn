@@ -11,9 +11,10 @@ import java.util.Arrays;
 public class QuickSortPractice {
     public static void main(String[] args) {
 //        int[] ints = {6, 1, 2, 7, 9};
-        int[] ints = {7,6,5,3,1,4,5,6,7};
+//        int[] ints = {7, 6, 5, 3, 1, 4, 5, 6, 7};
+        int[] ints = {3,5,4,7};
         quick_sort(ints, 0, ints.length - 1);
-        Arrays.stream(ints).forEach(System.out::print);
+        Arrays.stream(ints).forEach(System.out::println);
     }
 
     private static void quick_sort(int[] arr, int begin, int end) {
@@ -24,11 +25,11 @@ public class QuickSortPractice {
         int left = begin;
         int right = end;
         while (left < right) {
-            while (arr[right] >= pivot && left < right) {
-                right--;
-            }
             while (arr[left] <= pivot && left < right) {
                 left++;
+            }
+            while (arr[right] >= pivot && right > left) {
+                right--;
             }
             if (left < right) {
                 int temp = arr[left];
