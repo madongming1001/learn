@@ -25,11 +25,11 @@ public class QuickSortPractice {
         int left = begin;
         int right = end;
         while (left < right) {
-            while (arr[left] <= pivot && left < right) {
-                left++;
-            }
             while (arr[right] >= pivot && right > left) {
                 right--;
+            }
+            while (arr[left] <= pivot && left < right) {
+                left++;
             }
             if (left < right) {
                 int temp = arr[left];
