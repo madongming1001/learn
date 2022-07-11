@@ -2,8 +2,8 @@ package com.madm.learnroute.javaee;
 
 import com.google.common.collect.Lists;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +23,7 @@ import java.util.Map;
  * @author dongming.ma
  * @date 2022/7/4 23:56
  */
-public class ParadigmPractice {
+public class NormativePractice {
     public static void main(String[] args) {
         //编译器会认为装苹果的盘子 not is a 装水果的盘子
         //所以，就算容器里装的东西之间有继承关系，但容器之间是没有继承关系的。所以我们不可以把Plate的引用传递给Plate。
@@ -31,9 +31,9 @@ public class ParadigmPractice {
 
         Map<String, Fruit> map1 = new HashMap();
         mapPrint1(map1);
-        Map<String, List<Fruit>> map2 = new HashMap();
+        Map<String, List<? extends Fruit>> map2 = new HashMap();
         List<Apple> plates = Lists.newArrayList(new Apple());
-//        map2.put("plates", plates);
+        map2.put("plates", plates);
         mapPrint2(map2);
     }
 
@@ -50,6 +50,7 @@ public class ParadigmPractice {
 class Fruit {
 }
 
+@ToString
 class Apple extends Fruit {
 }
 
