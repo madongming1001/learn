@@ -1280,3 +1280,23 @@ ObjectMonitor::ObjectMonitor() {
 5、基本LockSupport实现线程间的阻塞和唤醒
 
 其中2、4在线程A唤醒B的时候，线程B不是立马获取到锁，只是通知可以参与锁竞争了
+
+
+
+
+
+# Thread.sleep、Object.wait、LockSupport.park 区别
+
+### Thread.sleep() 方法
+
+**通过sleep方法进入休眠的线程不会释放持有的锁，因此，在持有锁的时候调用该方法需要谨慎。**
+
+### Object.wait() 方法
+
+会释放锁，需要搭配synchronized使用
+
+**为什么需要搭配synchronized使用：**https://blog.csdn.net/lengxiao1993/article/details/52296220
+
+### LockSupport.park() 方法
+
+不会释放锁，会响应中断
