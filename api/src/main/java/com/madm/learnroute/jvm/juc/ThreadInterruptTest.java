@@ -1,9 +1,12 @@
 package com.madm.learnroute.jvm.juc;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author Fox
  * 中断机制
  */
+@Slf4j
 public class ThreadInterruptTest {
 
     static int i = 0;
@@ -18,7 +21,9 @@ public class ThreadInterruptTest {
                     System.out.println(i);
                     try {
                         Thread.sleep(10000);
+                        log.debug("未调用interrupted方法之前状态时：{}",Thread.currentThread().isInterrupted());
                     } catch (InterruptedException e) {
+                        log.debug("未调用interrupted方法之后状态时：{}",Thread.currentThread().isInterrupted());
                         e.printStackTrace();
                     }
 

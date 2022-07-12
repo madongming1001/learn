@@ -1120,9 +1120,11 @@ lockInterruptibly 优先考虑响应中断，而不是响应锁的普通获取�
 
 
 
-# Syhchronized和ReentrantLock的区别
+# Syhchronized
 
-**1、等待可中断**
+## Syhchronized和ReentrantLock的区别
+
+1、等待可中断**
 
 **2、公平锁**
 
@@ -1136,7 +1138,15 @@ lockInterruptibly 优先考虑响应中断，而不是响应锁的普通获取�
 
 3、对于长远来看，synchronized优化的空间的可能性更大，因为锁是记录在对象头里面
 
-![image-20220705193309158](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220705193309158.png)
+### Synchronized原理
+
+![preview](https://pic4.zhimg.com/v2-b7da59b4bc2a8957ac86a8eed7290da7_r.jpg)
+
+
+
+### Markword布局
+
+![image-20220711125639043](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220711125639043.png)
 
 ## 锁优化
 

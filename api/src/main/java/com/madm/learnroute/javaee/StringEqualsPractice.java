@@ -47,11 +47,11 @@ public class StringEqualsPractice {
         // 这个就是那个音符字符，只不过由于当前的网页没支持这种编码，所以没显示。
         // 这个就是音符字符的UTF-16编码
         // 代码单元指一种转换格式（UTF）中最小的一个分隔，称为一个代码单元（Code Unit）
-//        String B = "𝄞";
-//        String C = "\uD834\uDD1E";
-//        System.out.println(C);
-//        System.out.println(B.length());
-//        System.out.println(B.codePointCount(0, B.length()));
+        String B = "𝄞";
+        String C = "\uD834\uDD1E";
+        System.out.println(C);
+        System.out.println(B.length());
+        System.out.println(B.codePointCount(0, B.length()));
 
         System.out.println(Integer.toBinaryString(4));
         System.out.println(Integer.toBinaryString(-4));
