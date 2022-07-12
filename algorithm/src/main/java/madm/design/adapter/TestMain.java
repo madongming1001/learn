@@ -6,7 +6,7 @@ import com.mdm.utils.GsonObject;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
-public class Test {
+public class TestMain {
     public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         Gson gson = GsonObject.createGson();
         create_account create_account = new create_account();

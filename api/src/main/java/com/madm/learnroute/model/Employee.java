@@ -20,6 +20,11 @@ public class Employee {
         this.mobile = mobile;
     }
 
+    public Employee(long mobile, String name) {
+        this.name = name;
+        this.mobile = mobile;
+    }
+
     public String getName() {
         return name;
     }

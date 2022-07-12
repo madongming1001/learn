@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
  * @Date 2022/4/1 6:55 PM
  */
 @Slf4j
-public class Test {
+public class TestMain {
 
     public static void main(String[] args) {
         LotteryService lotteryService = new LotteryServiceImpl();

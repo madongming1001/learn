@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Test {
+public class TestMain {
     public static void main(String[] args) throws IOException {
 
         Map<String, Map<String, String>> map = new HashMap<>();

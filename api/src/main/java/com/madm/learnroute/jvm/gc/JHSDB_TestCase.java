@@ -16,7 +16,7 @@ import org.openjdk.jol.info.ClassLayout;
  * 参考文章：https://javadoop.com/post/metaspace
  */
 public class JHSDB_TestCase {
-    static class Test {
+    static class TestMain {
         //方法区如何实现并没有明确规定 所以静态信息放在了class对象里面
         static ObjectHolder staticObj = new ObjectHolder();
         //对象实例存放在堆中
@@ -32,9 +32,9 @@ public class JHSDB_TestCase {
     }
 
     public static void main(String[] args) {
-        System.out.println(ClassLayout.parseInstance(new Test()).toPrintable());
-        Test test = new JHSDB_TestCase.Test();
-        test.foo();
+        System.out.println(ClassLayout.parseInstance(new TestMain()).toPrintable());
+        TestMain testMain = new JHSDB_TestCase.TestMain();
+        testMain.foo();
     }
 }
 
