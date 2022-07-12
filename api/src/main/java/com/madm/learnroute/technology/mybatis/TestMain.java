@@ -4,7 +4,7 @@ import com.madm.learnroute.technology.mybatis.service.UserService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class Test {
+public class TestMain {
 
 	public static void main(String[] args) {
 
