@@ -1,8 +1,11 @@
 package com.madm.learnroute.jvm.juc;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author  Fox
  */
+@Slf4j
 public class ThreadStopDemo2 implements Runnable {
 
     @Override
@@ -15,8 +18,9 @@ public class ThreadStopDemo2 implements Runnable {
                 Thread.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                log.debug("重新设置线程中断状态为true");
                 //重新设置线程中断状态为true
-                Thread.currentThread().interrupt();
+//                Thread.currentThread().interrupt();
             }
         }
         System.out.println("线程停止： stop thread");
@@ -26,7 +30,9 @@ public class ThreadStopDemo2 implements Runnable {
         Thread thread = new Thread(new ThreadStopDemo2());
         thread.start();
         Thread.sleep(5);
-        thread.interrupt();
+        while(thread.isAlive()){
+            thread.interrupt();
+        }
     }
 }
 

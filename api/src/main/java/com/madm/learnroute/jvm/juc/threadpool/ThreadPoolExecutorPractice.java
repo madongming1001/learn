@@ -8,24 +8,37 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ThreadPoolExecutorPractice {
 
     private static final int COUNT_BITS = Integer.SIZE - 3; // 29 11101
-    private static final int CAPACITY   = (1 << COUNT_BITS) - 1; // 29个1 10011111111111111111111111111111
-    private static final int RUNNING    = -1 << COUNT_BITS;
+    private static final int CAPACITY = (1 << COUNT_BITS) - 1; // 29个1 00011111111111111111111111111111
+    private static final int RUNNING = -1 << COUNT_BITS;
 
-    private static int runStateOf(int c)     { return c & ~CAPACITY; }
-    private static int workerCountOf(int c)  { return c & CAPACITY; }
-    private static int ctlOf(int rs, int wc) { return rs | wc; }
+    private static int runStateOf(int c) {
+        return c & ~CAPACITY;
+    }
+
+    private static int workerCountOf(int c) {
+        return c & CAPACITY;
+    }
+
+    private static int ctlOf(int rs, int wc) {
+        return rs | wc;
+    }
 
     public static void main(String[] args) {
         AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
-        System.out.println(ctl.get());
+        System.out.println(Integer.toBinaryString(ctl.get()));
+        System.out.println(Integer.toBinaryString(CAPACITY));
+        System.out.println(Integer.toBinaryString(~CAPACITY));
+        System.out.println(Integer.toBinaryString((1 << 16) - 1));
+
+
         System.out.println(RUNNING);
-        System.out.println(Integer.toBinaryString( -1));
+        System.out.println(Integer.toBinaryString(-1));
         System.out.println(-1 << 29);
         System.out.println(Integer.toBinaryString(-536870912));
 //        System.out.println(CAPACITY);
 //        executeSchedule();
         System.out.println(Integer.toBinaryString(-1 - 1));//11111111111111111111111111111110
-        System.out.println(-1 -1 );
+        System.out.println(-1 - 1);
         System.out.println(Long.valueOf("10100000000000000000000000000000", 2));
         System.out.println(Integer.toBinaryString(~3) + 1);//按位取反
         System.out.println((~3) + 1);
@@ -47,7 +60,7 @@ public class ThreadPoolExecutorPractice {
 
 
         //线程池线程预热，线程池的预热仅仅针对核心线程 ⚠️
-        ThreadPoolExecutor fixedThreadPool = (ThreadPoolExecutor)Executors.newFixedThreadPool(10);
+        ThreadPoolExecutor fixedThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
         //启动所有的核心线程
         fixedThreadPool.prestartAllCoreThreads();
         //仅启动一个核心线程

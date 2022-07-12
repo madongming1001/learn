@@ -9,10 +9,10 @@ import java.nio.charset.StandardCharsets;
 public class TestMain {
     public static void main(String[] args) {
         DataView dataView = new DataView();
-        log.info("\r\n家长视角访问：");
+        log.info(System.lineSeparator() + "家长视角访问：");
         // 家长
         dataView.show(new Parent());
-        log.info("\r\n校长视角访问：");
+        log.info(System.lineSeparator() + "校长视角访问：");
         // 校长
         dataView.show(new Principal());
     }

@@ -1084,3 +1084,28 @@ private void doCommit() {
 
 ## Broker异步刷盘
 
+
+
+
+
+
+
+
+
+
+
+# SpringBoot整合RocketMq
+
+## 事务执行流程
+
+![img](https://ask.qcloudimg.com/http-save/yehe-6288208/3ebc0d8b5dd010c939c63da45825571a.jpeg?imageView2/2/w/1620)
+
+1. 发送方发送半事务消息
+2. Broker收到半事务消息存储后返回结果
+3. 发送半事务消息方处理本地事务 executeLocalTransaction()
+4. 发送方把本地事务处理结果以消息形式发送到Broker
+5. Broker在固定的时间内（默认60秒）未收到4的确认消息，Broker为发送方发送回查消息
+6. 业务发送发收到Broker回查消息后，查询本地业务执行结果 checkLocalTransaction()
+7. 业务方发送回查结果消息
+
+1-4 是同步调用，5-7是异步调用。RocketMQ事务消息使用了2PC+事后补偿机制保证了最终一致性。
