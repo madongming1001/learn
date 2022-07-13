@@ -421,7 +421,7 @@ new SpringApplication()的时候构造方法完成了几件事情，本地设置
 nacos divcovery是通过事件发布的方式注册的
 
 ```text
-finishRefresh() -> WebServerInitializedEvent 事件发布的，AbstractAutoServiceRegistration 监听了这个事件，通过他的 onApplicationEvent 方法就会走到，NacosServiceRegistry 最后就会走到这个的register
+finishRefresh() -> WebServerInitializedEvent（ServletWebServerInitializedEvent） 事件发布的，AbstractAutoServiceRegistration 监听了这个事件，通过他的 onApplicationEvent 方法就会走到，NacosServiceRegistry 最后就会走到这个的register
 ```
 
 # springboot2.0默认创建什么代理？
@@ -899,3 +899,26 @@ public void await() {
 ```
 
 在await方法中，实际上当前线程在一个while循环中每10秒检查一次 stopAwait这个变量，它是一个volatile类型变量，用于确保被另一个线程修改后，当前线程能够立即看到这个变化。如果没有变化，就会一直处于while循环中。这就是该线程不退出的原因，也就是整个spring-boot应用不退出的原因。
+
+
+
+# spring扩展点
+
+- BeanFactoryPostProcessor 
+  - BeanDefinitionRegistryPostProcessor 
+- BeanPostProcessor 
+  - InstantiationAwareBeanPostProcessor 
+  - AbstractAutoProxyCreator
+- @Import
+  - ImportBeanDefinitionRegistrar 
+  - ImportSelector 
+- Aware 
+- InitializingBean 
+- FactoryBean 
+- SmartInitializingSingleton 
+- ApplicationListener 
+- Lifecycle 
+  - SmartLifecycle 
+  - LifecycleProcessor 
+- HandlerInterceptor 
+- MethodInterceptor 
