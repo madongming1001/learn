@@ -1,5 +1,6 @@
-package com.madm.learnroute.javaee;
+package com.madm.learnroute.jvm.juc.reentrantlock;
 
+import com.mdm.pojo.User;
 import sun.misc.Contended;
 
 import java.util.HashMap;
@@ -46,7 +47,6 @@ public class Cache {
     }
 
     public static void main(String[] args) {
-        System.out.println(Integer.toBinaryString(0x0000FFFF));
-        System.out.println(Long.toBinaryString(0xFFFFFFFF));
+        Cache.put("1", new User());
     }
 }
