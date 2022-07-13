@@ -1613,3 +1613,38 @@ INSERT INTO z SELECT 2，0；
 
 
 NativeSession.execSQL () 方法里，和 MySQL Server 交互的所有指令，最终都会调用这个方法执行。
+
+
+
+
+
+# 查找连续id的sql
+
+连续的数字id-row-number()的值是相同的
+
+```sql
+SELECT *,
+             count(*) over ( PARTITION BY t_rank ) as t2_rank
+      FROM (SELECT *, id - row_number() over ( ORDER BY id ) as t_rank FROM stadium WHERE people > 99) t
+
+SELECT *, id - row_number() over ( ORDER BY id ) as t_rank FROM stadium WHERE people > 99
+2,2071-01-02,109,1
+3,2071-01-03,150,1
+5,2071-01-05,145,2
+6,2071-01-06,1455,2
+7,2071-01-07,199,2
+8,2071-01-09,188,2
+
+SELECT *,
+             count(*) over ( PARTITION BY t_rank ) as t2_rank
+      FROM (SELECT *, id - row_number() over ( ORDER BY id ) as t_rank FROM stadium WHERE people > 99) t
+
+2,2071-01-02,109,1,2
+3,2071-01-03,150,1,2
+5,2071-01-05,145,2,4
+6,2071-01-06,1455,2,4
+7,2071-01-07,199,2,4
+8,2071-01-09,188,2,4
+
+```
+

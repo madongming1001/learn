@@ -1,16 +1,18 @@
 package com.madm.learnroute.technology.spring;
 
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MyFactoryBean implements FactoryBean {
     @Override
     public MyObject getObject() throws Exception {
-        return null;
+        return new MyObject();
     }
 
     @Override
     public Class<?> getObjectType() {
-        return null;
+        return MyObject.class;
     }
 
 }

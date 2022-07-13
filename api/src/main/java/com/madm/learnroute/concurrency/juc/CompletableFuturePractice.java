@@ -1,25 +1,36 @@
-package com.madm.learnroute.javaee;
+package com.madm.learnroute.concurrency.juc;
 
+import com.madm.learnroute.javaee.Discount;
 import lombok.Data;
+import lombok.SneakyThrows;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class CompletableFutureDemo {
+public class CompletableFuturePractice {
     static List<Shop> shops = Arrays.asList(new Shop("BestPrice"),
             new Shop("LetsSaveBig"),
             new Shop("MyFavoriteShop"),
             new Shop("BuyItAll"));
 
+    @SneakyThrows
     public static void main(String[] args) {
         Shop shop = new Shop("BestPrice");
         System.out.println(shop.getPrice("product"));
+
+
+        CompletableFuture<Void> voidCompletableFuture = CompletableFuture.runAsync(() -> System.out.println(1001));
+        CompletableFuture<Object> objectCompletableFuture = CompletableFuture.supplyAsync(() -> 102);
+        System.out.println(voidCompletableFuture.get());
+        System.out.printf((String) objectCompletableFuture.get());
+        //无异常类型
+        CompletableFuture.allOf(voidCompletableFuture,objectCompletableFuture).join();
+        //有异常类型
+        CompletableFuture.allOf(voidCompletableFuture,objectCompletableFuture).get();
     }
 
     private static void completableFutureTest() {

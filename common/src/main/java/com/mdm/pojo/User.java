@@ -11,7 +11,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Accessors(chain = true)
 public class User {
-    @NonNull
     private Integer id;
     @NonNull
     private String name;
@@ -20,5 +19,10 @@ public class User {
     public User(User user) {
         this.id = user.getId();
         this.name = user.getName();
+    }
+
+    public User(Integer id, @NonNull String name) {
+        this.id = id;
+        this.name = name;
     }
 }

@@ -684,7 +684,7 @@ class FeignClientsRegistrar
 		implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
 
 }
-
+.
 ```
 
 **通过import注解来注册bean有几种方式**
@@ -905,20 +905,47 @@ public void await() {
 # spring扩展点
 
 - BeanFactoryPostProcessor 
-  - BeanDefinitionRegistryPostProcessor 
+  - BeanDefinitionRegistryPostProcessor （ConfigurationClassPostProcessor）
 - BeanPostProcessor 
-  - InstantiationAwareBeanPostProcessor 
-  - AbstractAutoProxyCreator
+  - InstantiationAwareBeanPostProcessor （resolveBeforeInstantiation返回一个代理对象）
+  - AbstractAutoProxyCreator （代理）
 - @Import
   - ImportBeanDefinitionRegistrar 
   - ImportSelector 
 - Aware 
-- InitializingBean 
-- FactoryBean 
-- SmartInitializingSingleton 
-- ApplicationListener 
-- Lifecycle 
+- InitializingBean （afterPropertiesSet）
+- FactoryBean （getObject，getObjectType，isSingleton）
+- SmartInitializingSingleton (获取完所有单里bean之后，preInstantiateSingletons)
+- ApplicationListener
+- Lifecycle （finishRefresh）
   - SmartLifecycle 
   - LifecycleProcessor 
-- HandlerInterceptor 
-- MethodInterceptor 
+- HandlerInterceptor （mvc）
+- MethodInterceptor （mvc）
+
+
+
+# Spring注解
+
+**@Async默认使用的是spring的通用线程池 ThreadPoolTaskExecutor**
+
+```java
+//自动注入类
+TaskExecutionAutoConfiguration  
+/**
+ *默认核心线程数：8，最大线程数：Integet.MAX_VALUE，队列使用LinkedBlockingQueue，容量是：
+ *Integet.MAX_VALUE，空闲线程保留时间：60s，线程池拒绝策略：AbortPolicy。
+ */
+```
+
+
+
+# ApplicationListener的bean什么时候注册到多播器中的？
+
+参考文章：https://blog.csdn.net/zxd1435513775/article/details/121241025
+
+Listener是怎么被保存到广播器`ApplicationEventMulticaster`中的呢？
+
+答案：通过`ApplicationListenerDetector`这个`BeanPostProcessor`后置处理器。
+
+ApplicationListenerDetector 在 prepareBeanFactory注入的
