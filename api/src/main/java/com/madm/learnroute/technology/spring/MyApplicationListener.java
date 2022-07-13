@@ -2,10 +2,13 @@ package com.madm.learnroute.technology.spring;
 
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
 
-public class MyApplicationListener implements ApplicationListener {
+@Component
+public class MyApplicationListener implements ApplicationListener<MyApplicationEvent> {
+
     @Override
-    public void onApplicationEvent(ApplicationEvent event) {
-
+    public void onApplicationEvent(MyApplicationEvent event) {
+        System.out.println(event);
     }
 }

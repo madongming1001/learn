@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "learn-api",url = "${feign.server.nacosconfig}",fallbackFactory = UserInfoCallbackFactory.class)
+@FeignClient(name = "learn-api", url = "${feign.server.nacosconfig}", fallbackFactory = UserInfoCallbackFactory.class)
 @Component
 public interface UserInfoFeignClient {
 
@@ -17,4 +17,8 @@ public interface UserInfoFeignClient {
 
     @PostMapping("practice/protobufShow")
     Response getPersonProto(@RequestBody User user);
+
+    default void print() {
+        System.out.println("sssss");
+    }
 }
