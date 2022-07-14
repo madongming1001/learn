@@ -40,6 +40,29 @@ CPU在摩尔定律的指导下以每18个月翻一番的速度在发展，然而
 
 多核CPU的情况下有**多个一级缓存**，如果保证缓存内部数据的一致，不让系统数据混乱。这里就引出了一个**一致性的协议MESI**。
 
+
+
+### Cache Line缓存行格式
+
+#### 高速缓存的数据结构
+
+![img](https://img-blog.csdnimg.cn/img_convert/530400b6be69f3b3f23db013327959ec.png)
+
+高速缓存的底层数据结构其实是一个拉链散列表的结构，就是有很多的bucket，每个bucket挂了很多的cache entry，每个 cache entry 由三个部分组成： **tag 、 cache line 、 flag**
+
+cache line ：缓存的数据，可以包含多个变量的值
+tag ：指向了这个缓存数据在主内存的数据的地址
+flag ：标识了缓存行的状态，具体状态划分见下边MESI协议
+怎么在高速缓存中定位到这个变量呢？
+
+在处理器读写高速缓存的时候，实际上会根据变量名执行一个内存地址解码的操作，解析出来三个东西。 **index , tag 和 offerset 。**
+
+index ：用于定位到拉链散列表中的某个 bucket
+tag ：用于定位 cache entry
+offerset ：用于定位一个变量在 cache line 中的位置
+
+参考文章：https://blog.csdn.net/m0_38017860/article/details/122988861
+
 ### MESI 协议缓存状态
 
 MESI 是指4个状态的首字母。每个 `Cache line` 有4个状态，可用2个bit表示，它们分别是：
@@ -706,13 +729,12 @@ class VolatileBarrierExample {
 
 
 
-
-
-
-
-
-
 # MESI
 
 参考文章：https://zhuanlan.zhihu.com/p/84500221
 
+
+
+
+
+# [Java中的native是如何实现的（JNI）](https://segmentfault.com/a/1190000022812099)

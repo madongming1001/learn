@@ -1,5 +1,6 @@
 package com.madm.learnroute.javaee;
 
+import lombok.SneakyThrows;
 import lombok.experimental.Delegate;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -13,6 +14,8 @@ import java.util.*;
 
 public class ClassLoaderPractice {
     public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factories";
+
+    @SneakyThrows
     public static void main(String[] args) {
         // 出发都是舍弃小数位
 //        System.out.println(String.class.getClassLoader());
@@ -28,6 +31,10 @@ public class ClassLoaderPractice {
         //null 同级目录下去找
         MultiValueMap<String, String> result = result = new LinkedMultiValueMap<>();
         ClassLoader classLoader = ClassLoaderPractice.class.getClassLoader();
+
+        Enumeration<URL> resources = classLoader.getResources(FACTORIES_RESOURCE_LOCATION);
+
+
         try {
             Enumeration<URL> urls = (classLoader != null ?
                     classLoader.getResources(FACTORIES_RESOURCE_LOCATION) :
