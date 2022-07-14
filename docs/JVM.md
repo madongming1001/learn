@@ -240,6 +240,8 @@ public class Singleton {
 
 # 垃圾收集算法
 
+**如果说收集算法是内存回收的方法论，那么垃圾收集器就是内存回收的具体实现。**
+
 ## Garbage First(G1)收集器
 
 Garbage First（简称G1）收集器是垃圾收集器技术发展历史上的里程碑式的成果，它开创了收集器面向局部收集的设计思路和基于Region的内存布局形式。早在JDK7刚刚确立项目目标、Oracle公司制定的JDK 7 RoadMap里面，G1收集器就被视作JDK 7中HotSpot虚拟机的一项重要进化特征。从JDK6 Update 14开始就有Early Access版本的G1收集器供开发人员实验和试用，但由此开始G1收集器的“实验状态”（Experimental）持续了数年时间，直至JDK 7 Update 4，Oracle才认为它达到足够成熟的商用 程度，移除了“Experimental”的标识；到了JDK 8 Update 40的时候，**G1提供并发的类卸载的支持**，补全了其计划功能的最后一块拼图。这个版本以后的G1收集器才被Oracle官方称为“全功能的垃圾收集器”（Fully-Featured Garbage Collector）。
@@ -386,9 +388,14 @@ CMS使用针对于三色标级使用的是增量更新
 
 JMX 全称为 Java Management Extensions，翻译过来就是 Java 管理扩展，用来管理和监测 Java 程序。最常用到的就是对于 JVM 的监测和管理，比如 JVM 内存、CPU 使用率、线程数、垃圾收集情况等等。
 
+
+
 编译器种类：
 前端编译器：把.java文件转变成*.class文件的过程
 即时编译器：运行期把字节码转变成本地机器码的过程 -c -s
+
+参考文章：https://blog.csdn.net/sunxianghuang/article/details/52094859?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522165778461516782391814263%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=165778461516782391814263&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-1-52094859-null-null.142^v32^pc_rank_34,185^v2^control&utm_term=jit&spm=1018.2226.3001.4187
+
 提前编译器：直接把程序编译成与目标机器指令集相关的二进制代码的过程
 
 
@@ -584,3 +591,87 @@ System.out.println(i);
 ​		使用安全点的设计似乎已经完美解决如何停顿用户线程，让虚拟机进入垃圾回收状态的问题了，但实际情况却并不一定。安全点机制保证了程序执行时，在不太长的时间内就会遇到可进入垃圾收集过程的安全点。但是，程序“不执行”的时候呢？**所谓的程序不执行就是没有分配处理器时间，典型的场景便是用户线程处于Sleep状态或者Blocked状态，这时候线程无法响应虚拟机的中断请求**，不能再走到安全的地方去中断挂起自己，虚拟机也显然不可能持续等待线程重新被激活分配处理器时间。对于这种情况，就必须引入安全区域（Safe Region）来解决。 
 
 ​		安全区域是指能够确保在某一段代码片段之中，引用关系不会发生变化，因此，在这个区域中任意地方开始垃圾收集都是安全的。我们也可以把安全区域看作被扩展拉伸了的安全点。当用户线程执行到安全区域里面的代码时，首先会标识自己已经进入了安全区域，那样当这段时间里虚拟机要发起垃圾收集时就不必去管这些已声明自己在安全区域内的线程了。当线程要离开安全区域时，它要检查虚拟机是否已经完成了根节点枚举（或者垃圾收集过程中其他需要暂停用户线程的阶段），如果完成了，那线程就当作没事发生过，继续执行；否则它就必须一直等待，直到收到可以离开安全区域的信号为止。
+
+
+
+
+
+# 前端编译器
+
+**把*.java文件转变成*.class文件的过程。**
+
+## 总体架构
+
+从Javac代码的总体结构来看，编译过程大致可以分为1个准备过程和3个处理过程，它们分别如下 
+
+所示。
+
+1. 准备过程：初始化插入式注解处理器。 
+
+2. 解析与填充符号表过程，包括： 
+
+   词法、语法分析。将源代码的字符流转变为标记集合（**单个字符式程序编写时的最小元素，但标记才是编译时的最小元素）**，构造出抽象语法树。 
+
+   填充符号表。产生符号地址和符号信息。
+
+3. 插入式注解处理器的注解处理过程：插入式注解处理器的执行阶段。**允许读取、修改、添加抽象语法树中的任意元素。**
+
+4. 分析与字节码生成过程
+
+- 标注检查。对语法的静态信息进行检查。 （我们编码时经常能在IDE中看到由红线标注的错误提示，其中绝大部分都是来源于语义分析阶段的检查结果，会进行**常量折叠（编译器可以把变量直接进行最终赋值计算优化）**
+
+- 数据流及控制流分析。对程序动态运行过程进行检查。 
+
+- 解语法糖。将简化代码编写的语法糖还原为原有的形式。 
+
+- 字节码生成。将前面各个步骤所生成的信息转化成字节码。 
+
+  上述3个处理过程里，执行插入式注解时又可能会产生新的符号，如果有新的符号产生，**就必须转** 
+
+**回到之前的解析、填充符号表的过程中重新处理这些新符号，**
+
+
+
+# 垃圾收集相关的常用参数
+
+| 参数                               | 描述                                                         |
+| ---------------------------------- | ------------------------------------------------------------ |
+| -XX:+UseSerialGC                   | Jvm运行在Client模式下的默认值，打开此开关后，使用Serial + Serial Old的收集器组合进行内存回收 |
+| -XX:+UseParNewGC                   | 打开此开关后，使用ParNew + Serial Old的收集器进行垃圾回收    |
+| -XX:+UseConcMarkSweepGC            | 使用ParNew + CMS +  Serial Old的收集器组合进行内存回收，Serial Old作为CMS出现“Concurrent Mode Failure”失败后的后备收集器使用。 |
+| -XX:+UseParallelGC                 | Jvm运行在Server模式下的默认值，打开此开关后，使用Parallel Scavenge +  Serial Old的收集器组合进行回收 |
+| -XX:+UseParallelOldGC              | 使用Parallel Scavenge +  Parallel Old的收集器组合进行回收    |
+| -XX:SurvivorRatio                  | 新生代中Eden区域与Survivor区域的容量比值，默认为8，代表Eden:Subrvivor = 8:1 |
+| -XX:PretenureSizeThreshold         | 直接晋升到老年代对象的大小，设置这个参数后，大于这个参数的对象将直接在老年代分配 |
+| -XX:MaxTenuringThreshold           | 晋升到老年代的对象年龄，每次Minor GC之后，年龄就加1，当超过这个参数的值时进入老年代 |
+| -XX:UseAdaptiveSizePolicy          | 动态调整java堆中各个区域的大小以及进入老年代的年龄           |
+| -XX:+HandlePromotionFailure        | 是否允许新生代收集担保，进行一次minor gc后, 另一块Survivor空间不足时，将直接会在老年代中保留 |
+| -XX:ParallelGCThreads              | 设置并行GC进行内存回收的线程数                               |
+| -XX:GCTimeRatio                    | GC时间占总时间的比列，默认值为99，即允许1%的GC时间，仅在使用Parallel Scavenge 收集器时有效 |
+| -XX:MaxGCPauseMillis               | 设置GC的最大停顿时间，在Parallel Scavenge 收集器下有效       |
+| -XX:CMSInitiatingOccupancyFraction | 设置CMS收集器在老年代空间被使用多少后出发垃圾收集，默认值为68%，仅在CMS收集器时有效，-XX:CMSInitiatingOccupancyFraction=70 |
+| -XX:+UseCMSCompactAtFullCollection | 由于CMS收集器会产生碎片，此参数设置在垃圾收集器后是否需要一次内存碎片整理过程，仅在CMS收集器时有效 |
+| -XX:+CMSFullGCBeforeCompaction     | 设置CMS收集器在进行若干次垃圾收集后再进行一次内存碎片整理过程，通常与UseCMSCompactAtFullCollection参数一起使用 |
+| -XX:+UseFastAccessorMethods        | 原始类型优化                                                 |
+| -XX:+DisableExplicitGC             | 是否关闭手动System.gc                                        |
+| -XX:+CMSParallelRemarkEnabled      | 降低标记停顿                                                 |
+| -XX:LargePageSizeInBytes           | 内存页的大小不可设置过大，会影响Perm的大小，-XX:LargePageSizeInBytes=128m |
+
+`Client、Server模式默认GC` 
+
+|        | 新生代GC方式                  | 老年代和持久**代**GC方式 |
+| ------ | ----------------------------- | ------------------------ |
+| Client | Serial 串行GC                 | Serial Old 串行GC        |
+| Server | Parallel Scavenge  并行回收GC | Parallel Old 并行GC      |
+
+`Sun/Oracle JDK GC组合方式` 
+
+|                                          | 新生代GC方式                  | 老年代和持久**代**GC方式                                     |
+| ---------------------------------------- | ----------------------------- | ------------------------------------------------------------ |
+| -XX:+UseSerialGC                         | Serial 串行GC                 | Serial Old 串行GC                                            |
+| -XX:+UseParallelGC                       | Parallel Scavenge  并行回收GC | Serial Old  并行GC                                           |
+| -XX:+UseConcMarkSweepGC                  | ParNew 并行GC                 | CMS 并发GC  当出现“Concurrent Mode Failure”时 采用Serial Old 串行GC |
+| -XX:+UseParNewGC                         | ParNew 并行GC                 | Serial Old 串行GC                                            |
+| -XX:+UseParallelOldGC                    | Parallel Scavenge  并行回收GC | Parallel Old 并行GC                                          |
+| -XX:+UseConcMarkSweepGC -XX:+UseParNewGC | Serial 串行GC                 | CMS 并发GC  当出现“Concurrent Mode Failure”时 采用Serial Old 串行GC |
+

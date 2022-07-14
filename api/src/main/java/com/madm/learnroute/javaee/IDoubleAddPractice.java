@@ -10,6 +10,11 @@ import java.util.ArrayList;
  */
 public class IDoubleAddPractice {
     public static void main(String[] args) {
+        int i = 1;
+        //表达式的返回值是 i++ 之前的值;
+        i++;
+
+
         /**
          *  0 iconst_1
          *  1 istore_1 局部变量表 slot 1 有一个 i = 1
@@ -29,10 +34,10 @@ public class IDoubleAddPractice {
 //        i = ++i + i++;
 //        System.out.println(i);
 
-        ArrayList<String> nums = Lists.newArrayList("1", "2");
-        for (int k = 0; k < nums.size(); k++) {
-            System.out.println(k);
-        }
+//        ArrayList<String> nums = Lists.newArrayList("1", "2");
+//        for (int k = 0; k < nums.size(); k++) {
+//            System.out.println(k);
+//        }
     }
 
 //    public void nonStaticMain() {

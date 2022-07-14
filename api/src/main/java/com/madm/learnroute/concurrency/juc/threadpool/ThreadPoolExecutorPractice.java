@@ -31,6 +31,9 @@ public class ThreadPoolExecutorPractice {
         System.out.println(Integer.toBinaryString((1 << 16) - 1));
         System.out.println(Integer.toBinaryString(0xFFFF));
 
+        System.out.println(Integer.toBinaryString(65535));
+        System.out.println(Integer.parseInt("111111111111",2));
+
 
         System.out.println(RUNNING);
         System.out.println(Integer.toBinaryString(-1));
