@@ -8,18 +8,21 @@ import org.openjdk.jol.info.ClassLayout;
  */
 public class ObjectMemorySizeView {
 
+    private static Object obj;
+
     /**
      * 问这个代码最后输出什么？申请多大的内存空间，都在什么位置申请的
+     *
      * @param args
      */
     public static void main(String[] args) {
-        int[] a = new int[1024];
+//        int[] a = new int[1024];
+//
+//
+//        System.out.println(System.getProperties());
+//        System.out.println(RamUsageEstimator.sizeOf(a));
 
-
-        System.out.println(System.getProperties());
-        System.out.println(RamUsageEstimator.sizeOf(a));
-
-        System.out.println(RamUsageEstimator.shallowSizeOf(new Object()));
+        obj = new Object();
 //        System.out.println(ClassLayout.parseInstance(ObjectMemorySizeView.class).instanceSize());
 
 
