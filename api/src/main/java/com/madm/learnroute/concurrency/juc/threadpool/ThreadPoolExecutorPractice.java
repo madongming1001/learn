@@ -2,6 +2,8 @@ package com.madm.learnroute.concurrency.juc.threadpool;
 
 import lombok.SneakyThrows;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -10,6 +12,8 @@ public class ThreadPoolExecutorPractice {
     private static final int COUNT_BITS = Integer.SIZE - 3; // 29 11101
     private static final int CAPACITY = (1 << COUNT_BITS) - 1; // 29个1 00011111111111111111111111111111
     private static final int RUNNING = -1 << COUNT_BITS;
+
+    private static int index;
 
     private static int runStateOf(int c) {
         return c & ~CAPACITY;
@@ -32,7 +36,7 @@ public class ThreadPoolExecutorPractice {
         System.out.println(Integer.toBinaryString(0xFFFF));
 
         System.out.println(Integer.toBinaryString(65535));
-        System.out.println(Integer.parseInt("111111111111",2));
+        System.out.println(Integer.parseInt("111111111111", 2));
 
 
         System.out.println(RUNNING);
@@ -48,6 +52,7 @@ public class ThreadPoolExecutorPractice {
         System.out.println((~3) + 1);
     }
 
+    @SneakyThrows
     private static void executeSchedule() {
         ExecutorService ws = Executors.newWorkStealingPool();
         // 线程池的对应状态：
@@ -80,6 +85,10 @@ public class ThreadPoolExecutorPractice {
                 throw new IllegalAccessException();
             }
         });
+
+        List<Callable<Integer>> callables = Arrays.asList(() -> index++, () -> index++);
+
+        threadPoolExecutor.invokeAny(callables);
 
         for (int i = 0; i < 100; i++) {
             int finalI = i;

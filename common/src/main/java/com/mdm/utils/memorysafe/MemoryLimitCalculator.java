@@ -1,4 +1,8 @@
 package com.mdm.utils.memorysafe;
+
+import sun.instrument.InstrumentationImpl;
+
+import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
@@ -12,9 +16,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class MemoryLimitCalculator {
     // 计算对象所占内存大小的两种方式
-    // Instrumentation
+    // 1、Instrumentation
     // 它可以更加方便的做字节码增强操作，允许我们对已经加载甚至还没有被加载的类进行修改的操作，实现类似于性能监控的功能
-    // JConsole的页面信息就是从 ManagementFactory 里面拿的
+    // 2、ManagementFactory，JConsole的页面信息就是从 ManagementFactory 里面拿的
     private static final MemoryMXBean MX_BEAN = ManagementFactory.getMemoryMXBean();
 
     private static volatile long maxAvailable;
