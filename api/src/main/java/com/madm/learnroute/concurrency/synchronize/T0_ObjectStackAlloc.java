@@ -2,13 +2,12 @@ package com.madm.learnroute.concurrency.synchronize;
 
 /**
  * 查看JIT编译结果
- * java -XX:+UnlockDiagnosticVMOptions -XX:PrintAssemblyOptions=hsdis-print-bytes -XX:CompileCommand=print,*AtomicInteger.incrementAndGet
+ * -XX:+UnlockDiagnosticVMOptions
+ * -XX:+PrintAssembly -Xcomp
+ * -XX:CompileCommand=dontinline,*Bar.sum
+ * -XX:CompileCommand=compileonly,*Bar.sum
  *
- * @author ：图灵-杨过
- * @date：2019/7/26
- * @version: V1.0
- * @slogan: 天下风云出我辈，一入代码岁月催
- * @description :
+ * /Users/madongming/software/hsdis
  */
 public class T0_ObjectStackAlloc {
 

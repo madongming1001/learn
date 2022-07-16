@@ -641,7 +641,7 @@ System.out.println(i);
 | -XX:+UseConcMarkSweepGC            | 使用ParNew + CMS +  Serial Old的收集器组合进行内存回收，Serial Old作为CMS出现“Concurrent Mode Failure”失败后的后备收集器使用。 |
 | -XX:+UseParallelGC                 | Jvm运行在Server模式下的默认值，打开此开关后，使用Parallel Scavenge +  Serial Old的收集器组合进行回收 |
 | -XX:+UseParallelOldGC              | 使用Parallel Scavenge +  Parallel Old的收集器组合进行回收    |
-| -XX:SurvivorRatio                  | 新生代中Eden区域与Survivor区域的容量比值，默认为8，代表Eden:Subrvivor = 8:1 |
+| -XX:SurvivorRatio                  | 新生代中Eden区域与Survivor区域的容量比值，默认为8，代表Eden:Subrvivor = 8:1:1 |
 | -XX:PretenureSizeThreshold         | 直接晋升到老年代对象的大小，设置这个参数后，大于这个参数的对象将直接在老年代分配 |
 | -XX:MaxTenuringThreshold           | 晋升到老年代的对象年龄，每次Minor GC之后，年龄就加1，当超过这个参数的值时进入老年代 |
 | -XX:UseAdaptiveSizePolicy          | 动态调整java堆中各个区域的大小以及进入老年代的年龄           |
@@ -649,20 +649,22 @@ System.out.println(i);
 | -XX:ParallelGCThreads              | 设置并行GC进行内存回收的线程数                               |
 | -XX:GCTimeRatio                    | GC时间占总时间的比列，默认值为99，即允许1%的GC时间，仅在使用Parallel Scavenge 收集器时有效 |
 | -XX:MaxGCPauseMillis               | 设置GC的最大停顿时间，在Parallel Scavenge 收集器下有效       |
-| -XX:CMSInitiatingOccupancyFraction | 设置CMS收集器在老年代空间被使用多少后出发垃圾收集，默认值为68%，仅在CMS收集器时有效，-XX:CMSInitiatingOccupancyFraction=70 |
+| -XX:CMSInitiatingOccupancyFraction | 设置CMS收集器在老年代空间被使用多少后触发垃圾收集，默认值为68%，仅在CMS收集器时有效，-XX:CMSInitiatingOccupancyFraction=70 |
 | -XX:+UseCMSCompactAtFullCollection | 由于CMS收集器会产生碎片，此参数设置在垃圾收集器后是否需要一次内存碎片整理过程，仅在CMS收集器时有效 |
 | -XX:+CMSFullGCBeforeCompaction     | 设置CMS收集器在进行若干次垃圾收集后再进行一次内存碎片整理过程，通常与UseCMSCompactAtFullCollection参数一起使用 |
 | -XX:+UseFastAccessorMethods        | 原始类型优化                                                 |
 | -XX:+DisableExplicitGC             | 是否关闭手动System.gc                                        |
 | -XX:+CMSParallelRemarkEnabled      | 降低标记停顿                                                 |
 | -XX:LargePageSizeInBytes           | 内存页的大小不可设置过大，会影响Perm的大小，-XX:LargePageSizeInBytes=128m |
+| -XX:+HeapDumpOnOutOfMemoryError    | 表示当JVM发生OOM时，自动生成DUMP文件。                       |
 
 `Client、Server模式默认GC` 
 
-|        | 新生代GC方式                  | 老年代和持久**代**GC方式 |
-| ------ | ----------------------------- | ------------------------ |
-| Client | Serial 串行GC                 | Serial Old 串行GC        |
-| Server | Parallel Scavenge  并行回收GC | Parallel Old 并行GC      |
+|        | 新生代GC方式                  | 老年代和持久**代**GC方式                                     |
+| ------ | ----------------------------- | ------------------------------------------------------------ |
+| Client | Serial 串行GC                 | Serial Old 串行GC                                            |
+| Server | Parallel Scavenge  并行回收GC | Parallel Old 并行GC                                          |
+|        | -XX:CompileThreshold          | 当函数的调用次数超过-XX:CompileThreshold时，JIT就将字节码编译成本地机器码。client（1500） server（10000） |
 
 `Sun/Oracle JDK GC组合方式` 
 
