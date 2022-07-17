@@ -748,3 +748,9 @@ class VolatileBarrierExample {
 # CPU核心数
 
 参考文章：https://zhuanlan.zhihu.com/p/86855590
+
+
+
+
+
+**多处理器一般是采用基于总线监听机制的高速缓存一致性协议。在NUMA系统中，通常选择基于目录(directory-based)的方式来维护Cache的一致性。**
