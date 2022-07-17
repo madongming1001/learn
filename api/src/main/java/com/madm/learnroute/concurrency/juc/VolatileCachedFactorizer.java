@@ -1,5 +1,7 @@
 package com.madm.learnroute.concurrency.juc;
 
+import net.bytebuddy.agent.builder.AgentBuilder;
+
 import javax.annotation.concurrent.ThreadSafe;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -17,8 +19,6 @@ public class VolatileCachedFactorizer {
 
     private volatile boolean volflag = true;
 
-    public static void main(String[] args) {
-        System.out.println("Sss");
-    }
+    public static void main(String[] args) {}
 
 }
