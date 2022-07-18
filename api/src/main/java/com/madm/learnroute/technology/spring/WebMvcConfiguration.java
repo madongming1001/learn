@@ -13,10 +13,10 @@ import java.util.List;
 //实现接口 WebMvcConfigurer(官方推荐)
 //implements WebMvcConfigurer
 
-//继承WebMvcConfigurationSupport
+//继承 WebMvcConfigurationSupport
 //extends WebMvcConfigurationSupport
 //@Configuration
-public class MvcConfiguration extends WebMvcConfigurationSupport {
+public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AppkeyInterceptor()).addPathPatterns("/*").order(1);
