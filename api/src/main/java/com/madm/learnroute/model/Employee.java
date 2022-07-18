@@ -57,6 +57,10 @@ public class Employee {
         this.mobile = mobile;
     }
 
+    public void print(){
+        System.out.println("自定义方法");
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Employee{");

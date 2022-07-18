@@ -1,6 +1,9 @@
 package com.madm.learnroute.javaee;
 
+import org.springframework.util.ReflectionUtils;
+
 import java.io.FileInputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 /**
@@ -46,7 +49,7 @@ public class MyClassLoaderTest {
 //                    // If still not found, then invoke findClass in order
 //                    // to find the class.
 //                    long t1 = System.nanoTime();
-//                    if(!name.startsWith("com.example.learnroute.pojo.Teacher")){
+//                    if(!name.startsWith("Employee")){
 //                        c = this.getParent().loadClass(name);
 //                    }else{
 //                        c = findClass(name);
@@ -64,10 +67,17 @@ public class MyClassLoaderTest {
     }
 
     public static void main(String[] args) throws Exception {
-        MyClassLoader classLoader =  new MyClassLoader("/Users/madongming/IdeaProjects/learn-route/target/classes");
-        Class clazz = classLoader.loadClass("com.madm.pojo.Teacher");
-        Object obj = clazz.newInstance();
-        Method method = clazz.getDeclaredMethod("sout", null);
+        MyClassLoader classLoader =  new MyClassLoader("/Users/madongming/IdeaProjects/learn/classloader");
+        Class clazz = classLoader.loadClass("com.madm.learnroute.model.Employee1");
+        Constructor[] constructors = clazz.getConstructors();
+        Object obj = null;
+        for (Constructor constructor : constructors) {
+            if (constructor.getParameterCount() == 2) {
+                obj = constructor.newInstance(10L, "10");
+                break;
+            }
+        }
+        Method method = clazz.getDeclaredMethod("print", null);
         method.invoke(obj, null);
         System.out.println(clazz.getClassLoader().getClass().getName());
     }

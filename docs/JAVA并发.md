@@ -828,7 +828,7 @@ class VolatileBarrierExample {
 
 ## 
 
-**引用文章地址：https://juejin.cn/post/6893430262084927496**
+**参考文章：https://juejin.cn/post/6893430262084927496**
 
 
 

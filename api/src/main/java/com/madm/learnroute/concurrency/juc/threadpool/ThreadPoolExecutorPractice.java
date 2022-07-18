@@ -28,6 +28,8 @@ public class ThreadPoolExecutorPractice {
     }
 
     public static void main(String[] args) {
+        System.out.println(Integer.parseInt("111111", 2));
+
         AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
         System.out.println(Integer.toBinaryString(ctl.get()));
         System.out.println(Integer.toBinaryString(CAPACITY));
