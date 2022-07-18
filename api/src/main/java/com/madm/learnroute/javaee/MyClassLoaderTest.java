@@ -40,30 +40,42 @@ public class MyClassLoaderTest {
             }
         }
 
-//        @Override
-//        protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-//            synchronized (getClassLoadingLock(name)) {
-//                // First, check if the class has already been loaded
-//                Class<?> c = findLoadedClass(name);
-//                if (c == null) {
-//                    // If still not found, then invoke findClass in order
-//                    // to find the class.
-//                    long t1 = System.nanoTime();
-//                    if(!name.startsWith("Employee")){
-//                        c = this.getParent().loadClass(name);
-//                    }else{
-//                        c = findClass(name);
-//                    }
-//                    // this is the defining class loader; record the stats
-//                    sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
-//                    sun.misc.PerfCounter.getFindClasses().increment();
-//                }
-//                if (resolve) {
-//                    resolveClass(c);
-//                }
-//                return c;
-//            }
-//        }
+        /**
+         * 模拟实现Tomcat的webappClassLoader加载自己war包应用内不同版本类实现相互共存与隔离
+         * 破坏双亲委派是重写loadClass不往上查找就好了
+         * @param name
+         *         The <a href="#name">binary name</a> of the class
+         *
+         * @param resolve
+         *         If <tt>true</tt> then resolve the class
+         *
+         * @return
+         * @throws ClassNotFoundException
+         */
+        @Override
+        protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+            synchronized (getClassLoadingLock(name)) {
+                // First, check if the class has already been loaded
+                Class<?> c = findLoadedClass(name);
+                if (c == null) {
+                    // If still not found, then invoke findClass in order
+                    // to find the class.
+                    long t1 = System.nanoTime();
+                    if(!name.startsWith("Employee")){
+                        c = this.getParent().loadClass(name);
+                    }else{
+                        c = findClass(name);
+                    }
+                    // this is the defining class loader; record the stats
+                    sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
+                    sun.misc.PerfCounter.getFindClasses().increment();
+                }
+                if (resolve) {
+                    resolveClass(c);
+                }
+                return c;
+            }
+        }
     }
 
     public static void main(String[] args) throws Exception {
