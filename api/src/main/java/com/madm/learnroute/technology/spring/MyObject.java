@@ -1,9 +1,6 @@
 package com.madm.learnroute.technology.spring;
 
-import lombok.ToString;
-
 public class MyObject {
-
     public static void getObject(ObjectFactory<?> objectFactory) {
         System.out.println(objectFactory.getObject());
     }
