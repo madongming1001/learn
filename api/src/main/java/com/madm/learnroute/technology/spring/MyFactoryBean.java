@@ -3,7 +3,7 @@ package com.madm.learnroute.technology.spring;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class MyFactoryBean implements FactoryBean {
     @Override
     public MyObject getObject() throws Exception {
