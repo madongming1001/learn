@@ -15,6 +15,7 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -26,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping(value = "/practice")
 @Api(description = "练习接口", name = "PracticeController")
+@RefreshScope
 public class PracticeController {
 
     @Resource

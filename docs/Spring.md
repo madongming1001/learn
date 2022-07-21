@@ -970,3 +970,16 @@ ContextRefresher：主要功能是清空RefreshScope缓存，重新加载配置�
 
 RefreshEventListener：监听上下文刷新事件
 
+
+
+AbstractApplicationContext => refresh() => prepareBeanFactory()
+
+```java
+beanFactory.registerResolvableDependency(BeanFactory.class, beanFactory);
+beanFactory.registerResolvableDependency(ResourceLoader.class, this);
+beanFactory.registerResolvableDependency(ApplicationEventPublisher.class, this);
+beanFactory.registerResolvableDependency(ApplicationContext.class, this);
+```
+
+注册了自己，所以在声明@Bean的时候通过构造方法可以注入ConfigurableApplicationContext(这里是浅拷贝，所以后续的操作取出来的都是最新的值)
+
