@@ -10,9 +10,15 @@ import java.util.ArrayList;
  */
 public class IDoubleAddPractice {
     public static void main(String[] args) {
-        int i = 1;
+//        int i = 1;
         //表达式的返回值是 i++ 之前的值;
-        i++;
+//        i++;
+//        ++i;
+        int  count = 0;
+//        for (int i = 0; i < 100; i++) {
+//            count++;
+//        }
+        count = count;
 
 
         /**

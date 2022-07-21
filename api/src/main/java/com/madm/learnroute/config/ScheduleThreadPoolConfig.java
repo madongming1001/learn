@@ -1,5 +1,6 @@
 package com.madm.learnroute.config;
 
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
@@ -13,6 +14,7 @@ import java.util.concurrent.Executors;
  * @date 2022/6/29 09:11
  */
 @Configuration
+@RefreshScope
 public class ScheduleThreadPoolConfig implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {

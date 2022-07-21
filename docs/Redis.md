@@ -1199,3 +1199,11 @@ Redis的SORT命令可以对列表键（List）、集合键（Set）、或者有�
 
 ./redis-server redis.conf
 ./redis-cli -p 6379 shutdown
+
+
+
+
+
+# RedisDB数据结构
+
+![image-20220721120336755](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220721120336755.png)
