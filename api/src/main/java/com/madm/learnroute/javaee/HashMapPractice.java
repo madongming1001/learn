@@ -1,11 +1,14 @@
 package com.madm.learnroute.javaee;
 
+import com.mdm.pojo.AuthParam;
 import com.mdm.pojo.User;
+import com.mdm.utils.GsonObject;
 import org.apache.curator.shaded.com.google.common.collect.Lists;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -19,6 +22,11 @@ public class HashMapPractice {
     public static void main(String[] args) {
         List<User> lists = Arrays.asList(new User(1, "group 1", Lists.newArrayList()), new User(2, "group 1", Lists.newArrayList()),
                 new User(3, "group 2", Lists.newArrayList()), new User(4, "group 2", Lists.newArrayList()));
+        Map<Integer, User> userMap = lists.stream().collect(Collectors.toMap(x -> x.getId(), Function.identity()));
+        System.out.println(GsonObject.createGson().toJson(userMap));
+        userMap.get(1).setAuth(Arrays.asList(new AuthParam("1","2")));
+        System.out.println(GsonObject.createGson().toJson(userMap));
+
         Collection<List<User>> values = lists.stream().collect(Collectors.groupingBy(s -> {
             return s.getName();
         })).values();
