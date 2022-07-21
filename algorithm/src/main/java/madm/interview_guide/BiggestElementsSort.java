@@ -18,7 +18,7 @@ public class BiggestElementsSort {
 
     public static void main(String[] args) {
         // 1.获取数据源
-        int[] sourcesData = RandomGeneratorNumber.createArrayOfSize(1000_0000);
+        int[] sourcesData = RandomGeneratorNumber.createArrayOf(1000_0000);
         // 2.开始排序
         long begin = System.currentTimeMillis();
         Integer[] processor = BiggestElementsSort.processor(sourcesData, 2);
