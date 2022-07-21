@@ -968,4 +968,5 @@ ApplicationListenerDetector 在 prepareBeanFactory注入的
 
 ContextRefresher：主要功能是清空RefreshScope缓存，重新加载配置到Context中，发布事件（事件监听程序接收到事件后会重写配置相关的配类）
 
-RefreshEventListener：监听上下文刷新事件  
+RefreshEventListener：监听上下文刷新事件
+
