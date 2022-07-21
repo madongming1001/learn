@@ -949,3 +949,23 @@ Listener是怎么被保存到广播器`ApplicationEventMulticaster`中的呢？
 答案：通过`ApplicationListenerDetector`这个`BeanPostProcessor`后置处理器。
 
 ApplicationListenerDetector 在 prepareBeanFactory注入的
+
+
+
+
+
+# ConfigurationClassPostProcessor
+
+​		首先，ConfigurationClassPostProcessor后置处理器的处理入口为`postProcessBeanDefinitionRegistry()`方法。其主要使用了`ConfigurationClassParser`配置类解析器解析`@Configuration`配置类上的诸如`@ComponentScan`、`@Import`、`@Bean`等注解，并尝试发现所有的配置类；还使用了`ConfigurationClassBeanDefinitionReader`注册所发现的所有配置类中的所有Bean定义；结束执行的条件是所有配置类都被发现和处理，相应的bean定义注册到容器。
+
+
+
+# RefreshScope
+
+参考文章：https://www.modb.pro/db/104172
+
+## 主要类
+
+ContextRefresher：主要功能是清空RefreshScope缓存，重新加载配置到Context中，发布事件（事件监听程序接收到事件后会重写配置相关的配类）
+
+RefreshEventListener：监听上下文刷新事件  

@@ -11,11 +11,11 @@ public class MyBeanDefinitionRegistryPostProcessor implements BeanDefinitionRegi
 
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-//        System.out.println("MyBeanDefinitionRegistryPostProcessor:"+registry.getBeanD efinitionCount());
+        System.out.println("MyBeanDefinitionRegistryPostProcessor:"+registry.getBeanDefinitionCount());
     }
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-//        System.out.println("MyBeanDefinitionRegistryPostProcessor:"+beanFactory.getBeanDefinitionCount());
+        System.out.println("MyBeanDefinitionRegistryPostProcessor:"+beanFactory.getBeanDefinitionCount());
     }
 }
