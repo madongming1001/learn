@@ -983,3 +983,36 @@ beanFactory.registerResolvableDependency(ApplicationContext.class, this);
 
 注册了自己，所以在声明@Bean的时候通过构造方法可以注入ConfigurableApplicationContext(这里是浅拷贝，所以后续的操作取出来的都是最新的值)
 
+
+
+# Spring内置的事件
+
+**ApplicationContextEvent 是 Spring Context 相关的事件基类，如下图所示：**
+
+![图片](https://mmbiz.qpic.cn/mmbiz_png/JdLkEI9sZfdnf4LkFxFWiavibb3ia7qGHfIOtxUeZALUBPecOP305crXtI8Vt1Uql16syHZpO0z4YchtTia8zLTu0g/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
+
+- ContextStartedEvent：Spring Context 启动**完成** 事件。
+- ContextStoppedEvent：Spring Context 停止**完成** 事件。
+- ContextClosedEvent：Spring Context 停止**开始** 事件。
+- ContextRefreshedEvent：Spring Context 初始化或刷新**完成** 事件。
+
+
+
+**SpringApplicationEvent 是 Spring Boot Application（应用）相关的事件基类**
+
+![图片](https://mmbiz.qpic.cn/mmbiz_png/JdLkEI9sZfdnf4LkFxFWiavibb3ia7qGHfIQ9e9RYIGU8J84A8cAjsPic9e54pCFS80RpkrZ1RlLBqWIvpKpO8RpZw/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
+
+- ApplicationStartingEvent：Application 启动**开始** 事件。
+- ApplicationEnvironmentPreparedEvent：Spring Environment 准备完成的事件。
+- ApplicationContextInitializedEvent：Spring Context 准备完成，但是 Bean Definition 未加载时的事件
+- ApplicationPreparedEvent：Spring Context 准备完成，但是未刷新时的事件。
+- ApplicationReadyEvent：Application 启动**成功** 事件。
+- ApplicationFailedEvent：Application 启动**失败** 事件。
+
+
+
+
+
+# CORS
+
+**CORS** （Cross-Origin Resource Sharing，跨域资源共享）是一个系统，它由一系列传输的[HTTP 头](https://developer.mozilla.org/zh-CN/docs/Glossary/HTTP_header)组成，这些 HTTP 头决定浏览器是否阻止前端 JavaScript 代码获取跨域请求的响应。
