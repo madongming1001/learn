@@ -19,18 +19,15 @@ class TestA {
 }
 
 class Test {
-    HashMap<String, Object> map = new HashMap<>();
-    {
-        map.put("random", new Random());
-        map.put("this", this);
-        System.out.println("对象创建");
-    }
-    public Integer value1 = 1;
     private ThreadLocal<Map<String, Object>> tl = new ThreadLocal<>();
     {
-        value1 = 2;
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("random", new Random());
+        map.put("this", this);
         tl.set(map);
     }
+
+    public Integer value1 = 1;
 
     public static void main(String[] args) {
         Test test = new Test();
