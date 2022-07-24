@@ -662,7 +662,7 @@ System.out.println(i);
 | -XX:+UseParallelGC                 | Jvm运行在Server模式下的默认值，打开此开关后，使用Parallel Scavenge +  Serial Old的收集器组合进行回收 |
 | -XX:+UseParallelOldGC              | 使用Parallel Scavenge +  Parallel Old的收集器组合进行回收    |
 | -XX:SurvivorRatio                  | 新生代中Eden区域与Survivor区域的容量比值，默认为8，代表Eden:Subrvivor = 8:1:1 |
-| -XX:PretenureSizeThreshold         | 直接晋升到老年代对象的大小，设置这个参数后，大于这个参数的对象将直接在老年代分配（**只针对Serial和ParNew两款新生代收集器有效**） |
+| -XX:PretenureSizeThreshold         | 直接晋升到老年代对象的大小，设置这个参数后，大于这个参数的对象将直接在老年代分配（**只针对Serial和ParNew两款新生代收集器有效**）不知道为什么UseAdaptiveSizePolicy函数也有这个功能 |
 | -XX:MaxTenuringThreshold           | 晋升到老年代的对象年龄，每次Minor GC之后，年龄就加1，当超过这个参数的值时进入老年代 |
 | -XX:UseAdaptiveSizePolicy          | 动态调整java堆中各个区域的大小以及进入老年代的年龄（Parallel Scavenge 收集器专有） |
 | -XX:+HandlePromotionFailure        | 是否允许新生代收集担保，避免直接full gc                      |
