@@ -72,7 +72,7 @@ public class ProxyPractice {
             System.out.println("before");
             Object result = proxy.invokeSuper(obj, args);//不报错
 //            Object result = method.invoke(new Cat(), args);
-//            Object result = proxy.invoke(obj, args);//报错 由于obj是创建的代理对象 他还是会调用你代理的方法 所以递归循环了 args 是参数
+//            Object result = proxy.invoke(obj, args);//报错 由于obj是创建的代理对象 他还是会调用代理的方法 所以递归循环了 args 是参数
             System.out.println("after");
             return result;
         }, NoOp.INSTANCE});
