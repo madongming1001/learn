@@ -1,4 +1,6 @@
-# 方法区
+6
+
+方法区
 
 方法区(MethodArea)与Java堆一样，是各个线程共享的内存区域，它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等数据。虽然《Java虚拟机规范》中把方法区描述为堆的一个逻辑部分，但是它却有一个别名叫作“非堆”(Non-Heap)，目的是与Java堆区分开来。
 
@@ -669,7 +671,7 @@ System.out.println(i);
 | -XX:ParallelGCThreads              | 设置并行GC进行内存回收的线程数                               |
 | -XX:GCTimeRatio                    | GC时间占总时间的比列，默认值为99，即允许1%的GC时间，仅在使用Parallel Scavenge 收集器时有效 |
 | -XX:MaxGCPauseMillis               | 设置GC的最大停顿时间，在Parallel Scavenge 收集器下有效       |
-| -XX:CMSInitiatingOccupancyFraction | 设置CMS收集器在老年代空间被使用多少后触发垃圾收集，默认值为68%，仅在CMS收集器时有效，-XX:CMSInitiatingOccupancyFraction=70 |
+| -XX:CMSInitiatingOccupancyFraction | 设置CMS收集器在老年代空间被使用多少后触发垃圾收集，默认值为68%，JDK6时改为92%，仅在CMS收集器时有效，-XX:CMSInitiatingOccupancyFraction=70 |
 | -XX:+UseCMSCompactAtFullCollection | 由于CMS收集器会产生碎片，此参数设置在垃圾收集器后是否需要一次内存碎片整理过程，仅在CMS收集器时有效 |
 | -XX:+CMSFullGCBeforeCompaction     | 设置CMS收集器在进行若干次垃圾收集后再进行一次内存碎片整理过程，通常与UseCMSCompactAtFullCollection参数一起使用 |
 | -XX:+UseFastAccessorMethods        | 原始类型优化                                                 |
@@ -678,10 +680,24 @@ System.out.println(i);
 | -XX:LargePageSizeInBytes           | 内存页的大小不可设置过大，会影响Perm的大小，-XX:LargePageSizeInBytes=128m |
 | -XX:+HeapDumpOnOutOfMemoryError    | 表示当JVM发生OOM时，自动生成DUMP文件。                       |
 | -XX:NewRatio                       | 默认2表示新生代占年老代的1/2，占整个堆内存的1/3。            |
+| -XX:+PrintCommandLineFlags         | 该参数打印传递给虚拟机的显式和隐式参数。                     |
+| -XX:+PrintVMOptions                | 该参数表示程序运行时，打印虚拟机接受到的命令行显式参数。     |
+| -XX:+PrintFlagsFinal               | 该参数会打印所有的系统参数的值。                             |
+| -XX:+G1HeapRegionSize              | 设置Region的大小，取值范围1MB～32MB，且应为2的N次幂，默认将整堆划分为2048个分区 |
+| -XX:+UseG1GC                       | 使用G1收集器，JDK9默认                                       |
+| -XX:ParallelGCThreads              | 指定GC工作的线程数量                                         |
+| -XX:G1NewSizePercent               | 新生代内存初始空间(默认整堆5%，值配置整数，默认就是百分比)   |
+| -XX:G1MaxNewSizePercent            | 新生代内存最大空间默认60%                                    |
+| -XX:TargetSurvivorRatio            | 动态年龄判断                                                 |
+| -XX:MaxTenuringThreshold           | 最大年龄阈值15                                               |
+| -XX:InitiatingHeapOccupancyPercent | 老年代占用空间达到整堆内存阈值(默认45%)                      |
+| -XX:G1MixedGCLiveThresholdPercent  | 默认为85%，低于阈值才会回收该region，超过回收意义不大        |
+| -XX:G1MixedGCCountTarget           | 在一次回收过程中指定做几次筛选回收(默认8次)                  |
+| -XX:G1HeapWastePercent             | 默认5%，混合回收达到阈值停止回收                             |
 
 `Client、Server模式默认GC` 
 
-|        | 新生代GC方式                  | 老年代和持久**代**GC方式                                     |
+|        | 新生代GC方式                  | 老年代GC方式                                                 |
 | ------ | ----------------------------- | ------------------------------------------------------------ |
 | Client | Serial 串行GC                 | Serial Old 串行GC                                            |
 | Server | Parallel Scavenge  并行回收GC | Parallel Old 并行GC                                          |
@@ -851,3 +867,29 @@ MethodHandle详解：https://juejin.cn/post/6844904177131323406
 第二次：
 
 第三次：
+
+# 垃圾收集器
+
+## CMS收集器
+
+**CMS垃圾收集器三个缺点**
+
+1、收集器对处理器资源非常敏感，占用了一部分线程（或者说处理器的计算能力）而导致应用程序变慢
+
+2、CMS收集器无法处理浮动垃圾，有可能出现Con-current Mode Failure失败进而导致另一次完全Stop The World的Full Gc产生
+
+3、标记-清除 空间碎片 导致剩余空间无法分配大对象，需要进行Full GC,为了解决这个问题，CMS收集器提供了一个-XX：+UseCMS-CompactAtFullCollection开关参数（默认是开启的，此参数从JDK 9开始废弃），用于在CMS收集器不得不进行Full GC时开启内存碎片的合并整理过程，由于这个内存整理必须移动存活对象，（在Shenandoah和ZGC出现前） 无法并发的。这样空间碎片问题是解决了，但停顿时间又会变长，因此虚拟机设计者们还提供了另外一个参数-XX：CMSFullGCsBefore-Compaction（此参数从JDK 9开始废弃），这个参数的作用是要求CMS收集器在执行过若干次（数量由参数值决定）不整理空间的Full GC之后，下一次进入Full GC前会先进行碎片整理（默认值为0，表示每次进入Full GC时都进行碎片整理）。
+
+
+
+## ZGC收集器
+
+### 触发机制
+
+- **阻塞内存分配请求触发**：当垃圾来不及回收，垃圾将堆占满时，会导致部分线程阻塞。我们应当避免出现这种触发方式。日志中关键字是“Allocation Stall”。**（分配摊位）**
+- **基于分配速率的自适应算法**：最主要的GC触发方式，其算法原理可简单描述为”**ZGC根据近期的对象分配速率以及GC时间，计算出当内存占用达到什么阈值时触发下一次GC**”。自适应算法的详细理论可参考彭成寒《新一代垃圾回收器ZGC设计与实现》一书中的内容。通过ZAllocationSpikeTolerance参数控制阈值大小，该参数默认2，数值越大，越早的触发GC。我们通过调整此参数解决了一些问题。日志中关键字是“Allocation Rate”。
+- **基于固定时间间隔**：通过ZCollectionInterval控制，适合应对突增流量场景。流量平稳变化时，自适应算法可能在堆使用率达到95%以上才触发GC。流量突增时，自适应算法触发的时机可能会过晚，导致部分线程阻塞。我们通过调整此参数解决流量突增场景的问题，比如定时活动、秒杀等场景。日志中关键字是“Timer”。
+- **主动触发规则**：类似于固定间隔规则，但时间间隔不固定，是ZGC自行算出来的时机，我们的服务因为已经加了基于固定时间间隔的触发机制，所以通过-ZProactive参数将该功能关闭，以免GC频繁，影响服务可用性。 日志中关键字是“Proactive”。
+- 预热规则：服务刚启动时出现，一般不需要关注。日志中关键字是“Warmup”。
+- 外部触发：代码中显式调用System.gc()触发。 日志中关键字是“System.gc()”。
+- 元数据分配触发：元数据区不足时导致，一般不需要关注。 日志中关键字是“Metadata GC Threshold”。
