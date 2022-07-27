@@ -12,25 +12,20 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 public class CompletableFuturePractice {
-    static List<Shop> shops = Arrays.asList(new Shop("BestPrice"),
-            new Shop("LetsSaveBig"),
-            new Shop("MyFavoriteShop"),
-            new Shop("BuyItAll"));
+    static List<Shop> shops = Arrays.asList(new Shop("BestPrice"), new Shop("LetsSaveBig"), new Shop("MyFavoriteShop"), new Shop("BuyItAll"));
 
     @SneakyThrows
     public static void main(String[] args) {
         Shop shop = new Shop("BestPrice");
         System.out.println(shop.getPrice("product"));
-
-
         CompletableFuture<Void> voidCompletableFuture = CompletableFuture.runAsync(() -> System.out.println(1001));
         CompletableFuture<Object> objectCompletableFuture = CompletableFuture.supplyAsync(() -> 102);
         System.out.println(voidCompletableFuture.get());
-        System.out.printf((String) objectCompletableFuture.get());
-        //无异常类型
-        CompletableFuture.allOf(voidCompletableFuture,objectCompletableFuture).join();
-        //有异常类型
-        CompletableFuture.allOf(voidCompletableFuture,objectCompletableFuture).get();
+        System.out.printf(String.valueOf(objectCompletableFuture.get()));
+        //无异常类型 CancellationException CompletionException 未经检查异常 不强制抛出
+        CompletableFuture.allOf(voidCompletableFuture, objectCompletableFuture).join();
+        //有异常类型 CancellationException ExecutionException InterruptedException 检查异常 强制抛出
+        CompletableFuture.allOf(voidCompletableFuture, objectCompletableFuture).get();
     }
 
     private static void completableFutureTest() {
@@ -70,8 +65,7 @@ public class CompletableFuturePractice {
 
         public String getPrice(String product) {
             double price = calculatePrice(product);
-            Discount.Code code = Discount.Code.values()[
-                    new Random().nextInt(Discount.Code.values().length)];
+            Discount.Code code = Discount.Code.values()[new Random().nextInt(Discount.Code.values().length)];
             return String.format("%s:%.2f:%s", name, price, code);
         }
 
@@ -103,8 +97,7 @@ public class CompletableFuturePractice {
         }
 
         public List<String> findPrices(String product) {
-            List<CompletableFuture<String>> priceFutures = shops.stream().map(shop ->
-                    CompletableFuture.supplyAsync(() -> shop.getName() + "price is " + shop.getPriceAsync(product))).collect(Collectors.toList());
+            List<CompletableFuture<String>> priceFutures = shops.stream().map(shop -> CompletableFuture.supplyAsync(() -> shop.getName() + "price is " + shop.getPriceAsync(product))).collect(Collectors.toList());
             return priceFutures.stream().map(CompletableFuture::join).collect(Collectors.toList());
         }
     }
