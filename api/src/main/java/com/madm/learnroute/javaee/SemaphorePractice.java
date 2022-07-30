@@ -14,8 +14,6 @@ public class SemaphorePractice {
 
     public static void test02() throws InterruptedException {
         Semaphore semaphore = new Semaphore(3);
-        semaphore.acquire();
-        semaphore.release();
 
 
         CountDownLatch countDownLatch = new CountDownLatch(3);
