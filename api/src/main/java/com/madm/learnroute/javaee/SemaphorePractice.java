@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SemaphorePractice {
 
     public static void main(String[] args) throws InterruptedException {
-        test02();
+        //test02();
     }
 
     public static void test02() throws InterruptedException {
