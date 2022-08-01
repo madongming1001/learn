@@ -8,7 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class CopyOnWriteArrayListPractice {
     public static void main(String[] args) {
-        //添加元素会获取一个ReentrantLock锁
+        //添加元素会获取一个 ReentrantLock 锁
         CopyOnWriteArrayList<String> cwList = new CopyOnWriteArrayList<String>();
         cwList.add("11");
     }

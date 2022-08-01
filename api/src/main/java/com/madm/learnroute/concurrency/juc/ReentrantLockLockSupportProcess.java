@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -16,17 +17,20 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 public class ReentrantLockLockSupportProcess {
     private static ReentrantLock lock = new ReentrantLock();
+    private Condition park = lock.newCondition();
+    private Condition unPark = lock.newCondition();
 
     public static void main(String[] args) {
+
         ThreadPoolExecutor fixedThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
         fixedThreadPool.execute(() -> compute());
         fixedThreadPool.execute(() -> compute());
         boolean allThreadsIsDone = true;
-        while (true && allThreadsIsDone) {
+        while (allThreadsIsDone) {
             if (fixedThreadPool.getTaskCount() == fixedThreadPool.getCompletedTaskCount()) {
                 fixedThreadPool.shutdownNow();
                 allThreadsIsDone = false;
-                log.debug("线程池关闭");
+                log.info("线程池关闭");
             }
         }
 
@@ -35,6 +39,8 @@ public class ReentrantLockLockSupportProcess {
     @SneakyThrows
     public static void compute() {
         lock.lock();
+        lock.lockInterruptibly();
+        lock.tryLock(100L,TimeUnit.MILLISECONDS);
         try {
             while (true) {
                 TimeUnit.SECONDS.sleep(1);
@@ -42,6 +48,7 @@ public class ReentrantLockLockSupportProcess {
             }
             System.out.println(Thread.currentThread().getName());
         } finally {
+            lock.unlock();
             lock.unlock();
         }
     }

@@ -28,14 +28,14 @@ public class ReadThreadPractice extends Thread {
 
     public static void main(String[] args) throws InterruptedException {
         ReadThreadPractice read = new ReadThreadPractice();
-//        WriteThreadPractice write = new WriteThreadPractice();
-//
-//        write.start();
-//        read.start();
-//
-//        Thread.sleep(10L);
-//        read.interrupt();
-//        System.out.println("main exit");
+        WriteThreadPractice write = new WriteThreadPractice();
+
+        write.start();
+        read.start();
+
+        Thread.sleep(10L);
+        read.interrupt();
+        System.out.println("main exit");
     }
 
 }
