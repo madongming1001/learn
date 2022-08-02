@@ -10,6 +10,17 @@ import java.util.Objects;
  */
 public class HashCodeAndEqualsPractice {
     public static void main(String[] args) {
+        int c = 9;
+        c += (c = 3);
+        System.out.println(c);
+        int d = 9;
+        d = d + (d = 3);
+        System.out.println(d);
+
+        int i = 2;
+        int j = (i = 3) * i;
+        System.out.println(j);
+
         User user1 = new User("通话");
         User user2 = new User("重地");
         System.out.println(user1.hashCode() == user2.hashCode());//true
@@ -18,8 +29,8 @@ public class HashCodeAndEqualsPractice {
         System.out.println("===========================");
         Long a = 1L;
         int b = 1;
-        System.out.println(Objects.equals(b,a));//false
-        System.out.println(Objects.equals(a,b));//false
-        System.out.println(a==b);//true
+        System.out.println(Objects.equals(b, a));//false
+        System.out.println(Objects.equals(a, b));//false
+        System.out.println(a == b);//true
     }
 }

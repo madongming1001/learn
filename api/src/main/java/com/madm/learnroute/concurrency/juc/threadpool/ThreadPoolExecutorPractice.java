@@ -35,6 +35,7 @@ public class ThreadPoolExecutorPractice {
         System.out.println(Integer.toBinaryString(CAPACITY));
         System.out.println(Integer.toBinaryString(~CAPACITY));
         System.out.println(Integer.toBinaryString((1 << 16) - 1));
+        // 1111111111111111
         System.out.println(Integer.toBinaryString(0xFFFF));
 
         System.out.println(Integer.toBinaryString(65535));
