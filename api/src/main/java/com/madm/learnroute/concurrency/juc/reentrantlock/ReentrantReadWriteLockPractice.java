@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author dongming.ma
  * @date 2022/7/12 19:52
  */
-public class ReadWriteLockUse {
+public class ReentrantReadWriteLockPractice {
     public static void main(String[] args) {
         CachedData cachedData = new CachedData();
         cachedData.processCachedData();
@@ -27,7 +27,7 @@ class CachedData {
         if (!cacheValid) {
             // Must release read lock before acquiring write lock
             rwl.readLock().unlock();
-            rwl.writeLock().lock();
+            rwl.writeLock().lock();//如果有读锁或者不是当前线程获得的
             try {
                 // Recheck state because another thread might have
                 // acquired write lock and changed state before we did.

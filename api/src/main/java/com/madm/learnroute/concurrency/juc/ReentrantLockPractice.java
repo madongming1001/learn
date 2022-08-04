@@ -1,6 +1,5 @@
 package com.madm.learnroute.concurrency.juc;
 
-import cn.hutool.core.lang.func.VoidFunc0;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.CompletableFuture;
@@ -12,13 +11,13 @@ import java.util.concurrent.locks.ReentrantLock;
  * @date 2022/7/11 23:43
  */
 @Slf4j
-public class ReentrantLockExercise {
+public class ReentrantLockPractice {
     private static ReentrantLock lock = new ReentrantLock();
     private static Condition condition = lock.newCondition();
 
     public static void main(String[] args) {
-        CompletableFuture.runAsync(ReentrantLockExercise::await);
-        CompletableFuture.runAsync(ReentrantLockExercise::signal);
+        CompletableFuture.runAsync(ReentrantLockPractice::await);
+        CompletableFuture.runAsync(ReentrantLockPractice::signal);
     }
 
     public static void await() {
