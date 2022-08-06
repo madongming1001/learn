@@ -7,6 +7,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * CLH变种（同步队列）
  * @author dongming.ma
  * @date 2022/7/11 23:43
  */
