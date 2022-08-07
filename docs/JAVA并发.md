@@ -1309,7 +1309,7 @@ ObjectMonitor::ObjectMonitor() {
 
 ### LockSupport.park() 方法
 
-不会释放锁，会响应中断
+不会释放锁，会响应中断  
 
 
 

@@ -71,9 +71,8 @@ public class PriorityReturnFast {
     }
 
     public static void test3() throws Exception {
-
-
         ExecutorService executorService = Executors.newCachedThreadPool();
+
         ExecutorCompletionService<String> completionService = new ExecutorCompletionService<>(executorService);
         System.out.println("公司让你通知大家聚餐 你开车去接人");
         completionService.submit(() -> {
