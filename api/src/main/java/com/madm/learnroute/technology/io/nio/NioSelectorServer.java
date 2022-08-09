@@ -10,6 +10,9 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * 参考文章：https://note.youdao.com/ynoteshare/index.html?id=8ef33654f746921ad769ad9fe91a4c8f&type=note&_time=1660016387177
+ */
 public class NioSelectorServer {
     public static void main(String[] args) throws IOException, InterruptedException {
         // 创建NIO ServerSocketChannel
