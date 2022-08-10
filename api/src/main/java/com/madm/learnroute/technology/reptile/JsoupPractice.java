@@ -1,5 +1,6 @@
 package com.madm.learnroute.technology.reptile;
 
+import com.google.common.collect.Maps;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -109,5 +110,47 @@ public class JsoupPractice {
             }
         }
         map.put(provinceName, cityMap);
+    }
+
+    /**
+     * 在抓取城市名称的时候有一点要注意，直辖市城市的省份和城市名称是一样的
+     *
+     * @author xin
+     * @description 解析城市名称
+     * @date 2019/11/4 19:26
+     */
+    public static void parseExamAnswers(String url) throws IOException {
+        Document doc = Jsoup.connect(url).userAgent("Mozilla/5.0").header("Origin","strict-origin-when-cross-origin").get();
+        Elements elements = doc.getElementsByTag("tbody");
+        Element element = elements.get(4);
+        Elements childrens = element.children();
+        HashMap<String, String> answerMap = Maps.newHashMap();
+
+        String baseUri = element.baseUri();
+        Map<String, String> cityMap = new HashMap<>();
+
+        for (Element element1 : childrens) {
+            System.out.println(element1);
+            Elements citytrs = element1.getElementsByClass("citytr");
+
+            for (Element cityTag : citytrs) {
+                Elements tds = cityTag.getElementsByTag("td");
+
+                /**
+                 * 直辖市，城市名就是本身
+                 */
+                String cityName = tds.get(1).getElementsByTag("a").text();
+
+                if (cityName.equals("市辖区")) {
+//                    cityName = examType;
+                }
+                String href1 = tds.get(1).getElementsByTag("a").attr("href");
+
+//                System.out.println(cityName + " " + href1);
+
+//                cityMap.put(cityName, href1);
+            }
+        }
+//        answerMap.put(examType, cityMap);
     }
 }
