@@ -280,8 +280,6 @@ public static final int OP_ACCEPT = 1 << 4;
 
 **零拷贝是指计算机执行IO操作时，CPU不需要将数据从一个存储区域复制到另一个存储区域，从而可以减少上下文切换以及CPU的拷贝时间。它是一种`I/O`操作优化技术。**
 
-
-
 #### 传统IO的执行流程
 
 前端请求过来，服务端的任务就是：将服务端主机磁盘中的文件从已连接的socket发出去。关键实现代码如下：
@@ -580,3 +578,35 @@ Bootstrap、EventLoop（Group）、Channel
 事件和ChannelHandler、ChannelPipeline
 
 ChannelFuture
+
+
+
+# 传统接受发送数据几次上下文切换
+
+![image-20220811184639244](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220811184639244.png)
+
+**4次拷贝，4次上下文切换**
+
+## MMAP内存映射
+
+![image-20220811185002681](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220811185002681.png)
+
+**3次拷贝，4次上下文切换**
+
+## sendfile（linux 2.1）
+
+![image-20220811185055927](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220811185055927.png)
+
+**3（2）次拷贝，2次上下文切换**
+
+DMA支持的话可以文件读取缓存区传输地址位置给套接字发送缓冲区（SO_SNDBUF）
+
+## slice（2.6.17）
+
+![image-20220811185350092](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220811185350092.png)
+
+**2次拷贝，2次上下文切换**，通过管道共享数据
+
+buffer = File.read
+
+Socket.send(buffer)
