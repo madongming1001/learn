@@ -16,8 +16,8 @@ public class MMapTest {
     public static void main(String[] args) {
         try {
             FileChannel readChannel = FileChannel.open(Paths.get("./jay.txt"), StandardOpenOption.READ);
-//            readChannel.transferFrom();使用的是sendfile技术
-//            readChannel.transferTo();
+//            readChannel.transferFrom();使用的是sendfile技术2.1 2.6.17新出的slice
+//            readChannel.transferTo();使用的是sendfile技术
             MappedByteBuffer data = readChannel.map(FileChannel.MapMode.READ_ONLY, 0, 1024 * 1024 * 40);
             FileChannel writeChannel = FileChannel.open(Paths.get("./siting.txt"), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
             //数据传输
