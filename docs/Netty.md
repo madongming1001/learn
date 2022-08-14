@@ -610,3 +610,6 @@ DMA支持的话可以文件读取缓存区传输地址位置给套接字发送�
 buffer = File.read
 
 Socket.send(buffer)
+
+一个进程能够同时打开的文件描述符是1024个
+
