@@ -611,5 +611,8 @@ buffer = File.read
 
 Socket.send(buffer)
 
-一个进程能够同时打开的文件描述符是1024个
+select 是以数组形势保存的
 
+poll 以链表形式保存的文件描述符
+
+一个进程能够同时打开的文件描述符是1024个
