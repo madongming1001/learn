@@ -10,14 +10,15 @@ public class VolatilePractice {
     }
 
     public static void main(String[] args) {
-//        Thread[] threads = new Thread[THREADS_COUNT];
-//        for (int j = 0; j < threads.length; j++) {
-//            threads[j] = new Thread(() -> {
-//                for (int k = 0; k < 10000; k++) {
-//                    increase();
-//                }
-//            });
-//            threads[j].start();
-//        }
+        Thread[] threads = new Thread[THREADS_COUNT];
+        for (int j = 0; j < threads.length; j++) {
+            threads[j] = new Thread(() -> {
+                for (int k = 0; k < 1000; k++) {
+                    increase();
+                }
+            });
+            threads[j].start();
+        }
+        System.out.println("i == "+i);
     }
 }
