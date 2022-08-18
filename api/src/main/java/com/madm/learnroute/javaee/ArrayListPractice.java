@@ -1,7 +1,6 @@
 package com.madm.learnroute.javaee;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 线程不安全 扩容为1.5倍
