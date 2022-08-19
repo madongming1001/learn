@@ -82,3 +82,9 @@ https://blog.csdn.net/qq_21223653/article/details/121171293
 # 面试官：Mybatis中 Dao接口和XML文件的SQL如何建立关联？
 
 参考文章：https://mp.weixin.qq.com/s/FqwtyVhkUq7xJL7xCV-N6w
+
+
+
+# 面试官：MyBatis 插件有什么用途？说说底层原理？我竟然不会。
+
+参考文章：https://mp.weixin.qq.com/s/acddVQSo2exXd0yij8wFiQ
