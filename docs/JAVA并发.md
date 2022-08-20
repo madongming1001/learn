@@ -516,9 +516,24 @@ https://blog.csdn.net/weixin_30587025/article/details/96339354
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200331123933241.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzI3Njg2Nzc5,size_16,color_FFFFFF,t_70)
 
+### 为什么hashmap要h>>>16
 
+```java
+static final int hash(Object key) {
+    int h;
+    return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
 
-## lock 与 lockInterruptibly比较区别在于：
+```
+
+​		因为大多数时候map的数组length不是很大 不会超过65536 这样在hashcode有效位数很多的情况下，由于数组length过小，就会导致整体的散列性差
+
+### 为什么使用 ^ 不用&或者｜
+
+​		因为&和|都会使得结果偏向0或者1 ,并不是均匀的概念,所以用^。	
+
+**参考文章：**https://blog.csdn.net/qq_42034205/article/details/90384772
+
+### lock 与 lockInterruptibly比较区别在于：
 
 lock 优先考虑获取锁，待获取锁成功后，才响应中断。
 lockInterruptibly 优先考虑响应中断，而不是响应锁的普通获取或重入获取。
