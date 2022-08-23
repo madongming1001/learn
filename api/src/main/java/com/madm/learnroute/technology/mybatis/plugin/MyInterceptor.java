@@ -25,7 +25,7 @@ public class MyInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        //通过StatementHandler获取执行的sql
+        //通过 StatementHandler 获取执行的sql
         //如果当前代理的是一个非代理对象，那么就会调用真实拦截对象的方法
         //如果不是它就会调用下个插件代理对象的invoke方法
         StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
