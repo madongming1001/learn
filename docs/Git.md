@@ -17,7 +17,7 @@
 - `git push`
 - `git pull`
 - `touch .gitignore` 
--  git commit --amend --date "Mon Oct 17 16:25:43 2022 +0800"
+-  git commit -m '补交Oct18' --date "Mon Oct 17 18:18:18 2022 +0800"
 
 ####修改分支名称
 
