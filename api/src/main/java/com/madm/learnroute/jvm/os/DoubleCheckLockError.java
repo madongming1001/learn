@@ -61,10 +61,9 @@ public class DoubleCheckLockError {
             if (null == single) {
                 synchronized (SingleObj.class) {
                     if (null == single) {
-                        //1、创建对象分配内存空间
-                        //2、设置值
-                        //3、把刚才创建的对象赋值给变量
-                        //会发生指令重排
+                        //1、分配内存空间并将对象的字段赋默认值
+                        //2、调用init进行初始化（对象的字段赋初始值）
+                        //3、对象的内存地址赋值给局部变量
                         single = new SingleObj();
                     }
                 }
