@@ -47,7 +47,7 @@ public class GenerateDataUtil {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {
             //Integer.MAX_VALUE * 1.7 = 365_9722_1999 不可数循环增加safepoint 轮训标志 方式是改变内存的类型 可读不可读 然后触发中断响应事件
             for (long i = 1; i < Integer.MAX_VALUE * 1.7; i++) {
-                String data = generateRandomData(start, end) + ",";
+                String data = StringUtils.join(generateRandomData(start, end), ",");
                 bw.write(data);
                 // java1.7特性 可以在数字之间添加下划线 增加可读性 try-with-resources
                 // 每100万条记录成一行，100万条数据大概4M
