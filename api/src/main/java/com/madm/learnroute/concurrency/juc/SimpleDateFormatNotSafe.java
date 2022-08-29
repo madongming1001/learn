@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * 参考文章：https://www.jianshu.com/p/d9977a048dab
  * 可知每个SimpleDateFormat实例里面有一个Calendar对象，从后面会知道其实SimpleDateFormat之所以是线程不安全的就是因为Calendar是线程不安全的。
  * parse(){
  *
@@ -19,6 +18,7 @@ import java.util.Locale;
  *    ...
  *    //(5)返回设置好的cal对象
  * }
+ * 参考文章：https://www.jianshu.com/p/d9977a048dab
  */
 public class SimpleDateFormatNotSafe {
     static SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy", Locale.US);
