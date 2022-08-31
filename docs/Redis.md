@@ -380,8 +380,6 @@ typedef struct redisObject {
 } robj;
 ```
 
-https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/redis/redis%E7%9F%A5%E8%AF%86%E7%82%B9&%E9%9D%A2%E8%AF%95%E9%A2%98%E6%80%BB%E7%BB%93.md
-
 ![image-20220119225736048](noteImg/image-20220119225736048.png)
 
 ![image-20220119225835339](noteImg/image-20220119225835339.png)

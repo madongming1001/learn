@@ -1,4 +1,4 @@
-# espring假设去掉二级缓存？
+# spring假设去掉二级缓存？
 
 如果去掉了二级缓存，则需要直接在 `singletonFactory.getObject()` 阶段初始化完毕，并放到一级缓存中。
 
