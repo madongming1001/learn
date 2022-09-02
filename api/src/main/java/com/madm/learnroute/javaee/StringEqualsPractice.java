@@ -58,6 +58,7 @@ public class StringEqualsPractice {
 
 //        System.out.println(Integer.valueOf("11111",2));
         System.out.println(Integer.valueOf("11111",2));
+        System.out.println(Integer.toBinaryString(65535));
 
     }
 

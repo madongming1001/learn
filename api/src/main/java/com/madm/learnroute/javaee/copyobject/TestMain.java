@@ -1,7 +1,7 @@
 package com.madm.learnroute.javaee.copyobject;
 
+import cn.hutool.core.bean.BeanUtil;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.cglib.beans.BeanCopier;
 
 /**
@@ -32,7 +32,7 @@ public class TestMain {
             public ToBean callMethod(FromBean frombean) throws Exception {
 
                 ToBean toBean = new ToBean();
-                BeanUtils.copyProperties(toBean, frombean);
+                BeanUtil.copyProperties(toBean, frombean);
                 return toBean;
             }
         };
