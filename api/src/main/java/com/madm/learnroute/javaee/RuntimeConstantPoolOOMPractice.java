@@ -1,12 +1,8 @@
 package com.madm.learnroute.javaee;
 
-import cn.hutool.core.util.ReUtil;
 import com.mdm.pojo.Teacher;
-import com.mdm.pojo.User;
 
-import java.util.ArrayList;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * jdk6:‐Xms6M ‐Xmx6M ‐XX:PermSize=6M ‐XX:MaxPermSize=6M

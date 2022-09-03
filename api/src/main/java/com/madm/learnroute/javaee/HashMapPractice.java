@@ -41,6 +41,8 @@ public class HashMapPractice {
         prices.put("Pant", 150);
         System.out.println("HashMap: " + prices);
 
+        Iterator<Map.Entry<String, Integer>> iterator = prices.entrySet().iterator();
+
         // 重新计算鞋子打了10%折扣后的值
         int newPrice = prices.compute("Shoes2", (k, v) -> {
             if (v == null) {
