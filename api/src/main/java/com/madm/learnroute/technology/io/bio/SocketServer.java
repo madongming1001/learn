@@ -1,9 +1,14 @@
 package com.madm.learnroute.technology.io.bio;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * 读函数，分为等待系统可读和真正的读；
+ * 同理，写函数分为等待网卡可以写和真正的写。
+ */
 public class SocketServer {
     public static void main(String[] args) {
         try {
@@ -30,6 +35,7 @@ public class SocketServer {
     private static void handler(Socket socket) throws IOException {
         byte[] bytes = new byte[1024];
         System.out.println("准备read。。");
+        InputStream in = socket.getInputStream();
         int read = socket.getInputStream().read(bytes);
         System.out.println("read完毕。。");
         if (read != 1) {
