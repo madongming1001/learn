@@ -13,7 +13,8 @@ public class AsciiCode {
 //        for (int i = 0; i < chars2.length; i++) {
 //            System.out.print(chars2[i] + ":"+(int)chars2[i] + " ");
 //        }
-
+        //GBK字符集编码格式中文两字节
+        //UTF-8字符集编码三字节
         System.out.println((int) (Math.random() * 88) + 1);
     }
 }
