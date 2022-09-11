@@ -20,6 +20,13 @@ public class HashMapPractice {
     static final HashMap<String, String> map = new HashMap<String, String>(2);
 
     public static void main(String[] args) {
+        List<Integer> uniqueId = new ArrayList<>();
+        int newId = 0;
+        do {
+            newId = newId++;
+        } while (!uniqueId.add(newId));
+        System.out.println(uniqueId);
+        System.out.println("runner");
 //        List<User> lists = Arrays.asList(new User(1, "group 1"),
 //                new User(2, "group 2"),
 //                new User(3, "group 3"),
