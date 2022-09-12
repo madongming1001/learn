@@ -16,14 +16,18 @@ import java.util.Set;
 public class NioSelectorServer {
     public static void main(String[] args) throws IOException, InterruptedException {
         // 创建NIO ServerSocketChannel
+        //通道，被建立的一个应用程序和操作系统交互事件、传递内容的渠道（注意是连接到操作系统）。
         ServerSocketChannel serverSocket = ServerSocketChannel.open();
-        serverSocket.socket().bind(new InetSocketAddress(9000));
+        serverSocket.socket().bind(new InetSocketAddress(9000),1024);
         // 设置ServerSocketChannel为非阻塞
         serverSocket.configureBlocking(false);
         // 打开Selector处理Channel，即创建epoll epoll_create命令创建
         Selector selector = Selector.open();
-        // 把ServerSocketChannel注册到selector上，并且selector对客户端accept连接操作感兴趣
-        // 并没有把事件和selector绑定
+        //把ServerSocketChannel注册到selector上，并且selector对客户端accept连接操作感兴趣
+        //并没有把事件和selector绑定
+        //它实际上是一个表示选择器在检查通道就绪状态时需要关心的操作的比特掩码。
+        //比如一个选择器对通道的read和write操作感兴趣，那么选择器在检查该通道时，只会检查通道的read和write操作是否已经处在就绪状态。
+        //this代表当前调用的对象
         serverSocket.register(selector, SelectionKey.OP_ACCEPT);
         System.out.println("服务启动成功");
 
@@ -45,7 +49,7 @@ public class NioSelectorServer {
             // 返回rdList里面的事件
             // fd代表的是文件描述符号（file descriptor），linux内核为高效管理已打开的"文件"所创建的索引，用该索引可以找到文件
             // fd就是对应的channel无论是serversocketchannel还是socketchannel
-            selector.select();
+            selector.select(1000);
             // 获取selector中注册的全部事件的 SelectionKey 实例
             Set<SelectionKey> selectionKeys = selector.selectedKeys();
             System.out.println("请求数：" + selectionKeys.size());
@@ -65,6 +69,7 @@ public class NioSelectorServer {
                     System.out.println("客户端连接成功");
                 } else if (key.isReadable()) {  // 如果是OP_READ事件，则进行读取和打印
                     SocketChannel socketChannel = (SocketChannel) key.channel();
+                    //缓冲区本质上是一块可以写入数据，然后可以从中读取数据的内存（其实就是数组）。
                     ByteBuffer byteBuffer = ByteBuffer.allocate(128);
                     int len = socketChannel.read(byteBuffer);
                     // 如果有数据，把数据打印出来
@@ -78,6 +83,7 @@ public class NioSelectorServer {
                 //从事件集合里删除本次处理的key，防止下次select重复处理
                 iterator.remove();
             }
+            System.out.println("结束了");
         }
     }
 }
