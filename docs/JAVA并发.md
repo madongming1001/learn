@@ -286,13 +286,21 @@ java thread >> jvm javathread >> os thread
 
 ## 四种引用类型
 
-强引用：java默认的引用类型，例如 Object a = new Object();其中 a 为强引用，new Object()为一个具体的对象。一个对象从根路径能找到强引用指向它，jvm虚拟机就不会回收。
+### 强引用
 
-软引用(SoftReference)：进行年轻代的垃圾回收不会触发SoftReference所指向对象的回收；但如果触发Full GC，那SoftReference所指向的对象将被回收。备注：是除了软引用之外没有其他强引用引用的情况下。
+java默认的引用类型，例如 Object a = new Object();其中 a 为强引用，new Object()为一个具体的对象。一个对象从根路径能找到强引用指向它，jvm虚拟机就不会回收。
 
-弱引用(WeakReference) :如果对象除了有弱引用指向它后没有其他强引用关联它，当进行年轻代垃圾回收时，该引用指向的对象就会被垃圾回收器回收。
+### 软引用(SoftReference)
 
-虚引用(PhantomeReference) 该引用指向的对象，无法对垃圾收集器收集对象时产生任何影响，但在执行垃圾回收后垃圾收集器会通过注册在PhantomeReference上的队列来通知应用程序对象被回收。
+进行年轻代的垃圾回收不会触发SoftReference所指向对象的回收；但如果触发Full GC，那SoftReference所指向的对象将被回收。备注：是除了软引用之外没有其他强引用引用的情况下。
+
+### 弱引用(WeakReference) 
+
+如果对象除了有弱引用指向它后没有其他强引用关联它，当进行年轻代垃圾回收时，该引用指向的对象就会被垃圾回收器回收。
+
+### 虚引用(PhantomeReference) 
+
+该引用指向的对象，无法对垃圾收集器收集对象时产生任何影响，但在执行垃圾回收后垃圾收集器会通过注册在PhantomeReference上的队列来通知应用程序对象被回收。
 
 
 
