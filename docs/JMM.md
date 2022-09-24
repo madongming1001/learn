@@ -702,3 +702,83 @@ void executedOnCpu1() {
 **参考文章**：https://zhuanlan.zhihu.com/p/86855590
 
 **多处理器一般是采用基于总线监听机制的高速缓存一致性协议。在NUMA系统中，通常选择基于目录(directory-based)的方式来维护Cache的一致性。**
+
+
+
+# 指令集 ISA Instruction Set Architecture
+
+- 程序在执行之前要被编译为CPU能够理解的语言，这种语言或者说是规范就是指令集ISA
+- *反映了CPU软件层面的设计*
+- 指令集的Example - x86,Arm v8,Mipz
+
+**参考文章：**https://a-suozhang.xyz/2019/09/27/ISA/
+
+
+
+# 计算机系统
+
+## Intel系列处理器
+
+- 8086
+
+- [Pentium](https://baike.baidu.com/item/Pentium/2946980?fromModule=lemma_inlink)处理器
+
+- [酷睿](https://baike.baidu.com/item/酷睿/1149953?fromModule=lemma_inlink)
+
+## AMD
+
+美国*AMD*半导体公司专门为计算机、通信和消费电子行业设计和制造各种创新的微处理器（CPU、GPU、主板芯片组、电视卡芯片等），以及提供闪存和低功率处理器解决方案，公司成立于1969年
+
+- [锐龙](https://baike.baidu.com/item/锐龙/20470522?fromModule=lemma_inlink)
+
+**CPU的工作分为以下 5 个阶段**
+
+- 取指令（IF，instruction fetch），即将一条指令从[主存储器](https://baike.baidu.com/item/主存储器/10635399?fromModule=lemma_inlink)中取到[指令寄存器](https://baike.baidu.com/item/指令寄存器/3219483?fromModule=lemma_inlink)的过程。[程序计数器](https://baike.baidu.com/item/程序计数器/3219536?fromModule=lemma_inlink)中的数值，用来指示当前指令在主存中的位置。当 一条指令被取出后，[程序计数器](https://baike.baidu.com/item/程序计数器/3219536?fromModule=lemma_inlink)（PC）中的数值将根据指令字长度自动递增。
+
+- 指令译码阶段（ID，instruction decode），取出指令后，[指令译码器](https://baike.baidu.com/item/指令译码器/3295261?fromModule=lemma_inlink)按照预定的指令格式，对取回的指令进行拆分和解释，识别区分出不同的指令类 别以及各种获取操作数的方法。现代[CISC](https://baike.baidu.com/item/CISC/1189443?fromModule=lemma_inlink)处理器会将拆分已提高并行率和效率。
+
+- 执行指令阶段（EX，execute），具体实现指令的功能。CPU的不同部分被连接起来，以执行所需的操作。
+
+- 访存取数阶段（MEM，memory），根据指令需要访问主存、读取操作数，CPU得到操作数在主存中的地址，并从主存中读取该操作数用于运算。部分指令不需要访问主存，则可以跳过该阶段。
+
+- 结果写回阶段（WB，write back），作为最后一个阶段，结果写回阶段把执行指令阶段的运行结果数据“写回”到某种存储形式。结果数据一般会被写到CPU的内部寄存器中，以便被后续的指令快速地存取；许多指令还会改变[程序状态字寄存器](https://baike.baidu.com/item/程序状态字寄存器/10320153?fromModule=lemma_inlink)中标志位的状态，这些标志位标识着不同的操作结果，可被用来影响程序的动作。
+
+## cpu结构
+
+### 运算逻辑部件
+
+主要能够进行相关的逻辑运算，如：可以执行移位操作以及逻辑操作，除此之外还可以执行定点或浮点算术运算操作以及地址运算和转换等命令，是一种多功能的运算单元，算术运算与逻辑运算。
+
+### 寄存器部件
+
+用来暂存指令、数据和地址的。
+
+### 控制部件
+
+用来对指令进行分析并且能够发出相应的控制信号，总线管理（控制与使用权），处理异常情况和特殊请求（中断）。
+
+![image-20221022205520224](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221022205520224.png)
+
+### 寄存器
+
+#### 通用寄存器
+
+存放操作数，可作某种寻址方式所需的专用寄存器
+
+#### 数据寄存器（MDR）
+
+存放操作数（满足各种数据类型）两个寄存器存放双倍字长数据
+
+#### 地址寄存器（MAR）
+
+存放地址，其位数应满足最大的姿势范围用于特殊的寻址方式 段基值 栈指针
+
+#### 条件码寄存器
+
+存放条件码，可作程序分支的依据 如正、负、零、益出、进位等
+
+
+
+
+
+IR寄存器存放指令

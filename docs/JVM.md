@@ -513,19 +513,21 @@ javap是jdk自带的反解析工具。它的作用就是根据class字节码文�
 
 Push `int` constant onto the operand stack（写一个常量到操作数栈）
 
-### istore
-
-pop up operand stack  and Store `int` into local variable（弹出操作数栈元素写入到局部变量表）
-
 ### *iload*
 
 Load `int` from local variable store inio operand stack（读取局部变量表变量写入到操作数栈）
 
-### *iinc*
+### istore
+
+pop up operand stack  and Store `int` into local variable（弹出操作数栈元素写入到局部变量表）
+
+### iinc
 
 increment local variable by constant on the operand stack（把操作数栈栈顶元素自增）
 
+### dup
 
+Duplicate the top operand stack value（负责复制栈顶并压入栈顶）
 
 #  i++字节码指令（失效）
 
