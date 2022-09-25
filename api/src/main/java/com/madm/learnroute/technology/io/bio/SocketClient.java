@@ -3,6 +3,12 @@ package com.madm.learnroute.technology.io.bio;
 import java.io.IOException;
 import java.net.Socket;
 
+/**
+ * socket.accept()
+ * socket.read()
+ * socket.write()
+ * 都是同步阻塞的
+ */
 public class SocketClient {
 
     public static void main(String[] args) throws IOException {
