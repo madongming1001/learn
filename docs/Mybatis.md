@@ -1,3 +1,11 @@
+# 存储过程
+
+​		存储过程（Stored Procedure）是在大型数据库系统中，**一组为了完成特定功能的SQL 语句集**，存储在数据库中，经过第一次编译后再次调用不需要再次编译，用户通过指定存储过程的名字并给出参数（如果该存储过程带有参数）来调用存储过程。
+
+**参考文章:**https://www.cnblogs.com/xiaoxi/p/6606011.html
+
+
+
 ![image-20220408164728464](noteImg/image-20220408164728464.png)
 
 
@@ -8,7 +16,7 @@ https://blog.csdn.net/qq_21223653/article/details/121171293
 2)直接采用手写sql的方式 mapper.xml foreach
 3)引入mybats-plus-extends包 配置insertBatchSomeColumn类
 
-## sqlsession四大关键组件
+## Sqlsession四大关键组件
 
 ![image-20220612171455120](/Users/madongming/notes/noteImg/image-20220612171455120.png)
 
@@ -77,7 +85,17 @@ https://blog.csdn.net/qq_21223653/article/details/121171293
 - **BatchExecutor**：执行update（没有select，JDBC批处理不支持select），将所有sql都添加到批处理中（addBatch()），等待统一执行（executeBatch()），它缓存了多个Statement对象，每个Statement对象都是addBatch()完毕后，等待逐一执行executeBatch()批处理。与JDBC批处理相同。
 - 在Mybatis配置文件中，在设置（settings）可以指定默认的ExecutorType执行器类型，也可以手动给DefaultSqlSessionFactory的创建SqlSession的方法传递ExecutorType类型参数，如`SqlSession openSession(ExecutorType execType)`。
 
+# SqlSessionFactory and SqlSession
 
+SqlSessionFactory（资源对象）是MyBatis（线程安全的）的关键对象，它是个单个[数据库](https://cloud.tencent.com/solution/database?from=10680)映射关系经过编译后的内存镜像。**SqlSessionFactory就是生产SqlSession对象的工厂。那也就是说整个Mybatis中，如果只有一个数据库Server要连接，那么只需要一个工厂就够了（只有一个SqlSessionFactory的实例对象）**
+
+SqlSession**（线程独有）**它是应用程序与持久层之间交互操作的一个单线程对象,类似于JDBC中的Connection。SqlSession对象完全包含以数据库为背景的所有执行SQL操作的方法，它的底层封装了JDBC连接，可以用SqlSession实例来直接执行被映射的SQL语句。**SqlSession表示的是数据库客户端和数据库服务端之间的一种会话，并维护了两者之间的状态信息。里面有许多操作数据库的方法。**
+
+**SqlSessionFactoryBean是生产SqlSessionFactory的一种工厂bean。**
+
+**SqlSessionFactory是打开SqlSession会话的工厂，是一个接口，可以根据需求自己实现，它的默认实现类DefaultSqlSessionFactory使用了数据库连接池技术。**
+
+**参考文章：**https://segmentfault.com/a/1190000021523973
 
 # 面试官：Mybatis中 Dao接口和XML文件的SQL如何建立关联？
 
