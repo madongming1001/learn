@@ -1,16 +1,6 @@
 package com.madm.learnroute.javaee;
 
 
-import com.alibaba.fastjson.JSONObject;
-import com.mdm.pojo.User;
-import org.apache.commons.lang3.StringUtils;
-import org.openjdk.jol.info.ClassLayout;
-
-import javax.xml.bind.SchemaOutputResolver;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 /**
  * -server -Xcomp -XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly -XX:CompileCommand=compileonly
  */

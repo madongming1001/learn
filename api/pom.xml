@@ -11,6 +11,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <name>learn-api</name>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>9</source>
+                    <target>9</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <artifactId>learn-api</artifactId>
 
     <properties>
@@ -26,13 +38,6 @@
 <!--            <artifactId>mysql-connector-java</artifactId>-->
 <!--            <version>8.0.28</version>-->
 <!--        </dependency>-->
-
-        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>31.0.1-jre</version>
-        </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.redisson/redisson -->
         <dependency>

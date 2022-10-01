@@ -1,7 +1,5 @@
 package madm.data_structure;
 
-import jdk.nashorn.internal.ir.BlockLexicalContext;
-
 public class DynamicProgramming2 {
 
     private int minDist = Integer.MAX_VALUE; // 全局变量或者成员变量

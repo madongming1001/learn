@@ -633,7 +633,6 @@ public void aMethod {
 }
 ```
 
-
 **如果内层事务需要回滚，他会在rollack里面判断globalrollack是不是true 如果是true就是记录在threadlocal里面一个true的变量，**
 **外层事务由于catch了异常，就会在commit的时候判断threadlocal是否有这个变量，然后决定是否会滚**
 

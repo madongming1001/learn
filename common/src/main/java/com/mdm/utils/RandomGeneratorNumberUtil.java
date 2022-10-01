@@ -1,8 +1,6 @@
 package com.mdm.utils;
 
-import org.apache.commons.lang3.RandomUtils;
-
-public class RandomGeneratorNumber {
+public class RandomGeneratorNumberUtil {
 
     public static int[] createArrayOf(int size) {
         int[] result = new int[size];

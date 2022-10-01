@@ -7,6 +7,7 @@ import com.mdm.pojo.Teacher;
 import com.mdm.pojo.Apple;
 import com.mdm.pojo.User;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.builder.ToStringExclude;
 import org.apache.curator.shaded.com.google.common.collect.Lists;
 
 import java.math.BigDecimal;
@@ -60,13 +61,24 @@ public class ListStreamPractice {
         //存放apple对象集合
 
         Apple apple1 = new Apple(1, "苹果1", new BigDecimal("3.25"), 10);
-        Apple apple12 = new Apple(1, "苹果2", new BigDecimal("1.35"), 20);
         Apple apple2 = new Apple(2, "香蕉", new BigDecimal("2.89"), 30);
         Apple apple3 = new Apple(3, "荔枝", new BigDecimal("9.99"), 40);
+        Apple apple4 = new Apple(4, "苹果2", new BigDecimal("1.35"), 20);
+
+        //验证对过滤后的集合修改会影响原集合的内容
+        affectTheOriginalCollection(apple1,apple2,apple3,apple4);
+
         List<Invitee> invitees = Lists.newArrayList(new Invitee("1", "1", "1"), new Invitee("2", "2", "2"));
         List<String> newInstance = Lists.newArrayList("1", "2", "3", "4", "5", "6", "1");
         List<String> oldInstance = Lists.newArrayList("3", "232", "35", "24", "5", "6", "1");
-        System.out.println(CollectionUtils.intersection(newInstance, oldInstance));
+
+        //add：加、subtract：减、multiply：乘、divide：除
+        System.out.println(CollectionUtils.union(newInstance, oldInstance));//并集
+        System.out.println(CollectionUtils.intersection(newInstance, oldInstance));//交集
+        System.out.println(CollectionUtils.disjunction(newInstance, oldInstance));//交集的补集
+        System.out.println(CollectionUtils.subtract(newInstance, oldInstance));//集合相减
+
+
         System.out.println(CollectionUtils.isNotEmpty(newInstance));
 
         Map<String, Integer> collect4 = invitees.stream().collect(Collectors.toMap(key -> key.getUserId(), value -> 1, Integer::sum));
@@ -106,7 +118,6 @@ public class ListStreamPractice {
         System.out.println(users);
         List<Apple> appleList = new ArrayList();
         appleList.add(apple1);
-        appleList.add(apple12);
         appleList.add(apple2);
         appleList.add(apple3);
         // 去重
@@ -114,6 +125,19 @@ public class ListStreamPractice {
         appleList.stream().collect(Collectors.groupingBy(x -> x.getId())).entrySet().stream().distinct().collect(Collectors.toList()).forEach(x -> System.out.println(x.getValue()));
         collect3.stream().forEach(System.out::println);
 
+    }
+
+    private static void affectTheOriginalCollection(Apple apple1, Apple apple2, Apple apple3, Apple apple4) {
+        System.out.println("begin of method： affectTheOriginalCollection");
+        ArrayList<Apple> originalCollection = Lists.newArrayList(apple1, apple2, apple3, apple4);
+        List<Apple> currentCollection = originalCollection.stream().filter(apple -> apple.getId() > 2).collect(Collectors.toList());
+        for (Apple apple : currentCollection) {
+            apple.setName(apple.getName() + " 修改后的数据");
+        }
+        for (Apple apple : originalCollection) {
+            System.out.println(apple.getName());
+        }
+        System.out.println("end of method： affectTheOriginalCollection");
     }
 
     private static CompletableFuture parallelSleep(Invitee invitee) {

@@ -1,14 +1,19 @@
 package com.madm.learnroute.concurrency.juc.threadpool;
 
-import cn.hutool.core.date.StopWatch;
-import org.apache.commons.lang3.RandomUtils;
 
-import java.time.LocalDate;
+import lombok.experimental.var;
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.time.LocalTime;
-import java.util.Date;
 import java.util.LinkedList;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 /**
  * Java结束线程的三种方法
@@ -22,7 +27,6 @@ public class ScheduleThreadPoolExecutorPractice {
     private final static AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
 
     public static void main(String[] args) {
-//        System.out.println(ctl.get());
 
         ThreadPoolExecutor fixedThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
         LinkedList<Long> numOfMinute = new LinkedList<>();
@@ -40,10 +44,16 @@ public class ScheduleThreadPoolExecutorPractice {
         long totalTime = (end - start) / 1000;
         System.out.println(totalTime);
 
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
+        scheduledExecutorService.scheduleAtFixedRate(() -> {
+            ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
+            ThreadInfo[] threadInfo = threadBean.dumpAllThreads(false, false);
+            System.out.println(threadInfo.length + " os thread");
+        }, 1, 1, TimeUnit.SECONDS);
+
+
         ScheduledExecutorService schedule = Executors.newScheduledThreadPool(1);
-        schedule.schedule(() -> {
-            calculation.interrupt();
-        }, 1, TimeUnit.SECONDS);
+        schedule.schedule(() -> calculation.interrupt(), 1, TimeUnit.SECONDS);
 //        Task task = new Task("任务");
 //        // one-shot
 //        schedule.schedule(task, 2, TimeUnit.SECONDS);

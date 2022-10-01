@@ -1,6 +1,6 @@
 package com.madm.learnroute.javaee;
 
-import com.mdm.utils.RandomGeneratorNumber;
+import com.mdm.utils.RandomGeneratorNumberUtil;
 import lombok.Data;
 
 import javax.annotation.Nullable;
@@ -65,7 +65,7 @@ public class ForkJoinPoolPractice extends RecursiveTask<Integer> {
 
 class ForkJoinTestMain {
     public static void main(String[] args) {
-        ForkJoinPoolPractice task = new ForkJoinPoolPractice(0, 999, RandomGeneratorNumber.createArrayOf(1000));
+        ForkJoinPoolPractice task = new ForkJoinPoolPractice(0, 999, RandomGeneratorNumberUtil.createArrayOf(1000));
         long startTime = System.currentTimeMillis();
         int result = ForkJoinPool.commonPool().invoke(task);
         long endTime = System.currentTimeMillis();

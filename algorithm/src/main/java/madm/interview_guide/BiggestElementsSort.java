@@ -1,6 +1,7 @@
 package madm.interview_guide;
 
-import com.mdm.utils.RandomGeneratorNumber;
+import com.mdm.utils.RandomGeneratorNumberUtil;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +19,7 @@ public class BiggestElementsSort {
 
     public static void main(String[] args) {
         // 1.获取数据源
-        int[] sourcesData = RandomGeneratorNumber.createArrayOf(1000_0000);
+        int[] sourcesData = RandomGeneratorNumberUtil.createArrayOf(1000_0000);
         // 2.开始排序
         long begin = System.currentTimeMillis();
         Integer[] processor = BiggestElementsSort.processor(sourcesData, 2);
