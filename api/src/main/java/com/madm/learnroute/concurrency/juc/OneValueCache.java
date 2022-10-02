@@ -1,6 +1,5 @@
 package com.madm.learnroute.concurrency.juc;
 
-import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.bouncycastle.util.Arrays;
 
 import java.math.BigInteger;
@@ -9,7 +8,6 @@ import java.math.BigInteger;
  * @author dongming.ma
  * @date 2022/5/30 19:11
  */
-@Immutable
 public class OneValueCache {
     private final BigInteger lastNumber;
     private final BigInteger[] lastFactors;

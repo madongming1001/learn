@@ -1,7 +1,5 @@
 package com.madm.learnroute.javaee;
 
-import com.mdm.utils.UnsafeFactory;
-
 import java.util.concurrent.locks.LockSupport;
 
 
@@ -34,8 +32,8 @@ public class VisibilityPractice {
             //JMM模型    内存模型： 线程间通信有关   共享内存模型
             //没有跳出循环   可见性的问题
             //能够跳出循环   内存屏障
-            UnsafeFactory.getUnsafe().storeFence();
-            System.out.println("字段偏移量："+UnsafeFactory.getFieldOffset(UnsafeFactory.getUnsafe(), VisibilityPractice.class, "count"));
+//            UnsafeFactory.getUnsafe().storeFence();
+//            System.out.println("字段偏移量："+UnsafeFactory.getFieldOffset(UnsafeFactory.getUnsafe(), VisibilityPractice.class, "count"));
             Thread.yield();//能够跳出循环    ?   释放时间片，上下文切换   加载上下文：flag=true
             System.out.println(count);//能够跳出循环    内存屏障
 

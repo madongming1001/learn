@@ -1,7 +1,6 @@
 package com.madm.learnroute.concurrency.juc.reentrantlock;
 
 import com.mdm.pojo.User;
-import sun.misc.Contended;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +15,7 @@ public class Cache {
     /**
      * 加运行参数，-XX:-RestrictContended 保证和其他数据不在同一缓存行
      */
-    @Contended
+//    @Contended
     private Long l1 = 0L;
 
     public static final Object get(String key) {

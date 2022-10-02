@@ -1,17 +1,6 @@
 package com.madm.learnroute.javaee;
 
 import lombok.SneakyThrows;
-import lombok.experimental.Delegate;
-import org.springframework.core.io.UrlResource;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
-import sun.misc.Launcher;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
 
 public class ClassLoaderPractice {
     public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factories";
@@ -19,7 +8,7 @@ public class ClassLoaderPractice {
     @SneakyThrows
     public static void main(String[] args) {
         System.out.println(String.class.getClassLoader());
-        System.out.println(com.sun.crypto.provider.DESKeyFactory.class.getClassLoader().getClass().getName());
+//        System.out.println(com.sun.crypto.provider.DESKeyFactory.class.getClassLoader().getClass().getName());
         System.out.println(ClassLoaderPractice.class.getClassLoader().getClass().getName());
 
         System.out.println();
@@ -32,10 +21,10 @@ public class ClassLoaderPractice {
 
         System.out.println();
         System.out.println("bootstrapLoader加载以下文件：");
-        URL[] urls = Launcher.getBootstrapClassPath().getURLs();
-        for (int i = 0; i < urls.length; i++) {
-            System.out.println(urls[i]);
-        }
+//        URL[] urls = Launcher.getBootstrapClassPath().getURLs();
+//        for (int i = 0; i < urls.length; i++) {
+//            System.out.println(urls[i]);
+//        }
 
         System.out.println();
         System.out.println("extClassloader加载以下文件：");

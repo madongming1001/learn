@@ -1,11 +1,7 @@
 package com.madm.learnroute.javaee;
 
-import com.sun.media.sound.SoftTuning;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class LastIndexPractice {
