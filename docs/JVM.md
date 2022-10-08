@@ -1047,7 +1047,7 @@ public String toString() {
 
 HotSpot虚拟机为了避免安全点过多带来过重的负担，对循环还有一项优化措施，认为循环次数较少的话，执行时间应该也不会太长，所以使用int类型或范围更小的数据类型作为索引值的循环默认是不会被放置安全点的。这种循环被称为**可数循环（Counted Loop）**，相对应地，使用long或者范围更大的数据类型作为索引值的循环就被称为**不可数循环（Uncounted Loop）**，将会被放置安全点。
 
-
+**注：** -XX:GuaranteedSafepointInterval = 0 如果设置了进入安全点的间隔，就会隔一段时间判断是否有代码缓存要清理，如果有，会进入安全点。
 
 
 
@@ -1059,3 +1059,22 @@ HotSpot虚拟机为了避免安全点过多带来过重的负担，对循环还�
 
 
 
+# Java中的native是如何实现的
+
+## JNI的编程步骤
+
+1. 编写带有native声明的方法的java类
+2. 使用javac命令编译所编写的java类
+3. 然后使用javah + java类名生成扩展名为h的头文件
+4. 使用C/C++实现本地方法
+5. 使用gcc C/C++编写的文件生成动态连接库（Linux下是.so文件，Windows下是.dll文件）
+
+注：javah命令主要用于在JNI开发的时，把java代码声明的JNI方法转化成C\C++[头文件](https://so.csdn.net/so/search?q=头文件&spm=1001.2101.3001.7020)，以便进行JNI的C\C++端程序的开发。
+
+```java
+javah -encoding utf-8 demo
+```
+
+man命令可以查看系统参数详情 man pthread_create
+
+参考文章：https://segmentfault.com/a/1190000022812099
