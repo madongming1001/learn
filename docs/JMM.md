@@ -1,290 +1,12 @@
-# CPU有缓存一致性协议(MESI)，为何还需要volatile
+# 什么是JMM模型？
 
-> 前言
-
-- [并发编程从操作系统底层工作的整体认识开始](https://juejin.cn/post/6889076335369519118)
-- [深入理解Java内存模型(JMM)及volatile关键字](https://juejin.cn/post/6893430262084927496)
-- [CPU有缓存一致性协议(MESI)，为何还需要volatile](https://juejin.cn/post/6893792938824990734)
-
-前面我们从操作系统底层了解了现代计算机结构模型中的CPU指令结构、CPU缓存结构、CPU运行调度以及操作系统内存管理，并且学习了Java内存模型(JMM)和 volatile 关键字的一些特性。本篇来深入理解CPU缓存一致性协议(MESI)，最后来讨论既然CPU有缓存一致性协议（MESI），为什么JMM还需要volatile关键字？
-
-# CPU高速缓存（Cache Memory）
-
-## CPU为何要有高速缓存
-
-CPU在摩尔定律的指导下以每18个月翻一番的速度在发展，然而内存和硬盘的发展速度远远不及CPU。这就造成了高性能能的内存和硬盘价格及其昂贵。然而CPU的高度运算需要高速的数据。为了解决这个问题，CPU厂商在CPU中内置了少量的高速缓存以解决I\O速度和CPU运算速度之间的不匹配问题。
-
-在CPU访问存储设备时，无论是存取数据抑或读取指令，都趋于聚集在一片连续的区域中，这就被称为局部性原理。
-
-**时间局部性（Temporal Locality）**：如果一个信息项正在被访问，那么在近期它很可能还会被再次访问。
-
-> 比如循环、递归、方法的反复调用等。
-
-**空间局部性（Spatial Locality）**：如果一个存储器的位置被引用，那么将来他附近的位置也会被引用。
-
-> 比如顺序执行的代码、连续创建的两个对象、数组等。
-
-### 带有高速缓存的CPU执行计算的流程
-
-1. 程序以及数据被加载到主内存
-2. 指令和数据被加载到CPU的高速缓存
-3. CPU执行指令，把结果写到高速缓存
-4. 高速缓存中的数据写回主内存
-
-![img](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5d2c2c6de67f4ff982f920f3b36c1bd2~tplv-k3u1fbpfcp-watermark.awebp)
-
-### 目前流行的多级缓存结构
-
-由于CPU的运算速度超越了1级缓存的数据I/O能力，CPU厂商又引入了多级的缓存结构。多级缓存结构示意图如下： ![img](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8e9eb9d46f92403fa388b405a84a14de~tplv-k3u1fbpfcp-watermark.awebp)
-
-## 多核CPU多级缓存一致性协议MESI
-
-多核CPU的情况下有**多个一级缓存**，如果保证缓存内部数据的一致，不让系统数据混乱。这里就引出了一个**一致性的协议MESI**。
-
-
-
-### Cache Line缓存行格式
-
-#### 高速缓存的数据结构
-
-![img](https://img-blog.csdnimg.cn/img_convert/530400b6be69f3b3f23db013327959ec.png)
-
-高速缓存的底层数据结构其实是一个拉链散列表的结构，就是有很多的bucket，每个bucket挂了很多的cache entry，每个 cache entry 由三个部分组成： **tag 、 cache line 、 flag**
-
-cache line ：缓存的数据，可以包含多个变量的值
-tag ：指向了这个缓存数据在主内存的数据的地址
-flag ：标识了缓存行的状态，具体状态划分见下边MESI协议
-
-**怎么在高速缓存中定位到这个变量呢？**
-
-在处理器读写高速缓存的时候，实际上会根据变量名执行一个内存地址解码的操作，解析出来三个东西。 **index , tag 和 offerset 。**
-
-index ：用于定位到拉链散列表中的某个 bucket
-tag ：用于定位 cache entry
-offerset ：用于定位一个变量在 cache line 中的位置
-
-参考文章：https://blog.csdn.net/m0_38017860/article/details/122988861
-
-### MESI 协议缓存状态
-
-MESI 是指4个状态的首字母。每个 `Cache line` 有4个状态，可用2个bit表示，它们分别是：
-
-> **缓存行（Cache line）**：缓存存储数据的单元
-
-![img](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a705ee0f942f49e394c59e8dfb76ec45~tplv-k3u1fbpfcp-watermark.awebp)
-
-**注意**：对于M 和 E 状态而言是精确的，它们在和该缓存行的真正状态是一致的，而 S 状态可能是非一致的。
-
-如果一个缓存将处于**S状态**的缓存行作废了，而另一个缓存实际上可能已经独享了该缓存行，**但是该缓存却不会将缓存行升迁为E状态，这是因为其他缓存不会广播它们作废掉该缓存行的通知，**同样由于缓存并没有保存该缓存行的copy数量，因此（即使有这种通知）也没有办法确定自己是否已经独享了该缓存行。
-
-从上面的意义来看 **E状态** 是一种投机性的优化：如果一个CPU想修改一个处于 S状态 的缓存行，总线事务需要将所有该缓存行的 copy 变成 invalid 状态，而修改 E状态 的缓存不需要使用总线事务。
-
-> 投机：抓住机会谋取私利
-
-### MESI 状态转换
-
-![img](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fe98bd1427704efd8b8bbcb880449e38~tplv-k3u1fbpfcp-watermark.awebp) 理解该图的前置说明：
-
-1. **触发事件**
-
-![img](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/eadbc968dab14fcfa4f5cdcd9e20083e~tplv-k3u1fbpfcp-watermark.awebp)
-
-1. **cache分类**
-
-- **前提**：所有的cache共同缓存了主内存中的某一条数据。
-- **本地cache**：指当前cpu的cache。
-- **触发cache**：触发读写事件的cache。
-- **其他cache**：指既除了以上两种之外的cache。
-- **注意**：本地的事件触发 本地cache和触发cache为相同。
-
-上图的切换解释： ![img](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/03c7cc787d5f48b5ab2d0e4e3f22d598~tplv-k3u1fbpfcp-watermark.awebp)
-
-下图示意了，当一个cache line的调整的状态的时候，另外一个cache line 需要调整的状态。
-
-![img](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e7966485aad94956980af86135153193~tplv-k3u1fbpfcp-watermark.awebp)
-
-举例子来说：假设 cache 1 中有一个变量 `x = 0` 的 cache line 处于 S状态（共享）。 那么其他拥有 x 变量的 cache 2 、cache 3 等 `x` 的cache line 调整为 S状态（共享）或者调整为 I状态（无效）。
-
-### 多核缓存协同操作
-
-假设有三个CPU A、B、C，对应三个缓存分别是cache a、b、 c。在主内存中定义了x的引用值为0。 ![image.jpeg](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/787dc6704990429c876550e63138443d~tplv-k3u1fbpfcp-watermark.awebp)
-
-#### 单核读取
-
-那么执行流程是： CPU A 发出了一条指令，从主内存中读取x。
-
-从主内存通过bus读取到缓存中（远端读取Remote read）,这是该 Cache line 修改为 **E状态（独享）**. ![image.jpeg](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d671913625c540bb9b874bb285051b25~tplv-k3u1fbpfcp-watermark.awebp)
-
-#### 双核读取
-
-那么执行流程是：
-
-- CPU A 发出了一条指令，从主内存中读取x。
-- CPU A 从主内存通过bus读取到 cache a 中并将该 cache line 设置为 **E状态**。
-- CPU B 发出了一条指令，从主内存中读取x。
-- CPU B 试图从主内存中读取x时，CPU A 检测到了地址冲突。这时CPU A对相关数据做出响应。此时x 存储于cache a和cache b中，x在chche a和cache b中都被设置为S状态(共享)。
-
-![image.jpeg](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ec70b7940b8b435ab73935fe715fad17~tplv-k3u1fbpfcp-watermark.awebp)
-
-#### 修改数据
-
-那么执行流程是：
-
-- CPU A 计算完成后发指令需要修改x.
-- CPU A 将x设置为 **M状态(修改)** 并通知缓存了x的CPU B, CPU B将本地cache b中的x设置为 **I状态(无效)**
-- CPU A 对x进行赋值。
-
-![image.jpeg](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a4e25696c1ca40e3b16ab39041eaef37~tplv-k3u1fbpfcp-watermark.awebp)
-
-#### 同步数据
-
-那么执行流程是：
-
-- CPU B 发出了要读取x的指令。
-- CPU B 通知 CPU A，CPU A将修改后的数据同步到主内存时 cache a 修改为 **E（独享）**
-- CPU A同步CPU B的x，将cache a和同步后cache b中的x设置为 **S状态（共享）**。
-
-![image.jpeg](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ddd3b5b6da454d8480ba091059e6c4f6~tplv-k3u1fbpfcp-watermark.awebp)
-
-## 缓存行伪共享
-
-### 什么是伪共享？
-
-CPU缓存系统中是以缓存行（cache line）为单位存储的。目前主流的CPU Cache 的 Cache Line 大小都是64Bytes。在多线程情况下，如果需要修改“**共享同一个缓存行的变量**”，就会无意中影响彼此的性能，这就是伪共享（False Sharing）。
-
-**举个例子**: 现在有2个long 型变量 a 、b，如果有t1在访问a，t2在访问b，而a与b刚好在同一个cache line中，此时t1先修改a，将导致b被刷新！
-
-### 怎么解决伪共享？
-
-Java8中新增了一个注解： `@sun.misc.Contended` 。加上这个注解的类会自动补齐缓存行，需要注意的是此注解默认是无效的，需要在jvm启动时设置 `-XX:-RestrictContended` 才会生效。
-
-```java
-@sun.misc.Contended
-public final static class VolatileLong {
-    public volatile long value = 0L;
-    //public long p1, p2, p3, p4, p5, p6;
-}
-复制代码
-```
-
-
-
-# MESI优化和他们引入的问题
-
-缓存的一致性消息传递是要时间的，这就使其切换时会产生延迟。**当一个缓存被切换状态时其他缓存收到消息完成各自的切换并且发出回应消息这么一长串的时间中CPU都会等待所有缓存响应完成。**可能出现的阻塞都会导致各种各样的性能问题和稳定性问题。
-
-
-
-## CPU切换状态阻塞解决-存储缓存（Store Bufferes）
-
-比如你需要修改本地缓存中的一条信息，那么你必须将 **I（无效）状态**通知到其他拥有该缓存数据的CPU缓存中，并且等待确认。等待确认的过程会阻塞处理器，这会降低处理器的性能。应为这个等待远远比一个指令的执行时间长的多。
-
-
-
-## Store Bufferes
-
-为了避免这种CPU运算能力的浪费，`Store Bufferes` 被引入使用。处理器把它想要写入到主存的值写到缓存，然后继续去处理其他事情。当所有**失效确认**（Invalidate Acknowledge）都接收到时，数据才会最终被提交。但这么做有两个风险。
-
-
-
-## Store Bufferes的风险
-
-- 第一：就是处理器会尝试从存储缓存（Store buffer）中读取值，但它还没有进行提交。这个的解决方案称为 `Store Forwarding`，它使得加载的时候，如果存储缓存中存在，则进行返回。
-- 第二：保存什么时候会完成，这个并没有任何保证。
-
-```java
-value = 3；
-void exeToCPUA(){
-  value = 10;
-  isFinsh = true;
-}
-void exeToCPUB(){
-  if(isFinsh){
-    //value一定等于10？！
-    assert value == 10;
-  }
-}
-复制代码
-```
-
-试想一下开始执行时，CPU A 保存着 `isFinsh` 在 E(独享)状态，而 `value` 并没有保存在它的缓存中。（例如，Invalid）。在这种情况下，`value` 会比 `isFinsh` 更迟地抛弃存储缓存。完全有可能 CPU B 读取 `isFinsh` 的值为true，而value的值不等于10。**即isFinsh的赋值在value赋值之前**。
-
-这种在可识别的行为中发生的变化称为**重排序（reordings）**。注意，这不意味着你的指令的位置被恶意（或者好意）地更改。 它只是意味着其他的CPU会读到跟程序中写入的顺序不一样的结果。
-
-
-
-## 硬件内存模型
-
-执行失效也不是一个简单的操作，它需要处理器去处理。另外，**存储缓存（Store Buffers）\**并不是无穷大的，所以处理器有时需要等待失效确认的返回。这两个操作都会使得性能大幅降低。为了应付这种情况，引入了\**失效队列(\**\*\*invalid queue\*\**\*)**。它们的约定如下：
-
-- 对于所有的收到的Invalidate请求，Invalidate Acknowlege消息必须立刻发送
-- Invalidate并不真正执行，而是被放在一个特殊的队列中，在方便的时候才会去执行。
-- 处理器不会发送任何消息给所处理的缓存条目，直到它处理Invalidate。
-
-即便是这样处理器已然不知道什么时候优化是允许的，而什么时候并不允许。
-
-干脆处理器将这个任务丢给了写代码的人。这就是内存屏障（Memory Barriers）。
-
-- 写屏障 Store Memory Barrier(a.k.a. ST, SMB, smp_wmb)是一条告诉处理器在执行这之后的指令之前，应用所有已经在存储缓存（store buffer）中的保存的指令。
-- 读屏障Load Memory Barrier (a.k.a. LD, RMB, smp_rmb)是一条告诉处理器在执行任何的加载前，先应用所有已经在失效队列中的失效操作的指令。
-
-```java
-void executedOnCpu0() {
-    value = 10;
-    //在更新数据之前必须将所有存储缓存（store buffer）中的指令执行完毕。
-    storeMemoryBarrier();
-    finished = true;
-}
-void executedOnCpu1() {
-    while(!finished);
-    //在读取之前将所有失效队列中关于该数据的指令执行完毕。
-    loadMemoryBarrier();
-    assert value == 10;
-}
-复制代码
-```
-
-# 总结
-
-## 既然CPU有缓存一致性协议（MESI），为什么JMM还需要volatile关键字？
-
-**volatile**是java语言层面给出的保证，**MSEI协议**是多核cpu保证cache一致性的一种方法，中间隔的还很远，我们可以先来做几个假设：
-
-1. 回到远古时候，那个时候cpu只有单核，或者是多核但是保证sequence consistency，当然也无所谓有没有MESI协议了。那这个时候，我们需要java语言层面的volatile的支持吗？
-
-> 当然是需要的，因为在语言层面编译器和虚拟机为了做性能优化，可能会存在**指令重排**的可能，而volatile给我们提供了一种能力，我们可以告诉编译器，什么可以重排，什么不可以。
-
-1. 那好，假设更进一步，假设java语言层面不会对指令做任何的优化重排，那在多核cpu的场景下，我们还需要volatile关键字吗？
-
-> 答案仍然是需要的。**因为 MESI只是保证了多核cpu的独占cache之间的一致性**，但是cpu的并不是直接把数据写入L1 cache的，中间还可能有store buffer。有些arm和power架构的cpu还可能有load buffer或者invalid queue等等。因此，有MESI协议远远不够。
-
-1. 再接着，让我们再做一个更大胆的假设。假设cpu中这类store buffer/invalid queue等等都不存在了，cpu是数据是直接写入cache的，读取也是直接从cache读的，那还需要volatile关键字吗？
-
-> 你猜的没错，还需要的。原因就在这个“一致性”上。consistency和coherence都可以被翻译为一致性，**但是MSEI协议这里保证的仅仅coherence**而不是consistency。那consistency和cohence有什么区别呢？
-
-> 下面取自wiki的一段话： Coherence deals with maintaining a global order in which writes to a single location or single variable are seen by all processors. Consistency deals with the ordering of operations to multiple locations with respect to all processors.
-
-因此，**MESI协议最多只是保证了对于一个变量，在多个核上的读写顺序，对于多个变量而言是没有任何保证的**。很遗憾，还是需要volatile～～
-
-1. 好的，到了现在这步，我们再来做最后一个假设，假设cpu写cache都是按照指令顺序fifo写的，那现在可以抛弃volatile了吧？你觉得呢？
-
-> 那肯定不行啊！因为对于arm和power这个weak consistency的架构的cpu来说，它们只会保证指令之间有比如控制依赖，数据依赖，地址依赖等等依赖关系的指令间提交的先后顺序，而对于完全没有依赖关系的指令，比如x=1;y=2，它们是不会保证执行提交的顺序的，除非你使用了volatile，java把volatile编译成arm和power能够识别的barrier指令，这个时候才是按顺序的。
-
-
-
-**借鉴地址为：https://juejin.cn/post/6893792938824990734**
-
-
-
-## 什么是JMM模型？
-
-​		**试图定义一种"java内存模型"来屏蔽各种硬件和操作系统的内存访问差异，以实现让java程序在各种平台下都能达到一致的内存访问效果，主要定义程序中各种变量的访问规则。**
+​		**《Java虚拟机规范》中曾试图定义一种"java内存模型"来屏蔽各种硬件和操作系统的内存访问差异，以实现让java程序在各种平台下都能达到一致的内存访问效果，主要定义程序中各种变量的访问规则。**
 
 ​		Java 内存模型（Java Memory Model 简称JMM）是一种抽象的概念，来屏蔽各种硬件和操作系统的内存访问差异，已实现让java程序在各种平台下都能达到一致的内存访问差异。而他并不真实存在，它描述的一组规则或规范，通过这组规范定义了程序中各个变量（包括实例字段、静态字段和构成数组对象的元素）的访问方式。JVM运行程序的实体是线程，而每个线程创建时 JVM 都会为其创建一个工作内存（有些地方称为栈空间），用于存储线程私有的数据，而Java 内存模型中规定所有变量都存储在主内存，其主内存是共享内存区域，所有线程都可以访问，但线程对变量的操作（读取赋值等）必须在工作内存中进行，首先要将变量从主内存拷贝到增加的工作内存空间，然后对变量进行操作，操作完成后再将变量写回主内存，不能直接操作主内存中的变量，工作内存中存储这主内存中的变量副本拷贝，工作内存是每个线程的私有数据区域，因
 
 此不同的线程间无法访问对方的工作内存，线程间的通信（传值）必须通过主内存来完成。
 
-### JMM 不同于 JVM 内存区域模式
+## JMM 不同于 JVM 内存区域模式
 
 JMM 与 JVM 内存区域的划分是不同的概念层次，更恰当说 JMM 描述的是一组规则，通过这组规则控制各个变量在共享数据区域内和私有数据区域的访问方式，**JMM是围绕原子性、有序性、可见性展开**。JMM 与 Java 内存区域唯一相似点，都存在共享数据区域和私有数据区域，在 JMM 中主内存属于共享数据区域，从某个程度上讲应该包括了堆和方法区，而工作内存数据线程私有数据区域，从某个程度上讲则应该包括程序计数器、虚拟机栈以及本地方法栈。
 
@@ -389,11 +111,7 @@ X=x+1;
 
 #### 有序性问题
 
-在Java里面，可以通过 volatile 关键字来保证一定的“有序性”。另外可以通过 synchronized 和 Lock 来保证有序性，很显然，synchronized 和 Lock 保证每个时刻是只有一个线程执行同步代码，相当于是让线程顺序执行同步代码，自然就保证来有序性。
-
-### Java内存模型
-
-每个线程都有自己的工作内存，线程对变量的所有操作都必须在工作内存中进行，而不能直接对主内存进行操作。并且每个线程不能访问其他线程的工作内存。Java 内存模型具有一些先天的“有序性”，即不需要通过任何手段就能够得到保证的有序性，这个通常也称为 `happens-before` 原则。如果两个操作的执行次序无法从 `happens-before` 原则推导出来，那么它们就不能保证它们的有序性，虚拟机可以随意地对它们进行重排序。
+在Java里面，可以通过 **volatile** 关键字来保证一定的“有序性”。另外可以通过 synchronized 和 Lock 来保证有序性，很显然，synchronized 和 Lock 保证每个时刻是只有一个线程执行同步代码，相当于是让线程顺序执行同步代码，自然就保证来有序性。
 
 ### 指令重排序
 
@@ -411,7 +129,7 @@ Java语言规范规定 JVM 线程内部维持顺序化语义。即只要程序�
 
 #### happens-before 原则
 
-只靠 synchronized 和 volatile 关键字来保证原子性、可见性以及有序性，那么编写并发程序可能会显得十分麻烦，幸运的是，从JDK 5 开始，Java 使用新的 JSR-133 内存模型，提供了 `happens-before 原则` 来辅助保证程序执行的原子性、可见性和有序性的问题，它是判断数据十分存在竞争、线程十分安全的一句。happens-before 原则内容如下：
+**只靠 synchronized 和 volatile 关键字来保证原子性、可见性以及有序性，那么编写并发程序可能会显得十分麻烦**，幸运的是，从JDK 5 开始，Java 使用新的 JSR-133 内存模型，提供了 `happens-before 原则` 来辅助保证程序执行的原子性、可见性和有序性的问题，它是判断数据十分存在竞争、线程十分安全的一句。happens-before 原则内容如下：
 
 1. **程序顺序原则**，即在一个线程内必须保证语义串行，也就是说按照代码顺序执行。
 2. **锁规则**，解锁（unlock）操作必然发生在后续的同一个锁的加锁（lock）之前，也就是说，如果对于一个锁解锁后，再加锁，那么加锁的动作必须在解锁动作之后（同一个锁）。
@@ -426,14 +144,14 @@ Java语言规范规定 JVM 线程内部维持顺序化语义。即只要程序�
 
 ## volatile 内存语义
 
-volatile 是Java虚拟机提供的轻量级的同步机制。volatile 关键字有如下两个作用：
+**volatile** 是Java虚拟机提供的轻量级的同步机制。volatile 关键字有如下两项特性：
 
-1. 保证被 volatile 修饰的共享变量对所有线程总是可见的，也就是当一个线程修改了被 volatile 修饰共享变量的值，新值总是可以被其他线程立即得知。
-2. 紧张指令重排序优化。
+1. 保证被 volatile 修饰的共享变量对所有线程总是可见的，也就是当一个线程修改了被 volatile 修饰共享变量的值，新值总是可以被其他线程立即得知。（通知）
+2. 禁止指令重排序优化。
 
 ### volatile 的可见性
 
-关于 volatile 的可见性作用，我们必须意思到被 volatile 修饰的变量对所有线程总是立即可见的，对于 volatile 变量的所有写操作总是能立刻反应到其他线程中。
+关于 volatile 的可见性作用，我们必须意识到被 volatile 修饰的变量对所有线程总是立即可见的，对于 volatile 变量的所有写操作总是能立刻反应到其他线程中。
 
 **案例**：线程A改变 initFlag 属性之后，线程B马上感知到
 
@@ -728,28 +446,295 @@ class VolatileBarrierExample {
 
 前面保守策略下的 volatile 读和写，在 X86 处理器平台可以优化如下图所示。X86处理器仅会对读-写操作做重排序。X86 不会对读-读、读-写 和 写-写 做重排序，因此在 X86 处理器中会省略掉这3种操作类型对应的内存屏障。在 X86 中，JMM仅需在 volatile 写后面插入一个 StoreLoad 屏障即可正确实现 volatile写-读的内存语义，这意味着在 X86 处理器中，volatile写的开销比volatile读的开销会大很多（因为执行StoreLoad的屏障开销会比较大）。 ![img](https:////p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/560f433e63a04914aa214f385034cc1d~tplv-k3u1fbpfcp-watermark.awebp)
 
-## 
-
+##  
 
 链接：https://juejin.cn/post/6893430262084927496
 
+# CPU有缓存一致性协议(MESI)，为何还需要volatile
 
+> 前言
+
+- [并发编程从操作系统底层工作的整体认识开始](https://juejin.cn/post/6889076335369519118)
+- [深入理解Java内存模型(JMM)及volatile关键字](https://juejin.cn/post/6893430262084927496)
+- [CPU有缓存一致性协议(MESI)，为何还需要volatile](https://juejin.cn/post/6893792938824990734)
+
+前面我们从操作系统底层了解了现代计算机结构模型中的CPU指令结构、CPU缓存结构、CPU运行调度以及操作系统内存管理，并且学习了Java内存模型(JMM)和 volatile 关键字的一些特性。本篇来深入理解CPU缓存一致性协议(MESI)，最后来讨论既然CPU有缓存一致性协议（MESI），为什么JMM还需要volatile关键字？
+
+# CPU高速缓存（Cache Memory）
+
+## CPU为何要有高速缓存
+
+CPU在摩尔定律的指导下以每18个月翻一番的速度在发展，然而内存和硬盘的发展速度远远不及CPU。这就造成了高性能能的内存和硬盘价格及其昂贵。然而CPU的高度运算需要高速的数据。为了解决这个问题，CPU厂商在CPU中内置了少量的高速缓存以解决I\O速度和CPU运算速度之间的不匹配问题。
+
+在CPU访问存储设备时，无论是存取数据抑或读取指令，都趋于聚集在一片连续的区域中，这就被称为局部性原理。
+
+**时间局部性（Temporal Locality）**：如果一个信息项正在被访问，那么在近期它很可能还会被再次访问。
+
+> 比如循环、递归、方法的反复调用等。
+
+**空间局部性（Spatial Locality）**：如果一个存储器的位置被引用，那么将来他附近的位置也会被引用。
+
+> 比如顺序执行的代码、连续创建的两个对象、数组等。
+
+### 带有高速缓存的CPU执行计算的流程
+
+1. 程序以及数据被加载到主内存
+2. 指令和数据被加载到CPU的高速缓存
+3. CPU执行指令，把结果写到高速缓存
+4. 高速缓存中的数据写回主内存
+
+![img](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5d2c2c6de67f4ff982f920f3b36c1bd2~tplv-k3u1fbpfcp-watermark.awebp)
+
+### 目前流行的多级缓存结构
+
+由于CPU的运算速度超越了1级缓存的数据I/O能力，CPU厂商又引入了多级的缓存结构。多级缓存结构示意图如下： ![img](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8e9eb9d46f92403fa388b405a84a14de~tplv-k3u1fbpfcp-watermark.awebp)
+
+## 多核CPU多级缓存一致性协议MESI
+
+多核CPU的情况下有**多个一级缓存**，如果保证缓存内部数据的一致，不让系统数据混乱。这里就引出了一个**一致性的协议MESI**。
+
+
+
+### Cache Line缓存行格式
+
+#### 高速缓存的数据结构
+
+![img](https://img-blog.csdnimg.cn/img_convert/530400b6be69f3b3f23db013327959ec.png)
+
+高速缓存的底层数据结构其实是一个拉链散列表的结构，就是有很多的bucket，每个bucket挂了很多的cache entry，每个 cache entry 由三个部分组成： **tag 、 cache line 、 flag**
+
+cache line ：缓存的数据，可以包含多个变量的值
+tag ：指向了这个缓存数据在主内存的数据的地址
+flag ：标识了缓存行的状态，具体状态划分见下边MESI协议
+
+**怎么在高速缓存中定位到这个变量呢？**
+
+在处理器读写高速缓存的时候，实际上会根据变量名执行一个内存地址解码的操作，解析出来三个东西。 **index , tag 和 offerset 。**
+
+index ：用于定位到拉链散列表中的某个 bucket
+tag ：用于定位 cache entry
+offerset ：用于定位一个变量在 cache line 中的位置
+
+参考文章：https://blog.csdn.net/m0_38017860/article/details/122988861
+
+### MESI 协议缓存状态
+
+MESI 是指4个状态的首字母。每个 `Cache line` 有4个状态，可用2个bit表示，它们分别是：
+
+> **缓存行（Cache line）**：缓存存储数据的单元
+
+![img](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a705ee0f942f49e394c59e8dfb76ec45~tplv-k3u1fbpfcp-watermark.awebp)
+
+**注意**：对于M 和 E 状态而言是精确的，它们在和该缓存行的真正状态是一致的，而 S 状态可能是非一致的。
+
+如果一个缓存将处于**S状态**的缓存行作废了，而另一个缓存实际上可能已经独享了该缓存行，**但是该缓存却不会将缓存行升迁为E状态，这是因为其他缓存不会广播它们作废掉该缓存行的通知，**同样由于缓存并没有保存该缓存行的copy数量，因此（即使有这种通知）也没有办法确定自己是否已经独享了该缓存行。
+
+从上面的意义来看 **E状态** 是一种投机性的优化：如果一个CPU想修改一个处于 S状态 的缓存行，总线事务需要将所有该缓存行的 copy 变成 invalid 状态，而修改 E状态 的缓存不需要使用总线事务。
+
+> 投机：抓住机会谋取私利
+
+### MESI 状态转换
+
+![img](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fe98bd1427704efd8b8bbcb880449e38~tplv-k3u1fbpfcp-watermark.awebp) 理解该图的前置说明：
+
+1. **触发事件**
+
+![img](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/eadbc968dab14fcfa4f5cdcd9e20083e~tplv-k3u1fbpfcp-watermark.awebp)
+
+1. **cache分类**
+
+- **前提**：所有的cache共同缓存了主内存中的某一条数据。
+- **本地cache**：指当前cpu的cache。
+- **触发cache**：触发读写事件的cache。
+- **其他cache**：指既除了以上两种之外的cache。
+- **注意**：本地的事件触发 本地cache和触发cache为相同。
+
+上图的切换解释： ![img](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/03c7cc787d5f48b5ab2d0e4e3f22d598~tplv-k3u1fbpfcp-watermark.awebp)
+
+下图示意了，当一个cache line的调整的状态的时候，另外一个cache line 需要调整的状态。
+
+![img](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e7966485aad94956980af86135153193~tplv-k3u1fbpfcp-watermark.awebp)
+
+举例子来说：假设 cache 1 中有一个变量 `x = 0` 的 cache line 处于 S状态（共享）。 那么其他拥有 x 变量的 cache 2 、cache 3 等 `x` 的cache line 调整为 S状态（共享）或者调整为 I状态（无效）。
+
+### 多核缓存协同操作
+
+假设有三个CPU A、B、C，对应三个缓存分别是cache a、b、 c。在主内存中定义了x的引用值为0。 ![image.jpeg](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/787dc6704990429c876550e63138443d~tplv-k3u1fbpfcp-watermark.awebp)
+
+#### 单核读取
+
+那么执行流程是： CPU A 发出了一条指令，从主内存中读取x。
+
+从主内存通过bus读取到缓存中（远端读取Remote read）,这是该 Cache line 修改为 **E状态（独享）**. ![image.jpeg](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d671913625c540bb9b874bb285051b25~tplv-k3u1fbpfcp-watermark.awebp)
+
+#### 双核读取
+
+那么执行流程是：
+
+- CPU A 发出了一条指令，从主内存中读取x。
+- CPU A 从主内存通过bus读取到 cache a 中并将该 cache line 设置为 **E状态**。
+- CPU B 发出了一条指令，从主内存中读取x。
+- CPU B 试图从主内存中读取x时，CPU A 检测到了地址冲突。这时CPU A对相关数据做出响应。此时x 存储于cache a和cache b中，x在chche a和cache b中都被设置为S状态(共享)。
+
+![image.jpeg](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ec70b7940b8b435ab73935fe715fad17~tplv-k3u1fbpfcp-watermark.awebp)
+
+#### 修改数据
+
+那么执行流程是：
+
+- CPU A 计算完成后发指令需要修改x.
+- CPU A 将x设置为 **M状态(修改)** 并通知缓存了x的CPU B, CPU B将本地cache b中的x设置为 **I状态(无效)**
+- CPU A 对x进行赋值。
+
+![image.jpeg](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a4e25696c1ca40e3b16ab39041eaef37~tplv-k3u1fbpfcp-watermark.awebp)
+
+#### 同步数据
+
+那么执行流程是：
+
+- CPU B 发出了要读取x的指令。
+- CPU B 通知 CPU A，CPU A将修改后的数据同步到主内存时 cache a 修改为 **E（独享）**
+- CPU A同步CPU B的x，将cache a和同步后cache b中的x设置为 **S状态（共享）**。
+
+![image.jpeg](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ddd3b5b6da454d8480ba091059e6c4f6~tplv-k3u1fbpfcp-watermark.awebp)
+
+## 缓存行伪共享
+
+### 什么是伪共享？
+
+CPU缓存系统中是以缓存行（cache line）为单位存储的。目前主流的CPU Cache 的 Cache Line 大小都是64Bytes。在多线程情况下，如果需要修改“**共享同一个缓存行的变量**”，就会无意中影响彼此的性能，这就是伪共享（False Sharing）。
+
+**举个例子**: 现在有2个long 型变量 a 、b，如果有t1在访问a，t2在访问b，而a与b刚好在同一个cache line中，此时t1先修改a，将导致b被刷新！
+
+### 怎么解决伪共享？
+
+Java8中新增了一个注解： `@sun.misc.Contended` 。加上这个注解的类会自动补齐缓存行，需要注意的是此注解默认是无效的，需要在jvm启动时设置 `-XX:-RestrictContended` 才会生效。
+
+```java
+@sun.misc.Contended
+public final static class VolatileLong {
+    public volatile long value = 0L;
+    //public long p1, p2, p3, p4, p5, p6;
+}
+复制代码
+```
+
+
+
+# MESI优化和他们引入的问题
+
+缓存的一致性消息传递是要时间的，这就使其切换时会产生延迟。**当一个缓存被切换状态时其他缓存收到消息完成各自的切换并且发出回应消息这么一长串的时间中CPU都会等待所有缓存响应完成。**可能出现的阻塞都会导致各种各样的性能问题和稳定性问题。
+
+
+
+## CPU切换状态阻塞解决-存储缓存（Store Bufferes）
+
+比如你需要修改本地缓存中的一条信息，那么你必须将 **I（无效）状态**通知到其他拥有该缓存数据的CPU缓存中，并且等待确认。等待确认的过程会阻塞处理器，这会降低处理器的性能。应为这个等待远远比一个指令的执行时间长的多。
+
+
+
+## Store Bufferes
+
+为了避免这种CPU运算能力的浪费，`Store Bufferes` 被引入使用。处理器把它想要写入到主存的值写到缓存，然后继续去处理其他事情。当所有**失效确认**（Invalidate Acknowledge）都接收到时，数据才会最终被提交。但这么做有两个风险。
+
+
+
+## Store Bufferes的风险
+
+- 第一：就是处理器会尝试从存储缓存（Store buffer）中读取值，但它还没有进行提交。这个的解决方案称为 `Store Forwarding`，它使得加载的时候，如果存储缓存中存在，则进行返回。
+- 第二：保存什么时候会完成，这个并没有任何保证。
+
+```java
+value = 3；
+void exeToCPUA(){
+  value = 10;
+  isFinsh = true;
+}
+void exeToCPUB(){
+  if(isFinsh){
+    //value一定等于10？！
+    assert value == 10;
+  }
+}
+复制代码
+```
+
+试想一下开始执行时，CPU A 保存着 `isFinsh` 在 E(独享)状态，而 `value` 并没有保存在它的缓存中。（例如，Invalid）。在这种情况下，`value` 会比 `isFinsh` 更迟地抛弃存储缓存。完全有可能 CPU B 读取 `isFinsh` 的值为true，而value的值不等于10。**即isFinsh的赋值在value赋值之前**。
+
+这种在可识别的行为中发生的变化称为**重排序（reordings）**。注意，这不意味着你的指令的位置被恶意（或者好意）地更改。 它只是意味着其他的CPU会读到跟程序中写入的顺序不一样的结果。
+
+
+
+## 硬件内存模型
+
+执行失效也不是一个简单的操作，它需要处理器去处理。另外，**存储缓存（Store Buffers）\**并不是无穷大的，所以处理器有时需要等待失效确认的返回。这两个操作都会使得性能大幅降低。为了应付这种情况，引入了\**失效队列(\**\*\*invalid queue\*\**\*)**。它们的约定如下：
+
+- 对于所有的收到的Invalidate请求，Invalidate Acknowlege消息必须立刻发送
+- Invalidate并不真正执行，而是被放在一个特殊的队列中，在方便的时候才会去执行。
+- 处理器不会发送任何消息给所处理的缓存条目，直到它处理Invalidate。
+
+即便是这样处理器已然不知道什么时候优化是允许的，而什么时候并不允许。
+
+干脆处理器将这个任务丢给了写代码的人。这就是内存屏障（Memory Barriers）。
+
+- 写屏障 Store Memory Barrier(a.k.a. ST, SMB, smp_wmb)是一条告诉处理器在执行这之后的指令之前，应用所有已经在存储缓存（store buffer）中的保存的指令。
+- 读屏障Load Memory Barrier (a.k.a. LD, RMB, smp_rmb)是一条告诉处理器在执行任何的加载前，先应用所有已经在失效队列中的失效操作的指令。
+
+```java
+void executedOnCpu0() {
+    value = 10;
+    //在更新数据之前必须将所有存储缓存（store buffer）中的指令执行完毕。
+    storeMemoryBarrier();
+    finished = true;
+}
+void executedOnCpu1() {
+    while(!finished);
+    //在读取之前将所有失效队列中关于该数据的指令执行完毕。
+    loadMemoryBarrier();
+    assert value == 10;
+}
+复制代码
+```
+
+# 总结
+
+## 既然CPU有缓存一致性协议（MESI），为什么JMM还需要volatile关键字？
+
+**volatile**是java语言层面给出的保证，**MSEI协议**是多核cpu保证cache一致性的一种方法，中间隔的还很远，我们可以先来做几个假设：
+
+1. 回到远古时候，那个时候cpu只有单核，或者是多核但是保证sequence consistency，当然也无所谓有没有MESI协议了。那这个时候，我们需要java语言层面的volatile的支持吗？
+
+> 当然是需要的，因为在语言层面编译器和虚拟机为了做性能优化，可能会存在**指令重排**的可能，而volatile给我们提供了一种能力，我们可以告诉编译器，什么可以重排，什么不可以。
+
+1. 那好，假设更进一步，假设java语言层面不会对指令做任何的优化重排，那在多核cpu的场景下，我们还需要volatile关键字吗？
+
+> 答案仍然是需要的。**因为 MESI只是保证了多核cpu的独占cache之间的一致性**，但是cpu的并不是直接把数据写入L1 cache的，中间还可能有store buffer。有些arm和power架构的cpu还可能有load buffer或者invalid queue等等。因此，有MESI协议远远不够。
+
+1. 再接着，让我们再做一个更大胆的假设。假设cpu中这类store buffer/invalid queue等等都不存在了，cpu是数据是直接写入cache的，读取也是直接从cache读的，那还需要volatile关键字吗？
+
+> 你猜的没错，还需要的。原因就在这个“一致性”上。consistency和coherence都可以被翻译为一致性，**但是MSEI协议这里保证的仅仅coherence**而不是consistency。那consistency和cohence有什么区别呢？
+
+> 下面取自wiki的一段话： Coherence deals with maintaining a global order in which writes to a single location or single variable are seen by all processors. Consistency deals with the ordering of operations to multiple locations with respect to all processors.
+
+因此，**MESI协议最多只是保证了对于一个变量，在多个核上的读写顺序，对于多个变量而言是没有任何保证的**。很遗憾，还是需要volatile～～
+
+1. 好的，到了现在这步，我们再来做最后一个假设，假设cpu写cache都是按照指令顺序fifo写的，那现在可以抛弃volatile了吧？你觉得呢？
+
+> 那肯定不行啊！因为对于arm和power这个weak consistency的架构的cpu来说，它们只会保证指令之间有比如控制依赖，数据依赖，地址依赖等等依赖关系的指令间提交的先后顺序，而对于完全没有依赖关系的指令，比如x=1;y=2，它们是不会保证执行提交的顺序的，除非你使用了volatile，java把volatile编译成arm和power能够识别的barrier指令，这个时候才是按顺序的。
+
+
+
+**参考文章：https://juejin.cn/post/6893792938824990734**
 
 # MESI
 
-参考文章：https://zhuanlan.zhihu.com/p/84500221
-
-
-
-
+**参考文章**：https://zhuanlan.zhihu.com/p/84500221
 
 # [Java中的native是如何实现的（JNI）](https://segmentfault.com/a/1190000022812099)
 
 # CPU核心数
 
-参考文章：https://zhuanlan.zhihu.com/p/86855590
-
-
+**参考文章**：https://zhuanlan.zhihu.com/p/86855590
 
 
 
