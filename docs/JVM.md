@@ -1,3 +1,5 @@
+
+
 # JVM运行时数据区
 
 ## 栈
@@ -505,10 +507,6 @@ javap是jdk自带的反解析工具。它的作用就是根据class字节码文�
 
 
 
-
-
-
-
 # JVM字节码命令
 
 ### *iconst*
@@ -968,19 +966,41 @@ MethodHandle详解：https://juejin.cn/post/6844904177131323406
 
 ## jstat
 
-Jstat是JDK自带的一个轻量级小工具。全称“Java Virtual Machine statistics monitoring tool”，它位于java的bin目录下，主要利用JVM内建的指令对Java应用程序的资源和性能进行实时的命令行的监控，包括了对Heap size和垃圾回收状况的监控。可见，Jstat是轻量级的、专门针对JVM的工具。
+**jstat（JVM Statistics Monitoring Tool）是用于监视虚拟机各种运行状态信息的命令行工具**。他可以监视本地或者远程虚拟机进程中的类加载、内存、垃圾收集、即使编译等运行时数据。Jstat是JDK自带的一个轻量级小工具。全称“Java Virtual Machine statistics monitoring tool”，它位于java的bin目录下，主要利用JVM内建的指令对Java应用程序的资源和性能进行实时的命令行的监控，包括了对Heap size和垃圾回收状况的监控。可见，Jstat是轻量级的、专门针对JVM的工具。
 
 **原理：**PerfData文件
 Windows下默认理解是C:\Users\username\AppData\Local\Temp\hsperfdata_username
 Linux下默认路径是/tmp/hsperfdata_username
+
+## Jinfo
+
+jinfo（Configuration Info for Java）的作用是实时查看和调整虚拟机各项参数。
+
+## Jmap
+
+jmap（Memory Map for java）命令用于生成堆转出快照。也可以在内存溢出异常出现之后自动生成堆转储快照文件，通过-XX:+HeapDumpOnOutOfMemoryError参数
+
+## Jhat
+
+jhat（JVM Heap Analysis Tool）命令与jmap命令搭配使用，来分析jmap生成的堆转储快照。
+
+## Jstack
+
+**jstack（Stack Trace for java）命令用于生成虚拟机当前时刻的线程快照**。线程快照就是当前虚拟机内每一条线程正在执行的方法堆栈的集合，生成线程快照的目的通常是定位线程出现长时间停顿的原因，如线程间死锁、死循环、请求外部资源导致的长时间挂起等，都是导致线程长时间停顿的常见原因。
+
+## JConsole：java监视与管理控制台
+
+JConsole（Java Monitoring and Management Console）是一款基于JMX（Java Manage-ment。Extensions）的可视化监视、管理工具。它的主要功能是通过JMX的MBean（Managed Bean）对系统进行信息收集和参数动态调整。
+
+## VisualVm：多合-故障处理工具
+
+VisualVM，能够监控线程，[内存](https://so.csdn.net/so/search?q=内存&spm=1001.2101.3001.7020)情况，查看方法的CPU时间和内存中的对 象，已被GC的对象，反向查看分配的堆栈(如100个String对象分别由哪几个对象分配出来的)。
 
 
 
 # String到底创建的了几个对象
 
 参考文章：https://blog.csdn.net/qq_44507430/article/details/106752421
-
-
 
 #  String字符串判断
 
@@ -1022,6 +1042,14 @@ public String toString() {
    HotSpot 的 JIT 编译器不但会生成机器码，还会额外在每个 safepoint 生成一些 “调试符号信息”，以便 VM 能找到所需要的 “state of execution”。为 GC 生成的符号信息是 OopMap，指出栈上和寄存器哪里有 GC 管理的指针。
 
    Java 线程特性也是基于 Safepoint 实现的，那就是 `Thread.interrup()`，线程只有运行到 Safepoint 才知道是否 `interrupted`
+
+注：**openjdk关于safepoint的描述，**当Java线程正在执行native函数的时候，这种情况最复杂，篇幅也写的最多。当VM thread看到一个Java线程在执行native code，它不需要等待这个Java线程进入阻塞状态，因为当Java线程从执行native code返回的时候，Java线程会去检查safepoint看是否要block(When returning from the native code, a Java thread must check the safepoint _state to see if we must block)
+
+HotSpot虚拟机为了避免安全点过多带来过重的负担，对循环还有一项优化措施，认为循环次数较少的话，执行时间应该也不会太长，所以使用int类型或范围更小的数据类型作为索引值的循环默认是不会被放置安全点的。这种循环被称为**可数循环（Counted Loop）**，相对应地，使用long或者范围更大的数据类型作为索引值的循环就被称为**不可数循环（Uncounted Loop）**，将会被放置安全点。
+
+
+
+
 
 ## 为啥需要 Stop The World
 
