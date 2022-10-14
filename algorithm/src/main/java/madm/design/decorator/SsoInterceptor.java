@@ -1,9 +1,12 @@
 package madm.design.decorator;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.apache.commons.lang3.BooleanUtils.isFalse;
 
 /**
  * @Author MaDongMing
@@ -12,8 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class SsoInterceptor extends SsoDecorator {
 
-    private static Map<String, String> authMap = new
-            ConcurrentHashMap<String, String>();
+    private static Map<String, String> authMap = new ConcurrentHashMap<String, String>();
 
     static {
         authMap.put("huahua", "queryUserInfo");
@@ -25,10 +27,9 @@ public class SsoInterceptor extends SsoDecorator {
     }
 
     @Override
-    public boolean preHandle(String request, String response, Object
-            handler) {
+    public boolean preHandle(String request, String response, Object handler) {
         boolean success = super.preHandle(request, response, handler);
-        if (!success) return false;
+        if (isFalse(success)) return false;
         String userId = request.substring(8);
         String method = authMap.get(userId);
         log.info("模拟单点登录方法访拦截校验：{} {}", userId, method);
