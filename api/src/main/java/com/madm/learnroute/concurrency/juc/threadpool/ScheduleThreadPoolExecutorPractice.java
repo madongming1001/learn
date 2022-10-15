@@ -1,8 +1,6 @@
 package com.madm.learnroute.concurrency.juc.threadpool;
 
 
-import lombok.experimental.var;
-
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -13,7 +11,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
 
 /**
  * Java结束线程的三种方法
