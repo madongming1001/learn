@@ -4,10 +4,6 @@
 
 在JDK6的时候HotSpot开发团队就有放弃永久代，逐步改为采用本地内存(NativeMemory)来实现方法区的计划了，到了JDK7的HotSpot，已经把原本放在永久代的**字符串常量池、静态变量**等移出，而到了JDK8，终于完全废弃了永久代的概念，改用与JRockit、J9一样在本地内存中实现的元空间(Meta-space)来代替，把JDK7中永久代还剩余的内容(主要是类型信息)全部移到元空间中。
 
-### 运行时常量池
-
-运行时常量池(RuntimeConstantPool)是方法区的一部分。Class文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池表(ConstantPoolTable)，**用于存放编译期生成的各种字面量与符号引用**，这部分内容将在类加载后存放到方法区的运行时常量池中。
-
 
 
 # JVM运行时数据区
@@ -242,6 +238,10 @@ public class Singleton {
 
 **如果说收集算法是内存回收的方法论，那么垃圾收集器就是内存回收的具体实现。**
 
+
+
+# 垃圾收集器
+
 ## Garbage First(G1)收集器
 
 Garbage First（简称G1）收集器是垃圾收集器技术发展历史上的里程碑式的成果，它开创了收集器面向局部收集的设计思路和基于Region的内存布局形式。早在JDK7刚刚确立项目目标、Oracle公司制定的JDK 7 RoadMap里面，G1收集器就被视作JDK 7中HotSpot虚拟机的一项重要进化特征。从JDK6 Update 14开始就有Early Access版本的G1收集器供开发人员实验和试用，但由此开始G1收集器的“实验状态”（Experimental）持续了数年时间，直至JDK 7 Update 4，Oracle才认为它达到足够成熟的商用 程度，移除了“Experimental”的标识；到了JDK 8 Update 40的时候，**G1提供并发的类卸载的支持**，补全了其计划功能的最后一块拼图。这个版本以后的G1收集器才被Oracle官方称为“全功能的垃圾收集器”（Fully-Featured Garbage Collector）。
@@ -382,6 +382,16 @@ Java HotSpot(TM) 64-Bit Server VM warning: Option UseConcMarkSweepGC was depreca
 
 
 
+### ZGC中垃圾回收算法流程
+
+**标记（mark）**：从根集合出发，标记活跃对象；此时内存中存在活跃对象和已死亡对象。
+
+**转移（relocate）**：把活跃对象转移（复制）到新的内存上，原来的内存空间可以回收。
+
+**重定位（remap）**：因为对象的内存地址发生了变化，所以所有指向对象老地址的指针都要调整到对象新的地址上。
+
+
+
 CMS使用针对于三色标级使用的是增量更新
 
 什么是 JMX
@@ -400,7 +410,27 @@ JMX 全称为 Java Management Extensions，翻译过来就是 Java 管理扩展�
 
 
 
-### 对象创建
+### ZGC垃圾回收触发时机
+
+1. **基于分配速率的自适应算法：**通过-XX:ZAllocationSpikeTolerance参数控制阈值大小，该参数默认2，数值越大，越早的触发GC，一般在堆使用率达到95百分以上才触发GC
+2. **基于固定时间间隔：**适应应对突然流量场景。流量平稳变化时，自适应算法可能在堆使用率达到95%以上才触发GC。
+3. **主动触发规则：**类似于固定间隔规则，但时间间隔不固定，是ZGC自行算出来的时机，我们的服务因为已经加了基于固定时间间隔的触发机制，所以通过-XX:-ZProactive参数将该功能关闭，以免GC频繁，影响服务可用性。 日志中关键字是“Proactive”
+4. **预热规则：**服务刚启动时出现，一般不需要关注。日志中关键字是“Warmup”。
+5. **外部触发：**代码中显式调用System.gc()触发。 日志中关键字是“System.gc()”。
+6. **元数据分配触发：**元数据区不足时导致，一般不需要关注。 日志中关键字是“Metadata GC Threshold”。
+7. **阻塞内存分配请求触发：**当垃圾来不及回收，垃圾将堆占满时，会导致部分线程阻塞。我们应当避免出现这种触发方式。日志中关键字是“Allocation Stall（分配摊位）”。
+
+
+
+### ZGC参数设优化建议
+
+1. 堆大小（GC日志中看到Allocation Stall，通常可以认为对空间偏小或者ConcGCThreads数偏小）
+2. ParallelGCThreads：是设置STW任务的GC线程数目，默认为CPU个数的60%
+3. ConcGCThreads：是并发阶段GC线程的数目，默认为CPU个数的12.5%
+
+
+
+# 对象创建
 
 ​		Java是一门面向对象的编程语言，Java程序运行过程中无时无刻都有对象被创建出来。在语言层面 上，创建对象通常(例外:复制、反序列化)仅仅是一个new关键字而已，而在虚拟机中，对象(文中讨论的对象限于普通Java对象，不包括数组和Class对象等)的创建又是怎样一个过程呢?
 
@@ -425,8 +455,13 @@ JMX 全称为 Java Management Extensions，翻译过来就是 Java 管理扩展�
 JVM的常量池主要有以下几种：
 
 - class文件常量池
+
 - 运行时常量池
+
+  ​		运行时常量池(RuntimeConstantPool)是方法区的一部分。Class文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池表(ConstantPoolTable)，**用于存放编译期生成的各种字面量与符号引用**，这部分内容将在类加载后存放到方法区的运行时常量池中。
+
 - 字符串常量池
+
 - 基本类型包装类常量池
 
 ![image.png](https://segmentfault.com/img/bVcMZDj)
@@ -668,7 +703,7 @@ System.out.println(i);
 | -XX:+HandlePromotionFailure        | 是否允许新生代收集担保，避免直接full gc                      |
 | -XX:ParallelGCThreads              | 设置并行GC进行内存回收的线程数                               |
 | -XX:GCTimeRatio                    | GC时间占总时间的比列，默认值为99，即允许1%的GC时间，仅在使用Parallel Scavenge 收集器时有效 |
-| -XX:MaxGCPauseMillis               | 设置GC的最大停顿时间，在Parallel Scavenge 收集器下有效       |
+| -XX:MaxGCPauseMillis               | 设置GC的最大停顿时间，Parallel Scavenge和G1                  |
 | -XX:CMSInitiatingOccupancyFraction | 设置CMS收集器在老年代空间被使用多少后触发垃圾收集，默认值为68%，JDK6时改为92%，仅在CMS收集器时有效，-XX:CMSInitiatingOccupancyFraction=70 |
 | -XX:+UseCMSCompactAtFullCollection | 由于CMS收集器会产生碎片，此参数设置在垃圾收集器后是否需要一次内存碎片整理过程，仅在CMS收集器时有效 |
 | -XX:+CMSFullGCBeforeCompaction     | 设置CMS收集器在进行若干次垃圾收集后再进行一次内存碎片整理过程，通常与UseCMSCompactAtFullCollection参数一起使用 |
@@ -692,6 +727,9 @@ System.out.println(i);
 | -XX:G1MixedGCLiveThresholdPercent  | 默认为85%，低于阈值才会回收该region，超过回收意义不大        |
 | -XX:G1MixedGCCountTarget           | 在一次回收过程中指定做几次筛选回收(默认8次)                  |
 | -XX:G1HeapWastePercent             | 默认5%，混合回收达到阈值停止回收                             |
+| -XX:+PrintGCDetails                | 打印GC详细日志。                                             |
+| -XX:+PrintGCTimeStamps             | 输出GC的时间戳（以基准时间的形式）                           |
+| -XX:+PrintGCDateStamps             | 输出GC的时间戳（以日期的形式，如 2017-09-04T21:53:59.234+0800） |
 
 `Client、Server模式默认GC` 
 

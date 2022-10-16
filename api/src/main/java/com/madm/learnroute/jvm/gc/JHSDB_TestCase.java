@@ -3,6 +3,7 @@ package com.madm.learnroute.jvm.gc;
 import org.openjdk.jol.info.ClassLayout;
 
 /**
+ * HSDB是一款GUI调试工具，可用于调试JVM运行时数据，从而进行故障排除。
  * -XX:+UseCompressedOops 允许对象指针压缩。
  * -XX:+UseCompressedClassPointers 允许类指针压缩。
  * <p>
