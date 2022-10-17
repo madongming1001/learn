@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * VM options:
  * -XX:-PrintGC
- * -XX:+PrintSafepointStatistics
+ * -XX:+PrintSafepointStatistics deprecated
  *
  * @author dongming.ma
  * @date 2022/10/20 11:17
@@ -25,7 +25,6 @@ public class SafePointPractice {
             }
             System.out.println(Thread.currentThread().getName() + "执行结束!");
         };
-
         Thread t1 = new Thread(runnable);
         Thread t2 = new Thread(runnable);
         t1.start();
