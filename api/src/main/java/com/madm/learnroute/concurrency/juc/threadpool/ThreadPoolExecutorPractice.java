@@ -28,7 +28,9 @@ public class ThreadPoolExecutorPractice {
     }
 
     public static void main(String[] args) {
-        System.out.println(Integer.parseInt("111111", 2));
+        System.out.println(Long.toBinaryString(4294967296l));
+        System.out.println(Integer.MAX_VALUE);
+        System.out.println(Integer.toBinaryString(2147483647));
 
         AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
         System.out.println(Integer.toBinaryString(ctl.get()));
@@ -37,7 +39,7 @@ public class ThreadPoolExecutorPractice {
         System.out.println(Integer.toBinaryString((1 << 16) - 1));
         // 1111111111111111
         System.out.println(Integer.toBinaryString(0xFFFF));
-
+        //1111111111111111
         System.out.println(Integer.toBinaryString(65535));
         System.out.println(Integer.parseInt("111111111111", 2));
 
