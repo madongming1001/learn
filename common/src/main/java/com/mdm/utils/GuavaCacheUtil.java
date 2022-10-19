@@ -5,7 +5,7 @@ import com.google.common.cache.CacheBuilder;
 
 import java.util.concurrent.TimeUnit;
 
-public class LocalCacheUtil {
+public class GuavaCacheUtil {
 
     static Cache<String, String> myMap;
 
