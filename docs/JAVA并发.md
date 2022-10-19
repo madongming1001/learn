@@ -1318,3 +1318,14 @@ ObjectMonitor::ObjectMonitor() {
 # ReentrantLock为什么非公平比公平快
 
 在激烈竞争的情况下，非公平锁的性能高于公平锁的性能的一个原因是：在恢复一个被挂起的线程与该线程真正开始运行之间存在着严重的延迟。假设线程A持有一个锁，并且线程B请求这个锁。由于这个锁已被线程A持有，因此B将被挂起。当A释放锁时，B将被唤醒，因此会再次尝试获取锁。与此同时，如果C也请求这个锁，那么C很可能会在B被完全唤醒之前获得、使用以及释放这个锁。这样的情况是一个"双赢"的局面：B获得锁的时刻并没有推迟，C更早地获得了锁，并且吞吐量也获得了提高。
+
+
+
+# Thread的Run运行过程
+
+​		JavaThread的启动最终都要通过一个native方法java.lang.Thread#start0()完成的，这个方法经过解释器的native_entry入口，调用到了JVM_StartThread()函数。其中的static void thread_entry(JavaThread* thread, TRAPS)函数中会调用JavaCalls::call_virtual()函数。JavaThread最终会通过JavaCalls::call_virtual()函数来调用字节码中的run()方法。
+
+# 线程的两种状态
+
+线程有两种状态，在任何一个时间点上，线程是可结合的（joinable），或者是分离的（detached）。 一个可结合的线程能够被其他线程收回其资源和杀死； 相反，一个分离的线程是不能被其他线程回收或杀死的，它的存储器资源在它终止时由系统自动释放。
+
