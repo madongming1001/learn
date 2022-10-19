@@ -36,9 +36,7 @@ public class GenerateSqlFromEntity {
         //Class annotationType = null;
         //XmlElement xmlElement = null;
 
-        StringBuilder stb = null;
-        stb = new StringBuilder(50);
-
+        StringBuilder stb = new StringBuilder(50);
         if (tableName == null || tableName.equals("")) {
             // 未传表明默认用类名
             tableName = obj.getName();

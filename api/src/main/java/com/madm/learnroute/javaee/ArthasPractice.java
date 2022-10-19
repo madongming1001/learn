@@ -5,14 +5,18 @@ import java.util.HashSet;
 public class ArthasPractice {
 
     private static HashSet hashSet = new HashSet();
+    private static volatile boolean viability = true;
+
 
     public static void main(String[] args) {
         //模拟CPU过高
-        cpuHigh();
+//        cpuHigh();
         // 模拟线程死锁
         deadThread();
         // 不断的向 hashSet 集合增加数据
-        addHashSetThread();
+//        addHashSetThread();
+        while (viability) System.out.println("111");
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> viability = false));
     }
 
     /**

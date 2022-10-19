@@ -16,7 +16,7 @@
 
 ## 方法区
 
-方法区(MethodArea)与Java堆一样，是各个线程共享的内存区域，它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等数据。虽然《Java虚拟机规范》中把方法区描述为堆的一个逻辑部分，但是它却有一个别名叫作“非堆”(Non-Heap)，目的是与Java堆区分开来。
+方法区(MethodArea)与Java堆一样，是各个线程共享的内存区域，**它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等数据。**虽然《Java虚拟机规范》中把方法区描述为堆的一个逻辑部分，但是它却有一个别名叫作“非堆”(Non-Heap)，目的是与Java堆区分开来。
 
 在JDK6的时候HotSpot开发团队就有放弃永久代，逐步改为采用本地内存(NativeMemory)来实现方法区的计划了，到了JDK7的HotSpot，已经把原本放在永久代的**字符串常量池、静态变量**等移出，而到了JDK8，终于完全废弃了永久代的概念，改用与JRockit、J9一样在本地内存中实现的元空间(Meta-space)来代替，把JDK7中永久代还剩余的内容(主要是类型信息)全部移到元空间中。
 
@@ -467,7 +467,7 @@ JVM的常量池主要有以下几种：
 
 
 1. 每个class的字节码文件中都有一个常量池，里面是编译后即知的该class会用到的`字面量`与`符号引用`，这就是`class文件常量池`。JVM加载class，会将其类信息，包括class文件常量池置于方法区中。
-2. class类信息及其class文件常量池是字节码的二进制流，它代表的是一个类的静态存储结构，JVM加载类时，需要将其转换为方法区中的`java.lang.Class`类的对象实例；同时，会将class文件常量池中的内容导入`运行时常量池`。
+2. **class类信息及其class文件常量池是字节码的二进制流**，它代表的是一个类的静态存储结构，JVM加载类时，**需要将其转换为方法区中的`java.lang.Class`类的对象实例**；同时，会将class文件常量池中的内容导入`运行时常量池`。
 3. 运行时常量池中的常量对应的内容只是字面量，比如一个"字符串"，它还不是String对象；当Java程序在运行时执行到这个"字符串"字面量时，会去`字符串常量池`里找该字面量的对象引用是否存在，存在则直接返回该引用，不存在则在Java堆里创建该字面量对应的String对象，并将其引用置于字符串常量池中，然后返回该引用。
 4. Java的基本数据类型中，除了两个浮点数类型，其他的基本数据类型都在各自内部实现了常量池，但都在[-128~127]这个范围内。
 
@@ -545,6 +545,8 @@ iload_1 //读取局部变量表变量写入到操作数栈 （1）
 istore_1 //弹出操作数栈元素写入到局部变量表 （2）
   
 iinc 1 by 1 //局部变量表中的变量进行自增操作,此时局部变量表中i=1
+
+ldc //从常量池中取值压入到栈顶
 ```
 
 ```java
@@ -949,3 +951,47 @@ MethodHandle详解：https://juejin.cn/post/6844904177131323406
 ## init和clinit区别
 
 参考文章：https://blog.csdn.net/u013309870/article/details/72975536
+
+
+
+
+
+# 调优工具
+
+## JPS
+
+**原理：**Java进程在创建的时候，会生成相应的文件，进程相关的信息会写入到该文件中。Windows下默认路径是C:\Users\username\AppData\Local\Temp\hsperfdata_username（注意，AppData是隐藏目录），Linux下默认路径是/tem/hsperfdata_username。
+
+## jstat
+
+Jstat是JDK自带的一个轻量级小工具。全称“Java Virtual Machine statistics monitoring tool”，它位于java的bin目录下，主要利用JVM内建的指令对Java应用程序的资源和性能进行实时的命令行的监控，包括了对Heap size和垃圾回收状况的监控。可见，Jstat是轻量级的、专门针对JVM的工具。
+
+**原理：**PerfData文件
+Windows下默认理解是C:\Users\username\AppData\Local\Temp\hsperfdata_username
+Linux下默认路径是/tmp/hsperfdata_username
+
+
+
+# String到底创建的了几个对象
+
+参考文章：https://blog.csdn.net/qq_44507430/article/details/106752421
+
+
+
+#  String字符串判断
+
+“?”+si ，si+"?" , si+sj 都会底层new StringBuilder() 调用完append()之后在调用toString()
+
+```java
+@Override
+@HotSpotIntrinsicCandidate
+public String toString() {
+    // Create a copy, don't share the array
+    return isLatin1() ? StringLatin1.newString(value, 0, count)
+                      : StringUTF16.newString(value, 0, count);
+}
+```
+
+参考文章：https://blog.csdn.net/qq_44507430/article/details/106733368?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522166618541516782391862491%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=166618541516782391862491&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-1-106733368nullnull.142
+
+**注：**因此Javac编译器会对String连接做自动优化。在JDK 5之前，字符串加法会转化为**StringBuffer**对象的连续append()操作，在JDK 5及以后的版本中，会转化为**StringBuilder**对象的连续append()操作。 

@@ -6,7 +6,7 @@ package com.madm.learnroute.javaee;
  */
 public class StringEqualsPractice {
     public static void main(String[] args) {
-//        String abc = new String("abc");
+        String abc = new String("abc");
 //        String abc1 = new String("abc");
 //        System.out.println(abc == abc1);
 
