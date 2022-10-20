@@ -16,7 +16,7 @@
 
 ## 方法区
 
-方法区(MethodArea)与Java堆一样，是各个线程共享的内存区域，**它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等数据。**虽然《Java虚拟机规范》中把方法区描述为堆的一个逻辑部分，但是它却有一个别名叫作“非堆”(Non-Heap)，目的是与Java堆区分开来。
+方法区(MethodArea)与Java堆一样，是各个线程共享的内存区域，**它用于存储已被虚拟机加载的类型信息、常量、静态变量（jdk1.7已经把他移动到堆中与对象放在一起）、即时编译器编译后的代码缓存等数据。**虽然《Java虚拟机规范》中把方法区描述为堆的一个逻辑部分，但是它却有一个别名叫作“非堆”(Non-Heap)，目的是与Java堆区分开来。
 
 在JDK6的时候HotSpot开发团队就有放弃永久代，逐步改为采用本地内存(NativeMemory)来实现方法区的计划了，到了JDK7的HotSpot，已经把原本放在永久代的**字符串常量池、静态变量**等移出，而到了JDK8，终于完全废弃了永久代的概念，改用与JRockit、J9一样在本地内存中实现的元空间(Meta-space)来代替，把JDK7中永久代还剩余的内容(主要是类型信息)全部移到元空间中。
 
@@ -689,47 +689,51 @@ System.out.println(i);
 
 # 垃圾收集相关的常用参数
 
-| 参数                               | 描述                                                         |
-| ---------------------------------- | ------------------------------------------------------------ |
-| -XX:+UseSerialGC                   | Jvm运行在Client模式下的默认值，打开此开关后，使用Serial + Serial Old的收集器组合进行内存回收 |
-| -XX:+UseParNewGC                   | 打开此开关后，使用ParNew + Serial Old的收集器进行垃圾回收    |
-| -XX:+UseConcMarkSweepGC            | 使用ParNew + CMS +  Serial Old的收集器组合进行内存回收，Serial Old作为CMS出现“Concurrent Mode Failure”失败后的后备收集器使用。 |
-| -XX:+UseParallelGC                 | Jvm运行在Server模式下的默认值，打开此开关后，使用Parallel Scavenge +  Serial Old的收集器组合进行回收 |
-| -XX:+UseParallelOldGC              | 使用Parallel Scavenge +  Parallel Old的收集器组合进行回收    |
-| -XX:SurvivorRatio                  | 新生代中Eden区域与Survivor区域的容量比值，默认为8，代表Eden:Subrvivor = 8:1:1 |
-| -XX:PretenureSizeThreshold         | 直接晋升到老年代对象的大小，设置这个参数后，大于这个参数的对象将直接在老年代分配（**只针对Serial和ParNew两款新生代收集器有效**）不知道为什么UseAdaptiveSizePolicy函数也有这个功能 |
-| -XX:MaxTenuringThreshold           | 晋升到老年代的对象年龄，每次Minor GC之后，年龄就加1，当超过这个参数的值时进入老年代 |
-| -XX:UseAdaptiveSizePolicy          | 动态调整java堆中各个区域的大小以及进入老年代的年龄（Parallel Scavenge 收集器专有） |
-| -XX:+HandlePromotionFailure        | 是否允许新生代收集担保，避免直接full gc                      |
-| -XX:ParallelGCThreads              | 设置并行GC进行内存回收的线程数                               |
-| -XX:GCTimeRatio                    | GC时间占总时间的比列，默认值为99，即允许1%的GC时间，仅在使用Parallel Scavenge 收集器时有效 |
-| -XX:MaxGCPauseMillis               | 设置GC的最大停顿时间，Parallel Scavenge和G1                  |
-| -XX:CMSInitiatingOccupancyFraction | 设置CMS收集器在老年代空间被使用多少后触发垃圾收集，默认值为68%，JDK6时改为92%，仅在CMS收集器时有效，-XX:CMSInitiatingOccupancyFraction=70 |
-| -XX:+UseCMSCompactAtFullCollection | 由于CMS收集器会产生碎片，此参数设置在垃圾收集器后是否需要一次内存碎片整理过程，仅在CMS收集器时有效 |
-| -XX:+CMSFullGCBeforeCompaction     | 设置CMS收集器在进行若干次垃圾收集后再进行一次内存碎片整理过程，通常与UseCMSCompactAtFullCollection参数一起使用 |
-| -XX:+UseFastAccessorMethods        | 原始类型优化                                                 |
-| -XX:+DisableExplicitGC             | 是否关闭手动System.gc                                        |
-| -XX:+CMSParallelRemarkEnabled      | 降低标记停顿                                                 |
-| -XX:LargePageSizeInBytes           | 内存页的大小不可设置过大，会影响Perm的大小，-XX:LargePageSizeInBytes=128m |
-| -XX:+HeapDumpOnOutOfMemoryError    | 表示当JVM发生OOM时，自动生成DUMP文件。                       |
-| -XX:NewRatio                       | 默认2表示新生代占年老代的1/2，占整个堆内存的1/3。            |
-| -XX:+PrintCommandLineFlags         | 该参数打印传递给虚拟机的显式和隐式参数。                     |
-| -XX:+PrintVMOptions                | 该参数表示程序运行时，打印虚拟机接受到的命令行显式参数。     |
-| -XX:+PrintFlagsFinal               | 该参数会打印所有的系统参数的值。                             |
-| -XX:+G1HeapRegionSize              | 设置Region的大小，取值范围1MB～32MB，且应为2的N次幂，默认将整堆划分为2048个分区 |
-| -XX:+UseG1GC                       | 使用G1收集器，JDK9默认                                       |
-| -XX:ParallelGCThreads              | 指定GC工作的线程数量                                         |
-| -XX:G1NewSizePercent               | 新生代内存初始空间(默认整堆5%，值配置整数，默认就是百分比)   |
-| -XX:G1MaxNewSizePercent            | 新生代内存最大空间默认60%                                    |
-| -XX:TargetSurvivorRatio            | 动态年龄判断                                                 |
-| -XX:MaxTenuringThreshold           | 最大年龄阈值15                                               |
-| -XX:InitiatingHeapOccupancyPercent | 老年代占用空间达到整堆内存阈值(默认45%)                      |
-| -XX:G1MixedGCLiveThresholdPercent  | 默认为85%，低于阈值才会回收该region，超过回收意义不大        |
-| -XX:G1MixedGCCountTarget           | 在一次回收过程中指定做几次筛选回收(默认8次)                  |
-| -XX:G1HeapWastePercent             | 默认5%，混合回收达到阈值停止回收                             |
-| -XX:+PrintGCDetails                | 打印GC详细日志。                                             |
-| -XX:+PrintGCTimeStamps             | 输出GC的时间戳（以基准时间的形式）                           |
-| -XX:+PrintGCDateStamps             | 输出GC的时间戳（以日期的形式，如 2017-09-04T21:53:59.234+0800） |
+| 参数                                  | 描述                                                         |
+| ------------------------------------- | ------------------------------------------------------------ |
+| -XX:+UseSerialGC                      | Jvm运行在Client模式下的默认值，打开此开关后，使用Serial + Serial Old的收集器组合进行内存回收 |
+| -XX:+UseParNewGC                      | 打开此开关后，使用ParNew + Serial Old的收集器进行垃圾回收    |
+| -XX:+UseConcMarkSweepGC               | 使用ParNew + CMS +  Serial Old的收集器组合进行内存回收，Serial Old作为CMS出现“Concurrent Mode Failure”失败后的后备收集器使用。 |
+| -XX:+UseParallelGC                    | Jvm运行在Server模式下的默认值，打开此开关后，使用Parallel Scavenge +  Serial Old的收集器组合进行回收 |
+| -XX:+UseParallelOldGC                 | 使用Parallel Scavenge +  Parallel Old的收集器组合进行回收    |
+| -XX:SurvivorRatio                     | 新生代中Eden区域与Survivor区域的容量比值，默认为8，代表Eden:Subrvivor = 8:1:1 |
+| -XX:PretenureSizeThreshold            | 直接晋升到老年代对象的大小，设置这个参数后，大于这个参数的对象将直接在老年代分配（**只针对Serial和ParNew两款新生代收集器有效**）不知道为什么UseAdaptiveSizePolicy函数也有这个功能 |
+| -XX:MaxTenuringThreshold              | 晋升到老年代的对象年龄，每次Minor GC之后，年龄就加1，当超过这个参数的值时进入老年代 |
+| -XX:UseAdaptiveSizePolicy             | 动态调整java堆中各个区域的大小以及进入老年代的年龄（Parallel Scavenge 收集器专有） |
+| -XX:+HandlePromotionFailure           | 是否允许新生代收集担保，避免直接full gc                      |
+| -XX:ParallelGCThreads                 | 设置并行GC进行内存回收的线程数                               |
+| -XX:GCTimeRatio                       | GC时间占总时间的比列，默认值为99，即允许1%的GC时间，仅在使用Parallel Scavenge 收集器时有效 |
+| -XX:MaxGCPauseMillis                  | 设置GC的最大停顿时间，Parallel Scavenge和G1                  |
+| -XX:CMSInitiatingOccupancyFraction    | 设置CMS收集器在老年代空间被使用多少后触发垃圾收集，默认值为68%，JDK6时改为92%，仅在CMS收集器时有效，-XX:CMSInitiatingOccupancyFraction=70 |
+| -XX:+UseCMSCompactAtFullCollection    | 由于CMS收集器会产生碎片，此参数设置在垃圾收集器后是否需要一次内存碎片整理过程，仅在CMS收集器时有效 |
+| -XX:+CMSFullGCBeforeCompaction        | 设置CMS收集器在进行若干次垃圾收集后再进行一次内存碎片整理过程，通常与UseCMSCompactAtFullCollection参数一起使用 |
+| -XX:+UseFastAccessorMethods           | 原始类型优化                                                 |
+| -XX:+DisableExplicitGC                | 是否关闭手动System.gc                                        |
+| -XX:+CMSParallelRemarkEnabled         | 降低标记停顿                                                 |
+| -XX:LargePageSizeInBytes              | 内存页的大小不可设置过大，会影响Perm的大小，-XX:LargePageSizeInBytes=128m |
+| -XX:+HeapDumpOnOutOfMemoryError       | 表示当JVM发生OOM时，自动生成DUMP文件。                       |
+| -XX:NewRatio                          | 默认2表示新生代占年老代的1/2，占整个堆内存的1/3。            |
+| -XX:+PrintCommandLineFlags            | 该参数打印传递给虚拟机的显式和隐式参数。                     |
+| -XX:+PrintVMOptions                   | 该参数表示程序运行时，打印虚拟机接受到的命令行显式参数。     |
+| -XX:+PrintFlagsFinal                  | 该参数会打印所有的系统参数的值。                             |
+| -XX:+G1HeapRegionSize                 | 设置Region的大小，取值范围1MB～32MB，且应为2的N次幂，默认将整堆划分为2048个分区 |
+| -XX:+UseG1GC                          | 使用G1收集器，JDK9默认                                       |
+| -XX:ParallelGCThreads                 | 指定GC工作的线程数量                                         |
+| -XX:G1NewSizePercent                  | 新生代内存初始空间(默认整堆5%，值配置整数，默认就是百分比)   |
+| -XX:G1MaxNewSizePercent               | 新生代内存最大空间默认60%                                    |
+| -XX:TargetSurvivorRatio               | 动态年龄判断                                                 |
+| -XX:MaxTenuringThreshold              | 最大年龄阈值15                                               |
+| -XX:InitiatingHeapOccupancyPercent    | 老年代占用空间达到整堆内存阈值(默认45%)                      |
+| -XX:G1MixedGCLiveThresholdPercent     | 默认为85%，低于阈值才会回收该region，超过回收意义不大        |
+| -XX:G1MixedGCCountTarget              | 在一次回收过程中指定做几次筛选回收(默认8次)                  |
+| -XX:G1HeapWastePercent                | 默认5%，混合回收达到阈值停止回收                             |
+| -XX:+PrintGCDetails                   | 打印GC详细日志。                                             |
+| -XX:+PrintGCTimeStamps                | 输出GC的时间戳（以基准时间的形式）                           |
+| -XX:+PrintGCDateStamps                | 输出GC的时间戳（以日期的形式，如 2017-09-04T21:53:59.234+0800） |
+| -XX:+PrintGCApplicationStoppedTime    | 打印GC时，应用停顿时间                                       |
+| -XX:+PrintGCApplicationConcurrentTime | GC时打印应用执行时间                                         |
+| -XX:+PrintSafepointStatistics         |                                                              |
+| -XX:PrintSafepointStatisticsCount     |                                                              |
 
 `Client、Server模式默认GC` 
 
@@ -995,3 +999,32 @@ public String toString() {
 参考文章：https://blog.csdn.net/qq_44507430/article/details/106733368?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522166618541516782391862491%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=166618541516782391862491&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-1-106733368nullnull.142
 
 **注：**因此Javac编译器会对String连接做自动优化。在JDK 5之前，字符串加法会转化为**StringBuffer**对象的连续append()操作，在JDK 5及以后的版本中，会转化为**StringBuilder**对象的连续append()操作。 
+
+
+
+# Oopmap生成的时机
+
+1. 在类加载过程中就会进行记录，HotSpot 就将对象内存布局之中什么偏移量上数值是一个什么样的类型的数据这些信息存放到 OopMap 中。
+2. 在**JIT编译的时候也会在一些特定的位置记录下OopMap**，记录了执行到该方法的某条指令的时候，栈上和寄存器里哪些位置是引用，每个方法可能会有好多个OopMap，这是根据特定位置来决定的，这个特定位置会把这个方法分会好几块，每一块都有一个OopMap。
+
+两个都会在safepoint里面生成或记录，
+
+1. 循环的末尾
+2. 方法临返回前
+3. 抛异常的位置
+
+# safepoint生成的时机
+
+1. 在解释器里每条字节码的边界都可以是一个 safepoint，因为 HotSpot 的解释器总是很容易的找出完整的 “state of execution”。
+
+2. JIT 编译的代码里，HotSpot 会在所有方法的临返回之前，以及所有非 counted loop 的循环的回跳之前放置 safepoint。
+
+   HotSpot 的 JIT 编译器不但会生成机器码，还会额外在每个 safepoint 生成一些 “调试符号信息”，以便 VM 能找到所需要的 “state of execution”。为 GC 生成的符号信息是 OopMap，指出栈上和寄存器哪里有 GC 管理的指针。
+
+   Java 线程特性也是基于 Safepoint 实现的，那就是 `Thread.interrup()`，线程只有运行到 Safepoint 才知道是否 `interrupted`
+
+## 为啥需要 Stop The World
+
+​		有时候我们需要全局所有线程进入 Safepoint 这样才能统计出那些内存可以回收用于 GC，以及回收不再使用的代码清理 CodeCache，以及执行某些 Java instrument 命令或者 JDK 工具，例如：jstack 打印堆栈就需要 Stop The World 获取当前所有线程快照。
+
+参考文章：https://www.modb.pro/db/170162
