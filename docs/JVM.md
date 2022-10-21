@@ -1056,3 +1056,6 @@ HotSpot虚拟机为了避免安全点过多带来过重的负担，对循环还�
 ​		有时候我们需要全局所有线程进入 Safepoint 这样才能统计出那些内存可以回收用于 GC，以及回收不再使用的代码清理 CodeCache，以及执行某些 Java instrument 命令或者 JDK 工具，例如：jstack 打印堆栈就需要 Stop The World 获取当前所有线程快照。
 
 参考文章：https://www.modb.pro/db/170162
+
+
+

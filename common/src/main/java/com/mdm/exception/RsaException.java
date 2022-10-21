@@ -6,10 +6,8 @@ package com.mdm.exception;
  */
 public class RsaException extends RuntimeException {
 
-    private final String message;
-
     public RsaException(String message) {
-        this.message = message;
+        super(message);
     }
 
 }

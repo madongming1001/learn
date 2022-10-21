@@ -207,26 +207,7 @@ public class Jmm03_CodeVisibility {
 复制代码
 ```
 
-结合前面介绍的数据同步八大原子操作，我们来分析下：
 
-**线程A启动后**：
-
-- 第一步：执行read操作，**作用于主内存**，将变量`initFlag`从主内存拷贝一份，这时候还没有放到工作内存中，而是放在了总线里。如下图
-- 第二步：执行load操作，**作用于工作内存**，将上一步拷贝的变量，放入工作内存中；
-- 第三步：执行use（使用）操作，**作用于工作内存**，把工作内存中的变量传递给执行引擎，对于线程A来说，执行引擎会判断`initFlag = true`吗？不等于，循环一直进行
-
-执行过程如下图： ![img](https:////p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5a230e6313b54cd3ba0d72b423ddda81~tplv-k3u1fbpfcp-watermark.awebp)
-
-**线程B启动后**：
-
-- 第一步：执行read操作，**作用于主内存**，从主内存拷贝`initFlag`变量，这时候拷贝的变量还没有放到工作内存中，这一步是为了load做准备；
-- 第二步：执行load操作，**作用于工作内存**，将拷贝的变量放入到工作内存中；
-- 第三步：执行use操作，**作用于工作内存**，将工作内存的变量传递给执行引擎，执行引擎判断`while(!initFlag)`,那么执行循环体；
-- 第四步：执行assign操作，**作用于工作内存**，把从执行引擎接收的值赋值给工作内存的变量，即设置 `inifFlag = true` ;
-- 第五步：执行store操作，**作用于工作内存**，将工作内存中的变量 `initFlag = true` 传递给主内存；
-- 第六步：执行write操作，**作用于工作内存**，将变量写入到主内存中。
-
-![img](https:////p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7cb28e17265f4be692cb47616a6ea75a~tplv-k3u1fbpfcp-watermark.awebp)
 
 ### volatile 无法保证原子性
 
@@ -238,10 +219,9 @@ public class VolatileVisibility {
         i++;
     }
 }
-复制代码
 ```
 
-在并发场景下， `i` 变量的任何改变都会立马反应到其他线程中，但是如此存在多线程同时调用 increase() 方法的化，就会出现线程安全问题，毕竟 `i++` 操作并不具备原子性，该操作是先读取值，然后写回一个新值，相当于原来的值加上1，分两部完成。如果第二个线程在第一个线程读取旧值和写回新值期间读取 `i` 的值，那么第二个线程就会于第一个线程一起看到同一个值，并执行相同值的加1操作，这也就造成了线程安全失败，因此对于 increase 方法必须使用 synchronized 修饰，以便保证线程安全，需要注意的是一旦使用 synchronized 修饰方法后，由于 sunchronized 本身也具备于 volatile 相同的特性，即可见性，因此在这样的情况下就完全可以省去 volatile 修饰变量。
+在并发场景下， `i` 变量的任何改变都会立马反应到其他线程中，但是如此存在多线程同时调用 increase() 方法的化，就会出现线程安全问题，**毕竟 `i++` 操作并不具备原子性**，该操作是先读取值，然后写回一个新值，相当于原来的值加上1，分两部完成。如果第二个线程在第一个线程读取旧值和写回新值期间读取 `i` 的值，那么第二个线程就会于第一个线程一起看到同一个值，并执行相同值的加1操作，这也就造成了线程安全失败，因此对于 increase 方法必须使用 synchronized 修饰，以便保证线程安全，需要注意的是一旦使用 synchronized 修饰方法后，由于 sunchronized 本身也具备于 volatile 相同的特性，即可见性，因此在这样的情况下就完全可以省去 volatile 修饰变量。
 
 **案例**：起了10个线程，每个线程加到1000，10个线程，一共是10000
 
@@ -284,18 +264,11 @@ public class Jmm04_CodeAtomic {
 
 而实际结果,不到10000, 原因是: 有并发操作.  这时候, 如果我在counter上加关键字volatile, 可以保证原子性么?
 
-```java
-private volatile static int counter = 0;
-复制代码
-```
-
 我们发现, 依然不是10000, 这说明volatile不能保证原子性. 
 
 每个线程, 只有一个操作, counter++, 为什么不能保证原子性呢? 
 
-其实counter++不是一步完成的. 他是分为多步完成的. 我们用下面的图来解释 ![img](https:////p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ce37d6fdd2a7403a826e3dfd8a60637e~tplv-k3u1fbpfcp-watermark.awebp) 线程A通过read, load将变量加载到工作内存, 通过user将变量发送到执行引擎, 执行引擎执行counter++，这时线程B启动了, 通过read, load将变量加载到工作内存, 通过user将变量发送到执行引擎, 然后执行复制操作assign, stroe, write操作. 我们看到这是经过了n个步骤. 虽然看起来就是简单的一句话. 
-
-当线程B执行store将数据回传到主内存的时候, 同时会通知线程A, 丢弃counter++, 而这时counter已经自加了1, 将自加后的counter丢掉, 就导致总数据少1. 
+其实counter++不是一步完成的. 他是分为多步完成的. 我们用下面的图来解释 ![img](https:////p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ce37d6fdd2a7403a826e3dfd8a60637e~tplv-k3u1fbpfcp-watermark.awebp) **原因：**线程A通过read, load将变量加载到工作内存, 通过use将变量发送到执行引擎, 执行引擎执行counter++，这时线程B启动了, 通过read, load将变量加载到工作内存, 通过user将变量发送到执行引擎, 然后执行复制操作assign, stroe, write操作. 我们看到这是经过了n个步骤. 虽然看起来就是简单的一句话。当线程B执行store将数据回传到主内存的时候, 同时会通知线程A, 丢弃counter++, 而这时counter已经自加了1, 将自加后的counter丢掉, 就导致总数据少1。
 
 ### volatile 禁止重排优化
 
@@ -310,9 +283,43 @@ Intel 硬件提供了一系列的内存屏障，主要有：
 3. mfence，是一种全能型的屏障，具备 lfence 和 sfence 的能力；
 4. Lock 前缀，Lock 不是一种内存屏障，但是它能完成类似内存屏障的功能。**Lock 会对 CPU总线和高速缓存加锁**，可以理解为 CPU 指令级的一种锁。它后面可以跟 ADD、ADC、AND、BTC、BTR、BTS、CMPXCHG、CMPXCH8B、DEC、INC、NEG、NOT、OR、SBB、SUB、XOR、XADD、and XCHG 等指令。
 
+#### 指令重排种类
+
+1）**编译器重排序。**编译器在不改变单线程程序语义的前提下，可以重新安排语句的执行顺序。
+
+2）**指令级并行的重排序。**现代处理器采用了**指令级并行技术**来将多条指令重叠执行。如果不存在数据依赖性，处理器可以改变语句对应机器指令的执行顺序。
+
+3）**内存系统的重排序。**由于处理器使用缓存和读/写缓冲区，这使得加载和存储操作看上去可能是在乱序执行。
+
+**参考文章：**https://heapdump.cn/article/3291930
+
+**时钟周期：**由CPU时钟定义的定长时间间隔，是CPU工作的最小时间单位，也称节拍脉冲或T周期，完成一个基本动作所需要的时间。
+
+#### JSR是什么
+
+Java分为三个体系，分别为Java SE（J2SE，Java2Platform Standard Edition，标准版），JavaEE（J2EE，Java 2Platform, Enterprise Edition，企业版），Java ME（J2ME，Java 2Platform Micro Edition，微型版）。
+
+JSR是Java Specification Requests的缩写，意思是“Java 规范提案”。是指向JCP(JavaCommunity Process)提出新增一个标准化技术规范的正式请求。
+
+JCP由SUN于1995年创造Java的非正式过程，演进到如今有数百名来自世界各地Java代表成员一同监督Java发展的正式程序 。
+
+**过程：**事物发展变化所经过的程序。
+
+#### Java有两个编译期
+
+1、调用javac命令将java代码编译成java字节码
+
+2、Unix派系平台上调用gcc命令将openjdk源码编译成汇编代码
+
+编译期间java中所谓的指令重排主要是说编译openjdk时的指令重排，将Java代码编译成Java字节码是没有做指令重排的。即你加不加volatile，生成的字节码文件是一样的。
+
+![image-20221020183547383](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221020183547383.png)
+
+类属性在JVM中存储的时候会有一个属性：Access flags。JVM在运行的时候就是通过该属性来判断操作的类属性有没有加volatile修饰。
+
 #### JVM的内存屏障
 
-不同硬件实现内存屏障的方式不同，Java 内存模型屏蔽了这些底层硬件平台的差异，由 JVM 来为不同平台生产相应的机器码。JVM中提供了四类内存屏障指令：
+为了保证内存可见性，java编译器在生成指令序列的适当位置会插入内存屏障指令来禁止指定类型的处理器重排序。
 
 | **指令示例**             | **说明**                                                     |
 | ------------------------ | ------------------------------------------------------------ |
@@ -320,6 +327,8 @@ Intel 硬件提供了一系列的内存屏障，主要有：
 | Store1;StoreStore;Store2 | 在store2及其后的写操作执行前，保证store1的写操作已刷新到主内存 |
 | Load1;LoadStore;Store2   | 在store2及其后的写操作执行前，保证load1的读操作已经读取结束  |
 | Store1;StoreLoad;Load2   | 在store1的写操作已刷新到主内存之后，load2及其后的读操作才能执行 |
+
+**以常见的x86处理器来说，它是拥有相对较强的处理器内存模型，只允许Store-Load重排序。也因此在x86处理器的时候会省略掉这3种操作类型对应的内存屏障，在x86中，JMM仅需在volatile写后面插入一个StoreLoad屏障即可正确实现volatile写-读的内存语义。**
 
 内存屏障，又称**内存栅栏**，是一个CPU指令，它的作用有两个：
 
@@ -329,6 +338,8 @@ Intel 硬件提供了一系列的内存屏障，主要有：
 由于编译器和处理器都能执行指令重排优化。如果在指令间插入一条 `Memory Barrier` 则会高速编译器和CPU，不管什么指令都不能和这条 Memory Barrier 指令重排序，也就是说通过插入内存屏障禁止在内存屏障前后的指令执行重排序优化。
 
 Memory Barrier 的另外一个作用是强制刷出各种 CPU 的缓存数据，因此任何 CPU 上的线程都能读取到这些数据的最新版本。
+
+**注：通过内存屏障来实现来进制处理器进行重排序**
 
 总之，volatile 变量正是通过内存屏障实现其内存中的语义，即可见性和禁止重排优化。
 
@@ -385,70 +396,17 @@ private volatile static DoubleCheckLock instance;
 复制代码
 ```
 
-### volatile 内存语义的实现
+#### **lock指令的主要作用**
 
-前面提到过重排序分为**编译器重排序**和**处理器重排序**。为来实现 volatile 内存语义，JMM 会分别限制这两种类型的重排序类型。
-
-下面是JMM针对编译器制定的 volatile 重排序规则表。
-
-| 第一个操作 | 第二个操作：普通读写 | 第二个操作：volatile读 | 第二个操作：volatile写 |
-| ---------- | -------------------- | ---------------------- | ---------------------- |
-| 普通读写   | 可以重排             | 可以重排               | 不可以重排             |
-| volatile读 | 不可以重排           | 不可以重排             | 不可以重排             |
-| volatile写 | 可以重排             | 不可以重排             | 不可以重排             |
-
-举例来说，第二行最后一个单元格的意思是：在程序中，当第一个操作为普通变量的读或者写时，如果第二个操作为 volatile 写，则编译器不能重排序这两个操作。
-
-从上图可以看出：
-
-- 当第二个操作是 volatile 写时，不管第一个操作是什么，都不能重排序。这个规则确保了 volatile 写之前的操作不会被编译器重排序到 volatile 写之后。
-- 当第一个操作是 volatile 读时，不管第二个操作是什么，都不能重排序。这个规则确保了 volatile 读之后的操作不会被编译器重排序到 volatie 读之前。
-- 当第一个操作是 volatile 写，第二个操作是 volatile 读或写时，不能重排序。
-
-为了实现 volatile 的内存语义，编译在生成字节码时，会在指令序列中插入内存屏障来禁止特定类型的处理器重排序。对于编译器来说，发现一个最优布置来最小化插入屏障的总数几乎不可能。为此，JMM 采取保守策略。下面是基于保守策略的JMM内存屏障插入策略。
-
-- 在每个volatile写操作的前面插入一个StoreStore屏障；
-- 在每个volatile写操作的后面插入一个StoreLoad屏障；
-- 在每个volatile读操作的后面插入一个LoadLoad屏障；
-- 在每个volatile读操作的后面插入一个LoadStore屏障；
-
-上述内存屏障插入策略非常保守，但它可以保证在任一处理器平台，任意的程序中都能得到正确的 volatile 内存语义。
-
-下面是保守策略下，**volatile 写插入**内存屏障后生成的指令序列示意图 ![img](https:////p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/64c7ea5dd48c4acda794818c6098ec5d~tplv-k3u1fbpfcp-watermark.awebp) 上图中 StoreStore 屏障可以保证在volatile 写之前，其前面的所有普通写操作已经对任意处理器可见来。这是因为StoreStore屏障将保障上面所有的普通写在 volatile 写之前刷新到主内存。
-
-这里比较有意思的是，volatile 写后面的 StoreLoad 屏障。此屏障的作用是避免 volatile 写与后面可能有的 volatile 读/写操作重排序。因为编译器常常无法准确判断在一个 volatile 写的后面十分需要插入一个 StoreLoad 屏障（比如，一个volatile写之后方法立即return）。为来保证能正确实现 volatile 的内存语义，JMM 在采取了保守策略：在每个 volatile 写的后面，或者每个 volatile 读的前面插入一个 StoreLoad 屏障。从整体执行效率的角度考虑，JMM最终选择了在每个 volatile 写的后面插入一个 StoreLoad 屏障，因为volatile写-读内存语义的常见使用模式是：一个写线程写 volatile 变量，多个线程读同一个 volatile 变量。当读线程的数量大大超过写线程时，选择在 volatile 写之后插入 StoreLoad 屏障将带来可观的执行效率的提升。从这里可以看到JMM在实现上的一个特点：首先确保正确性，然后再去追求执行效率。
-
-下图是在保守策略下，**volatile 读插入**内存屏障后生成的指令序列示意图 ![img](https:////p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4a0aeb2602834459b5de3dd4b04a61fc~tplv-k3u1fbpfcp-watermark.awebp) 上图中 LoadLoad 屏障用来禁止处理器把上面的 volatile读 与下面的普通读重排序。LoadStore 屏障用来禁止处理器把上面的volatile读与下面的普通写重排序。
-
-上述 volatile写 和 volatile读的内存屏障插入策略非常保守。在实际执行时，只要不改变 volatile写-读的内存语义，编译器可以根据具体情况省略不必要的屏障。
-
-下面通过具体的示例代码进行说明。
+lock指令要等待前面的指令全部执行完、会把buffered write刷入主存,把store buffer中缓存的修改刷入L1 cache，再通过MESI保证可见性。
 
 ```java
-class VolatileBarrierExample {
-       int a;
-       volatile int v1 = 1;
-       volatile int v2 = 2;
-       void readAndWrite() {
-           int i = v1;　　    // 第一个volatile读
-           int j = v2;    　  // 第二个volatile读
-           a = i + j;         // 普通写
-           v1 = i + 1;     　 // 第一个volatile写
-           v2 = j * 2;    　  // 第二个 volatile写
-       }
-}
-复制代码
+Locking operations typically operate like I/O operations in that they wait for all previous instructions to complete and for all buffered writes to drain to memory
 ```
 
-针对 `readAndWrite()` 方法，编译器在生成字节码时可以做如下的优化。 ![img](https:////p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/030be50cd49346ceadbe7402e0a308ee~tplv-k3u1fbpfcp-watermark.awebp) 注意，最后的 StoreLoad 屏障不能省略。因为第二个 volatile 写之后，方法立即 return。此时编译器可能无法准确判断断定后面十分会有 volatile 读或写，为了安全起见，编译器通常会在这里插入一个 StoreLoad 屏障。
 
-上面的优化针对任意处理器平台，由于不同的处理器有不同“松紧度”的处理器内存模型，内存屏障的插入还可以根据具体的处理器内存模型继续优化。以X86处理完为例，上图中除最后的 StoreLoad 屏障外，其他的屏障都会被省略。
 
-前面保守策略下的 volatile 读和写，在 X86 处理器平台可以优化如下图所示。X86处理器仅会对读-写操作做重排序。X86 不会对读-读、读-写 和 写-写 做重排序，因此在 X86 处理器中会省略掉这3种操作类型对应的内存屏障。在 X86 中，JMM仅需在 volatile 写后面插入一个 StoreLoad 屏障即可正确实现 volatile写-读的内存语义，这意味着在 X86 处理器中，volatile写的开销比volatile读的开销会大很多（因为执行StoreLoad的屏障开销会比较大）。 ![img](https:////p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/560f433e63a04914aa214f385034cc1d~tplv-k3u1fbpfcp-watermark.awebp)
-
-##  
-
-链接：https://juejin.cn/post/6893430262084927496
+参考文章（具有用干货满满）：https://blog.csdn.net/qq_18433441/article/details/108585843
 
 # CPU有缓存一致性协议(MESI)，为何还需要volatile
 
@@ -514,6 +472,10 @@ flag ：标识了缓存行的状态，具体状态划分见下边MESI协议
 index ：用于定位到拉链散列表中的某个 bucket
 tag ：用于定位 cache entry
 offerset ：用于定位一个变量在 cache line 中的位置
+
+#### 查看缓存行大小
+
+sysctl hw.cachelinesize 128
 
 参考文章：https://blog.csdn.net/m0_38017860/article/details/122988861
 
@@ -730,12 +692,12 @@ void executedOnCpu1() {
 
 **参考文章**：https://zhuanlan.zhihu.com/p/84500221
 
-# [Java中的native是如何实现的（JNI）](https://segmentfault.com/a/1190000022812099)
+# Java中的native是如何实现的（JNI）
+
+**参考文章：**https://segmentfault.com/a/1190000022812099
 
 # CPU核心数
 
 **参考文章**：https://zhuanlan.zhihu.com/p/86855590
-
-
 
 **多处理器一般是采用基于总线监听机制的高速缓存一致性协议。在NUMA系统中，通常选择基于目录(directory-based)的方式来维护Cache的一致性。**
