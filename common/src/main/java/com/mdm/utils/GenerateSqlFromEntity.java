@@ -1,8 +1,6 @@
 package com.mdm.utils;
 
 
-import com.mdm.pojo.User;
-
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
