@@ -20,6 +20,7 @@ public class TwoDimensionalArraySum {
         System.out.println("Array初始化完毕....");
 
         long sum = 0L;
+        //不符合空间局部性
         long start = System.currentTimeMillis();
         for (int r = 0; r < RUNS; r++) {
             for (int i = 0; i < DIMENSION_1; i++) {//DIMENSION_1=1024*1024
@@ -32,6 +33,7 @@ public class TwoDimensionalArraySum {
         System.out.println("sum1:"+sum);
 
         sum = 0L;
+        //符合空间局部性
         start = System.currentTimeMillis();
         for (int r = 0; r < RUNS; r++) {
             for (int j=0;j<DIMENSION_2;j++) {//6
