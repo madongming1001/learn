@@ -852,7 +852,7 @@ MergedAnnotationsCollection
 //@component类
 ```
 
-
+参考文章：https://mp.weixin.qq.com/s/7arh4sVH1mlHE0GVVbZ84Q
 
 # 为什么sprinboot启动服务就不退出？
 
