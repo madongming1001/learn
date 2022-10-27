@@ -1,4 +1,4 @@
-# 目录
+目录
 
 ## Explain（执行计划）
 
@@ -27,298 +27,45 @@ set session optimizer_switch='derived_merge=on'; #关闭mysql5.7新特性对衍�
 1. **explain**：会在 explain 的基础上额外提供一些查询优化的信息。紧随其后通过 show warnings 命令可 以得到优化后的查询语句，从而看出优化器优化了什么。额外还有 filtered 列，是一个半分比的值，rows filtered/100 可以**估算**出将要和 explain 中前一个表进行连接的行数（前一个表指 explain 中的id值比当前表id值小的 表）
 2. **explain partitions**：相比 explain 多了个 partitions 字段，如果查询是基于分区表的话，会显示查询将访问的分 区。
 
-## 不走索引例子
-
-**1、联合索引第一个字段用范围不会走索引*
-
-**2**、**in和or在表数据量比较大的情况会走索引，在表记录不多的情况下会选择全表扫描*
-
-**3**、**like kk% 一般情况下会走索引 5.6所有下推优化**
-
-**4**、**不在索引列上做任何操作（计算、函数、（自动or手动）类型转换），会导致索引失效而转向全表扫描*
-
-**5**、**（！=或者<>），**not in **，**not exists **的时候无法使用索引会导致全表扫描**
-
-**6**、**is null,is not null 一般情况下也无法使用索引*
-
-**7**、**<***小于、***>***大于、***<=**、**>=***这些，mysql内部优化器会根据检索比例、表大小等多个因素整体评估是否使用索引**
-
-**8**、**.like以通配符开头（**'$abc...'）mysql索引失效会变成全表扫描操作
-
-
-
-### **数据溢出**
-
-​		如果我们定义一个表，表中只有一个 VARCHAR 字段，如下：CREATE TABLE test_varchar( c VARCHAR(60000) )然后往这个字段插入 60000 个字符，会发生什么？前边说过，MySQL 中磁盘和内存交互的基本单位是页，也就是说 MySQL 是以页为基本单位来管理存储空间的，我们的记录都会被分配到某个页中存储。而一个页的大小一般是 16KB，也就是 16384 字节，而一个 VARCHAR(M)类型的列就最多可以存储 65532 个字节，这样就可能造成一个页存放不了一条记录的情况。
-
-​		在 Compact 和 Redundant 行格式中，对于占用存储空间非常大的列，在记录的真实数据处只会存储该列的该列的前 768 个字节的数据，然后把剩余的数据分散存储在几个其他的页中，记录的真实数据处用 20 个字节存储指向这些页的地址。这个过程也叫做行溢出，存储超出 768 字节的那些页面也被称为溢出页。
-
-​		Dynamic 和 Compressed 行格式，不会在记录的真实数据处存储字段真实数据的前 768 个字节，而是把所有的字节都存储到其他页面中，只在记录的真实数据处存储其他页面的地址。
-
-
-
-### **索引页格式**
-
-​		前边我们简单提了一下页的概念，它是 InnoDB 管理存储空间的基本单位，一个页的大小一般是 16KB。
-
-​		InnoDB 为了不同的目的而设计了许多种不同类型的页，存放我们表中记录的那种类型的页自然也是其中的一员，官方称这种存放记录的页为索引（INDEX）页，不过要理解成数据页也没问题，毕竟存在着聚簇索引这种索引和数据混合的东西。
-
-![image-20220208190217690](noteImg/image-20220208190217690.png)
-
-![InnoDB architecture diagram showing in-memory and on-disk structures. In-memory structures include the buffer pool, adaptive hash index, change buffer, and log buffer. On-disk structures include tablespaces, redo logs, and doublewrite buffer files.](noteImg/innodb-architecture.png)
-
-**区（**extent**）**
-
-​		表空间中的页可以达到 2^32个页，实在是太多了，为了更好的管理这些页面，InnoDB 中还有一个区（英文名：extent）的概念。对于 16KB 的页来说，连续的64 个页就是一个区，也就是说一个区默认占用 1MB 空间大小。不论是系统表空间还是独立表空间，都可以看成是由若干个区组。
-
-​		每 256个区又被划分成一个**组**
-
-
-
-## Innodb三大特性
-
-### doublewrite buffer
-
-​		 InnoDB 在表空间上的 128 个页（2 个区，extend1 和extend2），大小是 2MB。
-
-​		InnoDB 的页大小一般是 16KB，其数据校验也是针对这 16KB 来计算的，将数据写入到磁盘是以页为单位进行操作的。而操作系统写文件是以 4KB 作为单位的，那么每写一个 InnoDB 的页到磁盘上，操作系统需要写 4 个块。
-
-​		而计算机硬件和操作系统，在极端情况下（比如断电）往往并不能保证这一操作的原子性，16K 的数据，写入 4K 时，发生了系统断电或系统崩溃，只有一部分写是成功的，这种情况下会产生 partial page write（部分页写入）问题。
-
-​		为了解决部分页写入问题，当 MySQL 将脏数据 flush到数据文件的时候, 先使用 memcopy 将脏数据复制到内存中的一个区域（也是2M），之后通过这个内存区域再分 2 次，每次写入 1MB 到系统表空间，然后马上调用 fsync 函数，同步到磁盘上。在这个过程中是顺序写，开销并不大，在完成 doublewrite 写入后，再将数据写入各数据文件文件，这时是离散写入。所以在正常的情况下, MySQL 写数据页时，会写两遍到磁盘上，第一遍是写到doublewrite buffer，第二遍是写到真正的数据文件中。如果发生了极端情况（断电），InnoDB 再次启动后，发现了一个页数据已经损坏，那么此时就可以从doublewrite buffer 中进行数据恢复了。
-
-### Buffer Pool
-
-​		我们知道，对于使用 InnoDB 作为存储引擎的表来说，不管是用于存储用户数据的索引（包括聚簇索引和二级索引），还是各种系统数据，都是以页的形式存放在表空间中的，而所谓的表空间只不过是 InnoDB 对文件系统上一个或几个实际文件的抽象，也就是说我们的数据说到底还是存储在磁盘上的。但是磁盘的速度慢，所以 InnoDB 存储引擎在处理客户端的请求时，当需要访问某个页的数据时，就会把完整的页的数据全部加载到内存中，也就是说即使我们只需要访问一个页的一条记录，那也需要先把整个页的数据加载到内存中。将整个页加载到内存中后就可以进行读写访问了，在进行完读写访问之后并不着急把该页对应的内存空间释放掉，而是将其缓存起来，这样将来有请求再次访问该页面时，就可以省去磁盘 IO 的开销了。
-
-**free链表**	
-
-​	buffer存储格式都是按照每个存储页都对应一个控制块而所有的控制块在前，存储页在后，如果新来一个页如何辨别哪里是空位置可以存放呢，就用到了**free链表**会把空闲的所有控制块都放入到**free链表**
-
-![image-20220208201845717](noteImg/image-20220208201845717.png)
-
-我们其实是根据表空间号 + 页号来定位一个页的，所以我们可以用表空间号 + 页号作为 key，缓存页作为 value 创建一个哈希表，在需要访问某个页的数据时，先从哈希表中根据表空间号 + 页号看看有没有应的缓存页，如果有，直接使用该缓存页就好，如果没有，那就从 free 链表中选一个空闲的缓存页，然后把磁盘中对应的页加载到该缓存页的位置。
-
-**flush链表**
-
-​		如果我们修改了 Buffer Pool 中某个缓存页的数据，那它就和磁盘上的页不一致了，这样的缓存页也被称为脏页（英文名：dirty page）所以，需要再创建一个存储脏页的链表，凡是修改过的缓存页对应的控制块都会作为一个节点加入到一个链表中，因为这个链表节点对应的缓存页都是需要被刷新到磁盘上的，所以也叫 flush 链表。
-
-​		如果非常多的使用频率偏低的页被同时加载到 Buffer Pool 时，可能会把那些使用频率非常高的页从 Buffer Pool 中淘汰掉。
-
-**LRU优化**
-
-因为有这两种情况的存在，所以 InnoDB 把这个 LRU 链表按照一定比例分成两截，
-
-分别是：
-
-一部分存储使用频率非常高的缓存页，所以这一部分链表也叫做热数据，或者称 young 区域。
-
-另一部分存储使用频率不是很高的缓存页，所以这一部分链表也叫做冷数据，或者称 old 区域。
-
-![image-20220208203449226](noteImg/image-20220208203449226.png)
-
-所以在对某个处在 old 区域的缓存页进行第一次访问时就在它对应的控制块中记录下来这个访问时间，如果后续的访问时间与第一次访问的时间在某个时间间隔内，那么该页面就不会被从 old 区域移动到 young 区域的头部，否则将它移动到 young 区域的头部。上述的这个间隔时间是由系统变量innodb_old_blocks_time 控制的：
-
-![image-20220208203815265](noteImg/image-20220208203815265.png)
-
-这个 innodb_old_blocks_time 的默认值是 1000，它的单位是毫秒，也就意味着对于从磁盘上被加载到 LRU 链表的 old 区域的某个页来说，如果第一次和最后一次访问该页面的时间间隔小于 1s（很明显在一次全表扫描的过程中，多次访问一个页面中的时间不会超过 1s），那么该页是不会被加入到 young 区域的，当然，像innodb_old_blocks_pct 一样，我们也可以在服务器启动或运行时设置innodb_old_blocks_time 的值，这里需要注意的是，如果我们把innodb_old_blocks_time 的值设置为 0，那么每次我们访问一个页面时就会把该页面放到 young 区域的头部。
-
-​		综上所述，正是因为将 LRU 链表划分为 young 和 old 区域这两个部分，又添加了 **innodb_old_blocks_time** 这个系统变量，才使得预读机制和全表扫描造成的缓存命中率降低的问题得到了遏制，因为用不到的预读页面以及全表扫描的页面都只会被放到 old 区域，而不影响 young 区域中的缓存页。
-
-**LRU 链表的极致优化**
-
-把young区域等分为4份，当处于前4分之1的时候不需要移动到young头部，后4分之三需要，优化目的在于减少对于同步所带来的开销损耗。
-
-实际上，MySQL 在冷热分离的基础上还做了一层优化。
-
-当一个缓存页处于热数据区域的时候，我们去访问这个缓存页，这个时候我们真的有必要把它移动到热点数据区域的头部吗？
-
-从代码的角度来看，将链表中的数据移动到头部，实际上就是修改元素的指针指向，这个操作是非常快的。但是为了安全起见，在修改链表的时候，我们需要对链表加上锁，否则容易出现并发问题。
-
-当并发量大的时候，因为要加锁，会存在锁竞争，每次移动显然效率就会下降。因此 MySQL 针对这一点又做了优化，如果一个缓存页处于热数据区域，且在热数据区域的前 1/4 区域（注意是热数据区域的 1/4，不是整个链表的 1/4），那么当访问这个缓存页的时候，就不用把它移动到热数据区域的头部；如果缓存页处于热数据的后 3/4 区域，那么当访问这个缓存页的时候，会把它移动到热数据区域的头部。
-
-**参考文章：https://zhuanlan.zhihu.com/p/142087506**
-
-**刷新脏页到磁盘**
-
-后台有专门的线程每隔一段时间负责把脏页刷新到磁盘，这样可以不影响用户线程处理正常的请求。主要有两种刷新路径：
-
-1、从 LRU 链表的冷数据中刷新一部分页面到磁盘。
-
-2、从 flush 链表中刷新一部分页面到磁盘。
-
-
-
-### 自适应哈希索引
-
-​		InnoDB存储引擎除了我们前面所说的各种索引，还有一种自适应哈希索引，我们知 道B+树的查找次数,取决于B+树的高度,在生产环境中,B+树的高度一般为3~4层,故 需要3~4次的IO查询。 
-
-​		所以在InnoDB存储引擎内部自己去监控索引表，如果监控到某个索引经常用，那么 就认为是热数据，然后内部自己创建一个hash索引，称之为自适应哈希索引( Adaptive Hash Index,AHI)，创建以后，如果下次又查询到这个索引，那么直接通 过hash算法推导出记录的地址，直接一次就能查到数据，比重复去B+tree索引中查 询三四次节点的效率高了不少。 
-
-必须得是等值查询。
-
-### 预读
-
-​		InnoDB 提供了预读（英文名：read ahead）。所谓预读，就是 InnoDB认为执行当前的请求可能之后会读取某些页面，就预先把它们加载到 Buffer Pool中。根据触发方式的不同，预读又可以细分为下边两种：
-
-*线性预读*
-
-InnoDB 提供了一个系统变量 innodb_read_ahead_threshold，如果顺序访问了某个区（extent）的页面超过这个系统变量的值，**就会触发一次异步读取下一个区中全部的页面到 Buffer Pool 的请求**。这个 innodb_read_ahead_threshold 系统变量的值默认是 56，我们可以在服务器启动时通过启动参数或者服务器运行过程中直接调整该系统变量的值，取值范围是 0~64。
-
-*随机预读*
-
-如果 Buffer Pool 中已经缓存了某个区的 13 个连续的页面，不论这些页面是不是顺序读取的，都会触发一次异步读取本区中所有其他的页面到 Buffer Pool 的请求。InnoDB同时提供了innodb_random_read_ahead 系统变量，它的默认值为OFF。
-
-**show variables like '%_read_ahead%';**
-
-## 数据库范式
-
-目前关系数据库有六种范式：第一范式（
-
-1NF）、第二范式（2NF）、第三范式（3NF）、 巴斯-科德范式（BCNF）、第四范式(4NF）和第五范式（5NF，又称完美范式）。
-
-**数据库设计的第一范式*
-
-定义： 属于第一范式关系的所有属性都不可再分，即数据项不可分。 
-
-![image-20220208213231317](noteImg/image-20220208213231317.png)
-
-**数据库设计的第二范式*
-
-第二范式（2NF）要求数据库表中的每个实例或行必须可以被惟一地区分。通常在实现来 
-
-说，需要为表加上一个列，以存储各个实例的惟一标识。主键ID。
-
-
-
-**数据库设计的第三范式*
-
-指每一个非主属性既不部分依赖于也不传递依赖于业务主键，也就是在第二范式的基础 上消除了非主键对主键的传递依赖。
-
-
-
-### **反范式设计**
-
-​		所谓得反范式化就是为了性能和读取效率得考虑而适当得对数据库设计范式得要求进行 违反。允许存在少量得冗余，换句话来说反范式化就是使用空间来换取时间。
-
-
-
-### 三星索引
-
-索引将相关的记录放到一起则获得一星； （索引的扫描范围越小越好）
-
-如果索引中的数据顺序和查找中的排列顺序一致则获得二星； 
-
-如果索引中的列包含了查询中需要的全部列则获得三星。 （覆盖索引）
-
-
-
-## Mysql内部优化策略
-
-1、移除不必要的括号 
-
-2、常量传递（constant_propagation） 
-
-3、移除没用的条件（trivial_condition_removal） 
-
-4、表达式计算 
-
-
-
-## Mysql性能优化
-
-1、硬件优化
-
-2、Mysql调优
-
-1. 业务层-请求了不需要的数据
-2. 选择合适的存储引擎 Innodb MyISAM
-3. 查询性能优化 通过慢查询日志 slow_query_log
-4. 根据相爱年供应时间
-
-3、架构调优
-
-
-
-
-
-
-
-
-
-
-
-
-
-#### ID列
+#### **ID列**
 
 id列越大执行优先级越高，id相同则从上往下执行，id为NULL最后执行。
 
-#### Select_type列
+#### **Select_type列**
 
-#simple：简单查询。查询不包含子查询和union
-#primary 查询最外层的select
-#derived 包含在select中的子查询（不在from子句中）
-#subquery 包含在 from 子句中的子查询。MySQL会将结果存放在一个临时表中，也称为派生表（derived的英文含义）
-#union 在union中的第二个和随后的select
-explain select (select 1 from actor where id = 1) from (select from film where id = 1) der;
+1） SIMPLE：简单的SELECT，不实用UNION或者子查询。
+2） PRIMARY：最外层SELECT。
+3） UNION：第二层，在SELECT之后使用了UNION。
+4） DEPENDENT UNION：UNION语句中的第二个SELECT，依赖于外部子查询。
+5） UNION RESULT：UNION的结果。
+6） SUBQUERY：子查询中的第一个SELECT。
+7） DEPENDENT SUBQUERY：子查询中的第一个SELECT，取决于外面的查询。
+8） DERIVED：导出表的SELECT（FROM子句的子查询）
 
-#### table列
+#### **table列**
 
 显示explain正在执行哪一张表
 
 #### type列
 
-#### 8大查询类型
-
-关联类型或访问类型
 **null > system > const > eq_ref > ref > range > index > ALL**
-一般来说，得保证查询达到range级别，最好达到ref
+**一般来说，得保证查询达到range级别，最好达到ref**
 
-##### 1.Null
-
-​	mysql能够在优化阶段分解查询语句，在执行阶段用不着再访问表或索引。
-
-##### 2.const,system
-
-​	mysql能对查询的某部分进行优化并将其转化成一个常量,用于 primary key 或 unique key 的所有列与常数比较时，所以表最多有一个匹配行，读取1次，速度比较快。system是 const的特例，表里只有一条元组匹配时为system
-explain select from (select from film where id = 1) tmp;
-
-##### 3.eq_ref
-
-​	primary key 或 unique key 索引的所有部分被连接使用 ，最多只会返回一条符合条件的记录。这可能是在 const 之外最好的联接类型了，简单的 select 查询不会出现这种 type。
-
-##### 4.ref
-
-​	相比 eq_ref，不使用唯一索引，而是使用普通索引或者唯一性索引的部分前缀，索引要和某个值相比较，可能会找到多个符合条件的行。
-
-##### 5.range
-
-​	范围扫描通常出现在 in(), between ,> ,<, >= 等操作中。使用一个索引来检索给定范围的行。
-
-##### 6.index
-
-​	扫描全索引就能拿到结果，一般是扫描某个二级索引，这种扫描不会从索引树根节点开始快速查找，而是直接 对二级索引的叶子节点遍历和扫描，速度还是比较慢的，这种查询一般为使用覆盖索引，二级索引一般比较小，所以这种通常比ALL快一些。
-
-##### 7.ALL
-
-​	即全表扫描，扫描你的聚簇索引的所有叶子节点。通常情况下这需要增加索引来进行优化了。
+1. Null：mysql能够在优化阶段分解查询语句，在执行阶段用不着再访问表或索引。
+2. const,system：mysql能对查询的某部分进行优化并将其转化成一个常量,用于 primary key 或 unique key 的所有列与常数比较时，所以表最多有一个匹配行，读取1次，速度比较快。system是 const的特例，表里只有一条元组匹配时为system explain select from (select from film where id = 1) tmp;
+3. eq_ref：primary key 或 unique key 索引的所有部分被连接使用 ，最多只会返回一条符合条件的记录。这可能是在 const 之外最好的联接类型了，简单的 select 查询不会出现这种 type。
+4. ref：相比 eq_ref，不使用唯一索引，而是使用普通索引或者唯一性索引的部分前缀，索引要和某个值相比较，可能会找到多个符合条件的行。
+5. range：范围扫描通常出现在 in(), between ,> ,<, >= 等操作中。使用一个索引来检索给定范围的行。
+6. index：扫描全索引就能拿到结果，一般是扫描某个二级索引，这种扫描不会从索引树根节点开始快速查找，而是直接 对二级索引的叶子节点遍历和扫描，速度还是比较慢的，这种查询一般为使用覆盖索引，二级索引一般比较小，所以这种通常比ALL快一些。
+7. ALL：即全表扫描，扫描你的聚簇索引的所有叶子节点。通常情况下这需要增加索引来进行优化了。
 
 #### possible_keys列
 
-这一列显示查询可能使用哪些索引来查找。 
-
-explain 时可能出现 possible_keys 有列，而 key 显示 NULL 的情况，这种情况是因为表中数据不多，mysql认为索引 
-
-对此查询帮助不大，选择了全表查询。
+显示可能应用在这张表中的索引，一个或多个。查询涉及到的字段上若存在索引，则该索引将被列出，但不一定被查询实际使用
 
 #### key列
 
-这一列显示mysql实际采用哪个索引来优化对该表的访问。 
-
-如果没有使用索引，则该列是 NULL。如果想强制mysql使用或忽视possible_keys列中的索引，在查询中使用 force 
-
-index、ignore index。 
+实际使用的索引，如果为NULL，则没有使用索引。 如果没有使用索引，则该列是 NULL。如果想强制mysql使用或忽视possible_keys列中的索引，在查询中使用 force index、ignore index。 
 
 #### key_len列
 
@@ -330,9 +77,7 @@ index、ignore index。
 
 char(n)：如果存汉字长度就是 3n 字节 
 
-varchar(n)：如果存汉字则长度是 3n + 2 字节，加的2字节用来存储字符串长度，因为 
-
-varchar是变长字符串 
+varchar(n)：如果存汉字则长度是 3n + 2 字节，加的2字节用来存储字符串长度，因为varchar是变长字符串 
 
 数值类型
 
@@ -380,150 +125,366 @@ Using temporary：mysql需要创建一张临时表来处理查询。出现这种
 
 引来优化。 
 
-Using filesort：将用外部排序而不是索引排序，数据较小时从内存排序，否则需要在磁盘完成排序。这种情况下一 
+Using filesort：将用外部排序而不是索引排序，数据较小时从内存排序，否则需要在磁盘完成排序。这种情况下
 
-般也是要考虑使用索引来优化的。
+一般般也是要考虑使用索引来优化的。
 
 Select tables optimized away：使用某些聚合函数（比如 max、min）来访问存在索引的某个字段是
 
+Using MRR：Multi-Range Read 回表优化
+
+Using join buffer（Block nested Loop）在使用join连接被驱动表没有索引的情况下使用BNL
 
 
-#### mysql组件
 
-##### **连接器**
+# InnoDB行记录格式
 
-管理连接与权限校验
+## COMPACT
 
-客户端如果长时间不发送command到Server端，连接器就会自动将它断开。这个时间是由参数 wait_timeout 控制的，默认值 
+![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4beb83ce7efa4ed99596da1f82241e33~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp)
 
-是 8 小时。 
+## Redundant
+
+![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d0e85ebd3593473eb497f838c1cb038c~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp)
+
+## COMPRESSED 和 DYNAMIC 
+
+Compressed 和 Dynamic 行记录格式与 Compact 行记录格式是类似的，只不过在处理行溢出数据时有些区别。
+
+这两种格式采用完全的行溢出方式，数据页不会存储真实数据的前768字节，只存储20个字节的指针来指向溢出页。而实际的数据都存储在溢出页中，看起来就像下面这样：
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/76ef672336474d93b309077f7df324c4~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp)
+
+Compressed 与 Dynamic 相比，Compressed 存储的行数据会以zlib的算法进行压缩以节省空间，因此对于 BLOB、TEXT、VARCHAR 这类大长度类型的数据能够进行非常有效的存储。
+
+
+
+## VARCHAR类型
+
+一行数据，除了 TEXT、BLOB 等大对象类型，总长度最大 `65535字节`。而且这个 65535 最大长度是包含 `变长字段长度列表`、`NULL值列表` 的。
+
+`VARCHAR(M)` 中的 M 指的是字符长度，而不是字节长度，计算时，要用总长度除以字符集最大长度，例如 utf8mb4 字符集每个字符的最大长度为 4字节。
+
+VARCHAR 类型如果小于255字节，要在变长字段长度列表占 `1字节`，否则占 `2字节`；如果可为NULL，还要在NULL值列表占 `1字节`，不过这一个字节可以存8个可为NULL的列的状态。所以一个 VARCHAR(M) 的字节长度最大为 `65532字节`。
+
+## CHAR 数据类型
+
+我们一般会认为 `CHAR(M)` 是定长类型，M 与 VARCHAR(M) 中的 M 是一样的，**指的是字符的长度**。类型为CHAR(M)时，**对于长度不足的值会用空格来补足，就算存的是空值，也会用空格补足，查询的时候会去除首尾的空格，而VARCHAR就不会。**
+
+## 行溢出数据
+
+MySQL中磁盘和内存交互的基本单位是`页`，一个页的大小一般是`16KB`，也就是`16384字节`，而一个VARCHAR(M)类型的列最多可以存储`65532字节`，一些大对象如 TEXT、BLOB 可能存储更多的数据，这时一个页可能就存不了一条记录。这个时候就会发生`行溢出`，多的数据就会存到另外的`溢出页`中。
+
+InnoDB 规定一页至少存储两条记录，如果页中只能存放下一条记录，InnoDB存储引擎会自动将行数据存放到溢出页中。在一般情况下，InnoDB 的数据都是存放在 `FIL_PAGE_INDEX` 类型的数据页中的。但是当发生行溢出时，溢出的数据会存放到 `FIL_PAGE_TYPE_BLOB` 类型的溢出页中。
+
+当发生行溢出时，数据页只保存了前768字节的前缀数据，接着是20个字节的偏移量，指向行溢出页，大致如下图所示。
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/20da3f98a3ce4a2d89561ee7feff7e81~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp)
+
+**参考文章：**https://juejin.cn/post/6970934163973079048
+
+
+
+
+
+# InnoDB索引页格式
+
+​		前边我们简单提了一下页的概念，它是 InnoDB 管理存储空间的基本单位，一个页的大小一般是 16KB。
+
+​		InnoDB 为了不同的目的而设计了许多种不同类型的页，存放我们表中记录的那种类型的页自然也是其中的一员，官方称这种存放记录的页为索引（INDEX）页，不过要理解成数据页也没问题，毕竟存在着聚簇索引这种索引和数据混合的东西。
+
+![image-20220208190217690](noteImg/image-20220208190217690.png)
+
+![InnoDB architecture diagram showing in-memory and on-disk structures. In-memory structures include the buffer pool, adaptive hash index, change buffer, and log buffer. On-disk structures include tablespaces, redo logs, and doublewrite buffer files.](noteImg/innodb-architecture.png)
+
+**区（**extent**）**
+
+​		表空间中的页可以达到 2^32个页，实在是太多了，为了更好的管理这些页面，InnoDB 中还有一个区（英文名：extent）的概念。对于 16KB 的页来说，连续的64 个页就是一个区，也就是说一个区默认占用 1MB 空间大小。不论是系统表空间还是独立表空间，都可以看成是由若干个区组。
+
+​		每 256个区又被划分成一个**组**
+
+
+
+# Innodb三大特性
+
+### doublewrite
+
+​		**doublewrite是为了保证数据页的可靠性。避免发生部分写失效（partial page write）**
+
+Double Write 分为了两个组成部分：
+
+- 内存中的double write buffe 2M
+- 物理磁盘上共享表空间中连续的128个页，即2个区（extent），大小同样为2MB
+
+**表空间**
+
+- 共享表空间，来自多个不同表及其对应索引的数据可以保存在单个.ibd文件中。
+
+- 独立表空间，单个表的数据及其索引保存在一个.ibd文件中。
+
+因为存储引擎缓冲池内的数据页大小默认为16KB，我们都知道 Linux 会以页为单位管理[内存](https://so.csdn.net/so/search?q=内存&spm=1001.2101.3001.7020)，无论是将磁盘中的数据加载到内存中，还是将内存中的数据写回磁盘，操作系统都会以页面为单位进行操作，哪怕我们只向磁盘中写入一个字节的数据，我们也需要将整个页面中的全部数据刷入磁盘中。
+
+所以在进行刷盘操作时，就有可能发生如下场景：
+
+![img](https://ask.qcloudimg.com/http-save/7768581/bli4l4gekd.jpeg?imageView2/2/w/1620)
+
+由于重做日志redo log记录的是物理内容，比如那个页那个offset修改了什么数据，一旦数据页被破坏了redo log就作用不了了，所以在应用重做日志前，用户需要一个页的副本，当写入失效发生时，先通过页的副本来还原该页。
+
+**Double write崩溃恢复**
+
+![img](https://ask.qcloudimg.com/http-save/7768581/knfsxb02gp.jpeg?imageView2/2/w/1620)
+
+参考文章：https://cloud.tencent.com/developer/article/1739772
+
+### Buffer Pool
+
+​		我们知道，对于使用 InnoDB 作为存储引擎的表来说，不管是用于存储用户数据的索引（包括聚簇索引和二级索引），还是各种系统数据，都是以页的形式存放在表空间中的，而所谓的表空间只不过是 InnoDB 对文件系统上一个或几个实际文件的抽象，也就是说我们的数据说到底还是存储在磁盘上的。但是磁盘的速度慢，所以 InnoDB 存储引擎在处理客户端的请求时，当需要访问某个页的数据时，就会把完整的页的数据全部加载到内存中，也就是说即使我们只需要访问一个页的一条记录，那也需要先把整个页的数据加载到内存中。将整个页加载到内存中后就可以进行读写访问了，在进行完读写访问之后并不着急把该页对应的内存空间释放掉，而是将其缓存起来，这样将来有请求再次访问该页面时，就可以省去磁盘 IO 的开销了。
+
+**free链表**	
+
+​	buffer存储格式都是按照每个存储页都对应一个控制块而所有的控制块在前，存储页在后，如果新来一个页如何辨别哪里是空位置可以存放呢，就用到了**free链表**会把空闲的所有控制块都放入到**free链表**
+
+![image-20220208201845717](noteImg/image-20220208201845717.png)
+
+我们其实是根据表空间号 + 页号来定位一个页的，所以我们可以用表空间号 + 页号作为 key，缓存页作为 value 创建一个哈希表，在需要访问某个页的数据时，先从哈希表中根据表空间号 + 页号看看有没有应的缓存页，如果有，直接使用该缓存页就好，如果没有，那就从 free 链表中选一个空闲的缓存页，然后把磁盘中对应的页加载到该缓存页的位置。
+
+**flush链表**
+
+​		如果我们修改了 Buffer Pool 中某个缓存页的数据，那它就和磁盘上的页不一致了，这样的缓存页也被称为脏页（英文名：dirty page）所以，需要再创建一个存储脏页的链表，凡是修改过的缓存页对应的控制块都会作为一个节点加入到一个链表中，因为这个链表节点对应的缓存页都是需要被刷新到磁盘上的，所以也叫 flush 链表。
+
+​		如果非常多的使用频率偏低的页被同时加载到 Buffer Pool 时，可能会把那些使用频率非常高的页从 Buffer Pool 中淘汰掉。
+
+**刷新脏页到磁盘**
+
+后台有专门的线程每隔一段时间负责把脏页刷新到磁盘，这样可以不影响用户线程处理正常的请求。主要有两种刷新路径：
+
+1、从 LRU 链表的冷数据中刷新一部分页面到磁盘。
+
+2、从 flush 链表中刷新一部分页面到磁盘。
+
+**LRU优化**
+
+因为有这两种情况的存在，所以 InnoDB 把这个 LRU 链表按照一定比例分成两截，
+
+分别是：
+
+一部分存储使用频率非常高的缓存页，所以这一部分链表也叫做热数据，或者称 young 区域。
+
+另一部分存储使用频率不是很高的缓存页，所以这一部分链表也叫做冷数据，或者称 old 区域。
+
+![image-20220208203449226](noteImg/image-20220208203449226.png)
+
+所以在对某个处在 old 区域的缓存页进行第一次访问时就在它对应的控制块中记录下来这个访问时间，如果后续的访问时间与第一次访问的时间在某个时间间隔内，那么该页面就不会被从 old 区域移动到 young 区域的头部，否则将它移动到 young 区域的头部。上述的这个间隔时间是由系统变量innodb_old_blocks_time 控制的：
+
+![image-20220208203815265](noteImg/image-20220208203815265.png)
+
+这个 innodb_old_blocks_time 的默认值是 1000，它的单位是毫秒，也就意味着对于从磁盘上被加载到 LRU 链表的 old 区域的某个页来说，如果第一次和最后一次访问该页面的时间间隔小于 1s（很明显在一次全表扫描的过程中，多次访问一个页面中的时间不会超过 1s），那么该页是不会被加入到 young 区域的，当然，像innodb_old_blocks_pct 一样，我们也可以在服务器启动或运行时设置innodb_old_blocks_time 的值，这里需要注意的是，如果我们把innodb_old_blocks_time 的值设置为 0，那么每次我们访问一个页面时就会把该页面放到 young 区域的头部。
+
+​		**当从磁盘读取数据页后，会先将数据页存放到 LRU 链表冷数据区的头部，**如果这些缓存页在 1 秒之后被访问，那么就将缓存页移动到热数据区的头部；如果是 1 秒之内被访问，则不会移动，缓存页仍然处于冷数据区中。1 秒这个数值，是由参数 innodb_old_blocks_time 控制。
+
+​		当遇到全表扫描或者预读时，如果没有空闲缓存页来存放它们，那么将会淘汰一个数据页，**而此时淘汰地是冷数据区尾部的数据页**。冷数据区的数据就是不经常访问的，因此这解决了误将热点数据淘汰的问题。如果在 1 秒后，因全表扫描和预读机制额外加载进来的缓存页，仍然没有人访问，那么它们会一直待在冷数据区，当再需要淘汰数据时，首先淘汰地就是这一部分数据。
+
+至此，基于冷热分离优化后的 LRU 链表，完美解决了直接使用 LRU 链表带来的问题。
+
+​		综上所述，正是因为将 LRU 链表划分为 young 和 old 区域这两个部分，又添加了 **innodb_old_blocks_time** 这个系统变量，才使得预读机制和全表扫描造成的缓存命中率降低的问题得到了遏制，因为用不到的预读页面以及全表扫描的页面都只会被放到 old 区域，而不影响 young 区域中的缓存页。
+
+**LRU 链表的极致优化**
+
+把young区域等分为4份，当处于前4分之1的时候不需要移动到young头部，后4分之三需要，优化目的在于减少对于同步所带来的开销损耗。
+
+实际上，MySQL 在冷热分离的基础上还做了一层优化。
+
+当一个缓存页处于热数据区域的时候，我们去访问这个缓存页，这个时候我们真的有必要把它移动到热点数据区域的头部吗？
+
+从代码的角度来看，将链表中的数据移动到头部，实际上就是修改元素的指针指向，这个操作是非常快的。但是为了安全起见，在修改链表的时候，我们需要对链表加上锁，否则容易出现并发问题。
+
+当并发量大的时候，因为要加锁，会存在锁竞争，每次移动显然效率就会下降。因此 MySQL 针对这一点又做了优化，如果一个缓存页处于热数据区域，且在热数据区域的前 1/4 区域（注意是热数据区域的 1/4，不是整个链表的 1/4），那么当访问这个缓存页的时候，就不用把它移动到热数据区域的头部；如果缓存页处于热数据的后 3/4 区域，那么当访问这个缓存页的时候，会把它移动到热数据区域的头部。
+
+**参考文章：https://zhuanlan.zhihu.com/p/142087506**
+
+
+
+### 自适应哈希索引
+
+​		InnoDB存储引擎除了我们前面所说的各种索引，还有一种自适应哈希索引，我们知 道B+树的查找次数,取决于B+树的高度,在生产环境中,B+树的高度一般为3~4层,故 需要3~4次的IO查询。 
+
+​		所以在InnoDB存储引擎内部自己去监控索引表，如果监控到某个索引经常用，那么 就认为是热数据，然后内部自己创建一个hash索引，称之为自适应哈希索引( Adaptive Hash Index,AHI)，创建以后，如果下次又查询到这个索引，那么直接通 过hash算法推导出记录的地址，直接一次就能查到数据，比重复去B+tree索引中查 询三四次节点的效率高了不少。 
+
+必须得是等值查询。
+
+### 预读
+
+​		InnoDB 提供了预读（英文名：read ahead）。所谓预读，就是 InnoDB认为执行当前的请求可能之后会读取某些页面，就预先把它们加载到 Buffer Pool中。根据触发方式的不同，预读又可以细分为下边两种：
+
+*线性预读*
+
+InnoDB 提供了一个系统变量 innodb_read_ahead_threshold，如果顺序访问了某个区（extent）的页面超过这个系统变量的值，**就会触发一次异步读取下一个区中全部的页面到 Buffer Pool 的请求**。这个 innodb_read_ahead_threshold 系统变量的值默认是 56，我们可以在服务器启动时通过启动参数或者服务器运行过程中直接调整该系统变量的值，取值范围是 0~64。
+
+*随机预读*
+
+如果 Buffer Pool 中已经缓存了某个区的 13 个连续的页面，不论这些页面是不是顺序读取的，都会触发一次异步读取本区中所有其他的页面到 Buffer Pool 的请求。InnoDB同时提供了innodb_random_read_ahead 系统变量，它的默认值为OFF。
+
+**show variables like '%_read_ahead%';**
+
+## 数据库范式
+
+目前关系数据库有六种范式：第一范式（
+
+1NF）、第二范式（2NF）、第三范式（3NF）、 巴斯-科德范式（BCNF）、第四范式(4NF）和第五范式（5NF，又称完美范式）。
+
+**数据库设计的第一范式*
+
+定义： 属于第一范式关系的所有属性都不可再分，即数据项不可分。 
+
+![image-20220208213231317](noteImg/image-20220208213231317.png)
+
+**数据库设计的第二范式*
+
+第二范式（2NF）要求数据库表中的每个实例或行必须可以被惟一地区分。通常在实现来 
+
+说，需要为表加上一个列，以存储各个实例的惟一标识。主键ID。
+
+
+
+**数据库设计的第三范式*
+
+指每一个非主属性既不部分依赖于也不传递依赖于业务主键，也就是在第二范式的基础 上消除了非主键对主键的传递依赖。**不包含已在其它表中已包含的非主关键字信息。**
+
+
+
+### **反范式设计**
+
+​		所谓得反范式化就是为了性能和读取效率得考虑而适当得对数据库设计范式得要求进行 违反。允许存在少量得冗余，换句话来说反范式化就是使用空间来换取时间。
+
+
+
+### 三星索引
+
+索引将相关的记录放到一起则获得一星； （索引的扫描范围越小越好）
+
+如果索引中的数据顺序和查找中的排列顺序一致则获得二星； 
+
+如果索引中的列包含了查询中需要的全部列则获得三星。 （覆盖索引）
+
+
+
+## Mysql内部优化策略
+
+1、移除不必要的括号 
+
+2、常量传递（constant_propagation） 
+
+3、移除没用的条件（trivial_condition_removal） 
+
+4、表达式计算 
+
+
+
+## Mysql性能优化
+
+1、硬件优化
+
+2、Mysql调优
+
+1. 业务层-请求了不需要的数据
+2. 选择合适的存储引擎 Innodb MyISAM
+3. 查询性能优化 通过慢查询日志 slow_query_log
+4. 根据相爱年供应时间
+
+3、架构调优
+
+# Mysql组件
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/0d2070e8f84c4801adbfa03bda1f98d9.png)
+
+## 连接器
+
+**管理连接与权限校验**
+
+客户端如果长时间不发送command到Server端，连接器就会自动将它断开。这个时间是由参数 wait_timeout 控制的，默认值 是 8 小时。 28800秒
 
  show global variables like "wait_timeout"; 
 
-Lost connection to MySQL server during query
+Lost connection to MySQL server during query 查询期间丢失与 MySQL 服务器的连接
 
-开发当中我们大多数时候用的都是长连接,把连接放在Pool内进行管理，但是长连接有些时候会导致 MySQL 占用内存涨得特别 
+开发当中我们大多数时候用的都是长连接,把连接放在Pool内进行管理，但是长连接有些时候会导致 MySQL 占用内存涨得特别快，这是因为 MySQL 在执行过程中临时使用的内存是管理在连接对象里面的。这些资源会在连接断开的时候才释放。所以如果长连接累积下来，可能导致内存占用太大，被系统强行杀掉（OOM），从现象看就是 MySQL 异常重启了。 
 
-快，这是因为 MySQL 在执行过程中临时使用的内存是管理在连接对象里面的。这些资源会在连接断开的时候才释放。所以如 
-
-果长连接累积下来，可能导致内存占用太大，被系统强行杀掉（OOM），从现象看就是 MySQL 异常重启了。 
-
-怎么解决这类问题呢？ 
+**怎么解决这类问题呢？** 
 
 1、定期断开长连接。使用一段时间，或者程序里面判断执行过一个占用内存的大查询后，断开连接，之后要查询再重连。 
 
-2、如果你用的是 MySQL 5.7 或更新版本，可以在每次执行一个比较大的操作后，通过执行 mysql_reset_connection 来重新初始化连接资 
+2、如果你用的是 MySQL 5.7 或更新版本，可以在每次执行一个比较大的操作后，通过执行**mysql_reset_connection** 来重新初始化连接资源。这个过程不需要重连和重新做权限验证，但是会将连接恢复到刚刚创建完时的状态。 
 
-源。这个过程不需要重连和重新做权限验证，但是会将连接恢复到刚刚创建完时的状态。 
+**查询缓存（mysql8.0已经移除了查询缓存功能）**
 
-##### 查询缓存（**mysql8.0已经移除了查询缓存功能**）
+查询缓存按照理想来说是对于效率提升很好的一个手段，但是由于缓存失效的非常频繁，只要对一个表的更新，那这张表的所有缓存都会被清空一般也就长时间不被修改的表才用到缓存。而对于8.0之前有三个参数来决定query_cache_type缓存的使用
 
-查询缓存按照理想来说是对于效率提升很好的一个手段，但是由于缓存失效的非常频繁，只要对一个表的更新，那这张表的所有缓存都会被清空
+0代表关闭查询缓存
 
-一般也就长时间不被修改的表才用到缓存。
+1代表开启缓存
 
-而对于8.0之前有三个参数来决定query_cache_type缓存的使用
+2代表只有遇到关键字sql_cache关键字时才缓存
 
-0代表关闭查询缓存 1代表开启缓存，2代表只有遇到关键字sql_cache关键字时才缓存
+## 分析器
 
-##### 分析器
+如果没有命中查询缓存，就要开始真正执行语句了。首先，MySQL 需要知道你要做什么，因此需要对 SQL 语句做解析。
 
-###### 词法分析
+分析器先会做“词法分析”。你输入的是由多个字符串和空格组成的一条 SQL 语句，MySQL 需要识别出里面的字符串分别是什么，代表什么。
 
-对于一个个空格的sql需要区分出每个单词所代表的含义，比如select id from user 各个区分 作用 select 查询 id 列名 from user 从user表
+MySQL 从你输入的"select"这个关键字识别出来，这是一个查询语句。它也要把字符串“T”识别成“表名 T”，把字符串“ID”识别成“列 ID”。
 
-###### 语法分析
+做完了这些识别以后，就要做“语法分析”。根据词法分析的结果，语法分析器会根据语法规则，判断你输入的这个 SQL 语句是否满足 MySQL 语法。
 
-根据词法分析的结果，语法分析器会根据语法规则，判断你输入的这个 SQL 语句 
+如果你的语句不对，就会收到“You have an error in your SQL syntax”的错误提醒，比如下面这个语句 select 少打了开头的字母“s”。
 
-是否满足 MySQL 语法。 
+```vbnet
+mysql> elect * from t where ID=1;
+ 
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'elect * from t where ID=1' at line 1
+```
 
-如果你的语句不对，就会收到“You have an error in your SQL syntax”的错误提醒，比如下面这个语句 from 写成了 
+一般语法错误会提示第一个出现错误的位置，所以你要关注的是紧接“use near”的内容。
 
-"rom"。
+mysql的词法分析由MysqlLex（mysql自己实现的），语法分析由Bison生成。
 
-而其中使用到的就是词法分析器
+## 优化器
 
-主要分为6个步骤
+执行计划生成，索引选择
 
-1.词法分析
+经过了分析器，MySQL 就知道你要做什么了。在开始执行之前，还要先经过优化器的处理。
 
-2.语法分析
+优化器是在表里面有多个索引的时候，决定使用哪个索引；或者在一个语句有多表关联（join）的时候，决定各个表的连接顺序。比如你执行下面这样的语句，这个语句是执行两个表的 join：
 
-3.语义分析
+```csharp
+mysql> select * from t1 join t2 using(ID)  where t1.c=10 and t2.d=20;
+```
 
-4.构建执行树
+- 既可以先从表 t1 里面取出 c=10 的记录的 ID 值，再根据 ID 值关联到表 t2，再判断 t2 里面 d 的值是否等于 20。
+- 也可以先从表 t2 里面取出 d=20 的记录的 ID 值，再根据 ID 值关联到 t1，再判断 t1 里面 c 的值是否等于 10。
 
-5.生成执行计划
+这两种执行方法的逻辑结果是一样的，但是执行的效率会有不同，而优化器的作用就是决定选择使用哪一个方案。
 
-6.计划的执行
+优化器阶段完成后，这个语句的执行方案就确定下来了，然后进入执行器阶段。如果你还有一些疑问，比如优化器是怎么选择索引的，有没有可能选择错等等，没关系，我会在后面的文章中单独展开说明优化器的内容。
 
-SQL语句的分析分为词法分析与语法分析，mysql的词法分析由MySQLLex[MySQL自己实现的]完成，语法分析由Bison生 
+## 执行器
 
-成。关于语法树大家如果想要深入研究可以参考这篇wiki文章：https://en.wikipedia.org/wiki/LR_parser。那么除了Bison 
+MySQL 通过分析器知道了你要做什么，通过优化器知道了该怎么做，于是就进入了执行器阶段，开始执行语句。
 
-外，Java当中也有开源的词法结构分析工具例如Antlr4，ANTLR从语法生成一个解析器，可以构建和遍历解析树，可以在IDEA 
+开始执行的时候，要先判断一下你对这个表 T 有没有执行查询的权限，如果没有，就会返回没有权限的错误，如下所示 (在工程实现上，如果命中查询缓存，会在查询缓存返回结果的时候，做权限验证。查询也会在优化器之前调用 precheck 验证权限)。
 
-工具当中安装插件：**antlr v4 grammar plugin。插件使用详见课程*
+```sql
+mysql> select * from T where ID=10;
+ 
+ERROR 1142 (42000): SELECT command denied to user 'b'@'localhost' for table 'T'
+```
 
+如果有权限，就打开表继续执行。打开表的时候，执行器就会根据表的引擎定义，去使用这个引擎提供的接口。
 
+比如我们这个例子中的表 T 中，ID 字段没有索引，那么执行器的执行流程是这样的：
 
-##### **优化器**
-
-经过了分析器，MySQL 就知道你要做什么了。在开始执行之前，还要先经过优化器的处理。 
-
-优化器是在表里面有多个索引的时候，决定使用哪个索引；或者在一个语句有多表关联（join）的时候，决定各个表的连接 
-
-顺序。
-
-##### **执行器**
-
-先判断你对于这张表又没有权限。
-
-然后再执行sql判断是否符合条件的数据，最后组成一个结果集返回给客户端。
-
-
-
-#### bin-log
-
-binlog是Server层实现的二进制日志,他会记录我们的cud操作。Binlog有以下几个特点： 
-
-1、Binlog在MySQL的Server层实现（引擎共用） 
-
-2、Binlog为逻辑日志,记录的是一条语句的原始逻辑 
-
-3、Binlog不限大小,追加写入,不会覆盖以前的日志 
-
-使用bin-log需要先配置
-
-配置my.cnf
-
-log-bin=地址
-
-格式有三种 statement，row，mixed
-
-binlog-format=row（默认）
-
-show variables like '%log_bin%'; 查看bin‐log是否开启 
-
-flush logs; 会多一个最新的bin‐log日志 
-
-show master status; 查看最后一个bin‐log日志的相关信息 
-
-reset master; 清空所有的bin‐log日志 
-
-1. **statement**
-
-   当binlog=statement时，binlog记录的是SQL本身的语句，语句中可能有函数，比如uuid每次获取都是不一样的，这样同步slave的时候就会出现数据不一致问题
-
-2. **row**会记录比如删除delete from table where id < 100,会记录100条删除每条id的语句，内容占用空间大
-
-3. **mixed**
-
-​		statement格式记录sql原句，可能会导致主备不一致，所以出现了row格式
-但是row格式也有一个缺点，就是很占空间，比如你delete语句删除1万行记录，statement格式会记录一个sql删除1万行就没了；但是使用row格式会把这1万要删除的记录都写到binlog中，这样会导致binlog占用了大量空间，同时写binlog也要耗费大量IO，影响mysql的整体速度
-所以MySQL出了个mixed格式，它是前面两种格式的混合。意思是MySQL自己会判断这条SQL语句是否会引起主备不一致，是的话就会使用row，否则就用statement格式
-也就是说上面delete语句加上了limit 1，MySQL认为会引起主备不一致，它就会使用row格式记录到binlog；如果delete 1万行记录，MySQL认为不会引起主备不一致，它就会使用statement格式记录到binlog。
+1. 调用 InnoDB 引擎接口取这个表的第一行，判断 ID 值是不是 10，如果不是则跳过，如果是则将这行存在结果集中；
+2. 调用引擎接口取“下一行”，重复相同的判断逻辑，直到取到这个表的最后一行。
+   1. 执行器将上述遍历过程中所有满足条件的行组成的记录集作为结果集返回给客户端。
 
 #### 索引使用情况（mysql5.6引入索引下推）
 
@@ -579,111 +540,6 @@ by的优化如果不需要排序的可以加上**order by null禁止排序**。�
 
 的限定条件就不要去having限定了。
 
-#### **filesort文件排序方式**
-
-参考文章：http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/16%20%20%E2%80%9Corder%20by%E2%80%9D%E6%98%AF%E6%80%8E%E4%B9%88%E5%B7%A5%E4%BD%9C%E7%9A%84%EF%BC%9F.md
-
-```sql
-CREATE TABLE `t` (
-  `id` int(11) NOT NULL,
-  `city` varchar(16) NOT NULL,
-  `name` varchar(16) NOT NULL,
-  `age` int(11) NOT NULL,
-  `addr` varchar(128) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `city` (`city`)
-) ENGINE=InnoDB;
-create index cityIndex ON t (city);
-select city,name,age from t where city='杭州' order by name limit 1000  ;
-```
-
-在 city 字段上创建索引之后，我们用 explain 命令来看看这个语句的执行情况。
-
-![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/826579b63225def812330ef6c344a303.png)
-
-图 1 使用 explain 命令查看语句的执行情况
-
-Extra 这个字段中的“Using filesort”表示的就是需要排序，MySQL 会给每个线程分配一块内存用于排序，称为 sort_buffer。
-
-#### 全字段排序：
-
-##### **使用sort_buffer的大体执行流程：**
-
-1. 初始化 sort_buffer，确定放入 name、city、age 这三个字段；
-2. 从索引 city 找到第一个满足 city='杭州’条件的主键 id，也就是图中的 ID_X；
-3. 到主键 id 索引取出整行，取 name、city、age 三个字段的值，存入 sort_buffer 中；
-4. 从索引 city 取下一个记录的主键 id；
-5. 重复步骤 3、4 直到 city 的值不满足查询条件为止，对应的主键 id 也就是图中的 ID_Y；
-6. 对 sort_buffer 中的数据按照字段 name 做快速排序；
-7. 按照排序结果取前 1000 行返回给客户端。
-
-**“按 name 排序”这个动作，可能在内存中完成，也可能需要使用外部排序，这取决于排序所需的内存和参数 sort_buffer_size。sort_buffer_size，就是 MySQL 为排序开辟的内存（sort_buffer）的大小。如果要排序的数据量小于 sort_buffer_size，排序就在内存中完成。但如果排序数据量太大，内存放不下，则不得不利用磁盘临时文件辅助排序。**
-
-你可以用下面介绍的方法，来确定一个排序语句是否使用了临时文件。
-
-```sql
-/* 打开 optimizer_trace，只对本线程有效 */
-SET optimizer_trace='enabled=on'; 
-/* @a 保存 Innodb_rows_read 的初始值 */
-select VARIABLE_VALUE into @a from  performance_schema.session_status where variable_name = 'Innodb_rows_read';
-/* 执行语句 */
-select city, name,age from t where city='杭州' order by name limit 1000; 
-/* 查看 OPTIMIZER_TRACE 输出 */
-SELECT * FROM `information_schema`.`OPTIMIZER_TRACE`\G
-/* @b 保存 Innodb_rows_read 的当前值 */
-select VARIABLE_VALUE into @b from performance_schema.session_status where variable_name = 'Innodb_rows_read';
-/* 计算 Innodb_rows_read 差值 */
-select @b-@a;
-```
-
-这个方法是通过查看 OPTIMIZER_TRACE 的结果来确认的，你可以从 number_of_tmp_files 中看到是否使用了临时文件。
-
-![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/89baf99cdeefe90a22370e1d6f5e6495.png)
-
-图 4 全排序的 OPTIMIZER_TRACE 部分结果
-
-**number_of_tmp_files** 表示的是，排序过程中使用的临时文件数。你一定奇怪，为什么需要 12 个文件？内存放不下时，就需要使用外部排序，外部排序一般使用归并排序算法。可以这么简单理解，**MySQL 将需要排序的数据分成 12 份，每一份单独排序后存在这些临时文件中。然后把这 12 个有序文件再合并成一个有序的大文件。**
-
-```sql
-#定在创建 InnoDB 索引期间用于对数据进行排序的排序缓冲区的大小。
-innodb_sort_buffer_size,1048576 1M
-#每个语句进行排序的缓冲区大小
-sort_buffer_size,786432 0.75M
-```
-
-#### rowId排序
-
-​		如果单行长度太大，存放到内存的数据就会很少，这样要分成很多个临时文件，排序的性能会很差。mysql通过比较系统变量 **max_length_for_sort_data**(默认4096字节，mysql 8.0.27)的大小和需要查询的字段总大小判断使用哪种排序方式（全字段还是rowid排序）
-
-**排序的执行过程变成如下的样子：**
-
-1. 初始化 sort_buffer，确定放入两个字段，即 name 和 id；
-2. 从索引 city 找到第一个满足 city='杭州’条件的主键 id，也就是图中的 ID_X；
-3. 到主键 id 索引取出整行，取 name、id 这两个字段，存入 sort_buffer 中；
-4. 从索引 city 取下一个记录的主键 id；
-5. 重复步骤 3、4 直到不满足 city='杭州’条件为止，也就是图中的 ID_Y；
-6. 对 sort_buffer 中的数据按照字段 name 进行排序；
-7. 遍历排序结果，取前 1000 行，并按照 id 的值回到原表中取出 city、name 和 age 三个字段返回给客户端。
-
-#### 全字段排序 VS rowid 排序
-
-他两的区别就是通过id索引查出来的数据放入到sort_buffer的字段多少，看查询字段
-
-全字段是在根据主键Id查询主键索引期间查处所有select得字段放入到sort_buffer
-
-rowid存放的是主键id和排序字段
-
-如果 MySQL 实在是担心排序内存太小，会影响排序效率，才会采用 rowid 排序算法，这样排序过程中一次可以排序更多行，但是需要再回到原表去取数据。
-
-如果 MySQL 认为内存足够大，会优先选择全字段排序，把需要的字段都放到 sort_buffer 中，这样排序后就会直接从内存里面返回查询结果了，不用再回到原表去取数据。
-
-这也就体现了 MySQL 的一个设计思想：**如果内存够，就要多利用内存，尽量减少磁盘访问。**对于 InnoDB 表来说，rowid 排序会要求回表多造成磁盘读，因此不会被优先选择。
-
-#### 优化：
-
-1. 可以利用添加索引来避免排序。
-2. 也可利用索引覆盖来直接返回结果，跟利用索引来避免排序相比好处是不需要上聚集索引里找到另一个缺失的字段然后返回。
-
 
 
 #### 索引原则
@@ -736,11 +592,13 @@ MySQL提供了日志分析工具`mysqldumpslow`
 
 
 
-## **Mysql的表关联常见有两种算法**
+# **Mysql常见的几种算法**
 
 参考文章：http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/35%20%20join%E8%AF%AD%E5%8F%A5%E6%80%8E%E4%B9%88%E4%BC%98%E5%8C%96%EF%BC%9F.md
 
-###  Index Nested-Loop Join 算法
+##  Index Nested-Loop Join 算法
+
+**拿驱动表的条件索引去被驱动表根据索引找就叫做Index Nested-Loop Join**
 
 我们来看一下这个语句：
 
@@ -765,34 +623,32 @@ select * from t1 straight_join t2 on (t1.a=t2.a);
 
 这个过程是先遍历表 t1，然后根据从表 t1 中取出的每行数据中的 a 值，去表 t2 中查找满足条件的记录。在形式上，这个过程就跟我们写程序时的嵌套查询类似，并且可以用上被驱动表的索引，所以我们称之为“Index Nested-Loop Join”，简称 NLJ。
 
+## Simple Nested-Loop Join
 
+**驱动表索引去驱动表用不上索引的情况。**
 
-# Block Nested-Loop Join
+每一次别驱动表都需要做全表扫描，负担太大没有使用
 
-这时候，被驱动表上没有可用的索引，算法的流程是这样的：
+## Block Nested-Loop Join
+
+被驱动表上没有可用的索引，算法的流程是这样的：
 
 1. 把表 t1 的数据读入线程内存 join_buffer 中，由于我们这个语句中写的是 select *，因此是把整个表 t1 放入了内存；
 2. 扫描表 t2，把表 t2 中的每一行取出来，跟 join_buffer 中的数据做对比，满足 join 条件的，作为结果集的一部分返回。
 
-对应地，这条 SQL 语句的 explain 结果如下所示：
-
-![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/676921fa0883e9463dd34fb2bc5e87e1.png)
-
-图 4 不使用索引字段 join 的 explain 结果
+![image-20221026174422681](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221026174422681.png)
 
 可以看到，在这个过程中，对表 t1 和 t2 都做了一次全表扫描，因此总的扫描行数是 1100。由于 join_buffer 是以无序数组的方式组织的，因此对表 t2 中的每一行，都要做 100 次判断，总共需要在内存中做的判断次数是：100*1000=10 万次。
 
-然后，你可能马上就会问了，这个例子里表 t1 才 100 行，要是表 t1 是一个大表，join_buffer 放不下怎么办呢？
+然后，你可能马上就会问了，这个例子里表 t1 才 100 行，要是表 t1 是一个大表，join_buffer 放不下怎么办呢？join_buffer 的大小是由参数 join_buffer_size 设定的，默认值是 256k。如果放不下表 t1 的所有数据话，策略很简单，就是分段放。我把 join_buffer_size 改成 1200，再执行：
 
-join_buffer 的大小是由参数 join_buffer_size 设定的，默认值是 256k。**如果放不下表 t1 的所有数据话，策略很简单，就是分段放。**我把 join_buffer_size 改成 1200，再执行：
-
-```csharp
+```sql
 select * from t1 straight_join t2 on (t1.a=t2.b);
 ```
 
 执行过程就变成了：
 
-1. 扫描表 t1，顺序读取数据行放入 join_buffer 中，放完第 88 行 join_buffer 满了，继续第 2 步；
+1. 扫描表 t1，顺序读取数据行放入 join_buffer 中，放完第 88 行 join_buffer 满了，继续第 2 步
 2. 扫描表 t2，把 t2 中的每一行取出来，跟 join_buffer 中的数据做对比，满足 join 条件的，作为结果集的一部分返回；
 3. 清空 join_buffer；
 4. 继续扫描表 t1，顺序读取最后的 12 行数据放入 join_buffer 中，继续执行第 2 步。
@@ -811,15 +667,389 @@ select * from t1 straight_join t2 on (t1.a=t2.b);
    - 在 join_buffer_size 足够大的时候，是一样的；
    - 在 join_buffer_size 不够大的时候（这种情况更常见），应该选择小表做驱动表。
 
-#### 对于小表定义的明确
+**对于小表的定义在决定哪个表做驱动表的时候，应该是两个表按照各自的条件过滤，过滤完成之后，计算参与 join 的各个字段的总数据量，数据量小的那个表，就是“小表”，应该作为驱动表。如果直接使用 join 语句，MySQL 优化器可能会选择表 t1 或 t2 作为驱动表**Multi-Range Read 优化
 
-所以，更准确地说，**在决定哪个表做驱动表的时候，应该是两个表按照各自的条件过滤，过滤完成之后，计算参与 join 的各个字段的总数据量，数据量小的那个表，就是“小表”，应该作为驱动表。**
+参考文章：http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/35%20%20join%E8%AF%AD%E5%8F%A5%E6%80%8E%E4%B9%88%E4%BC%98%E5%8C%96%EF%BC%9F.md
 
-！！！**如果直接使用 join 语句，MySQL 优化器可能会选择表 t1 或 t2 作为驱动表**
+## Multi-Range Read 优化 (MRR)
+
+**在二级索引进行回表查询的时候，这个优化的主要目的是尽量使用顺序读盘。**
+
+```sql
+create table t1(id int primary key, a int, b int, index(a));
+select** * **from** t1 **where** a>=1 **and** a<=100;
+```
+
+**因为大多数的数据都是按照主键递增顺序插入得到的，所以我们可以认为，如果按照主键的递增顺序查询的话，对磁盘的读比较接近顺序读，能够提升读性能。**
+
+这，就是 MRR 优化的设计思路。此时，语句的执行流程变成了这样：
+
+1. 根据索引 a，定位到满足条件的记录，将 id 值放入 **read_rnd_buffer** 中 ;
+2. 将 **read_rnd_buffer** 中的 id 进行递增排序；
+3. 排序后的 id 数组，依次到主键 id 索引中查记录，并作为结果返回。
+
+```sql
+show variables like '%read_rnd_buffer_size%';
+```
+
+**另外需要说明的是，如果你想要稳定地使用 MRR 优化的话，需要设置`set optimizer_switch="mrr_cost_based=off"`。（官方文档的说法，是现在的优化器策略，判断消耗的时候，会更倾向于不使用 MRR，把 mrr_cost_based 设置为 off，就是固定使用 MRR 了。）**
+
+**MRR 能够提升性能的核心**在于，这条查询语句在索引 a 上做的是一个范围查询（也就是说，这是一个多值查询），可以得到足够多的主键 id。这样通过排序以后，再去主键索引查数据，才能体现出“顺序性”的优势。
+
+## Batched Key Access
+
+理解了 MRR 性能提升的原理，我们就能理解 MySQL 在 5.6 版本后开始引入的 Batched Key Access(BKA) 算法了。这个 BKA 算法，其实就是对 NLJ 算法的优化。
+
+我们再来看看上一篇文章中用到的 NLJ 算法的流程图：
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/10e14e8b9691ac6337d457172b641a3d.jpg)
+
+图 4 Index Nested-Loop Join 流程图
+
+NLJ 算法执行的逻辑是：从驱动表 t1，一行行地取出 a 的值，再到被驱动表 t2 去做 join。也就是说，对于表 t2 来说，每次都是匹配一个值。这时，MRR 的优势就用不上了。
+
+那怎么才能一次性地多传些值给表 t2 呢？方法就是，从表 t1 里一次性地多拿些行出来，一起传给表 t2。
+
+既然如此，我们就把表 t1 的数据取出来一部分，先放到一个临时内存。这个临时内存不是别人，就是 join_buffer。
+
+通过上一篇文章，我们知道 join_buffer 在 BNL 算法里的作用，是暂存驱动表的数据。但是在 NLJ 算法里并没有用。那么，我们刚好就可以复用 join_buffer 到 BKA 算法中。
+
+如图 5 所示，是上面的 NLJ 算法优化后的 BKA 算法的流程。
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/31d85666542b9cb0b47a447a8593a47e.jpg)
+
+图 5 Batched Key Access 流程
+
+图中，我在 join_buffer 中放入的数据是 P1~P100，表示的是只会取查询需要的字段。当然，如果 join buffer 放不下 P1~P100 的所有数据，就会把这 100 行数据分成多段执行上图的流程。
+
+那么，这个 BKA 算法到底要怎么启用呢？
+
+如果要使用 BKA 优化算法的话，你需要在执行 SQL 语句之前，先设置
+
+```bash
+set optimizer_switch='mrr=on,mrr_cost_based=off,batched_key_access=on';
+```
+
+其中，前两个参数的作用是要启用 MRR。这么做的原因是，BKA 算法的优化要依赖于 MRR。理解了 MRR 性能提升的原理，我们就能理解 MySQL 在 **5.6 版本后**开始引入的 Batched Key Access(BKA) 算法了。这个 BKA 算法，其实就是对 NLJ 算法的优化。
+
+**问题：查询虚拟列会导致sql显示不了**
+
+**参考文章：**https://blog.csdn.net/bczzm/article/details/100577819
+
+## BNL 算法的性能问题
+
+说完了 NLJ 算法的优化，我们再来看 BNL 算法的优化。
+
+我在上一篇文章末尾，给你留下的思考题是，使用 Block Nested-Loop Join(BNL) 算法时，可能会对被驱动表做多次扫描。如果这个被驱动表是一个大的冷数据表，除了会导致 IO 压力大以外，还会对系统有什么影响呢？
+
+在[第 33 篇文章]中，我们说到 InnoDB 的 LRU 算法的时候提到，由于 InnoDB 对 Bufffer Pool 的 LRU 算法做了优化，即：第一次从磁盘读入内存的数据页，会先放在 old 区域。如果 1 秒之后这个数据页不再被访问了，就不会被移动到 LRU 链表头部，这样对 Buffer Pool 的命中率影响就不大。
+
+但是，如果一个使用 BNL 算法的 join 语句，多次扫描一个冷表，而且这个语句执行时间超过 1 秒，就会在再次扫描冷表的时候，把冷表的数据页移到 LRU 链表头部。
+
+**出现两种问题：**
+
+1. 如果冷表数据能完全融入Buffer Pool old区的话，由于多次扫描冷表导致sql执行时间超过1秒，就会把冷表的数据页移到LRU链表头部。
+2. 如果这个冷表很大，就会出现另外一种情况：业务正常访问的数据页，没有机会进入 young 区域。
+
+由于优化机制的存在，一个正常访问的数据页，要进入 young 区域，需要隔 1 秒后再次被访问到。但是，由于我们的 join 语句在循环读磁盘和淘汰内存页，进入 old 区域的数据页，很可能在 1 秒之内就被淘汰了。这样，就会导致这个 MySQL 实例的 Buffer Pool 在这段时间内，young 区域的数据页没有被合理地淘汰。
+
+也就是说，这两种情况都会影响 Buffer Pool 的正常运作。
+
+**大表 join 操作虽然对 IO 有影响，但是在语句执行结束后，对 IO 的影响也就结束了。但是，对 Buffer Pool 的影响就是持续性的，需要依靠后续的查询请求慢慢恢复内存命中率。**
+
+为了减少这种影响，你可以考虑增大 join_buffer_size 的值，减少对被驱动表的扫描次数。
+
+也就是说，BNL 算法对系统的影响主要包括三个方面：
+
+1. 可能会多次扫描被驱动表，占用磁盘 IO 资源；
+2. 判断 join 条件需要执行 M*N 次对比（M、N 分别是两张表的行数），如果是大表就会占用非常多的 CPU 资源；
+3. 可能会导致 Buffer Pool 的热数据被淘汰，影响内存命中率。
+
+我们执行语句之前，需要通过理论分析和查看 explain 结果的方式，确认是否要使用 BNL 算法。如果确认优化器会使用 BNL 算法，就需要做优化。优化的常见做法是，给被驱动表的 join 字段加上索引，把 BNL 算法转成 BKA 算法。
+
+## BNL 转 BKA 
+
+一些情况下，我们可以直接在被驱动表上建索引，这时就可以直接转成 BKA 算法了。
+
+但是，有时候你确实会碰到一些不适合在被驱动表上建索引的情况。比如下面这个语句：
+
+```csharp
+select * from t1 join t2 on (t1.b=t2.b) where t2.b>=1 and t2.b<=2000;
+```
+
+我们在文章开始的时候，在表 t2 中插入了 100 万行数据，但是经过 where 条件过滤后，需要参与 join 的只有 2000 行数据。如果这条语句同时是一个低频的 SQL 语句，那么再为这个语句在表 t2 的字段 b 上创建一个索引就很浪费了。
+
+但是，如果使用 BNL 算法来 join 的话，这个语句的执行流程是这样的：
+
+1. 把表 t1 的所有字段取出来，存入 join_buffer 中。这个表只有 1000 行，join_buffer_size 默认值是 256k，可以完全存入。
+2. 扫描表 t2，取出每一行数据跟 join_buffer 中的数据进行对比，
+   - 如果不满足 t1.b=t2.b，则跳过；
+   - 如果满足 t1.b=t2.b, 再判断其他条件，也就是是否满足 t2.b 处于 [1,2000] 的条件，如果是，就作为结果集的一部分返回，否则跳过。
+
+我在上一篇文章中说过，对于表 t2 的每一行，判断 join 是否满足的时候，都需要遍历 join_buffer 中的所有行。因此判断等值条件的次数是 1000*100 万 =10 亿次，这个判断的工作量很大。
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/92fbdbfc35da3040396401250cb33f60.png)
+
+图 6 explain 结果
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/d862bc3e88305688df2c354a4b26809c.png)
+
+图 7 语句执行时间
+
+可以看到，explain 结果里 Extra 字段显示使用了 BNL 算法。在我的测试环境里，这条语句需要执行 1 分 11 秒。
+
+在表 t2 的字段 b 上创建索引会浪费资源，但是不创建索引的话这个语句的等值条件要判断 10 亿次，想想也是浪费。那么，有没有两全其美的办法呢？
+
+这时候，我们可以考虑使用临时表。使用临时表的大致思路是：
+
+1. 把表 t2 中满足条件的数据放在临时表 tmp_t 中；
+2. 为了让 join 使用 BKA 算法，给临时表 tmp_t 的字段 b 加上索引；
+3. 让表 t1 和 tmp_t 做 join 操作。
+
+此时，对应的 SQL 语句的写法如下：
+
+```sql
+create temporary table temp_t(id int primary key, a int, b int, index(b))engine=innodb;
+insert into temp_t select * from t2 where b>=1 and b<=2000;
+select * from t1 join temp_t on (t1.b=temp_t.b);
+```
+
+图 8 就是这个语句序列的执行效果。
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/a80cdffe8173fa0fd8969ed976ac6ac7.png)
+
+图 8 使用临时表的执行效果
+
+可以看到，整个过程 3 个语句执行时间的总和还不到 1 秒，相比于前面的 1 分 11 秒，性能得到了大幅提升。接下来，我们一起看一下这个过程的消耗：
+
+1. 执行 insert 语句构造 temp_t 表并插入数据的过程中，对表 t2 做了全表扫描，这里扫描行数是 100 万。
+2. 之后的 join 语句，扫描表 t1，这里的扫描行数是 1000；join 比较过程中，做了 1000 次带索引的查询。相比于优化前的 join 语句需要做 10 亿次条件判断来说，这个优化效果还是很明显的。
+
+总体来看，不论是在原表上加索引，还是用有索引的临时表，我们的思路都是让 join 语句能够用上被驱动表上的索引，来触发 BKA 算法，提升查询性能。
+
+## 扩展 -hash join
+
+看到这里你可能发现了，其实上面计算 10 亿次那个操作，看上去有点儿傻。如果 join_buffer 里面维护的不是一个无序数组，而是一个哈希表的话，那么就不是 10 亿次判断，而是 100 万次 hash 查找。这样的话，整条语句的执行速度就快多了吧？
+
+确实如此。
+
+这，也正是 MySQL 的优化器和执行器一直被诟病的一个原因：不支持哈希 join。并且，MySQL 官方的 roadmap，也是迟迟没有把这个优化排上议程。
+
+实际上，这个优化思路，我们可以自己实现在业务端。实现流程大致如下：
+
+1. `select * from t1;`取得表 t1 的全部 1000 行数据，在业务端存入一个 hash 结构，比如 C++ 里的 set、PHP 的数组这样的数据结构。
+2. `select * from t2 where b>=1 and b<=2000;` 获取表 t2 中满足条件的 2000 行数据。
+3. 把这 2000 行数据，一行一行地取到业务端，到 hash 结构的数据表中寻找匹配的数据。满足匹配的条件的这行数据，就作为结果集的一行。
 
 
 
-#### in和exsits优化
+## 全字段排序
+
+参考文章：http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/16%20%20%E2%80%9Corder%20by%E2%80%9D%E6%98%AF%E6%80%8E%E4%B9%88%E5%B7%A5%E4%BD%9C%E7%9A%84%EF%BC%9F.md
+
+**先按照索引把所需要的所有字段数据放入到sort_buffer,然后对 sort_buffer 中的数据按照字段 name 做快速排序，按照排序结果返回给客户端。**
+
+“按 name 排序”这个动作，可能在内存中完成，也可能需要使用外部排序，这取决于排序所需的内存和参数 sort_buffer_size。
+
+sort_buffer_size，就是 MySQL 为排序开辟的内存（sort_buffer）的大小。如果要排序的数据量小于 sort_buffer_size，排序就在内存中完成。但如果排序数据量太大，内存放不下，则不得不利用磁盘临时文件辅助排序。
+
+你可以用下面介绍的方法，来确定一个排序语句是否使用了临时文件。
+
+```sql
+/* 打开 optimizer_trace，只对本线程有效 */
+SET optimizer_trace='enabled=on'; 
+ 
+/* @a 保存 Innodb_rows_read 的初始值 */
+select VARIABLE_VALUE into @a from  performance_schema.session_status where variable_name = 'Innodb_rows_read';
+ 
+/* 执行语句 */
+select city, name,age from t where city='杭州' order by name limit 1000; 
+ 
+/* 查看 OPTIMIZER_TRACE 输出 */
+SELECT * FROM `information_schema`.`OPTIMIZER_TRACE`\G
+ 
+/* @b 保存 Innodb_rows_read 的当前值 */
+select VARIABLE_VALUE into @b from performance_schema.session_status where variable_name = 'Innodb_rows_read';
+ 
+/* 计算 Innodb_rows_read 差值 */
+select @b-@a;
+```
+
+这个方法是通过查看 OPTIMIZER_TRACE 的结果来确认的，你可以从 number_of_tmp_files 中看到是否使用了临时文件。
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/89baf99cdeefe90a22370e1d6f5e6495.png)
+
+图 4 全排序的 OPTIMIZER_TRACE 部分结果
+
+number_of_tmp_files 表示的是，排序过程中使用的临时文件数。你一定奇怪，为什么需要 12 个文件？内存放不下时，就需要使用外部排序，外部排序一般使用归并排序算法。可以这么简单理解，**MySQL 将需要排序的数据分成 12 份，每一份单独排序后存在这些临时文件中。然后把这 12 个有序文件再合并成一个有序的大文件。**
+
+如果 sort_buffer_size 超过了需要排序的数据量的大小，**number_of_tmp_files** 就是 0，表示排序可以直接在内存中完成。
+
+否则就需要放在临时文件中排序。sort_buffer_size 越小，需要分成的份数越多，number_of_tmp_files 的值就越大。
+
+接下来，我再和你解释一下图 4 中其他两个值的意思。
+
+我们的示例表中有 4000 条满足 city='杭州’的记录，所以你可以看到 examined_rows=4000，表示参与排序的行数是 4000 行。
+
+sort_mode 里面的 packed_additional_fields 的意思是，排序过程对字符串做了“紧凑”处理。即使 name 字段的定义是 varchar(16)，在排序过程中还是要按照实际长度来分配空间的。
+
+同时，最后一个查询语句 select @b-@a 的返回结果是 4000，表示整个执行过程只扫描了 4000 行。
+
+这里需要注意的是，为了避免对结论造成干扰，我把 internal_tmp_disk_storage_engine 设置成 MyISAM。否则，select @b-@a 的结果会显示为 4001。
+
+这是因为查询 OPTIMIZER_TRACE 这个表时，需要用到临时表，而 internal_tmp_disk_storage_engine 的默认值是 InnoDB。如果使用的是 InnoDB 引擎的话，把数据从临时表取出来的时候，会让 Innodb_rows_read 的值加 1。
+
+## RowId 排序
+
+**sort_buffer只存放索引列和主键Id当在sort_buffer或者借助临时文件排序完成后在又一次回表操作之后才能返回结果集。**
+
+在上面这个算法过程里面，只对原表的数据读了一遍，剩下的操作都是在 sort_buffer 和临时文件中执行的。但这个算法有一个问题，就是如果查询要返回的字段很多的话，那么 sort_buffer 里面要放的字段数太多，这样内存里能够同时放下的行数很少，要分成很多个临时文件，排序的性能会很差。
+
+所以如果单行很大，这个方法效率不够好。
+
+那么，**如果 MySQL 认为排序的单行长度太大会怎么做呢？**
+
+接下来，我来修改一个参数，让 MySQL 采用另外一种算法。
+
+```java
+SET max_length_for_sort_data = 16;
+```
+
+**max_length_for_sort_data，是 MySQL 中专门控制用于排序的行数据的长度的一个参数。它的意思是，如果单行的长度超过这个值，MySQL 就认为单行太大，要换一个算法。**
+
+city、name、age 这三个字段的定义总长度是 36，我把 max_length_for_sort_data 设置为 16，我们再来看看计算过程有什么改变。
+
+新的算法放入 sort_buffer 的字段，只有要排序的列（即 name 字段）和主键 id。
+
+但这时，排序的结果就因为少了 city 和 age 字段的值，不能直接返回了，整个执行流程就变成如下所示的样子：
+
+1. 初始化 sort_buffer，确定放入两个字段，即 name 和 id；
+2. 从索引 city 找到第一个满足 city='杭州’条件的主键 id，也就是图中的 ID_X；
+3. 到主键 id 索引取出整行，取 name、id 这两个字段，存入 sort_buffer 中；
+4. 从索引 city 取下一个记录的主键 id；
+5. 重复步骤 3、4 直到不满足 city='杭州’条件为止，也就是图中的 ID_Y；
+6. 对 sort_buffer 中的数据按照字段 name 进行排序；
+7. 遍历排序结果，取前 1000 行，并按照 id 的值回到原表中取出 city、name 和 age 三个字段返回给客户端。
+
+这个执行流程的示意图如下，我把它称为 rowid 排序。
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/dc92b67721171206a302eb679c83e86d.jpg)
+
+图 5 rowid 排序
+
+对比图 3 的全字段排序流程图你会发现，rowid 排序多访问了一次表 t 的主键索引，就是步骤 7。
+
+需要说明的是，最后的“结果集”是一个逻辑概念，实际上 MySQL 服务端从排序后的 sort_buffer 中依次取出 id，然后到原表查到 city、name 和 age 这三个字段的结果，不需要在服务端再耗费内存存储结果，是直接返回给客户端的。
+
+根据这个说明过程和图示，你可以想一下，这个时候执行 select @b-@a，结果会是多少呢？
+
+现在，我们就来看看结果有什么不同。
+
+首先，图中的 examined_rows 的值还是 4000，表示用于排序的数据是 4000 行。但是 select @b-@a 这个语句的值变成 5000 了。
+
+因为这时候除了排序过程外，在排序完成后，还要根据 id 去原表取值。由于语句是 limit 1000，因此会多读 1000 行。
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/27f164804d1a4689718291be5d10f89b.png)
+
+图 6 rowid 排序的 OPTIMIZER_TRACE 部分输出
+
+从 OPTIMIZER_TRACE 的结果中，你还能看到另外两个信息也变了。
+
+- sort_mode 变成了 <sort_key, rowid>，表示参与排序的只有 name 和 id 这两个字段。
+- number_of_tmp_files 变成 10 了，是因为这时候参与排序的行数虽然仍然是 4000 行，但是每一行都变小了，因此需要排序的总数据量就变小了，需要的临时文件也相应地变少了。
+
+## 全字段排序 VS rowid 排序
+
+我们来分析一下，从这两个执行流程里，还能得出什么结论。
+
+如果 MySQL 实在是担心排序内存太小，会影响排序效率，才会采用 rowid 排序算法，这样排序过程中一次可以排序更多行，但是需要再回到原表去取数据。
+
+如果 MySQL 认为内存足够大，会优先选择全字段排序，把需要的字段都放到 sort_buffer 中，这样排序后就会直接从内存里面返回查询结果了，不用再回到原表去取数据。
+
+这也就体现了 MySQL 的一个设计思想：**如果内存够，就要多利用内存，尽量减少磁盘访问。**
+
+对于 InnoDB 表来说，rowid 排序会要求回表多造成磁盘读，因此不会被优先选择。
+
+这个结论看上去有点废话的感觉，但是你要记住它，下一篇文章我们就会用到。
+
+看到这里，你就了解了，MySQL 做排序是一个成本比较高的操作。那么你会问，是不是所有的 order by 都需要排序操作呢？如果不排序就能得到正确的结果，那对系统的消耗会小很多，语句的执行时间也会变得更短。
+
+其实，并不是所有的 order by 语句，都需要排序操作的。从上面分析的执行过程，我们可以看到，MySQL 之所以需要生成临时表，并且在临时表上做排序操作，**其原因是原来的数据都是无序的。**
+
+你可以设想下，如果能够保证从 city 这个索引上取出来的行，天然就是按照 name 递增排序的话，是不是就可以不用再排序了呢？
+
+确实是这样的。
+
+所以，我们可以在这个市民表上创建一个 city 和 name 的联合索引，对应的 SQL 语句是：
+
+```sql
+alter table t add index city_user(city, name);
+```
+
+作为与 city 索引的对比，我们来看看这个索引的示意图。
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/f980201372b676893647fb17fac4e2bf.png)
+
+图 7 city 和 name 联合索引示意图
+
+在这个索引里面，我们依然可以用树搜索的方式定位到第一个满足 city='杭州’的记录，并且额外确保了，接下来按顺序取“下一条记录”的遍历过程中，只要 city 的值是杭州，name 的值就一定是有序的。
+
+这样整个查询过程的流程就变成了：
+
+1. 从索引 (city,name) 找到第一个满足 city='杭州’条件的主键 id；
+2. 到主键 id 索引取出整行，取 name、city、age 三个字段的值，作为结果集的一部分直接返回；
+3. 从索引 (city,name) 取下一个记录主键 id；
+4. 重复步骤 2、3，直到查到第 1000 条记录，或者是不满足 city='杭州’条件时循环结束。
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/3f590c3a14f9236f2d8e1e2cb9686692.jpg)
+
+图 8 引入 (city,name) 联合索引后，查询语句的执行计划
+
+可以看到，这个查询过程不需要临时表，也不需要排序。接下来，我们用 explain 的结果来印证一下。
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/fc53de303811ba3c46d344595743358a.png)
+
+图 9 引入 (city,name) 联合索引后，查询语句的执行计划
+
+从图中可以看到，Extra 字段中没有 Using filesort 了，也就是不需要排序了。而且由于 (city,name) 这个联合索引本身有序，所以这个查询也不用把 4000 行全都读一遍，只要找到满足条件的前 1000 条记录就可以退出了。也就是说，在我们这个例子里，只需要扫描 1000 次。
+
+既然说到这里了，我们再往前讨论，**这个语句的执行流程有没有可能进一步简化呢？**不知道你还记不记得，我在第 5 篇文章[《 深入浅出索引（下）》]中，和你介绍的覆盖索引。
+
+这里我们可以再稍微复习一下。**覆盖索引是指，索引上的信息足够满足查询请求，不需要再回到主键索引上去取数据。**
+
+按照覆盖索引的概念，我们可以再优化一下这个查询语句的执行流程。
+
+针对这个查询，我们可以创建一个 city、name 和 age 的联合索引，对应的 SQL 语句就是：
+
+```sql
+alter table t add index city_user_age(city, name, age);
+```
+
+这时，对于 city 字段的值相同的行来说，还是按照 name 字段的值递增排序的，此时的查询语句也就不再需要排序了。这样整个查询语句的执行流程就变成了：
+
+1. 从索引 (city,name,age) 找到第一个满足 city='杭州’条件的记录，取出其中的 city、name 和 age 这三个字段的值，作为结果集的一部分直接返回；
+2. 从索引 (city,name,age) 取下一个记录，同样取出这三个字段的值，作为结果集的一部分直接返回；
+3. 重复执行步骤 2，直到查到第 1000 条记录，或者是不满足 city='杭州’条件时循环结束。
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/df4b8e445a59c53df1f2e0f115f02cd6.jpg)
+
+图 10 引入 (city,name,age) 联合索引后，查询语句的执行流程
+
+然后，我们再来看看 explain 的结果。
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/9e40b7b8f0e3f81126a9171cc22e3423.png)
+
+图 11 引入 (city,name,age) 联合索引后，查询语句的执行计划
+
+可以看到，Extra 字段里面多了“Using index”，表示的就是使用了覆盖索引，性能上会快很多。
+
+当然，这里并不是说要为了每个查询能用上覆盖索引，就要把语句中涉及的字段都建上联合索引，毕竟索引还是有维护代价的。这是一个需要权衡的决定。
+
+
+
+
+
+in和exsits优化**
 
 原则：**小表驱动大表**，即小的数据集驱动大的数据集
 
@@ -831,7 +1061,7 @@ select * from t1 straight_join t2 on (t1.a=t2.b);
 
 
 
-#### count(\*)查询优化
+**count()查询优化**
 
 **四个sql的执行计划一样，说明这四个sql执行效率应该差不多**
 
@@ -847,7 +1077,7 @@ count(**) 是例外，mysql并不会把全部字段取出来，而是专门做�
 
 
 
-#### 事务
+# 事务
 
 事务是由一组SQL语句组成的逻辑处理单元,事务具有以下4个属性,通常简称为事务的ACID属性。
 
@@ -881,23 +1111,27 @@ count(**) 是例外，mysql并不会把全部字段取出来，而是专门做�
 
   ##### 幻读（Phantom Reads）
 
-  　　一个事务按相同的查询条件重新读取以前检索过的数据，却发现其他事务插入了满足其查询条件的新数据，这种现象就称为“幻读”。
+  　　**快照视图读取的数据不足以支撑接下来的业务操作。**快照读视图里面发现没有要插入的数据，然后进行insert的时候发现提示数据已存在，这种情况下就叫幻读。**明明按照第一次快照视图里面没有该数据，自己插入确失败了，以为自己看错了刚才的视图数据，这就是所谓的幻读。**
 
-  　　一句话：**事务A读取到了事务B提交的新增数据，不符合隔离性**
+  一句话就是事务A添加以为没有的数据其实事务B已经添加完成了，所以出现了错误。
 
   ![https://note.youdao.com/yws/public/resource/354ae85f3519bac0581919a458278a59/xmlnote/74624CB778F948349A31BA0A40430F51/98786](https://note.youdao.com/yws/public/resource/354ae85f3519bac0581919a458278a59/xmlnote/74624CB778F948349A31BA0A40430F51/98786)
 
   **不可重复读和幻读区别：**
 
-  **不可重复读的重点是修改，幻读的重点在于新增或者删除**
+  **不可重复读的重点是两次查询结果不同，幻读的重点在于新增或者删除**
+
+  **但是会有幻读的问题，幻读修改或添加以为在视图中没有或可修改的数据失败了**
 
   数据库的事务隔离越严格,并发副作用越小,但付出的代价也就越大,因为事务隔离实质上就是使事务在一定程度上“串行化”进行,这显然与“并发”是矛盾的。
 
   同时,不同的应用对读一致性和事务隔离程度的要求也是不同的,比如许多应用对“不可重复读"和“幻读”并不敏感,可能更关心数据并发访问的能力。
 
-  **常看当前数据库的事务隔离级别: show variables like 'tx_isolation';**
+  ## **常看当前数据库的事务隔离级别**
 
-  **设置事务隔离级别：****set tx_isolation='REPEATABLE-READ';**
+  **show variables like 'tx_isolation';**
+
+  **设置事务隔离级别：**set tx_isolation='REPEATABLE-READ';
 
   **Mysql默认的事务隔离级别是可重复读，用Spring开发程序时，如果不设置隔离级别默认用Mysql设置的隔离级别，如果Spring设置了就用已经设置的隔离级别**
 
@@ -920,14 +1154,15 @@ count(**) 是例外，mysql并不会把全部字段取出来，而是专门做�
   
 
   **表锁**
-
+  
   每次操作锁住整张表。开销小，加锁快；不会出现死锁；锁定粒度大，发生锁冲突的概率最高，并发度最低；一般用在整表数据迁移的场景。
-
+  
   lock table 表名称 read（write），表名称2 read（write）
   
   show open tables；
   
-  unlock tables
+
+unlock tables
   **案例分析（加读锁）**
 
   lock table mylock read
@@ -942,80 +1177,25 @@ count(**) 是例外，mysql并不会把全部字段取出来，而是专门做�
 
   当前session对该表的增删改查都没有问题，其他session对该表的所有操作被阻塞
 
-  
-
-  ##### **行锁**
-
-  每次操作锁住一行数据。开销大，加锁慢；会出现死锁；锁定粒度最小，发生锁冲突的概率最低，并发度最高。
-  
-  InnoDB与MYISAM的最大不同有两点：
-  
-  - **InnoDB支持事务（TRANSACTION）**
-  - **InnoDB支持行级锁**
-  
-  **总结：**
-
-MyISAM在执行查询语句SELECT前，会自动给涉及的所有表加读锁,在执行update、insert、delete操作会自动给涉及的表加写锁。
-
-InnoDB在执行查询语句SELECT时(非串行隔离级别)，不会加锁。但是update、insert、delete操作会加行锁。
-
-简而言之，就是**读锁会阻塞写，但是不会阻塞读。而写锁则会把读和写都阻塞**。
 
 
-
-**间隙锁(Gap Lock) 间隙锁是在可重复读隔离级别下才会生效。**
-
-间隙锁，锁的就是两个值之间的空隙。Mysql默认级别是repeatable-read，有办法解决幻读问题吗？间隙锁在某些情况下可以解决幻读问题。
-
-
-
-**临键锁(Next-key Locks)**
-
-Next-Key Locks是行锁与间隙锁的组合。像上面那个例子里的这个(3,20]的整个区间可以叫做临键锁。
-
-
-
-**无索引行锁会升级为表锁(RR级别会升级为表锁，RC级别不会升级为表锁)**
-
-锁主要是加在索引上，如果对非索引字段更新，行锁可能会变表锁
-
-session1 执行：update account set balance = 800 where name = 'lilei';
-
-session2 对该表任一行操作都会阻塞住
-
-**InnoDB的行锁是针对索引加的锁，不是针对记录加的锁。并且该索引不能失效，否则都会从行锁升级为表锁**。
-
-锁定某一行还可以用lock in share mode(共享锁) 和for update(排它锁)，例如：select from test_innodb_lock where a = 2 for update; 这样其他session只能读这行数据，修改则会被阻塞，直到锁定行的session提交
-
-
-
-**死锁**
-
-**set tx_isolation='**repeatable-read**';**
-
-Session_1执行：select from account where id=1 for update;
-
-Session_2执行：select from account where id=2 for update;
-
-Session_1执行：select from account where id=2 for update;
-
-Session_2执行：select from account where id=1 for update;
-
-查看近期死锁日志信息：show engine innodb status\G; 
-
-大多数情况mysql可以自动检测死锁并回滚产生死锁的那个事务，但是有些情况mysql没法自动检测死锁
-
-
-
-**MVCC多版本并发控制机制**
+## MVCC多版本并发控制机制
 
 Mysql在可重复读隔离级别下如何保证事务较高的隔离性，我们上节课给大家演示过，同样的sql查询语句在一个事务里多次执行查询结果相同，就算其它事务对数据有修改也不会影响当前事务sql语句的查询结果。
 
 这个隔离性就是靠MVCC(**Multi-Version Concurrency Control**)机制来保证的，对一行数据的读和写两个操作默认是不会通过加锁互斥来保证隔离性，避免了频繁加锁互斥，而在串行化隔离级别为了保证较高的隔离性是通过将所有操作加锁互斥来实现的。
 
-Mysql在读已提交和可重复读隔离级别下都实现了MVCC机制。
+InnoDB 的行数据有多个版本，每个数据版本有自己的 row trx_id，每个事务或者语句有自己的一致性视图。普通查询语句是一致性读，一致性读会根据 row trx_id 和一致性视图确定数据版本的可见性。
 
+**Mysql在读已提交和可重复读隔离级别下都实现了MVCC机制。**
 
+在 `InnoDB` 存储引擎中，创建一个新事务后，执行每个 `select` 语句前，都会创建一个快照（Read View），**快照中保存了当前数据库系统中正处于活跃（没有 commit）的事务的 ID 号**。其实简单的说保存的是系统中当前不应该被本事务看到的其他事务 ID 列表（即 m_ids）。**当用户在这个事务中要读取某个记录行的时候**，`InnoDB` 会将该记录行的 `DB_TRX_ID` 与 `Read View` 中的一些变量及当前事务 ID 进行比较，判断是否满足可见性条件。
+
+**Read View生成的时间**
+
+第一种启动方式，一致性视图是在第执行第一个快照读语句时创建的；
+
+ 第二种启动方式，一致性视图是在执行 start transaction with consistent snapshot 时创建的。
 
 **undo日志版本链与read view机制详解**
 
@@ -1043,11 +1223,34 @@ undo日志版本链是指一行数据被多个事务依次修改过后，在每�
 
 **注意：**begin/start transaction 命令并不是一个事务的起点，在执行到它们之后的第一个修改操作InnoDB表的语句，事务才真正启动，才会向mysql申请事务id，mysql内部是严格按照事务的启动顺序来分配事务id的。
 
+**当前读和快照读**
+
+正常情况下是快照读，但是使用lock in share mode 或 for update就会变成当前读，在使用select进行查询，之后同一事务进行update的时候，insert、update、delete是快照读，原则是**更新数据都是先读后写的，而这个读，只能读当前的值，称为“当前读”（current read），如果当前的记录的行锁被其他事务占用的话，就需要进入锁等待。**
+
+**而读提交的逻辑和可重复读的逻辑类似，它们最主要的区别是：**
+
+- 在可重复读隔离级别下，只需要在事务开始的时候创建一致性视图，之后事务里的其他查询都共用这个一致性视图；
+- 在读提交隔离级别下，每一个语句执行前都会重新算出一个新的视图。
+
 **总结：**
 
 MVCC机制的实现就是通过read-view机制与undo版本链比对机制，使得不同的事务会根据数据版本链对比规则读取同一条数据在版本链上的不同版本数据。
 
-#### **Innodb引擎SQL执行的BufferPool缓存机制**
+#### 行锁(Record Lock)
+
+锁定单个行记录上的锁，如果没有设置任何索引会使用隐式的主键进行锁定。
+
+#### 间隙锁(Gap Lock)
+
+锁定一个范围，但不包括记录本身，是为了阻止多个事务将记录插入到同一个范围内。
+
+#### 临键锁(Next-key Locks)
+
+Gap Lock+Record Lock，锁定一个范围，并且锁定记录本身，当查询的索引含有**唯一属性**时，会对next-key lock进行优化，将其降级为Record Lock锁。
+
+**对于一条记录来说既拥有聚集索引也拥有辅助索引，Next-key lock会对主键索引加上Record lock锁，然后对于辅助索引加上左闭右闭Gap Lock**
+
+#### BufferPool
 
 ​    ![0](https://note.youdao.com/yws/public/resource/b36b975188fadf7bfbfd75c0d2d6b834/xmlnote/9C296B9BBF3C4C0389F470357FC55FE9/99001)
 
@@ -1055,11 +1258,76 @@ MVCC机制的实现就是通过read-view机制与undo版本链比对机制，使
 
 因为来一个请求就直接对磁盘文件进行随机读写，然后更新磁盘文件里的数据性能可能相当差。因为磁盘随机读写的性能是非常差的，所以直接更新磁盘文件是不能让数据库抗住很高并发的。Mysql这套机制看起来复杂，但它可以保证每个更新请求都是**更新内存BufferPool**，然后**顺序写日志文件**，同时还能保证各种异常情况下的数据一性。更新内存的性能是极高的，然后顺序写磁盘上的日志文件的性能也是非常高的，要远高于随机读写磁盘文件。正是通过这套机制，才能让我们的MySQL数据库在较高配置的机器上每秒可以抗下几干甚至上万的读写请求。
 
+**参考文章：**https://javaguide.cn/database/mysql/innodb-implementation-of-mvcc.html#%E9%9A%90%E8%97%8F%E5%AD%97%E6%AE%B5
 
 
-#### 执行一个SQL的步骤：
 
-undo日志文件、redo日志文件（Innodb引擎持有）、binlog（server层，binlog主要用来恢复数据库磁盘里的数据）
+#### 日志文件
+
+##### Undo log
+
+回滚行记录到某个特定版本
+
+##### Redo log
+
+恢复事务提交修改的页操作，两部分组成：
+
+1、是内存中的重做日志缓冲（redo log buffer）
+
+2、重做日志文件（redo log file）
+
+**控制重做日志刷新到磁盘的策略**
+
+```sql
+innodb_flush_log_at_trx_commit
+0 提交时不进行写入重做日志操作，仅在master thread每隔一秒钟进行一次fsync重做日志文件的写入
+1 默认，表示事务提交时必须调用一次fsync操作
+2 表示事务提交时仅写入操作系统的文件缓冲区，有操作系统决定何时写入
+```
+
+**binlog和redolog区别**
+
+1. 所处层面不同，binlog时server的，redo时innodb特有的
+2. 记录日志内容不同，逻辑binlog记录的是sql语句（原始sql），物理redo记录的是对于每个页的修改（**记录在什么数据页那个位置修改了多少字节修改后的数据是什么**）
+3. binlog只在事务提交完成后进行一次写入，redolog在事务进行中不断地被写入
+
+##### Bin-log
+
+binlog是Server层实现的二进制日志,他会记录我们的cud操作。Binlog有以下几个特点： 
+
+1. Binlog在MySQL的Server层实现（引擎共用） 
+2. Binlog为逻辑日志,记录的是一条语句的原始逻辑 
+3. Binlog不限大小,追加写入,不会覆盖以前的日志 
+
+**使用bin-log需要先配置my.cnf**
+
+```sql
+#查看bin‐log是否开启 
+show variables like '%log_bin%'; 
+```
+
+binlog三种格式：
+
+- **statement**：**当binlog=statement时，binlog记录的是SQL本身的语句，语句中可能有函数，比如uuid每次获取都是不一样的，这样同步slave的时候就会出现数据不一致问题
+  1. LOAD_FILE()
+  2. UUID()
+  3. USER()
+  4. FOUND_ROWS()
+  5. SYSDATE() (除非启动时启用了 --sysdate-is-now 选项)）
+- **row：**会记录比如删除delete from table where id < 100,会记录100条删除每条id的语句，内容占用空间大
+- **mixed：**分析sql，然后决定使用哪种记录方式
+
+statement格式记录sql原句，**可能会导致主备不一致**，所以出现了row格式但是row格式也有一个缺点，就是很占空间，比如你delete语句删除1万行记录，statement格式会记录一个sql删除1万行就没了；但是使用row格式会把这1万要删除的记录都写到binlog中，这样会导致binlog占用了大量空间同时写binlog也要耗费大量IO，影响mysql的整体速度。所以MySQL出了个mixed格式，它是前面两种格式的混合。意思是MySQL自己会判断这条SQL语句是否会引起主备不一致，是的话就会使用row，否则就用statement格式也就是说上面delete语句加上了limit1，MySQL认为会引起主备不一致，它就会使用row格式记录到binlog；如果delete 1万行记录，MySQL认为不会引起主备不一致，它就会使用statement格式记录到binlog。
+
+**binlong常用命令**
+
+```sql
+flush logs; #会多一个最新的bin‐log日志 
+show master status; #查看最后一个bin‐log日志的相关信息 
+reset master; #清空所有的bin‐log日志 
+```
+
+
 
 redo日志文件：如果事务提交成功，buffer pool里的数据还没来得及写入磁盘，此时系统宕机了，可以用redo日志里的数据恢复buffer pool里的缓存数据
 
@@ -1081,8 +1349,6 @@ redo日志文件：如果事务提交成功，buffer pool里的数据还没来�
 
 
 
-
-
 mysql主从
 
 1.数据安全
@@ -1093,27 +1359,9 @@ mysql主从
 
 
 
-#### 索引失效
+# 面试题
 
-1.mysql在使用不等于**（！=，<>，not in **，**not exists,（is null,is not null）一般不走索引 ）*的时候无法使用索引会导致全表扫描 
-
-2.不在索引列上做任何操作（计算、函数、（自动or手动）类型转换），会导致索引失效而转向全表扫描
-
-EXPLAIN SELECT FROM employees WHERE **left(name,3)*= 'LiLei'; 
-
-3.存储引擎不能使用索引中范围条件右边的列
-
-4.**<***小于、***>***大于、***<=**、**>=*这些，mysql内部优化器会根据检索比例、表大小等多个因素整体评估是否使用索引
-
-5.**字符串不加单引号索引失效**
-
-6.**少用or或in，用它查询时，mysql不一定使用索引，mysql内部优化器会根据检索比例、表大小等多个因素整体评*
-
-**估是否使用索引，详见范围查询优化**
-
-## 面试题
-
-### 线上怎么修改列的数据类型的？
+## 线上怎么修改列的数据类型的？
 
 方式一:使用mysql5.6 提供的在线修改功能。
 
@@ -1121,9 +1369,162 @@ ALTER TABLE table_name change old_field_name new_field_name field_type;
 
 那么，在mysql5.5这个版本之前，这是通过临时表拷贝的方式实现的。执行ALTER语句后，会**新建**一个带有新结构的**临时表**，将原表数据全部拷贝到临时表，然后Rename，完成创建操作。这个方式过程中，原表是可读的，不可写。
 
+## 索引失效
+
+**参考文章：**https://www.51cto.com/article/702691.html
+
+1. 联合索引的场景下，查询条件不满足最左匹配原则。
+2. 条件中带有 **or** 即使其中有条件带索引也不会使用。
+3. 索引列参与了运算，会导致全表扫描，索引失效。
+4. 索引列参与了函数处理，会导致全表扫描，索引失效。
+5. 模糊查询时(like语句)，模糊匹配的占位符位于条件的首部。
+6. 参数类型与字段类型不匹配，导致类型发生了隐式转换，索引失效。
+7. 两列数据做比较，即便两列都创建了索引，索引也会失效。
+8. 查询条件使用不等<>进行比较时，需要慎重，看结果集大小。
+9. 查询条件使用is null时正常走索引，使用is not null时，不走索引。
+10. not in和not exists如果是主键索引走索引，其他不走。
+11. order by导致索引失效，一般主键索引走，其他的索引覆盖走。
+12. 当查询条件为大于等于、in等范围查询时，根据查询结果占全表数据比例的不同，优化器有可能会放弃索引，进行全表扫描。
+
+## 表自增id用完了怎么办
+
+1. 正常自己设置的ID如果满了，在分配的话就会出现主键冲突错误
+
+2. 如果是系统自动分配的6位row_id,满了之后会从0开始，覆盖相匹配数据
+
+3. xid（8字节）,Mysql server层维护，每次执行语句的时候将它赋值给 Query_id，然后给这个变量加 1。如果当前语句是这个事务执行的第一条语句，那么 MySQL 还会同时把 Query_id 赋值给这个事务的 Xid。**纯内存变量，但是 MySQL 重启之后会重新生成新的 binlog 文件，这就保证了，同一个 binlog 文件里，Xid 一定是惟一的。从0开始**
+
+4. trx_id（6字节），InnoDB 数据可见性的核心思想是：每一行数据都记录了**更新它的 trx_id**，当一个事务读到一行数据的时候，判断这个数据是否可见的方法，就是通过事务的一致性视图与这行数据的 trx_id 做对比。**当从新从0开始的时候会出现脏读的bug**，而事务 id 从 0 开始计数，就导致了系统在这个时刻之后，所有的查询都会出现脏读的。
+
+5. thread_Id（4字节），满了从0开始，但是，你不会在 show processlist 里看到两个相同的 thread_id。
+
+   这，是因为 MySQL 设计了一个唯一数组的逻辑，给新线程分配 thread_id 的时候，逻辑代码是这样的：
+
+   ```bash
+   do {
+     new_id= thread_id_counter++;
+   } while (!thread_ids.insert_unique(new_id).second);
+   ```
+
+   这个代码逻辑简单而且实现优雅，相信你一看就能明白。
+
+**trx_id非连读递增的原因？**
+
+1. update 和 delete 语句除了事务本身，**还涉及到标记删除旧数据，也就是要把数据放到 purge 队列里等待后续物理删除**，这个操作也会把 max_trx_id+1， 因此在一个事务中至少加 2；
+2. InnoDB 的后台操作，**比如表的索引信息统计这类操作**，也是会启动内部事务的，因此你可能看到，trx_id 值并不是按照加 1 递增的。
+
+**参考文章：**http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/45%20%20%E8%87%AA%E5%A2%9Eid%E7%94%A8%E5%AE%8C%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F.md
+
+## 查找连续id的sql
+
+**连续的数字id-row-number()的值是相同的**
+
+```sql
+SELECT *,
+             count(*) over ( PARTITION BY t_rank ) as t2_rank
+      FROM (SELECT *, id - row_number() over ( ORDER BY id ) as t_rank FROM stadium WHERE people > 99) t
+
+SELECT *, id - row_number() over ( ORDER BY id ) as t_rank FROM stadium WHERE people > 99
+2,2071-01-02,109,1
+3,2071-01-03,150,1
+5,2071-01-05,145,2
+6,2071-01-06,1455,2
+7,2071-01-07,199,2
+8,2071-01-09,188,2
+
+SELECT *,
+             count(*) over ( PARTITION BY t_rank ) as t2_rank
+      FROM (SELECT *, id - row_number() over ( ORDER BY id ) as t_rank FROM stadium WHERE people > 99) t
+
+2,2071-01-02,109,1,2
+3,2071-01-03,150,1,2
+5,2071-01-05,145,2,4
+6,2071-01-06,1455,2,4
+7,2071-01-07,199,2,4
+8,2071-01-09,188,2,4
+
+```
+
+## MySQL与redis缓存的同步方案
+
+参考文章：https://blog.csdn.net/androidstarjack/article/details/115191588
+方案1：通过MySQL自动同步刷新Redis，MySQL触发器+UDF函数实现
+
+- 在MySQL中对要操作的数据设置触发器Trigger，监听操作
+- 客户端（NodeServer）向MySQL中写入数据时，触发器会被触发，触发之后调用MySQL的UDF函数
+- UDF函数可以把数据写入到Redis中，从而达到同步的效果
+- 这种方案适合于读多写少，并且不存并发写的场景
+- 因为MySQL触发器本身就会造成效率的降低，如果一个表经常被操作，这种方案显示是不合适的
+
+方案2：解析MySQL的binlog实现，将数据库中的数据同步到Redis
+canal是阿里巴巴旗下的一款开源项目，纯Java开发。基于数据库增量日志解析提供增量数据订阅&消费，目前主要支持了MySQL（也支持mariaDB）
+
+## **Mysql分页**
+
+总页数公式：totalRecord是总记录数；pageSize是一页分多少条记录
+
+```sql
+int totalPageNum = (totalRecord + pageSize - 1) / pageSize;
+```
+
+参考文章：https://blog.csdn.net/m0_45899013/article/details/10735764
 
 
-## 数据库设计范式
+
+
+
+# 常用命令
+
+## 查看SQL执行时间
+
+```sql
+show variables like '%profiling%';
+
+set profiling = on;
+
+执行语句
+
+show profiles;查看执行时间
+```
+
+## 添加唯一索引 
+
+alter table account add unique (appId, accountId)
+
+## 添加字段
+
+alter table 表名 add字段 类型 其他;
+
+## 生成数据脚本
+
+```sql
+truncate department;
+
+SET GLOBAL log_bin_trust_function_creators=TRUE; -- 创建函数一定要写这个
+DELIMITER $$   -- 写函数之前必须要写，该标志
+
+CREATE FUNCTION mock_data()     -- 创建函数（方法）
+RETURNS INT                 -- 返回类型
+BEGIN                         -- 函数方法体开始
+ DECLARE num INT DEFAULT 1000000;      -- 定义一个变量num为int类型。默认值为100 0000
+ DECLARE i INT DEFAULT 0;
+
+ WHILE i < num DO            -- 循环条件
+     INSERT INTO department(depno,depname,memo)
+     VALUES(i,concat('depname',i),concat('memo',i));
+    SET i =  i + 1;    -- i自增
+ END WHILE;    -- 循环结束
+ RETURN i;
+END;
+
+# drop function mock_data;
+
+select mock_data();
+```
+
+
+
+# 数据库设计范式
 
 第一范式
 
@@ -1137,8 +1538,6 @@ ALTER TABLE table_name change old_field_name new_field_name field_type;
 
 要求一个数据库表中不包含已在其他表中包含的非主关键字信息，即数据不能存在传递关系，即每个属性都跟主键有直接关系而不是间接关系
 
-
-
 范式化和反范式话
 
 1.性能提升-冗余，缓存和汇总
@@ -1148,10 +1547,6 @@ ALTER TABLE table_name change old_field_name new_field_name field_type;
 3.反范式设计-分库分表中的查询
 
 
-
-回表优化MRR
-
-只为用于搜索，排序或分组的列创建索引
 
 三星索引
 
@@ -1249,162 +1644,6 @@ MySQL在一般情况下执行一个查询时最多只会用到单个二级索引
 
 
 
-File Header
-
-Page Header
-
-Infimum + Supremum
-
-User Records
-
-Free Space
-
-Page Directory
-
-File Tailer
-
-
-
-
-
-独立表空间结构
-
-区 （64个页）
-
-段（256个区）用两个段来区分是叶子结点 还是非叶子结点 页节点段 非页节点段
-
-## Innodb三个特性
-
-Adaptive Hash Index
-
-Buffer pool
-
-Double write buffer
-
-预读不是特性
-
-
-
-mysql官方推荐的设置为80% 加上其他一些使用额外还有10% 比较危险
-
-show engine innodb status;查看innodb使用情况 hit rate命中率
-
-buffer pool 如果再没有专人管理和实时监控的情况下 设置为内存的60%
-
-如果有专人管理和实时监控的情况下 设置为内存的75% 并持续根据业务和数据情况进行增大和减小
-
-以上都是推荐值
-
-free链表
-
-![image-20220111155228919](noteImg/image-20220111155228919.png)
-
-每一个空白页都有一个控制块
-
-被修改过的页又叫做脏页
-
-flush链表 被修改过的页都生成一个链表 和free链表差不多
-
-LRU（Least recently used）链表的管理
-
-热区young 冷 old
-
-热区域63% 37%
-
-刷新脏页到磁盘
-
-BUF_FLUSH_LRU
-
-BUF_FLUSH_LIST 异步
-
-BUF_FLUSH_SINGLE_PAGE
-
-事务原子性是通过undo日志来实现的 
-
-持久性 redo  wal机制
-
-隔离性读写锁 mvcc
-
-acid
-
-c是目的 aid是手段
-
-redo
-
-1.logbuffer快满的时候
-
-2.事务提交的时候
-
-3.专门线程刷盘
-
-4.系统推出的时候
-
-ib_logfile0
-
-ib_logfile1
-
-覆盖写
-
-innodb_flush_log_at_trx_commit(0,1,2)
-
-0.事务提交的时候不立即同步redo日志 由后台线程同步
-
-1.默认值 commit的时候强制刷新到磁盘
-
-2.当事务commit时候，将redo日志写到操作系统的缓冲区，并不保证将日志刷新到磁盘之上
-
-redo log 那个数据页在某个位置进行了修改
-
-binlog逻辑日志 sql的原始逻辑 记录数据变化的业务逻辑 binlog无法判断哪些数据已经落盘 哪些没有落盘的
-
-redo和binlog通过2pc来保证数据一致性
-
-
-
-
-
-## mybatis的一级缓存失效 
-
-**会现在自己的threadlocal里面找sqlsession 如果没有创建一个新的 创建完成之后在设置到threadloca变量里面，如果没有开启事务就会一级缓存失效。**
-
-```java
-@Override
-public <T> T selectOne(String statement, Object parameter) {
-  return this.sqlSessionProxy.selectOne(statement, parameter);
-}
-```
-
-```java
-public SqlSessionTemplate(SqlSessionFactory sqlSessionFactory, ExecutorType executorType,
-    PersistenceExceptionTranslator exceptionTranslator) {
-
-  notNull(sqlSessionFactory, "Property 'sqlSessionFactory' is required");
-  notNull(executorType, "Property 'executorType' is required");
-
-  this.sqlSessionFactory = sqlSessionFactory;
-  this.executorType = executorType;
-  this.exceptionTranslator = exceptionTranslator;
-  this.sqlSessionProxy = (SqlSession) newProxyInstance(
-      SqlSessionFactory.class.getClassLoader(),
-      new Class[] { SqlSession.class },
-      new SqlSessionInterceptor());
-}
-```
-
-![image-20220115165113769](noteImg/image-20220115165113769.png)
-
-![image-20220115165125624](noteImg/image-20220115165125624.png)
-
-
-
-![image-20220115165225216](noteImg/image-20220115165225216.png)
-
-
-
-
-
-
-
 ## jdbc四大核心对象
 
 Connection
@@ -1429,270 +1668,27 @@ XMLConfigBuilder.java //解析xml文件
 XmlMapperBuilder.java //解析mapper文件
 ```
 
-### 添加唯一索引 
 
-alter table account add unique (appId, accountId)
 
-### 添加字段
+# 索引
 
-alter table 表名 add字段 类型 其他;
+## 聚集索引
 
+指索引项的排序方式和表中数据记录排序方式一致的索引 
 
+## 聚簇索引
 
-### MySQL与redis缓存的同步方案
+并不是一种单独的索引类型，而是一种数据存储方式。具体的细节依赖于其实现方式，但InnoDB的聚簇索引实际上在同一个结构中保存了B-Tree索引和数据行。
 
-参考文章：https://blog.csdn.net/androidstarjack/article/details/115191588
-方案1：通过MySQL自动同步刷新Redis，MySQL触发器+UDF函数实现
 
-- 在MySQL中对要操作的数据设置触发器Trigger，监听操作
-- 客户端（NodeServer）向MySQL中写入数据时，触发器会被触发，触发之后调用MySQL的UDF函数
-- UDF函数可以把数据写入到Redis中，从而达到同步的效果
 
-- 这种方案适合于读多写少，并且不存并发写的场景
-- 因为MySQL触发器本身就会造成效率的降低，如果一个表经常被操作，这种方案显示是不合适的
+# 虚拟列 Generated columns
 
-方案2：解析MySQL的binlog实现，将数据库中的数据同步到Redis
-canal是阿里巴巴旗下的一款开源项目，纯Java开发。基于数据库增量日志解析提供增量数据订阅&消费，目前主要支持了MySQL（也支持mariaDB）
+**mysql 5.7 新特性虚拟列**
 
-### **Mysql分页**
+参考文章：https://www.jianshu.com/p/8447f5aefedd
 
-总页数公式：totalRecord是总记录数；pageSize是一页分多少条记录
+MySQL的表生成列通常又叫做虚拟列或计算列。这个生成列的值是在列定义时包含了一个计算表达式计算得到的，有两种类型的生成列：
 
-```sql
-int totalPageNum = (totalRecord + pageSize - 1) / pageSize;
-```
-
-参考文章：https://blog.csdn.net/m0_45899013/article/details/10735764
-
-
-
-### 查看SQL执行时间
-
-```sql
-show variables like '%profiling%';
-
-set profiling = on;
-
-执行语句
-
-show profiles;查看执行时间
-```
-
-
-
-### 生成数据脚本
-
-```sql
-truncate department;
-
-SET GLOBAL log_bin_trust_function_creators=TRUE; -- 创建函数一定要写这个
-DELIMITER $$   -- 写函数之前必须要写，该标志
-
-CREATE FUNCTION mock_data()     -- 创建函数（方法）
-RETURNS INT                 -- 返回类型
-BEGIN                         -- 函数方法体开始
- DECLARE num INT DEFAULT 1000000;      -- 定义一个变量num为int类型。默认值为100 0000
- DECLARE i INT DEFAULT 0;
-
- WHILE i < num DO            -- 循环条件
-     INSERT INTO department(depno,depname,memo)
-     VALUES(i,concat('depname',i),concat('memo',i));
-    SET i =  i + 1;    -- i自增
- END WHILE;    -- 循环结束
- RETURN i;
-END;
-
-# drop function mock_data;
-
-select mock_data();
-```
-
-
-
-
-
-然而，当查询的索引含有唯一属性时，InnoDB存储引擎对Next-Key Lock进行优化，将其降级为Record Lock，即仅锁住索引本身，而不是范围。
-
-很明显，这时SQL语句通过索引列b进行查询，因此其使用传统的Next-Key Locking技术加锁，并且由于有两个索引，其需要分别进行锁定。对于聚集索引，其仅对列a等于5的索引加上Record Lock。而对于辅助索引，其加上的是Next-Key Lock，锁定的范围是(1，3)，特别需要注意的是，InnoDB存储引擎还会对辅助索引下一个键值加上Gap Lock，既还有一个辅助索引范围为(3，6)
-
-
-
-## 锁
-
-![img](https://upload-images.jianshu.io/upload_images/18392321-0cea8be39189fb12.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/598/format/webp)
-
-参考文章：https://www.jianshu.com/p/478bc84a7721
-
-**读锁会阻塞写(X)，但是不会堵塞读(S)。而写锁则会把读(S)和写(X)都堵塞**
-
-共享锁：
-
-```sql
-select * from table_name where ... lock in share mode
-```
-
-​		**对于共享锁而言，对当前行加共享锁，不会阻塞其他事务对同一行的读请求，但会阻塞对同一行的写请求。只有当读锁释放后，才会执行其它事物的写操作。**
-
-排他锁：
-
-```sql
-select * from table_name where ... for update
-```
-
-​		**对于排它锁而言，会阻塞其他事务对同一行的读和写操作，只有当写锁释放后，才会执行其它事务的读写操作。**
-
-#### 记录锁（Record Locks）
-
-```sql
-SELECT * FROM `test` WHERE `id`=1 FOR UPDATE;
-```
-
-- **id 列必须为唯一索引列或主键列**，否则上述语句加的锁就会变成临键锁(有关临键锁下面会讲)。
-- **同时查询语句必须为精准匹配（=）**，不能为 >、<、like等，否则也会退化成临键锁。
-
-​	在通过 **主键索引** 与 **唯一索引** 对数据行进行 UPDATE 操作时，也会对该行数据加记录锁，`记录锁也是排它(X)锁`,所以会阻塞其他事务对其**插入、更新、删除**。
-
-#### 间隙锁（Gap Locks）
-
-间隙锁 是 **Innodb 在 RR(可重复读) 隔离级别** 下为了解决`幻读问题`时引入的锁机制。**间隙锁是innodb中行锁的一种**。左开右开
-
-#### 临键锁（Next-Key Locks）
-
-**Next-key总是会去锁定索引记录，如果InnoDB存储引擎表在建立的时候没有设置任何一个索引，那么这时InnoDB存储引擎会使用隐式的主键来进行锁定。**
-
-**锁的是一个区间，例如一个索引有10，11，13和20这四个值，那么该索引可能被Next-Key Locking的区间为：**
-
-【Negative infinity，10】
-
-【10，11】
-
-【11，13】
-
-【13，20】
-
-【20，Positive infinity】
-
-采用Next-Key Lock的锁定技术称为Next-key Locking。其设计的目的是为了解决Phantom Problem，锁定的不是单个值，而是一个范围，是谓词锁（predict lock）的一种改进。除了next-key locking，还有previous-key locking技术。同样上述的索引10、11、13和20，若采用previous-key locking技术，那么可锁定的区间为：
-
-【negative infinity，10】
-
-【10，11】
-
-【11，13】
-
-【13，20】
-
-【20，positive infinity】
-
-当查询的索引还有唯一属性时，InnoDB存储引擎会对Next-key Lock进行优化，将其降级为Record Lock，即仅锁住索引本身，而不是范围。
-
-```sql
-DROP TABLE IF EXISTS t；
-CREATE TABLE T (a INT PRIMARY KEY);
-INSERT INTO t SELECT 1；
-INSERT INTO t SELECT 2；
-INSERT INTO t SELECT 5；
-```
-
-| 时间 | 会话A                                 | 会话B                    |
-| ---- | ------------------------------------- | ------------------------ |
-| 1    | BEGIN;                                |                          |
-| 2    | SELECT * FROM t WHERE a=5 FOR UPDATE; |                          |
-| 3    |                                       | BEGIN；                  |
-| 4    |                                       | INSERT INTO t SELECT 4； |
-| 5    |                                       | COMMIT；成功，不需要等待 |
-| 6    | COMMIT                                |                          |
-
-**由于a是主键且唯一，Next-Key Lock算法降级为了Record Lock，从而提高应用的并发性。正如前面所介绍的，Next-Key Lock降级为Record Lock仅在查询的列是唯一索引的情况下。若是辅助索引，则情况会完全不同。同样，首先根据如下代码创建测试表z：**
-
-```sql
-CREATE TABLE z （a INT，b INT，PRIMARY KEY（a），KEY（b））；
-INSERT INTO z SELECT 1，1；
-INSERT INTO z SELECT 3，1；
-INSERT INTO z SELECT 5，3；
-INSERT INTO z SELECT 7，6；
-INSERT INTO z SELECT 10，8；
-```
-
-表z的列b是辅助索引，若在会话A中执行下面的SQL语句：
-
-```sql
-SELECT * FROM z WHERE b =3 FOR UPDATE；
-```
-
-很明显，这时SQL语句通过索引列b进行查询，因此其使用传统的Next-Key Locking技术加锁，并且由于有两个索引，其需要分别进行锁定。对于聚集索引，其仅对列a等于5的索引加上Record Lock。而对于辅助索引，其加上的是Next-Key Lock，锁定的范围是（1，3），特别注意的是，**InnoDB存储引擎还会对辅助索引下一个键值加上Gap Lock**，既还有一个辅助索引范围为（3，6）的锁。因此，若在新会话B中运行下面的SQL语句，都会被阻塞：
-
-```sql
-SELECT * FROM z WHERE a = 5 LOCK IN SHARE MODE;
-INSERT INTO z SELECT 4,2;
-INSERT INTO z SELECT 6,5;
-```
-
-第一个SQL语句不能执行，因为在会话A种执行的SQL语句已经对聚集索引中列a = 5的值加上X锁，因此执行会被阻塞。第二个SQL语句，主键插入4，没有问题，但是插入的辅助索引值2在锁定的范围（1，3）中，因此执行同样会被阻塞。第三个SQL语句，插入的主键6没有被锁定，5也不在范围（1，3）之间。但插入的值在另一个锁定的范围（3，6）中，故同样需要等待。而下面的SQL语句，不会被阻塞，可以立即执行：
-
-```sql
-INSERT INTO z SELECT 8,6;
-INSERT INTO z SELECT 2,0;
-INSERT INTO z SELECT 6,7;
-```
-
-在InnoDB存储引擎中，对于INSERT的操作，其会检查插入记录的下一条记录是否被锁定，若已经被锁定，则不允许查询。对于上面的例子，会话A已经锁定了表z中b=3的记录，即已经锁定了（1，3）的范围，这时若在其他会话中进行如下的插入同样会导致阻塞：
-
-```sql
-INSERT INTO z SELECT 2,2;
-```
-
-因为在辅助索引列b上插入值为2的记录时，会检测到下一个记录3已经被索引。而将插入修改为如下的值，可以立即执行：
-
-```sql
-INSERT INTO z SELECT 2，0；
-```
-
-最后需再次提醒的是，对于唯一键值的锁定，Next-Key Lock降级为Record Lock仅存于查询所有的唯一索引列。**若唯一索引有多个列组成，而查询是查找多个唯一索引列中的其中一个，**那么查询其实是range类型查询，而不是point类型查询，故InnoDB存储引擎**依然适用Next-Key Lock进行锁定。**
-
-#### **总结：**
-
-1、锁唯一索引会降级为Record Lock
-
-2、锁辅助索引会先锁定聚集索引一条记录用**Record Lock**，对于辅助索引其加上的是**Next-Key Lock**，还有对于辅助索引下一键值加上**Gap Lock**
-
-3、唯一索引有多个列组成，查询唯一索引列中的其中一个，依然会使用Next-Key Lock进行锁定
-
-
-
-NativeSession.execSQL () 方法里，和 MySQL Server 交互的所有指令，最终都会调用这个方法执行。
-
-
-
-
-
-# 查找连续id的sql
-
-连续的数字id-row-number()的值是相同的
-
-```sql
-SELECT *,
-             count(*) over ( PARTITION BY t_rank ) as t2_rank
-      FROM (SELECT *, id - row_number() over ( ORDER BY id ) as t_rank FROM stadium WHERE people > 99) t
-
-SELECT *, id - row_number() over ( ORDER BY id ) as t_rank FROM stadium WHERE people > 99
-2,2071-01-02,109,1
-3,2071-01-03,150,1
-5,2071-01-05,145,2
-6,2071-01-06,1455,2
-7,2071-01-07,199,2
-8,2071-01-09,188,2
-
-SELECT *,
-             count(*) over ( PARTITION BY t_rank ) as t2_rank
-      FROM (SELECT *, id - row_number() over ( ORDER BY id ) as t_rank FROM stadium WHERE people > 99) t
-
-2,2071-01-02,109,1,2
-3,2071-01-03,150,1,2
-5,2071-01-05,145,2,4
-6,2071-01-06,1455,2,4
-7,2071-01-07,199,2,4
-8,2071-01-09,188,2,4
-
-```
-
+Virtual（虚拟）：这个类型的列会在读取表记录时自动计算此列的结果并返回。
+ Stored（存储）：这个类型的列会在表中插入一条数据时自动计算对应的值，并插入到这个列中，那么这个列会作为一个常规列存在表中。虚拟生成列有时候比存储生成列更有用，因为它不会占用存储空间。
