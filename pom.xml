@@ -192,6 +192,12 @@
             <artifactId>javapoet</artifactId>
             <version>1.13.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.phantomthief/more-lambdas -->
+        <dependency>
+            <groupId>com.github.phantomthief</groupId>
+            <artifactId>more-lambdas</artifactId>
+            <version>0.1.55</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
