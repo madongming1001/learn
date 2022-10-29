@@ -19,7 +19,6 @@ public class WaitNotify {
     }
 
     static class Wait implements Runnable {
-        @Override
         public void run() {
             synchronized (lock) {
                 while (flag) {
@@ -36,7 +35,6 @@ public class WaitNotify {
 
     static class Notify implements Runnable {
         @SneakyThrows
-        @Override
         public void run() {
             // 加锁，拥有lock的Monitor
             synchronized (lock) {
