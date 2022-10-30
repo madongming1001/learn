@@ -1,6 +1,5 @@
-package com.madm.learnroute.javaee.concurrency.juc;
+package com.madm.learnroute.javaee.concurrent.juc;
 
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;

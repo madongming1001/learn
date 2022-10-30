@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee.concurrent;
+package com.madm.learnroute.javaee.concurrent.juc;
 
 /**
  * @author dongming.ma

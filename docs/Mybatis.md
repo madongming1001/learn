@@ -106,3 +106,45 @@ SqlSession**（线程独有）**它是应用程序与持久层之间交互操作
 # 面试官：MyBatis 插件有什么用途？说说底层原理？我竟然不会。
 
 参考文章：https://mp.weixin.qq.com/s/acddVQSo2exXd0yij8wFiQ
+
+# mybatis的一级缓存失效 
+
+**会现在自己的threadlocal里面找sqlsession 如果没有创建一个新的 创建完成之后在设置到threadloca变量里面，如果没有开启事务就会一级缓存失效。**
+
+```java
+@Override
+public <T> T selectOne(String statement, Object parameter) {
+  return this.sqlSessionProxy.selectOne(statement, parameter);
+}
+```
+
+```java
+public SqlSessionTemplate(SqlSessionFactory sqlSessionFactory, ExecutorType executorType,
+    PersistenceExceptionTranslator exceptionTranslator) {
+
+  notNull(sqlSessionFactory, "Property 'sqlSessionFactory' is required");
+  notNull(executorType, "Property 'executorType' is required");
+
+  this.sqlSessionFactory = sqlSessionFactory;
+  this.executorType = executorType;
+  this.exceptionTranslator = exceptionTranslator;
+  this.sqlSessionProxy = (SqlSession) newProxyInstance(
+      SqlSessionFactory.class.getClassLoader(),
+      new Class[] { SqlSession.class },
+      new SqlSessionInterceptor());
+}
+```
+
+![image-20220115165113769](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220115165113769.png)
+
+![image-20220115165125624](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220115165125624.png)
+
+
+
+![image-20220115165225216](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220115165225216.png)
+
+
+
+
+
+# 

@@ -63,9 +63,9 @@ public class ProtostuffUtil {
         }
     }
 
-    public static void main(String[] args) {
-        byte[] userBytes = ProtostuffUtil.serializer(new User(1, "zhuge", Lists.newArrayList()));
-        User user = ProtostuffUtil.deserializer(userBytes, User.class);
-        System.out.println(user);
-    }
+//    public static void main(String[] args) {
+//        byte[] userBytes = ProtostuffUtil.serializer(new User(1, "zhuge", Lists.newArrayList()));
+//        User user = ProtostuffUtil.deserializer(userBytes, User.class);
+//        System.out.println(user);
+//    }
 }

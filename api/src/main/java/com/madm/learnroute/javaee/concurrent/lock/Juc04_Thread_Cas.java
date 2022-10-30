@@ -1,6 +1,6 @@
-package com.madm.learnroute.javaee.concurrency.lock;
+package com.madm.learnroute.javaee.concurrent.lock;
 
-import com.madm.learnroute.javaee.concurrency.util.UnsafeInstance;
+import com.madm.learnroute.javaee.concurrent.util.UnsafeInstance;
 import lombok.extern.slf4j.Slf4j;
 import sun.misc.Unsafe;
 

@@ -472,7 +472,7 @@ MethodMatcher getMethodMatcher();
 //ThrowsAdviceAdapter
 ```
 
-spirng boot项目的@EnableAspectJAutoProxy 最终会通过Import注册一个AnnotationAwareAspectJAutoProxyCreator类d
+spirng boot项目的@EnableAspectJAutoProxy 最终会通过Import注册一个AnnotationAwareAspectJAutoProxyCreator类
 
 ```java
 			//AfterReturningAdviceAdapter AfterReturningAdviceInterceptor
@@ -1015,3 +1015,4 @@ beanFactory.registerResolvableDependency(ApplicationContext.class, this);
 # CORS
 
 **CORS** （Cross-Origin Resource Sharing，跨域资源共享）是一个系统，它由一系列传输的[HTTP 头](https://developer.mozilla.org/zh-CN/docs/Glossary/HTTP_header)组成，这些 HTTP 头决定浏览器是否阻止前端 JavaScript 代码获取跨域请求的响应。
+

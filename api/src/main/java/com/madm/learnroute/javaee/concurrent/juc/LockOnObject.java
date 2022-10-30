@@ -1,6 +1,4 @@
-package com.madm.learnroute.javaee.concurrency.juc;
-
-import java.util.Objects;
+package com.madm.learnroute.javaee.concurrent.juc;
 
 public class LockOnObject {
     private static Object object = new Object();

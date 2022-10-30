@@ -218,17 +218,17 @@ public class SnowflakeIdUtil {
     /**
      * 测试
      */
-    public static void main(String[] args) throws ParseException {
-        System.out.println(System.currentTimeMillis());
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 5; i++) {
-            long id = SnowflakeIdUtil.generateId();
-            System.out.println(id);
-        }
-        System.out.println((System.nanoTime() - startTime) / 1000000 + "ms");
-
-        Date date = DateUtils.parseDate("2021-01-01 00:00:00","yyyy-MM-dd HH:mm:ss");
-        System.out.println(date.getTime());
-    }
+//    public static void main(String[] args) throws ParseException {
+//        System.out.println(System.currentTimeMillis());
+//        long startTime = System.nanoTime();
+//        for (int i = 0; i < 5; i++) {
+//            long id = SnowflakeIdUtil.generateId();
+//            System.out.println(id);
+//        }
+//        System.out.println((System.nanoTime() - startTime) / 1000000 + "ms");
+//
+//        Date date = DateUtils.parseDate("2021-01-01 00:00:00","yyyy-MM-dd HH:mm:ss");
+//        System.out.println(date.getTime());
+//    }
 
 }

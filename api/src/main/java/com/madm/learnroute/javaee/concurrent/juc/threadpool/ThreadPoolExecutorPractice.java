@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee.concurrency.juc.threadpool;
+package com.madm.learnroute.javaee.concurrent.juc.threadpool;
 
 import lombok.SneakyThrows;
 

@@ -1,4 +1,4 @@
-### 简单介绍Netty？
+# 简单介绍Netty？
 
 第一：Netty 是一个 基于 NIO 模型的高性能网络通信框架，其实可以认为它是对NIO网络模型的封装，提供了简单易用的API，我们可以利用这些封装好的API快速开发自己的网络程序。
 
@@ -209,6 +209,13 @@ private void setUpdateEvents(int fd, byte events, boolean force) {
 **为什么Netty使用NIO而不是AIO？**
 
 在Linux系统上，**AIO的底层实现仍使用Epoll**，没有很好实现AIO，因此在性能上没有明显的优势，而且被JDK封装了一层不容易深度优化，Linux上AIO还不够成熟。Netty是**异步非阻塞**框架，Netty在NIO上做了很多异步的封装。
+
+**为什么BIO不结合1:1线程来使用？**
+
+1. **线程的创建和销毁成本很高**，在Linux这样的操作系统中，线程本质上就是一个进程。创建和销毁都是重量级的系统函数。
+2. **线程本身占用较大内存**，像Java的线程栈，一般至少分配512K～1M的空间，如果系统中的线程数过千，恐怕整个JVM的内存都会被吃掉一半。 
+3. **线程的切换成本是很高的。**操作系统发生线程切换的时候，需要保留线程的上下文，然后执行系统调用。如果线程数过高，可能执行线程切换的时间甚至会大于线程执行的时间，这时候带来的表现往往是系统load偏高、CPU sy使用率特别高（超过20%以上)，导致系统几乎陷入不可用的状态。
+4. **容易造成锯齿状的系统负载。**因为系统负载是用活动线程数或CPU核心数，一旦线程数量高但外部网络环境不是很稳定，就很容易造成大量请求的结果同时返回，激活大量阻塞线程从而使系统负载压力过大。
 
 
 
@@ -616,3 +623,61 @@ select 是以数组形势保存的
 poll 以链表形式保存的文件描述符
 
 一个进程能够同时打开的文件描述符是1024个
+
+
+
+# javaNIO
+
+## **NIO三大核心组件**
+
+NIO有三大核心组件：Selector选择器、Channel管道、buffer缓冲区。
+
+**Selector**
+
+Selector的英文含义是“选择器”，自称为时间注册器，通道可以注册感兴趣的事件。
+
+**Channels**
+
+和操作系统之间进行时间交互、传输内容的通道，可同时读写，双工机制。
+
+**Buffer**
+
+channels读取数据需要通过buffer，buffer缓冲区，buffer可以读写切换，也可以进行数据指针移动。
+
+## Reactor模型类型
+
+**Reactor模式称为反应器模式或应答者模式，是基于事件驱动的设计模式，拥有一个或多个并发输入源，有一个服务处理器和多个请求处理器，服务处理器会同步的将输入的请求事件以多路复用的方式分发给相应的请求处理器。**
+
+Reactor设计模式是一种为处理并发服务请求，并将请求提交到一个或多个服务处理程序的事件设计模式。当客户端请求抵达后，服务处理程序使用多路分配策略，由一个非阻塞的线程来接收所有请求，然后将请求派发到相关的工作线程并进行处理的过程。
+
+在事件驱动的应用中，将一个或多个客户端的请求分离和调度给应用程序，同步有序地接收并处理多个服务请求。对于高并发系统经常会使用到Reactor模式，用来替代常用的多线程处理方式以节省系统资源并提高系统的吞吐量。
+
+### **单线程Reactor模式流程**
+
+​		服务器端的Reactor是一个线程对象，该线程会启动时间循环，并使用Selector（选择器）来实现IO的多路复用。注册一个Acceptor事件处理器到Reactor中，Acceptor事件处理器所关注的时间是ACCEPT事件，这样Reactor会监听客户端向服务端发起的连接请求事件（ACCEPT）
+
+​	 客户端向服务器端发起一个连接请求，Reactor监听到了该ACCEPT事件的发生并将该ACCEPT事件派发给相应的Acceptor处理器来进行处理。Acceptor处理器通过accept()方法得到与这个客户端对应的连接(SocketChannel)，然后将该连接所关注的READ事件以及对应的READ事件处理器注册到Reactor中，这样一来Reactor就会监听该连接的READ事件了。
+
+​	 当Reactor监听到有读或者写事件发生时，将相关的事件派发给对应的处理器进行处理。比如，读处理器会通过SocketChannel的read()方法读取数据，此时read()操作可以直接读取到数据，而不会堵塞与等待可读的数据到来。
+
+​	 每当处理完所有就绪的感兴趣的I/O事件后，Reactor线程会再次执行select()阻塞等待新的事件就绪并将其分派给对应处理器进行处理。
+
+注意，Reactor的单线程模式的单线程主要是针对于I/O操作而言，也就是所有的I/O的accept()、read()、write()以及connect()操作都在一个线程上完成的。
+
+但在目前的单线程Reactor模式中，不仅I/O操作在该Reactor线程上，**连非I/O的业务操作也在该线程上进行处理了**，这可能会大大延迟I/O请求的响应。所以我们应该将非I/O的业务逻辑操作从Reactor线程上卸载，以此来加速Reactor线程对I/O请求的响应。
+
+![https://note.youdao.com/yws/public/resource/8ef33654f746921ad769ad9fe91a4c8f/xmlnote/OFFICED5F6435B59444264B2E0B3F4A9FE3468/10075](https://note.youdao.com/yws/public/resource/8ef33654f746921ad769ad9fe91a4c8f/xmlnote/OFFICED5F6435B59444264B2E0B3F4A9FE3468/10075)
+
+### 单线程Reactor，工作者线程池模式
+
+业务处理剥离出线程模型中，交给工作者线程池处理
+
+![https://note.youdao.com/yws/public/resource/8ef33654f746921ad769ad9fe91a4c8f/xmlnote/OFFICE4A2F9D2C8A8F4220BB69B68DC0E3AFCD/10076](https://note.youdao.com/yws/public/resource/8ef33654f746921ad769ad9fe91a4c8f/xmlnote/OFFICE4A2F9D2C8A8F4220BB69B68DC0E3AFCD/10076)
+
+### 多线程主从Reactor模式
+
+主Reactor只负责接收客户端请求，acceptor注册事件之后得到的SocketChannel交给subReactor，然后subReactor进行数据的read和send，其中的非IO操作部分交给工作者线程池。
+
+![https://note.youdao.com/yws/public/resource/8ef33654f746921ad769ad9fe91a4c8f/xmlnote/OFFICE051C61BA01BD49428FE89212C4FABA34/10077](https://note.youdao.com/yws/public/resource/8ef33654f746921ad769ad9fe91a4c8f/xmlnote/OFFICE051C61BA01BD49428FE89212C4FABA34/10077)
+
+清理脏数据、无用连接的释放、大 key 的删除

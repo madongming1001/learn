@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee.concurrency.juc;
+package com.madm.learnroute.javaee.concurrent.juc;
 
 public class ThreadJoinDemo {
 

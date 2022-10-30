@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee.concurrency.juc;
+package com.madm.learnroute.javaee.concurrent.juc;
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;

@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee.concurrency.juc;
+package com.madm.learnroute.javaee.concurrent.juc;
 
 import com.madm.learnroute.javaee.Discount;
 import lombok.Data;

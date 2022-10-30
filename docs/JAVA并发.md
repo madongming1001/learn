@@ -1,4 +1,4 @@
-
+# Java线程池实现原理
 
 ## ThreadPoolExecutor类继承关系
 
@@ -12,17 +12,17 @@
 
 ![image-20211119112153576](noteImg/image-20211119112153576.png)
 
-## 
 
-## interface Executor类
+
+## 类主要定义
+
+**interface Executor类**
 
 ```java
 void execute(Runnable command);
 ```
 
-
-
-## abstract class AbstractExecutorService类
+**abstract class AbstractExecutorService类**
 
 ```java
 public <T> Future<T> submit(Callable<T> task) {
@@ -33,9 +33,7 @@ public <T> Future<T> submit(Callable<T> task) {
 }
 ```
 
-
-
-## Worker对象结构
+**Worker**
 
 ```java
 /** Thread this worker is running in.  Null if factory fails. */
@@ -45,6 +43,35 @@ Runnable firstTask;
 /** Per-thread task counter */
 volatile long completedTasks;
 ```
+
+ThreadPoolExecutor实现的顶层接口是Executor，顶层接口Executor提供了一种思想：**将任务提交和任务执行进行解耦。**用户无需关注如何创建线程，如何调度线程来执行任务，用户只需提供Runnable对象，将任务的运行逻辑提交到执行器(Executor)中，由Executor框架完成线程的调配和任务的执行部分。**ExecutorService接口增加了一些能力：（1）扩充执行任务的能力，补充可以为一个或一批异步任务生成Future的方法；**（2）提供了管控线程池的方法，比如停止线程池的运行。**AbstractExecutorService则是上层的抽象类，将执行任务的流程串联了起来，保证下层的实现只需关注一个执行任务的方法即可。最下层的实现类ThreadPoolExecutor实现最复杂的运行部分，ThreadPoolExecutor将会一方面维护自身的生命周期，另一方面同时管理线程和任务，使两者良好的结合从而执行并行任务。**
+
+
+
+**ThreadPoolExecutor的运行状态有5种，分别为：**
+
+![img](https://p0.meituan.net/travelcube/62853fa44bfa47d63143babe3b5a4c6e82532.png)
+
+
+
+## Worker线程管理
+
+Worker线程
+
+**线程池为了掌握线程的状态并维护线程的生命周期**，设计了线程池内的工作线程Worker。我们来看一下它的部分代码：
+
+```Java
+private final class Worker extends AbstractQueuedSynchronizer implements Runnable{
+    final Thread thread;//Worker持有的线程
+    Runnable firstTask;//初始化的任务，可以为null
+}
+```
+
+Worker这个工作线程，实现了Runnable接口，并持有一个线程thread，一个初始化的任务firstTask。thread是在调用构造方法时通过ThreadFactory来创建的线程，可以用来执行任务；firstTask用它来保存传入的第一个任务，这个任务可以有也可以为null。如果这个值是非空的，那么线程就会在启动初期立即执行这个任务，**也就对应核心线程创建时的情况**；如果这个值是null，那么就需要创建一个线程去执行任务列表（workQueue）中的任务，**也就是非核心线程的创建。**
+
+
+
+**参考文章：**https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html
 
 
 
@@ -61,6 +88,22 @@ volatile long completedTasks;
 ![image-20211119143915735](noteImg/image-20211119143915735.png)
 
 ![image-20211119143928425](noteImg/image-20211119143928425.png)
+
+### java如何创建thread线程，jvm回掉run方法
+
+从C/C++方法中调用的一些Java方法主要有：
+
+（1）Java主类中的main()方法；
+
+（2）Java主类装载时，调用JavaCalls::call()函数执行checkAndLoadMain()方法；
+
+（3）类的初始化过程中，调用JavaCalls::call()函数执行的Java类初始化方法<clinit>，可以查看JavaCalls::call_default_constructor()函数，有对<clinit>方法的调用逻辑；
+
+（4）我们先省略main方法的执行流程（其实main方法的执行也是先启动一个JavaMain线程，套路都是一样的），单看某个JavaThread的启动过程。JavaThread的启动最终都要通过一个native方法java.lang.Thread#start0()完成的，这个方法经过解释器的native_entry入口，调用到了JVM_StartThread()函数。其中的static void thread_entry(JavaThread* thread, TRAPS)函数中会调用JavaCalls::call_virtual()函数。JavaThread最终会通过JavaCalls::call_virtual()函数来调用字节码中的run()方法；
+
+（5）在SystemDictionary::load_instance_class()这个能体现双亲委派的函数中，如果类加载器对象不为空，则会调用这个类加载器的loadClass()函数（通过call_virtual()函数来调用）来加载类。
+
+
 
 
 
@@ -136,10 +179,6 @@ DiscardPolicy
 ```
 
 
-
- 
-
-## 线程时间片一般是10ms～100ms不等，上下文切换时间大约为5ms～10ms
 
 ## 进程
 
@@ -800,3 +839,6 @@ ObjectMonitor::ObjectMonitor() {
 
 线程有两种状态，在任何一个时间点上，线程是可结合的（joinable），或者是分离的（detached）。 一个可结合的线程能够被其他线程收回其资源和杀死； 相反，一个分离的线程是不能被其他线程回收或杀死的，它的存储器资源在它终止时由系统自动释放。
 
+# Java线程池KeepAliveTime原理
+
+​		其实只是在线程从工作队列 poll 任务时，加上了超时限制，如果线程在 keepAliveTime 的时间内 poll 不到任务，那我就认为这条线程没事做，可以干掉了 。

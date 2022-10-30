@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee.concurrency.synchronize;
+package com.madm.learnroute.javaee.concurrent.synchronize;
 
 /**
  * 查看JIT编译结果

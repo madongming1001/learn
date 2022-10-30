@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee.concurrency.juc;
+package com.madm.learnroute.javaee.concurrent.juc;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

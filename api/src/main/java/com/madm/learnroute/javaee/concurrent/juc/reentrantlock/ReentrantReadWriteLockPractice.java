@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee.concurrency.juc.reentrantlock;
+package com.madm.learnroute.javaee.concurrent.juc.reentrantlock;
 
 import com.mdm.pojo.User;
 

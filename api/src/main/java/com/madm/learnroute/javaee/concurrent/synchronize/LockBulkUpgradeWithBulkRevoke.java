@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee.concurrency.synchronize;
+package com.madm.learnroute.javaee.concurrent.synchronize;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openjdk.jol.info.ClassLayout;

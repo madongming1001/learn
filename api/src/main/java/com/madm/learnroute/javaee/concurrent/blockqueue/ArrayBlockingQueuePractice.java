@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee.concurrency.blockqueue;
+package com.madm.learnroute.javaee.concurrent.blockqueue;
 
 import java.util.concurrent.ArrayBlockingQueue;
 

@@ -7,6 +7,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * 什么是GMT（Greenwich Mean Time）格林尼治标准时间（也称格林威治时间）
@@ -46,7 +48,9 @@ public class java8DateTimePractice {
         LocalDate now = LocalDate.now();
         LocalDate lastWeek = now.minusWeeks(1);
         LocalDate nextWeek = now.plusWeeks(1);
-
+        //asia亚洲
+        TimeZone timeZone = TimeZone.getDefault();
+        System.out.println(timeZone);
         // 某个月有多少天
         LocalDate localDate = LocalDate.of(2018, 2, 22);
         LocalDate lastDay = localDate.with(TemporalAdjusters.lastDayOfMonth());

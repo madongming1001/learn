@@ -59,12 +59,12 @@ public class GenerateDataUtil {
         }
     }
 
-    public static void main(String[] args) {
-        GenerateDataUtil generateData = new GenerateDataUtil();
-        try {
-            generateData.generateData();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public static void main(String[] args) {
+//        GenerateDataUtil generateData = new GenerateDataUtil();
+//        try {
+//            generateData.generateData();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

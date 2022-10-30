@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee.concurrent;
+package com.madm.learnroute.javaee.concurrent.juc;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;

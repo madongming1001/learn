@@ -38,38 +38,38 @@ public class RandomByWeightUtil {
      *
      * @param args
      */
-    public static void main(String[] args) {
-        List<Integer> value = new ArrayList<>();
-        value.add(1);
-        value.add(2);
-        value.add(3);
-        List<Integer> weight = new ArrayList<>();
-        weight.add(1);
-        weight.add(2);
-        weight.add(3);
-
-        int totalNum = 9999_9999;
-        int result1 = 0;
-        int result2 = 0;
-        int result3 = 0;
-        for (int i = 0; i < totalNum; i++) {
-            Integer randomSchemeByWeight = getRandomSchemeByWeight(value, weight);
-            switch (randomSchemeByWeight) {
-                case 1:
-                    result1++;
-                    break;
-                case 2:
-                    result2++;
-                    break;
-                case 3:
-                    result3++;
-                    break;
-                default:
-                    throw new RuntimeException("Calculate Error");
-            }
-        }
-        System.out.println("result1:" + result1 + "\tAvg:" + (float) result1 / (float) totalNum);
-        System.out.println("result2:" + result2 + "\tAvg:" + (float) result2 / (float) totalNum);
-        System.out.println("result3:" + result3 + "\tAvg:" + (float) result3 / (float) totalNum);
-    }
+//    public static void main(String[] args) {
+//        List<Integer> value = new ArrayList<>();
+//        value.add(1);
+//        value.add(2);
+//        value.add(3);
+//        List<Integer> weight = new ArrayList<>();
+//        weight.add(1);
+//        weight.add(2);
+//        weight.add(3);
+//
+//        int totalNum = 9999_9999;
+//        int result1 = 0;
+//        int result2 = 0;
+//        int result3 = 0;
+//        for (int i = 0; i < totalNum; i++) {
+//            Integer randomSchemeByWeight = getRandomSchemeByWeight(value, weight);
+//            switch (randomSchemeByWeight) {
+//                case 1:
+//                    result1++;
+//                    break;
+//                case 2:
+//                    result2++;
+//                    break;
+//                case 3:
+//                    result3++;
+//                    break;
+//                default:
+//                    throw new RuntimeException("Calculate Error");
+//            }
+//        }
+//        System.out.println("result1:" + result1 + "\tAvg:" + (float) result1 / (float) totalNum);
+//        System.out.println("result2:" + result2 + "\tAvg:" + (float) result2 / (float) totalNum);
+//        System.out.println("result3:" + result3 + "\tAvg:" + (float) result3 / (float) totalNum);
+//    }
 }

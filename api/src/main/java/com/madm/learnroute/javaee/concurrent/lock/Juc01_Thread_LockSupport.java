@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee.concurrency.lock;
+package com.madm.learnroute.javaee.concurrent.lock;
 
 import lombok.extern.slf4j.Slf4j;
 

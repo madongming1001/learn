@@ -1,6 +1,6 @@
-package com.madm.learnroute.javaee.concurrency.lock;
+package com.madm.learnroute.javaee.concurrent.lock;
 
-import com.madm.learnroute.javaee.concurrency.util.UnsafeInstance;
+import com.madm.learnroute.javaee.concurrent.util.UnsafeInstance;
 import sun.misc.Unsafe;
 
 import java.util.concurrent.ConcurrentLinkedQueue;

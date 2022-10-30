@@ -1,6 +1,6 @@
-package com.madm.learnroute.javaee.concurrency.blockqueue;
+package com.madm.learnroute.javaee.concurrent.blockqueue;
 
-import com.madm.learnroute.javaee.concurrency.juc.threadpool.ThreadExecutionPractice;
+import com.madm.learnroute.javaee.concurrent.juc.threadpool.ThreadExecutionPractice;
 import lombok.SneakyThrows;
 
 import java.util.concurrent.LinkedBlockingQueue;

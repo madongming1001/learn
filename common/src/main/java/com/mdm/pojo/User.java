@@ -3,6 +3,7 @@ package com.mdm.pojo;
 import lombok.*;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -10,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Accessors(chain = true)
-public class User {
+public class User implements Serializable {
     private Integer id;
     @NonNull
     private String name;
@@ -21,8 +22,7 @@ public class User {
         this.name = user.getName();
     }
 
-    public User(Integer id, @NonNull String name) {
+    public User(Integer id, String... name) {
         this.id = id;
-        this.name = name;
     }
 }
