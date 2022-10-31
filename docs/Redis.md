@@ -1559,17 +1559,17 @@ redis cluster节点间采取gossip协议进行通信
 
 **gossip：** 
 
-​     ![0](https://note.youdao.com/yws/public/resource/218d9ba28237a441217d0e024d410769/xmlnote/362F42FC9DAE4AB8A59C5DC7242EE0F0/101611) 
+![image-20221031210346014](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221031210346014.png)
 
-gossip协议包含多种消息，包括ping，pong，meet，fail等等。 
+gossip协议包含多种消息，包括**ping**，**pong**，**meet**，**fail**等等。 
 
-meet：某个节点发送meet给新加入的节点，让新节点加入集群中，然后新节点就会开始与其他节点进行通信；
+**meet**：某个节点发送meet给新加入的节点，让新节点加入集群中，然后新节点就会开始与其他节点进行通信；
 
-ping：每个节点都会频繁给其他节点发送ping，其中包含自己的状态还有自己维护的集群元数据，互相通过ping交换元数据(类似自己感知到的集群节点增加和移除，hash slot信息等)； 
+**ping**：每个节点都会频繁给其他节点发送ping，其中包含自己的状态还有自己维护的集群元数据，互相通过ping交换元数据(类似自己感知到的集群节点增加和移除，hash slot信息等)； 
 
-pong: 对ping和meet消息的返回，包含自己的状态和其他信息，也可以用于信息广播和更新； 
+**pong**: 对ping和meet消息的返回，包含自己的状态和其他信息，也可以用于信息广播和更新； 
 
-fail: 某个节点判断另一个节点fail之后，就发送fail给其他节点，通知其他节点，指定的节点宕机了。
+**fail**: 某个节点判断另一个节点fail之后，就发送fail给其他节点，通知其他节点，指定的节点宕机了。
 
 
 
