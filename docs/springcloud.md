@@ -25,3 +25,4 @@ Spring Cloud Gateway 的Filter的种类有两种，一：GatewayFilter (单一�
 ## **[嵌套校验]**
 
 一个待验证的pojo类，其中还包含了待验证的对象，需要在待验证对象上注解`@Valid`，才能验证待验证对象中的成员属性，这里不能使用`@Validated`。
+

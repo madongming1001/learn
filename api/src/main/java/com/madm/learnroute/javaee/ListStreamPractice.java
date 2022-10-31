@@ -73,10 +73,10 @@ public class ListStreamPractice {
         List<String> oldInstance = Lists.newArrayList("3", "232", "35", "24", "5", "6", "1");
 
         //add：加、subtract：减、multiply：乘、divide：除
-        System.out.println(CollectionUtils.union(newInstance, oldInstance));//并集
-        System.out.println(CollectionUtils.intersection(newInstance, oldInstance));//交集
-        System.out.println(CollectionUtils.disjunction(newInstance, oldInstance));//交集的补集
-        System.out.println(CollectionUtils.subtract(newInstance, oldInstance));//集合相减
+        System.out.println(CollectionUtils.union(newInstance, oldInstance));//并集：给定两个集合A，B，把他们所有的元素合并在一起组成的集合
+        System.out.println(CollectionUtils.intersection(newInstance, oldInstance));//交集：对于给定的两个集合，返回一个包含两个集合中共有元素的新集合。
+        System.out.println(CollectionUtils.disjunction(newInstance, oldInstance));//差集：对于给定的两个集合，返回一个包含所有存在于第一个集合且不存在于第二个集合的元素的新集合
+        System.out.println(CollectionUtils.subtract(newInstance, oldInstance));//子集：验证一个给定集合是否是另一个集合的子集。
 
 
         System.out.println(CollectionUtils.isNotEmpty(newInstance));

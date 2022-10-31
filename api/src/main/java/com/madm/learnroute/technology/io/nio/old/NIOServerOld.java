@@ -11,7 +11,7 @@ import java.util.Iterator;
 
 public class NIOServerOld {
 
-    //public static ExecutorService pool = Executors.newFixedThreadPool(10);
+//    public static ExecutorService pool = Executors.newFixedThreadPool(10);
 
     public static void main(String[] args) throws IOException {
         // 创建一个在本地端口进行监听的服务Socket通道.并设置为非阻塞方式
@@ -27,7 +27,7 @@ public class NIOServerOld {
         while (true) {
             System.out.println("等待事件发生。。");
             // 轮询监听channel里的key，select是阻塞的，accept()也是阻塞的
-            int select = selector.select();
+            selector.select();
 
             System.out.println("有事件发生了。。");
             // 有客户端请求，被轮询监听到

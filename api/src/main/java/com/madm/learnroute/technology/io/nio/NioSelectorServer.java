@@ -21,13 +21,32 @@ public class NioSelectorServer {
         serverSocket.socket().bind(new InetSocketAddress(9000),1024);
         // 设置ServerSocketChannel为非阻塞
         serverSocket.configureBlocking(false);
-        // 打开Selector处理Channel，即创建epoll epoll_create命令创建
+        // 打开Selector处理Channel，即创建epoll epoll_create 命令创建
+        /**
+         * epfd
+         * struct eventpoll {
+         *     sys_epoll_wait用到的等待队列
+         *     wait_queue_head_t wq;
+         *     红黑树的根节点，这颗树中存储着所有添加到epoll中的需要监控的事件
+         *     struct rb_root  rbr;
+         *     双链表中则存放着将要通过 epoll_wait 返回给用户的满足条件的事件
+         *     struct list_head rdlist;
+         * };
+         * 其中wq为等待队列链表，软中断数据就绪的时候会通过 wq 来找到阻塞在 epoll 对象上的用户进程。（epoll_wait若就绪队列中无数据，会将当前进程加入到等待队列中）
+         *
+         * int epoll_create(int size); // 内核中间加一个ep对象，把所有需要监听的 socket 都放到 ep 对象中
+         * int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event); // epoll_ctl负责把socket增加、删除到内核红黑树
+         * int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout);// epoll_wait 负责检测可读队列，没有可读socket则阻塞进程,收集发生的事件的连接
+         * 而所有添加到epoll中的事件都会与设备(网卡)驱动程序建立回调关系，
+         * 也就是说，当相应的事件发生时会调用这个回调方法。这个回调方法在内核中叫ep_poll_callback,它会将发生的事件epitem添加到rdlist双链表中。
+         *
+         */
         Selector selector = Selector.open();
         //把ServerSocketChannel注册到selector上，并且selector对客户端accept连接操作感兴趣
         //并没有把事件和selector绑定
         //它实际上是一个表示选择器在检查通道就绪状态时需要关心的操作的比特掩码。
         //比如一个选择器对通道的read和write操作感兴趣，那么选择器在检查该通道时，只会检查通道的read和write操作是否已经处在就绪状态。
-        //this代表当前调用的对象
+        //this代表当前调用的对象 SO_REUSEPORT
         serverSocket.register(selector, SelectionKey.OP_ACCEPT);
         System.out.println("服务启动成功");
 

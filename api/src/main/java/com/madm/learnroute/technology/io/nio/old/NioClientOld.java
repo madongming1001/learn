@@ -38,7 +38,7 @@ public class NioClientOld {
         // 获得一个通道管理器
         this.selector = Selector.open();
 
-        // 客户端连接服务器,需要在listen（）方法中调用channel.finishConnect() 才能完成连接
+        // 客户端连接服务器,需要在 listen() 方法中调用channel.finishConnect() 才能完成连接
         channel.connect(new InetSocketAddress(ip, port));
         //将通道管理器和该通道绑定，并为该通道注册SelectionKey.OP_CONNECT事件。
         channel.register(selector, SelectionKey.OP_CONNECT);
