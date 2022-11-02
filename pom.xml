@@ -24,12 +24,11 @@
         <module>common</module>
         <module>algorithm</module>
     </modules>
-
     <properties>
         <spring-cloud.version>Hoxton.SR12</spring-cloud.version>
         <spring-boot.version>2.3.12.RELEASE</spring-boot.version>
+        <rocketmq-version>2.2.2</rocketmq-version>
     </properties>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -45,6 +44,17 @@
                 <version>2.2.7.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>rocketmq-spring-boot-starter</artifactId>
+                        <groupId>org.apache.rocketmq</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>2.2.2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -179,7 +189,7 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.12.0</version>
         </dependency>
-<!--        责任链第三方标准库-->
+        <!--        责任链第三方标准库-->
         <dependency>
             <groupId>com.foldright.auto-pipeline</groupId>
             <artifactId>auto-pipeline-processor</artifactId>

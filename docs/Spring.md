@@ -692,6 +692,7 @@ class FeignClientsRegistrar
 2. 实现ImportBeanDefinitionRegistrar接口，spring容器就会调用其registerBeanDefinitions方法；
 
 3. 带有Configuration注解的配置类。
+4. 带有Component的注解
 
 ```java
 	@Override

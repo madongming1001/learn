@@ -1252,7 +1252,7 @@ MVCC机制的实现就是通过read-view机制与undo版本链比对机制，使
 
 Gap Lock+Record Lock，锁定一个范围，并且锁定记录本身，当查询的索引含有**唯一属性**时，会对next-key lock进行优化，将其降级为Record Lock锁。
 
-**对于一条记录来说既拥有聚集索引也拥有辅助索引，Next-key lock会对主键索引加上Record lock锁，然后对于辅助索引加上左闭右闭Gap Lock**
+**当查询的索引是辅助索引时，记录本身既拥有聚集索引也拥有辅助索引，Next-key lock会对主键索引加上Record lock锁，然后对于辅助索引加上左闭右闭Gap Lock**
 
 InnoDB存储引擎默认的事务隔离级别是Repeatable Read，在该隔离级别下，其采用Next-Key Locking的方式来加锁。而在事务隔离级别Read Committed下，其仅采用Record Lock。
 
