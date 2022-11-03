@@ -49,3 +49,14 @@ public class TestC {
 **break retry示例**
 
 **参考文章：**https://blog.csdn.net/elsostal/article/details/109630920
+
+# 错误
+
+## 类文件具有错误的版本 55.0, 应为 52.0
+
+```text
+1.解压文件：jar -xvf caffeine-3.0.1.jar
+2.查看二进制文件：javap -verbose Caffeine
+```
+
+**参考文章：**https://www.jianshu.com/p/a2b026e5790c
