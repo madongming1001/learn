@@ -2,12 +2,17 @@ package com.madm.learnroute.javaee;
 
 import org.openjdk.jol.info.ClassLayout;
 
+
+
 class MyCustomClassLoader {
     private Long initStatus;
 }
+
 public class ThreadLocalRandomPractice {
+
+    static Object obj = new Object();
+
     public static void main(String[] args) {
-        MyCustomClassLoader classLoader = new MyCustomClassLoader();
-        System.out.println(ClassLayout.parseInstance(classLoader).toPrintable());
+        System.out.println(ClassLayout.parseInstance(obj).toPrintable());
     }
 }

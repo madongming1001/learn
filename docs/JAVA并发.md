@@ -1,4 +1,4 @@
-# Java线程池实现原理
+Java线程池实现原理
 
 ## ThreadPoolExecutor类继承关系
 
@@ -385,6 +385,8 @@ LinkedBlockingDeque：一个由链表结构组成的双向阻塞队列
 
 **地址：**https://www.processon.com/view/link/618ce3941e0853689b0818e2
 
+
+
 ### 原子操作类
 
 #### 原子更新基本类型类
@@ -413,7 +415,7 @@ AtomicIntegerArray
 
 
 
-#### 原子更新应用类型
+#### 原子更新引用类型
 
 ```
 AtomicReference
@@ -648,11 +650,25 @@ lockInterruptibly 优先考虑响应中断，而不是响应锁的普通获取�
 
 3、对于长远来看，synchronized优化的空间的可能性更大，因为锁是记录在对象头里面
 
-### Synchronized原理
+# Synchronized
 
 ![preview](https://pic4.zhimg.com/v2-b7da59b4bc2a8957ac86a8eed7290da7_r.jpg)
 
 
+
+**在执行类的初始化期间，JVM会去获取一个锁，这个锁可以同步多个线程对同一个类的初始化。**
+
+java语言规范规定，对于每一个类或接口C，都有一个唯一的初始化锁LC与之对应。
+
+```java
+public static Instance getInstance2() {
+    return InstanceHolder.instance;
+}
+
+private static class InstanceHolder {
+    public static Instance instance = new Instance();
+}
+```
 
 ### Markword布局
 
@@ -672,7 +688,15 @@ lockInterruptibly 优先考虑响应中断，而不是响应锁的普通获取�
 
 ​		如果这个更新操作失败了，那就意味着至少存在一条线程与当前线程竞争获取该对象的锁。虚拟机首先会检查对象的Mark Word是否指向当前线程的栈帧，如果是，说明当前线程已经拥有了这个对象的锁，那直接进入同步块继续执行就可以了，否则就说明这个锁对象已经被其他线程抢占了。如果出现两条以上的线程争用同一个锁的情况，那轻量级锁就不再有效，必须要膨胀为重量级锁，锁标志的状态值变为“10”，此时Mark Word中存储的就是指向重量级锁（互斥量）的指针，后面等待锁的线程也必须进入阻塞状态。
 
-**偏向锁：**
+**注意⚠️：当一个对象已经计算过一致性哈希码后，它就再也无法进入偏向所状态了：而当一个对象当前正处于偏向所状态，又收到需要计算其一致性哈希码请求时，它的偏向状态会立即撤销，并且锁会膨胀为重量级锁。**
+
+**+UseCompressedOops**：开启之后会使用32-bit的offset来代表java object的引用
+
+**-XX:+UseCompressedClassPointers（默认开启）**：指的是kclass pointer指针，对象头的另外一部分是klass类型指针，即对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。
+
+
+
+## 偏向锁
 
 ​		它的目的是消除数据在无竞争情况下的同步原语，进一步提高程序的运行性能。
 
@@ -686,7 +710,21 @@ lockInterruptibly 优先考虑响应中断，而不是响应锁的普通获取�
 
 ​		偏向锁在Java 6和Java 7里是默认启用的，但是它在应用程序启动几秒钟之后才激活，如有必要可以使用JVM参数来关闭延迟：-XX:BiasedLockingStartupDelay=0。如果你确定应用程序里所有的锁通常情况下处于竞争状态，可以通过JVM参数关闭偏向锁：-XX:- UseBiasedLocking=false，那么程序默认会进入轻量级锁状态。 
 
+![2701326321-5f3ac4a3b2791_fix732](/Users/madongming/IdeaProjects/learn/docs/noteImg/2701326321-5f3ac4a3b2791_fix732.png)
 
+### 批量重偏向
+
+**批量重偏向（bulk rebias）机制是为了解决**：一个线程创建了大量对象并执行了初始的同步操作，后来另一个线程也来将这些对象作为锁对象进行操作，这样会导致大量的锁撤销升级为轻量级锁。为了避免大量偏向锁升级为轻量级锁
+
+### 批量撤销
+
+批量撤销（bulk revoke）机制是为了解决：在明显多线程竞争剧烈的场景下使用偏向锁是不合适的。
+
+**参考文章：**https://segmentfault.com/a/1190000023665056
+
+## 轻量级锁
+
+**轻量级锁所适应的场景是线程交替执行同步块的场合，如果存在同一时间多个线程访问同一把锁的场合，就会导致轻量级锁膨胀为重量级锁。**
 
 ## 对象内置锁（ObjectMonitor）
 
@@ -713,10 +751,6 @@ ObjectMonitor::ObjectMonitor() {
   OwnerIsThread = 0 ;  
 }  
 ```
-
-
-
-
 
 
 
@@ -779,9 +813,7 @@ ObjectMonitor::ObjectMonitor() {
 
 
 
-
-
-# CycliBarriar和CountdownLatch的区别？
+# CyclicBarrier和CountdownLatch的区别？
 
 ![img](https://ask.qcloudimg.com/http-save/7256485/3uwx6izita.png?imageView2/2/w/1620)
 
@@ -1045,3 +1077,26 @@ public final void acquire(int arg) {
 
 CLH锁是有由Craig, Landin, and Hagersten这三个人发明的锁，取了三个人名字的首字母，所以叫 CLH Lock。CLH锁是一个自旋锁。能确保无饥饿性。提供先来先服务的公平性。**CLH队列锁也是一种基于链表的可扩展、高性能、公平的自旋锁，申请线程仅仅在本地变量上自旋，它不断轮询前驱的状态，假设发现前驱释放了锁就结束自旋。**
 
+
+
+# CPU访问内存方式
+
+#### SMP(Symmetric Multi-Processor)
+
+![img](https://www.baiyp.ren/images/thread/clh/clh07.png)
+
+对称多处理器结构，指服务器中多个CPU对称工作，每个CPU访问内存地址所需时间相同。其主要特征是共享，包含对CPU，内存，I/O等进行共享。
+
+SMP能够保证内存一致性，但这些共享的资源很可能成为性能瓶颈，随着CPU数量的增加，每个CPU都要访问相同的内存资源，**可能导致内存访问冲突，**
+
+ 可能会导致CPU资源的浪费。常用的PC机就属于这种。
+
+#### NUMA(Non-Uniform Memory Access)
+
+![img](https://www.baiyp.ren/images/thread/clh/clh08.png)
+
+ 非一致存储访问，将CPU分为CPU模块，每个CPU模块由多个CPU组成，并且具有独立的本地内存、I/O槽口等，模块之间可以通过**互联模块**相互访问，
+
+ 访问本地内存的速度将远远高于访问远地内存(系统内其它节点的内存)的速度，这也是非一致存储访问的由来。NUMA较好地解决SMP的扩展问题，
+
+当CPU数量增加时，因为访问远地内存的延时远远超过本地内存，系统性能无法线性增加。

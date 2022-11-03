@@ -1,5 +1,7 @@
 package com.madm.learnroute.jvm.jmm.dcl;
 
+import com.alibaba.nacos.api.naming.pojo.Instance;
+
 /**
  * @author ：图灵-杨过
  * @date：2019/7/10
@@ -17,9 +19,10 @@ public class Singleton {
 
     /**
      * 双重锁机制保证单例安全
+     *
      * @return
      */
-    public static Singleton getInstance() {
+    public static Singleton getInstance1() {
         if (myinstance == null) {
             synchronized (Singleton.class) {
                 if (myinstance == null) {
@@ -29,4 +32,14 @@ public class Singleton {
         }
         return myinstance;
     }
+
+    public static Instance getInstance2() {
+        return InstanceHolder.instance;
+    }
+
+    private static class InstanceHolder {
+        public static Instance instance = new Instance();
+    }
+
+
 }

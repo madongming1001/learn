@@ -142,7 +142,7 @@ Java语言规范规定 JVM 线程内部维持顺序化语义。即只要程序�
 
 > finalize()是Object中的方法，当垃圾回收器将要回收对象所占内存之前被调用，即当一个对象被虚拟机宣告死亡时会先调用它finalize()方法，让此对象处理它生前的最后事情（这个对象可以趁这个时机挣脱死亡的命运）。
 
-## volatile 内存语义
+# volatile 内存语义
 
 **volatile** 是Java虚拟机提供的轻量级的同步机制。volatile 关键字有如下两项特性：
 
@@ -204,11 +204,7 @@ public class Jmm03_CodeVisibility {
         threadB.start();
     }
 }
-
-复制代码
 ```
-
-
 
 ### volatile 无法保证原子性
 
@@ -283,6 +279,8 @@ Intel 硬件提供了一系列的内存屏障，主要有：
 2. sfence，是一种 Store Barrier 写屏障；
 3. mfence，是一种全能型的屏障，具备 lfence 和 sfence 的能力；
 4. Lock 前缀，Lock 不是一种内存屏障，但是它能完成类似内存屏障的功能。**Lock 会对 CPU总线和高速缓存加锁**，可以理解为 CPU 指令级的一种锁。它后面可以跟 ADD、ADC、AND、BTC、BTR、BTS、CMPXCHG、CMPXCH8B、DEC、INC、NEG、NOT、OR、SBB、SUB、XOR、XADD、and XCHG 等指令。
+
+字节码层面acc_flags：ACC_VOLATILE
 
 #### 指令重排种类
 
@@ -404,8 +402,6 @@ lock指令要等待前面的指令全部执行完、会把buffered write刷入�
 ```java
 Locking operations typically operate like I/O operations in that they wait for all previous instructions to complete and for all buffered writes to drain to memory
 ```
-
-
 
 参考文章（具有用干货满满）：https://blog.csdn.net/qq_18433441/article/details/108585843
 

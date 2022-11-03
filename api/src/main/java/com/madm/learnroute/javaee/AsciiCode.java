@@ -16,5 +16,6 @@ public class AsciiCode {
         //GBK字符集编码格式中文两字节
         //UTF-8字符集编码三字节
         System.out.println((int) (Math.random() * 88) + 1);
+        System.out.println(Math.random());
     }
 }
