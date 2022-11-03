@@ -813,23 +813,83 @@ ObjectMonitor::ObjectMonitor() {
 
 **通过sleep方法进入休眠的线程不会释放持有的锁，因此，在持有锁的时候调用该方法需要谨慎。**
 
-### Object.wait() 方法
-
-会释放锁，需要搭配synchronized使用
-
-**为什么需要搭配synchronized使用：**https://blog.csdn.net/lengxiao1993/article/details/52296220
-
 ### LockSupport.park() 方法
 
 不会释放锁，会响应中断  
+
+### Object.wait() 方法
+
+如果不和synchzonized一起使用有可能出现方法乱序执行的情况，先执行了notify()之后在执行了wait()，后执行的wait()由于没有额外的notify()操作，所以该线程一直阻塞下去。
+
+使用synchronized的情况下就保证了当前操作的是同一个对象。**由于上的锁未执行到wait之前所以是不会释放锁的。**
+
+```java
+// 线程 A 的代码
+synchronized(obj_A)
+{
+    while(!condition){ 
+        obj_A.wait();
+    }
+    // do something 
+}
+// 线程 B 的代码
+synchronized(obj_A)
+{
+    if(!condition){ 
+        // do something ...
+        condition = true;
+        obj_A.notify();
+    }
+}
+```
+
+**为什么需要搭配synchronized使用：**https://blog.csdn.net/lengxiao1993/article/details/52296220
+
+## 内置锁(ObjectMonitor)
+
+**参考文章：**https://www.cnblogs.com/hongdada/p/14513036.html
+
+Monitor可以理解为一个同步工具或一种同步机制，通常被描述为一个对象。**每一个Java对象就有一把看不见的锁，称为内部锁或者Monitor锁。**
+
+通常所说的对象的内置锁，**是对象头Mark Word中的重量级锁指针指向的monitor对象，该对象是在HotSpot底层C++语言编写的(openjdk里面看)，简单看一下代码：**
+
+```.cpp
+//结构体如下
+ObjectMonitor::ObjectMonitor() {  
+  _header       = NULL;  
+  _count       = 0;  
+  _waiters      = 0,  
+  _recursions   = 0;       //线程的重入次数
+  _object       = NULL;  
+  _owner        = NULL;    //标识拥有该monitor的线程
+  _WaitSet      = NULL;    //等待线程组成的双向循环链表，_WaitSet是第一个节点
+  _WaitSetLock  = 0 ;  
+  _Responsible  = NULL ;  
+  _succ         = NULL ;  
+  _cxq          = NULL ;    //多线程竞争锁进入时的单向链表
+  _FreeNext     = NULL ;  
+  _EntryList    = NULL ;    //_owner从该双向循环链表中唤醒线程结点，_EntryList是第一个节点
+  _SpinFreq     = 0 ;  
+  _SpinClock    = 0 ;  
+  OwnerIsThread = 0 ;  
+}  
+```
+
+**特别重要的两个属性：**
+
+监控区（Entry Set）：锁已被其他线程获取，期待获取锁的线程就进入Monitor对象的监控区
+
+待授权区（Wait Set）：曾经获取到锁，但是调用了wait方法，线程进入待授权区
+
+
+
+
 
 
 
 # ReentrantLock为什么非公平比公平快
 
-在激烈竞争的情况下，非公平锁的性能高于公平锁的性能的一个原因是：在恢复一个被挂起的线程与该线程真正开始运行之间存在着严重的延迟。假设线程A持有一个锁，并且线程B请求这个锁。由于这个锁已被线程A持有，因此B将被挂起。当A释放锁时，B将被唤醒，因此会再次尝试获取锁。与此同时，如果C也请求这个锁，那么C很可能会在B被完全唤醒之前获得、使用以及释放这个锁。这样的情况是一个"双赢"的局面：B获得锁的时刻并没有推迟，C更早地获得了锁，并且吞吐量也获得了提高。
-
-
+在激烈竞争的情况下，非公平锁的性能高于公平锁的性能的一个原因是：**在恢复一个被挂起的线程与该线程真正开始运行之间存在着严重的延迟。**假设线程A持有一个锁，并且线程B请求这个锁。由于这个锁已被线程A持有，因此B将被挂起。当A释放锁时，B将被唤醒，因此会再次尝试获取锁。与此同时，如果C也请求这个锁，那么C很可能会在B被完全唤醒之前获得、使用以及释放这个锁。这样的情况是一个"双赢"的局面：B获得锁的时刻并没有推迟，C更早地获得了锁，并且吞吐量也获得了提高。
 
 # Thread的Run运行过程
 
@@ -842,3 +902,146 @@ ObjectMonitor::ObjectMonitor() {
 # Java线程池KeepAliveTime原理
 
 ​		其实只是在线程从工作队列 poll 任务时，加上了超时限制，如果线程在 keepAliveTime 的时间内 poll 不到任务，那我就认为这条线程没事做，可以干掉了 。
+
+# AbstractQueuedSynchronizer
+
+锁是用来控制多个线程访问共享资源的方式，一般来说，一个锁能够防止多个线程同时访问共享资源（但是有些锁可以允许多个线程并发的访问共享资源，比如读写锁）。在Lock接口出现之前，java程序是靠synchronized关键字实现锁功能的，而**java SE 5**之后，并发包中新增了Lock接口（以及相关实现类）用来实现锁功能，它提供了与synchronized关键字类似的同步功能，只是在使用时需要显示地获取和释放锁。虽然它缺少了（通过synchronized块或者方法所提供的）隐式获取释放锁的便携性，但是却拥有了锁获取与释放的可操作性、可中断的获取锁以及超时获取锁等多种synchronized关键字所不具备的同步特性。
+
+**AbstractQueuedSynchronizer（以下简称同步器），是用来构建锁或者其他同步组建的基础框架，他是用了一个int成员变成表示同步状态，通过内置的FIFO队列来完成资源获取线程的排队工作。** 
+
+## 公平非公平锁区别jdk1.8
+
+### FairSync
+
+```java
+        final void lock() {
+            acquire(1);
+        }
+        protected final boolean tryAcquire(int acquires) {
+            final Thread current = Thread.currentThread();
+            int c = getState();
+            if (c == 0) {
+                if (!hasQueuedPredecessors() &&
+                    compareAndSetState(0, acquires)) {
+                    setExclusiveOwnerThread(current);
+                    return true;
+                }
+            }
+            else if (current == getExclusiveOwnerThread()) {
+                int nextc = c + acquires;
+                if (nextc < 0)
+                    throw new Error("Maximum lock count exceeded");
+                setState(nextc);
+                return true;
+            }
+            return false;
+        }
+```
+
+### NonfairSync
+
+```java
+        final void lock() {
+            if (compareAndSetState(0, 1))
+                setExclusiveOwnerThread(Thread.currentThread());
+            else
+                acquire(1);
+        }
+        final boolean nonfairTryAcquire(int acquires) {
+            final Thread current = Thread.currentThread();
+            int c = getState();
+            if (c == 0) {
+                if (compareAndSetState(0, acquires)) {
+                    setExclusiveOwnerThread(current);
+                    return true;
+                }
+            }
+            else if (current == getExclusiveOwnerThread()) {
+                int nextc = c + acquires;
+                if (nextc < 0) // overflow
+                    throw new Error("Maximum lock count exceeded");
+                setState(nextc);
+                return true;
+            }
+            return false;
+        }
+```
+
+**核心方法**
+
+```java
+static final class Node {
+        /** Marker to indicate a node is waiting in shared mode */
+        static final Node SHARED = new Node();
+        /** 用于指示节点正在独占模式下等待的标记 */
+        static final Node EXCLUSIVE = null;
+        /** waitStatus值，表示线程已取消 该节点由于超时或中断而被取消。节点永远不会离开这个状态。特别是，具有取消节点的线程永远不会再次阻塞。*/
+        static final int CANCELLED =  1;
+        /** waitStatus值，指示后续线程需要取消标记 */
+        static final int SIGNAL    = -1;
+        /** waitStatus值，指示线程正在等待条件，此节点当前位于条件队列中。*/
+        static final int CONDITION = -2;
+        /** waitStatus值，指示下一个acquireShared应无条件传播*/
+        static final int PROPAGATE = -3;
+
+        /**
+         * Status field, taking on only the values:
+         *   SIGNAL:     The successor of this node is (or will soon be)
+         *               blocked (via park), so the current node must
+         *               unpark its successor when it releases or
+         *               cancels. To avoid races, acquire methods must
+         *               first indicate they need a signal,
+         *               then retry the atomic acquire, and then,
+         *               on failure, block.
+         *   CANCELLED:  This node is cancelled due to timeout or interrupt.
+         *               Nodes never leave this state. In particular,
+         *               a thread with cancelled node never again blocks.
+         *   CONDITION:  This node is currently on a condition queue.
+         *               It will not be used as a sync queue node
+         *               until transferred, at which time the status
+         *               will be set to 0. (Use of this value here has
+         *               nothing to do with the other uses of the
+         *               field, but simplifies mechanics.)
+         *   PROPAGATE:  A releaseShared should be propagated to other
+         *               nodes. This is set (for head node only) in
+         *               doReleaseShared to ensure propagation
+         *               continues, even if other operations have
+         *               since intervened.
+         *   0:          None of the above
+         *
+         * The values are arranged numerically to simplify use.
+         * Non-negative values mean that a node doesn't need to
+         * signal. So, most code doesn't need to check for particular
+         * values, just for sign.
+         *
+         * The field is initialized to 0 for normal sync nodes, and
+         * CONDITION for condition nodes.  It is modified using CAS
+         * (or when possible, unconditional volatile writes).
+         */
+        volatile int waitStatus;
+}
+public final void acquire(int arg) {
+    if (!tryAcquire(arg) &&
+        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+        selfInterrupt();
+}
+```
+
+# 面试题
+
+## 为什么局部方法内访问变量要用final修饰自己猜测？
+
+个人理解的好处有：
+1、访问局部变量要比访问成员变量要快
+2、访问局部变量要比每次调用方法去获取对象要快
+3、使用final修饰可以避免变量被重新赋值（引用赋值）
+4、使用final修饰时，JVM不用去跟踪该引用是否被更改？准备阶段把final替换为符号引用直接找到地址，初始化阶段把符号引用转换为具体的引用，到时候方法栈内引用堆变量直接就可以找到，不需要再去堆找到之后替换。
+
+
+
+# CLH队列锁
+
+参考文章：https://www.baiyp.ren/CLH%E9%98%9F%E5%88%97%E9%94%81.html
+
+CLH锁是有由Craig, Landin, and Hagersten这三个人发明的锁，取了三个人名字的首字母，所以叫 CLH Lock。CLH锁是一个自旋锁。能确保无饥饿性。提供先来先服务的公平性。**CLH队列锁也是一种基于链表的可扩展、高性能、公平的自旋锁，申请线程仅仅在本地变量上自旋，它不断轮询前驱的状态，假设发现前驱释放了锁就结束自旋。**
+

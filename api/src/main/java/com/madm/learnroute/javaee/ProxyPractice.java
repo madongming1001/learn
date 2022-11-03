@@ -1,12 +1,12 @@
 package com.madm.learnroute.javaee;
 
 
+import lombok.SneakyThrows;
 import net.sf.cglib.core.DebuggingClassWriter;
 import org.springframework.cglib.proxy.*;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.*;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Properties;
 
@@ -20,12 +20,31 @@ import java.util.Properties;
  */
 interface Animal {
     void call();
+
+    void eat();
 }
 
 class Cat implements Animal {
     @Override
     public void call() {
         System.out.println("喵喵喵 ~");
+    }
+
+    @Override
+    public void eat() {
+        System.out.println("吃东西 ～");
+    }
+}
+
+class Dog implements Animal {
+    @Override
+    public void call() {
+        System.out.println("汪汪汪 ~");
+    }
+
+    @Override
+    public void eat() {
+        System.out.println("呃呃呃 ～");
     }
 }
 
@@ -40,6 +59,7 @@ class TargetInvoker implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         System.out.println("jdk 代理执行前");
+        System.out.println(proxy.getClass());
         Object result = method.invoke(target, args);
         System.out.println("jdk 代理执行后");
         return result;
@@ -76,7 +96,7 @@ public class ProxyPractice {
             System.out.println("after");
             return result;
         }, NoOp.INSTANCE});
-        enhancer.setCallbackFilter(method -> 0 );
+        enhancer.setCallbackFilter(method -> 0);
 
 
         Cat cat = (Cat) enhancer.create();
@@ -84,7 +104,8 @@ public class ProxyPractice {
     }
 
     private static void jdkProxyGenerate() throws Exception {
-        System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
+//        System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");//jdk 1.8
+        System.setProperty("jdk.proxy.ProxyGenerator.saveGeneratedFiles", "true");//jdk 1.8 after
         Cat cat = new Cat();
         Animal proxy = (Animal) TargetInvoker.getProxy(cat);
         proxy.call();
@@ -105,9 +126,24 @@ public class ProxyPractice {
     public static void main(String[] args) throws Exception {
 
         //JDK代理生成 InvocationHandler
-        jdkProxyGenerate();
+//        jdkProxyGenerate();
 
         //CGLIB代理生成 MethodInterceptor
         cglibProxyGenerate();
+//        testReflectMethod();
+    }
+
+    /**
+     * 测试从一个对象获取method对象，穿参数为另一个对象，测试方法能否调用成功
+     */
+    @SneakyThrows
+    private static void testReflectMethod() {
+        Class<Cat> catClass = Cat.class;
+        Method[] methods = catClass.getDeclaredMethods();
+        for (Method method : methods) {
+//            Dog cat = new Dog(); cause：object is not an instance of declaring class
+            Cat cat = new Cat();
+            method.invoke(cat);
+        }
     }
 }

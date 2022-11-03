@@ -300,7 +300,7 @@ Intel 硬件提供了一系列的内存屏障，主要有：
 
 Java分为三个体系，分别为**Java SE**（J2SE，Java2Platform Standard Edition，标准版），**JavaEE**（J2EE，Java 2Platform, Enterprise Edition，企业版），**Java ME**（J2ME，Java 2Platform Micro Edition，微型版）。
 
-**JSR**是Java Specification Requests的缩写，意思是“Java 规范提案”。是指向JCP(JavaCommunity Process)提出新增一个标准化技术规范的正式请求。
+**JSR**是Java Specification Requests的缩写，意思是“Java 规范提案”。是指向JCP(JavaCommunity Process)提出新增一个标准化技术规范的正式请求。 
 
 **JCP**（ Java Community Process) 是一个开放的国际组织，主要由Java开发者以及被授权者组成，职能是发展和更新Java技术规范、参考实现（RI）、技术兼容包（TCK）。Java技术和JCP两者的原创者都是SUN计算机公司。然而，JCP已经由SUN于1995年创造Java的非正式过程，演进到如今有数百名来自世界各地Java代表成员一同监督Java发展的正式程序。
 

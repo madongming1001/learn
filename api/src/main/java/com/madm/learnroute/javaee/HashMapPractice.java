@@ -46,7 +46,13 @@ public class HashMapPractice {
         prices.put("Shoes", 200);
         prices.put("Bag", 300);
         prices.put("Pant", 150);
+        prices.put("111", 150);
         System.out.println("HashMap: " + prices);
+
+        Integer key = prices.putIfAbsent("111", 32);
+        System.out.println("HashMap: " + prices);
+        System.out.println("之前值是："+key);
+
 
         Iterator<Map.Entry<String, Integer>> iterator = prices.entrySet().iterator();
 

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.*;
 
-@Component
+//@Component
 public class RedisTemplatePractice {
 
     @Autowired

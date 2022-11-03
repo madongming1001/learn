@@ -962,15 +962,13 @@ ApplicationListenerDetector 在 prepareBeanFactory注入的
 
 # RefreshScope
 
-参考文章：https://www.modb.pro/db/104172
+参考文章：https://www.modb.pro/db/104172，https://www.bmabk.com/index.php/post/38126.html
 
 ## 主要类
 
 ContextRefresher：主要功能是清空RefreshScope缓存，重新加载配置到Context中，发布事件（事件监听程序接收到事件后会重写配置相关的配类）
 
-RefreshEventListener：监听上下文刷新事件
-
-
+RefreshEventListener：会监听RefreshEvent事件，发生事件之后调用ContextRefresher.refresh()方法
 
 AbstractApplicationContext => refresh() => prepareBeanFactory()
 
