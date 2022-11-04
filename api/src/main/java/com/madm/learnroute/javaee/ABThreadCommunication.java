@@ -20,23 +20,21 @@ import java.util.concurrent.TimeUnit;
 public class ABThreadCommunication {
 
     private volatile static boolean a = false;
-    private volatile static boolean b = false;
 
-    private static SynchronousQueue bq = new SynchronousQueue();
 
     public static void main(String[] args) {
-//        ABCommunicationForVolatile();
-        ABCommunicationForBlockingQueue();
+        ABCommunicationForVolatile();
+//        ABCommunicationForBlockingQueue();
     }
 
     private static void ABCommunicationForBlockingQueue() {
+        SynchronousQueue bq = new SynchronousQueue();
         Thread t1 = new Thread(() -> {
             try {
-                System.out.println("发送a线程的信号");
+                System.out.println("发送线程1的信号");
                 bq.put("a");
-                bq.put("b");
                 String el = (String) bq.take();
-                System.out.println("收到" + el + "线程的信号");
+                System.out.println("收到线程2的信号");
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -45,9 +43,9 @@ public class ABThreadCommunication {
         Thread t2 = new Thread(() -> {
             try {
                 String el = (String) bq.take();
-                System.out.println("收到" + el + "线程的信号");
+                System.out.println("收到线程1的信号");
                 bq.put("b");
-                System.out.println("发送线" + "b" + "程的信号");
+                System.out.println("发送线程2的信号");
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -61,7 +59,7 @@ public class ABThreadCommunication {
         Thread t1 = new Thread(() -> {
             System.out.println("发送a线程的信号");
             a = true;
-            while (!b) {
+            while (a) {
                 try {
                     TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
@@ -71,7 +69,6 @@ public class ABThreadCommunication {
             System.out.println("收到b线程的信号");
         });
         Thread t2 = new Thread(() -> {
-            System.out.println("收到a线程的信号");
             while (!a) {
                 try {
                     TimeUnit.SECONDS.sleep(1);
@@ -79,8 +76,9 @@ public class ABThreadCommunication {
                     e.printStackTrace();
                 }
             }
+            System.out.println("收到a线程的信号");
             System.out.println("发送b线程的信号");
-            b = true;
+            a = false;
         });
         t1.start();
         t2.start();
