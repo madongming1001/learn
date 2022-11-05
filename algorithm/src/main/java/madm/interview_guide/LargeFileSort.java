@@ -26,7 +26,7 @@ public class LargeFileSort {
 
     private static void createBigFile() {
         Random random = new Random();
-        try (FileWriter writer = new FileWriter(BIG_FILE_NAME, UTF_8)) {
+        try (FileWriter writer = new FileWriter(BIG_FILE_NAME)) {
             for (int i = 0; i < LINE_COUNT; i++) {
                 int val = random.nextInt(Integer.MAX_VALUE);
                 writer.write(val + LINE_SEPARATOR);
@@ -68,7 +68,7 @@ public class LargeFileSort {
 //        Map<BufferedReader, String> map = new HashMap<>();
         int[] littleNumbers = new int[fileNameList.size()];
         int index = 0;
-        try (FileWriter writer = new FileWriter(SORT_FILE_NAME, UTF_8)) {
+        try (FileWriter writer = new FileWriter(SORT_FILE_NAME)) {
             for (String fileName : fileNameList) {
                 BufferedReader tmpReader = new BufferedReader(new FileReader(fileName));
                 littleNumbers[index++] = Integer.valueOf(tmpReader.readLine());
