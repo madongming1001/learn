@@ -1,9 +1,15 @@
 package com.madm.learnroute.javaee;
 
 
+import cn.hutool.core.io.LineHandler;
 import com.madm.learnroute.model.Employee;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Consumer;
+
 /**
  * @author dongming.ma
  * @date 2022/7/3 22:58
@@ -32,9 +38,9 @@ public class ComparatorTest {
          *
          *     sort 对象接收一个 Comparator 函数式接口，可以传入一个lambda表达式
          */
-        employees.sort((o1, o2) -> o1.getName().compareTo(o2.getName()));
+        employees.sort(Comparator.comparing(Employee::getName));
 
-        Collections.sort(employees, (o1, o2) -> o1.getName().compareTo(o2.getName()));
+        Collections.sort(employees, Comparator.comparing(Employee::getName));
 
         employees.forEach(System.out::println);
 
@@ -51,5 +57,6 @@ public class ComparatorTest {
          */
         employees.sort(Comparator.comparing(Employee::getName));
 
+        Comparator<Integer> customComparator = Comparator.comparingInt(o -> o);
     }
 }

@@ -54,9 +54,24 @@ public class TestC {
 
 ## 类文件具有错误的版本 55.0, 应为 52.0
 
+**java编译文件后会产生【 major.minor】信息 不同数字会对应不同的jdk版本，比如52对应的是jdk8**
+
 ```text
 1.解压文件：jar -xvf caffeine-3.0.1.jar
 2.查看二进制文件：javap -verbose Caffeine
 ```
 
 **参考文章：**https://www.jianshu.com/p/a2b026e5790c
+
+# UML
+
+[UML](https://zh.wikipedia.org/wiki/统一建模语言) 是统一建模语言的简称，它是一种由一整套图表组成的标准化建模语言。UML用于帮助系统开发人员阐明，展示，构建和记录软件系统的产出。**统一建模语言（ UML）利用文本和图形文档，通过在对象之间建立更紧密的关系，来增强软件项目的分析和设计。**
+
+UML 图表可大致分为**结构性图表**和**行为性图表**两种。
+
+**结构性图**表显示了系统在不同抽象层次和实现层次上的静态结构以及它们之间的相互关系。结构性图表中的元素表示系统中具意义的概念，可能包括抽象的、现实的和實作的概念。结构性图表有七种类型：
+
+**行为性图表**显示了系统中对象的动态行为 ，可用以表达系统随时间的变化。行为性图表有七种类型：
+
+**参考文章：**https://www.visual-paradigm.com/cn/guide/uml-unified-modeling-language/what-is-uml/#use-case-diagram
+

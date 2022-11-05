@@ -1,3 +1,5 @@
+
+
 # spring假设去掉二级缓存？
 
 如果去掉了二级缓存，则需要直接在 `singletonFactory.getObject()` 阶段初始化完毕，并放到一级缓存中。
@@ -39,6 +41,7 @@ spring.main.allow-circular-references=true
 ```java
 * <p>Bean factory implementations should support the standard bean lifecycle interfaces
 * as far as possible. The full set of initialization methods and their standard order is:
+  Bean 工厂实现应尽可能支持标准的 bean 生命周期接口。全套初始化方法及其标准顺序为：
 * <ol>
 * <li>BeanNameAware's {@code setBeanName}
 * <li>BeanClassLoaderAware's {@code setBeanClassLoader}
@@ -60,6 +63,7 @@ spring.main.allow-circular-references=true
 * <li>a custom init-method definition
 * <li>{@code postProcessAfterInitialization} methods of BeanPostProcessors
 * </ol>
+BeanFactory.java
 ```
 
 ```java
@@ -134,6 +138,15 @@ applicationEventMulticaster（spring上下文监听器）
 
 # Spring Aop
 
+**入口**
+
+```java
+@EnableAspectJAutoProxy -> AspectJAutoProxyRegistrar
+注册一个 AnnotationAwareAspectJAutoProxyCreator.java
+```
+
+
+
 ## Advice的执行顺序
 
 ```java
@@ -156,7 +169,9 @@ throwable
 
 **注：可以通过Order注解或者实现Order接口修改优先级，数越大优先级越低**
 
+**可以把 Spring AOP 想象成一个同心圆。被增强的原始方法在圆心，每一层 AOP 就是增加一个新的同心圆。同时，优先级最高的在最外层。方法被调用时，从最外层按照 AOP1、AOP2 的顺序依次执行 around、before 方法，然后执行 method 方法，最后按照 AOP2、AOP1 的顺序依次执行 after 方法**。
 
+![图片](https://mmbiz.qpic.cn/mmbiz_png/Qooo5wPkibGrxHm3hNHbVsbrkxOUJ6M6rTYXRsUuYmDbGic0QHiaEUHfN2yUvOQM0lmlFOQdjLSibUenoGTC9PDia2A/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
 
 ## Aop调用链条组装
 
@@ -320,123 +335,12 @@ AtAfterThrowing -> AspectJAfterThrowingAdvice
 
 
 
-# spring创建对象的五种方式
-
-
-
-![image-20211216155602502](noteImg/image-20211216155602502.png)
-
-![image-20211216220650964](noteImg/image-20211216220650964.png)
-
-## 通过BeanPostProcess实现InstantiationBeanPostProcessor创建对象
-
-```java
-public class CustomTargetSource extends AbstractBeanFactoryBasedTargetSource {
-
-    private static final long serialVersionUID = 1231212121L;
-
-    @Override
-    public Object getTarget() throws Exception {
-        return getBeanFactory().getBean(getTargetBeanName());
-    }
-}
-public class CustomTargetSourceCreator extends AbstractBeanFactoryBasedTargetSourceCreator {
-    @Override
-    protected AbstractBeanFactoryBasedTargetSource createBeanFactoryBasedTargetSource(Class<?> beanClass, String beanName) {
-        if (getBeanFactory() instanceof ConfigurableListableBeanFactory) {
-            if (beanClass.isAssignableFrom(UserServiceImpl.class)) {
-                return new CustomTargetSource();
-            }
-        }
-        return null;
-    }
-}
-@Component
-public class SetCustomTargetSourceCreator implements PriorityOrdered, BeanFactoryAware, InitializingBean {
-
-    private BeanFactory beanFactory;
-    private boolean load = false;
-
-    @Override
-    public int getOrder() {
-        return 45;
-    }
-
-    @Override
-    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        this.beanFactory = beanFactory;
-    }
-
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        if (!load) {
-            AnnotationAwareAspectJAutoProxyCreator annotationAwareAspectJAutoProxyCreator = beanFactory.getBean(AnnotationAwareAspectJAutoProxyCreator.class);
-            CustomTargetSourceCreator customTargetSourceCreator = new CustomTargetSourceCreator();
-            customTargetSourceCreator.setBeanFactory(beanFactory);
-            annotationAwareAspectJAutoProxyCreator.setCustomTargetSourceCreators(customTargetSourceCreator);
-            load = !load;
-        }
-    }
-}
-public interface UserService {
-    void userInfo();
-}
-@Service
-public class UserServiceImpl implements UserService{
-    @Override
-    public void userInfo() {
-        System.out.println("打印了用户信息 UserServiceImpl1");
-    }
-}
-```
-
-## RestTemplate的Ribbon
-
-![image-20220119111513269](noteImg/image-20220119111513269.png)
-
-
-
-# SpringBoot启动流程
-
-## Spring默认启动的时候就会创建几个BeanDefinition
-
-```
-new SpringApplication()的时候构造方法完成了几件事情，本地设置从spring.factories加载的 ApplicationContextInitializer.class相关的类，本地设置从spring.factories加载的 ApplicationListener.class相关的类。
-执行run方法（）主要步骤
-1、获取 SpringApplicationRunListener
-2、prepareEnvironment 发布事件 ApplicationEnvironmentPreparedEvent(BootstrapApplicationListener) 去加载 bootstrap.yml 文件
-3、createApplicationContext，根据 webApplicationType 类型不同创建 ConfigurableApplicationContext，这个时候就会通过其创建对象的构造方法，创建两个对象，一个是 AnnotatedBeanDefinitionReader，一个是ClassPathBeanDefinitionScanner对象，其中AnnotatedBeanDefinitionReader 在new对象的时候就是往容器里面注册几个beandefinition，其中比较重要的是，
-	1. AutowiredAnnotationBeanPostProcessor.java
-	2. CommonAnnotationBeanPostProcessor.java
-	3. ConfigurationClassPostProcessor.java
-4、准备上下文 
-	nacos config 整合 springboot 位置
-  1、applyInitializers
-  2、PropertySourceBootstrapConfiguration
-  3、PropertySourceLocator.locateCollection
-  4、NacosPropertySourceLocator.locate
-```
-
-nacos divcovery是通过事件发布的方式注册的
-
-```text
-finishRefresh() -> WebServerInitializedEvent（ServletWebServerInitializedEvent） 事件发布的，AbstractAutoServiceRegistration 监听了这个事件，通过他的 onApplicationEvent 方法就会走到，NacosServiceRegistry 最后就会走到这个的register
-```
-
-# springboot2.0默认创建什么代理？
-
-参考文章：https://note.youdao.com/ynoteshare/index.html?id=ca8cc5711375e0fd4e605aa4f5aa4be3&type=note&_time=1656590927414
-
-
-
-
-
 # Spring事务
 
 **EnableTransactionManagement的selector 注册类**
 
 ```java
+TransactionManagementConfigurationSelector.java
 AutoProxyRegistrar -> InfrastructureAdvisorAutoProxyCreator
 
 ProxyTransactionManagementConfiguration -> BeanFactoryTransactionAttributeSourceAdvisor
@@ -444,13 +348,15 @@ ProxyTransactionManagementConfiguration -> BeanFactoryTransactionAttributeSource
 																					 TransactionInterceptor
 ```
 
+**common suffix：**AutoProxyCreator
 
+![image-20221104175940869](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221104175940869.png)
 
 ## 五种Advice
 
 ```java
 MethodBeforeAdvice
-
+ 
 AfterReturningAdvice
 
 ThrowsAdvice
@@ -771,7 +677,7 @@ EvaluationContext：评估/计算的上下文，表达式在计算上下文中�
 
 # MDC
 
-MDC 全称是 Mapped Diagnostic Context，可以粗略的理解成是一个线程安全的存放诊断日志的容器。
+**MDC 全称是 Mapped Diagnostic Context，可以粗略的理解成是一个线程安全的存放诊断日志的容器。**
 
 log4j
 log4j可以控制日志信息输送的目的地是控制台、文件、GUI组件，甚至是套接口服务器、NT的时间记录器、UNIX Syslog护进程等。
@@ -945,10 +851,9 @@ TaskExecutionAutoConfiguration
 
 Listener是怎么被保存到广播器`ApplicationEventMulticaster`中的呢？
 
+ApplicationListenerDetector 在 prepareBeanFactory 注入的
+
 答案：通过`ApplicationListenerDetector`这个`BeanPostProcessor`后置处理器。
-
-ApplicationListenerDetector 在 prepareBeanFactory注入的
-
 
 
 
@@ -1008,9 +913,145 @@ beanFactory.registerResolvableDependency(ApplicationContext.class, this);
 
 
 
-
-
 # CORS
 
 **CORS** （Cross-Origin Resource Sharing，跨域资源共享）是一个系统，它由一系列传输的[HTTP 头](https://developer.mozilla.org/zh-CN/docs/Glossary/HTTP_header)组成，这些 HTTP 头决定浏览器是否阻止前端 JavaScript 代码获取跨域请求的响应。
 
+# spring创建对象的五种方式
+
+
+
+![image-20211216155602502](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20211216155602502.png)
+
+![image-20211216220650964](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20211216220650964.png)
+
+## 通过BeanPostProcess实现InstantiationBeanPostProcessor创建对象
+
+```java
+public class CustomTargetSource extends AbstractBeanFactoryBasedTargetSource {
+
+    private static final long serialVersionUID = 1231212121L;
+
+    @Override
+    public Object getTarget() throws Exception {
+        return getBeanFactory().getBean(getTargetBeanName());
+    }
+}
+public class CustomTargetSourceCreator extends AbstractBeanFactoryBasedTargetSourceCreator {
+    @Override
+    protected AbstractBeanFactoryBasedTargetSource createBeanFactoryBasedTargetSource(Class<?> beanClass, String beanName) {
+        if (getBeanFactory() instanceof ConfigurableListableBeanFactory) {
+            if (beanClass.isAssignableFrom(UserServiceImpl.class)) {
+                return new CustomTargetSource();
+            }
+        }
+        return null;
+    }
+}
+@Component
+public class SetCustomTargetSourceCreator implements PriorityOrdered, BeanFactoryAware, InitializingBean {
+
+    private BeanFactory beanFactory;
+    private boolean load = false;
+
+    @Override
+    public int getOrder() {
+        return 45;
+    }
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        this.beanFactory = beanFactory;
+    }
+
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (!load) {
+            AnnotationAwareAspectJAutoProxyCreator annotationAwareAspectJAutoProxyCreator = beanFactory.getBean(AnnotationAwareAspectJAutoProxyCreator.class);
+            CustomTargetSourceCreator customTargetSourceCreator = new CustomTargetSourceCreator();
+            customTargetSourceCreator.setBeanFactory(beanFactory);
+            annotationAwareAspectJAutoProxyCreator.setCustomTargetSourceCreators(customTargetSourceCreator);
+            load = !load;
+        }
+    }
+}
+public interface UserService {
+    void userInfo();
+}
+@Service
+public class UserServiceImpl implements UserService{
+    @Override
+    public void userInfo() {
+        System.out.println("打印了用户信息 UserServiceImpl1");
+    }
+}
+```
+
+## RestTemplate的Ribbon
+
+![image-20220119111513269](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220119111513269.png)
+
+# SpringBoot启动流程
+
+## Spring默认启动的时候就会创建几个BeanDefinition
+
+```
+new SpringApplication()的时候构造方法完成了几件事情，本地设置从spring.factories加载的 ApplicationContextInitializer.class相关的类，本地设置从spring.factories加载的 ApplicationListener.class相关的类。
+执行run方法（）主要步骤
+1、获取 SpringApplicationRunListener
+2、prepareEnvironment 发布事件 ApplicationEnvironmentPreparedEvent(BootstrapApplicationListener) 去加载 bootstrap.yml 文件
+3、createApplicationContext，根据 webApplicationType 类型不同创建 ConfigurableApplicationContext，这个时候就会通过其创建对象的构造方法，创建两个对象，一个是 AnnotatedBeanDefinitionReader，一个是ClassPathBeanDefinitionScanner对象，其中AnnotatedBeanDefinitionReader 在new对象的时候就是往容器里面注册几个beandefinition，其中比较重要的是，
+	1. AutowiredAnnotationBeanPostProcessor.java
+	2. CommonAnnotationBeanPostProcessor.java
+	3. ConfigurationClassPostProcessor.java
+4、准备上下文 
+	nacos config 整合 springboot 位置
+  1、applyInitializers
+  2、PropertySourceBootstrapConfiguration
+  3、PropertySourceLocator.locateCollection
+  4、NacosPropertySourceLocator.locate
+```
+
+nacos divcovery是通过事件发布的方式注册的
+
+```text
+finishRefresh() -> WebServerInitializedEvent（ServletWebServerInitializedEvent） 事件发布的，AbstractAutoServiceRegistration 监听了这个事件，通过他的 onApplicationEvent 方法就会走到，NacosServiceRegistry 最后就会走到这个的register
+```
+
+# springboot2.0默认创建什么代理？
+
+参考文章：https://note.youdao.com/ynoteshare/index.html?id=ca8cc5711375e0fd4e605aa4f5aa4be3&type=note&_time=1656590927414
+
+# BeanDefinition
+
+![image-20221104215842689](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221104215842689.png)
+
+![img](https://ask.qcloudimg.com/http-save/yehe-6158873/mku1x7r0xe.png?imageView2/2/w/1620)
+
+**参考文章：**https://cloud.tencent.com/developer/article/1497805
+
+**@Configuration注解的类会成为一个工厂类，而所有的@Bean注解的方法会成为工厂方法，通过工厂方法实例化Bean，而不是直接通过构造函数初始化**（
+
+
+
+
+
+# Spring获取运行主类Class对象
+
+```
+private Class<?> deduceMainApplicationClass() {
+   try {
+      StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();
+      for (StackTraceElement stackTraceElement : stackTrace) {
+         if ("main".equals(stackTraceElement.getMethodName())) {
+            return Class.forName(stackTraceElement.getClassName());
+         }
+      }
+   }
+   catch (ClassNotFoundException ex) {
+      // Swallow and continue
+   }
+   return null;
+}
+```
