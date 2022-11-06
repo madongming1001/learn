@@ -1,10 +1,13 @@
 package com.madm.learnroute.javaee;
 
 
+import com.madm.learnroute.annotation.UserId;
 import lombok.SneakyThrows;
 import net.sf.cglib.core.DebuggingClassWriter;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.cglib.proxy.*;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
@@ -17,6 +20,17 @@ import java.util.Properties;
  * jdk代理对象的缺点：被代理对象必须实现一个或多个接口
  * Cglib代理对象的缺点：目标不能是final类
  * Created by YangTao
+ * CallbackInfo 里面有很多回掉的类型
+ *     private static final CallbackInfo[] CALLBACKS = {
+ *         new CallbackInfo(NoOp.class, NoOpGenerator.INSTANCE),
+ *         new CallbackInfo(MethodInterceptor.class, MethodInterceptorGenerator.INSTANCE),
+ *         new CallbackInfo(InvocationHandler.class, InvocationHandlerGenerator.INSTANCE),
+ *         new CallbackInfo(LazyLoader.class, LazyLoaderGenerator.INSTANCE),
+ *         new CallbackInfo(Dispatcher.class, DispatcherGenerator.INSTANCE),
+ *         new CallbackInfo(FixedValue.class, FixedValueGenerator.INSTANCE),
+ *         new CallbackInfo(ProxyRefDispatcher.class, DispatcherGenerator.PROXY_REF_INSTANCE),
+ *     };
+ *
  */
 interface Animal {
     void call();
@@ -25,24 +39,21 @@ interface Animal {
 }
 
 class Cat implements Animal {
-    @Override
+    @UserId("sdfd")
     public void call() {
         System.out.println("喵喵喵 ~");
     }
 
-    @Override
     public void eat() {
         System.out.println("吃东西 ～");
     }
 }
 
 class Dog implements Animal {
-    @Override
     public void call() {
         System.out.println("汪汪汪 ~");
     }
 
-    @Override
     public void eat() {
         System.out.println("呃呃呃 ～");
     }
@@ -124,13 +135,13 @@ public class ProxyPractice {
     }
 
     public static void main(String[] args) throws Exception {
-
         //JDK代理生成 InvocationHandler
 //        jdkProxyGenerate();
 
         //CGLIB代理生成 MethodInterceptor
-        cglibProxyGenerate();
-//        testReflectMethod();
+//        cglibProxyGenerate();
+
+        testReflectMethod();
     }
 
     /**
@@ -144,6 +155,9 @@ public class ProxyPractice {
 //            Dog cat = new Dog(); cause：object is not an instance of declaring class
             Cat cat = new Cat();
             method.invoke(cat);
+            UserId a = method.getAnnotation(UserId.class);
+            System.out.println(a.value());
         }
+
     }
 }

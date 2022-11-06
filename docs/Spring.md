@@ -1,5 +1,3 @@
-
-
 # spring假设去掉二级缓存？
 
 如果去掉了二级缓存，则需要直接在 `singletonFactory.getObject()` 阶段初始化完毕，并放到一级缓存中。
@@ -37,6 +35,111 @@ spring.main.allow-circular-references=true
 ## 循环依赖+动态代理
 
 ![6ff44764aade35144ef61879e129b47a.png](https://img-blog.csdnimg.cn/img_convert/6ff44764aade35144ef61879e129b47a.png)
+
+**存在提前暴露的情况下，比如Bean A的情况，最后才会把二级缓存的对象赋值给当前bean然后返回。**
+
+```java
+// 6. 存在提前曝光情况下
+if (earlySingletonExposure) {
+   // earlySingletonReference：二级缓存，缓存的是经过提前曝光提前Spring AOP代理的bean 经过实力话 没有经过属性填充和初始化
+   Object earlySingletonReference = getSingleton(beanName, false);
+   // earlySingletonReference只有在检测到有循环依赖的情况下才会不为空
+   if (earlySingletonReference != null) {
+      // exposedObject跟bean一样，说明初始化操作没用应用Initialization后置处理器(指AOP操作)改变exposedObject
+      // 主要是因为exposedObject如果提前代理过，就会跳过Spring AOP代理，所以exposedObject没被改变，也就等于bean了
+      // 如果exposedObject没有在初始化方法中改变，说明没有被增强
+      if (exposedObject == bean) {
+         // 将二级缓存中的提前AOP代理的bean赋值给exposedObject，并返回
+         //自动注入是空的
+         exposedObject = earlySingletonReference;
+      }
+      // 引用都不相等了，也就是现在的bean已经不是当时提前曝光的bean了
+      else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
+         // dependentBeans也就是B, C, D
+         String[] dependentBeans = getDependentBeans(beanName);
+         Set<String> actualDependentBeans = new LinkedHashSet<>(dependentBeans.length);
+         for (String dependentBean : dependentBeans) {
+            if (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) {
+               actualDependentBeans.add(dependentBean);
+            }
+         }
+         //被依赖检测异常
+         //因为bean创建后所依赖的bean一定是已经创建的
+         //actualDependentBeans不为空则表示当前bean创建后其依赖的bean却没有全部创建完，也就说存在循环依赖
+         if (!actualDependentBeans.isEmpty()) {
+            throw new BeanCurrentlyInCreationException(beanName, "Bean with name '" + beanName + "' has been injected into other beans [" + StringUtils.collectionToCommaDelimitedString(actualDependentBeans) + "] in its raw version as part of a circular reference, but has eventually been " + "wrapped. This means that said other beans do not use the final version of the " + "bean. This is often the result of over-eager type matching - consider using " + "'getBeanNamesForType' with the 'allowEagerInit' flag turned off, for example.");
+         }
+      }
+   }
+}
+```
+
+```java
+createBean
+//遇到Aop的 BeanPostProcessor 的话就findCandidateAdvisors找到所有的advisor放到容器中，advisor指的是spring中封装pointcut和notify的对象，这里不会对具体需要代理的对象创建代理类，而是有一个插口（getCustomTargetSource）让我们可以做，但一般不会做。
+标注@Aspectj的对象是在shouldSkip方法返回null，而普通的bean在方法结束返回null，因为没有自定义targetSource
+@Nullable
+protected Object resolveBeforeInstantiation(String beanName, RootBeanDefinition mbd) {
+   Object bean = null;
+   if (!Boolean.FALSE.equals(mbd.beforeInstantiationResolved)) {
+      // Make sure bean class is actually resolved at this point.
+      if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
+         Class<?> targetType = determineTargetType(beanName, mbd);
+         if (targetType != null) {
+            //AbstractAutoProxyCreator
+            bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
+            if (bean != null) {
+               bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+            }
+         }
+      }
+      mbd.beforeInstantiationResolved = (bean != null);
+   }
+   return bean;
+}
+
+	@Override
+	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {
+		Object cacheKey = getCacheKey(beanClass, beanName);
+
+		//1.不需要创建代理
+		if (!StringUtils.hasLength(beanName) || !this.targetSourcedBeans.contains(beanName)) {
+			if (this.advisedBeans.containsKey(cacheKey)) {
+				return null;
+			}
+			//2.如果是基础设施或者应该跳过的类，则说明这个类不需要创建代理，缓存起来
+			//默认shouldSkip是false，都不应该跳过
+			//但是AspectJAwareAdvisorAutoProxyCreator实现了该方法
+			//解析所有@Aspectj标注的对象里面的每个通知连接点称为advisor对象
+			//Pointcut.class, Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class
+			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
+				this.advisedBeans.put(cacheKey, Boolean.FALSE);
+				return null;
+			}
+		}
+
+		// Create proxy here if we have a custom TargetSource.
+		// Suppresses unnecessary default instantiation of the target bean:
+		// The TargetSource will handle target instances in a custom fashion.
+		// 2.对于自定义的 TargetSource 会立即创建代理，并缓存
+		TargetSource targetSource = getCustomTargetSource(beanClass, beanName);
+		if (targetSource != null) {
+			if (StringUtils.hasLength(beanName)) {
+				this.targetSourcedBeans.add(beanName);
+			}
+			Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(beanClass, beanName, targetSource);
+			Object proxy = createProxy(beanClass, beanName, specificInterceptors, targetSource);
+			this.proxyTypes.put(cacheKey, proxy.getClass());
+			return proxy;
+		}
+
+		return null;
+	}
+```
+
+
+
+
 
 ```java
 * <p>Bean factory implementations should support the standard bean lifecycle interfaces
@@ -176,7 +279,7 @@ throwable
 ## Aop调用链条组装
 
 ```java
-由于cglib代理创建的时候callback数组0的位置是 DynamicAdvisedInterceptor，而在调用目标方法的时候都会走到 DynamicAdvisedInterceptor.intercept()，而里面最终就会创建一个 CglibMethodInvocation 对象，把符合的list<Advice>传给构造方法，还有其他参数，代理对象等，接着就会调用 proceed(),由于 CglibMethodInvocation 的 proceed()就是调用父类的 ReflectiveMethodInvocation.proceed(),而父类就会有一个计数器不断的调用list<advice>对应坐标的类，当前 ReflectiveMethodInvocation.proceed()最后面会调用每个advice的invoke方法，并会把当前对象传过去，因为当前proceed()是 CglibMethodInvocation 调用过来的，所以this对象就是他( CglibMethodInvocation),接下来调用的第一个invoke()坑定是 ExposeInvocationInterceptor 的（AbstractAdvisorAutoProxyCreator&findEligibleAdvisors()extendAdvisors()添加的，是从AbstractAutoProxyCreator的warpIfNecessary方法来的），首先会把 CglibMethodInvocation 方到一个threadlocal里面，以保证同线程其他位置可以使用，proceed(this(代指 CglibMethodInvocation))最后会调用
+由于cglib代理创建的时候callback数组0的位置是 DynamicAdvisedInterceptor，而在调用目标方法的时候都会走到 DynamicAdvisedInterceptor.intercept()，而里面最终就会创建一个 CglibMethodInvocation 对象，把符合的list<Advice>传给构造方法，还有其他参数，代理对象等，接着就会调用 proceed(),由于 CglibMethodInvocation 的 proceed()就是调用父类的 ReflectiveMethodInvocation.proceed(),而父类就会有一个计数器不断的调用list<advice>对应坐标的类，当前 ReflectiveMethodInvocation.proceed()最后面会调用每个advice的invoke方法，并会把当前对象传过去，因为当前proceed()是 CglibMethodInvocation 调用过来的，所以this对象就是他( CglibMethodInvocation),接下来调用的第一个invoke()肯定是 ExposeInvocationInterceptor 的（AbstractAdvisorAutoProxyCreator&findEligibleAdvisors()extendAdvisors()添加的，是从AbstractAutoProxyCreator的warpIfNecessary方法来的），首先会把 CglibMethodInvocation 方到一个threadlocal里面，以保证同线程其他位置可以使用，proceed(this(代指 CglibMethodInvocation))最后会调用
 CglibMethodInvocation.proceed()，由于里面是调用父类的proceed(),这是父类的计数器每次调用就会+1，然后还有走到invoke(this),周而复始。各通知类的方法不尽相同，就是会在调用方法的前后穿插自己的逻辑比如 MethodBeforeAdviceInterceptor（）。
 
 XML的时候Advice是以下表作为顺序的，最终在拼出来的chain按照这个顺序
@@ -255,15 +358,24 @@ XML的时候Advice是以下表作为顺序的，最终在拼出来的chain按照
 			throw ex;
 		}
 	}
+	
+FastClassInfo
+fci.f1 = 被代理对象
+fci.f2 = 代理对象
 ```
 
+**DynamicAdvisedInterceptor.intercept组装6个MethodInterceptor**
 
+```java
+1、ExposeInvocatinoInterceptor
+2、AspectjAroundAdvice
+3、AspectJMethodBeforeAdvice -> MethodBeforeAdviceAdapter -> MethodBeforeAdviceInterceptor
+4、AspectJAfterAdvice
+5、AspectJAfterReturningAdvice  -> AfterReturningAdviceAdapter->AfterReturningAdviceInterceptor
+6、AspectJAfterThrowingAdvice
+```
 
-
-
-
-
-
+**findCandidateAdvisors()找到了所有的advisor，并把每一个aspectj的切面方法给到了AbstractAspectJAdvice。InstantiationModelAwarePointcutAdvisorImpl**
 
 ## 注解对应Advice接口
 
@@ -278,6 +390,8 @@ AtAfter -> AspectJAfterAdvice
 AtAfterReturning -> AspectJAfterReturningAdvice
 AtAfterThrowing -> AspectJAfterThrowingAdvice
 ```
+
+![image-20221106231422821](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221106231422821.png)
 
 ## DefaultListableBeanFactory类图
 
@@ -333,6 +447,41 @@ AtAfterThrowing -> AspectJAfterThrowingAdvice
 //initializeBean&postProcessAfterInitialization
 ```
 
+```java
+@Override
+public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
+   if (bean != null) {
+      //获取当前bean的key：如果beanName不为空，则以beanName为key，如果为FactoryBean类型，
+      //前面还会添加&符号，如果beanName为空，则以当前bean对应的class为key
+      Object cacheKey = getCacheKey(bean.getClass(), beanName);
+      //判断当前 bean 是否正在被代理，如果正在被代理则不进行封装
+      //根据是否提前调用过 getEarlyBeanReference 方法
+      //null != bean 说明对象没有提前暴露过 就是没有提前调用getEarlyBeanReference()方法
+      //earlyProxyReferences 只有两种情况 一个有值 一个没值
+      if (this.earlyProxyReferences.remove(cacheKey) != bean) {
+         //如果他需要被代理，则需要封装指定的bean
+         return wrapIfNecessary(bean, beanName, cacheKey);
+      }
+   }
+   return bean;
+}
+```
+
+## 可以被代理的类执行流程
+
+```java
+getAdvicesAndAdvisorsForBean -> findEligibleAdvisors -> {
+  //根据配置文件以及注解的方式找到所有声明aspectj的切面，然后生成对应的advisor，advisor主要作用是封装pointcut和advice
+	findCandidateAdvisors();
+  //根据当前类的所有方法找到所有符合的advisors
+  findAdvisorsThatCanApply();
+  //向advisors0号位置添加对象ExposeInvocationInterceptor，用于整个调用链的  //向advisors0号位置添加对象ExposeInvocationInterceptor，ExposeInvocationInterceptor 就是用来传递MethodInvocation的。在后续的任何下调用链环节，只需要用到当前的MethodInvocation就通过ExposeInvocationInterceptor.currentInvocation()静态方法获得
+  extendAdvisors(eligibleAdvisors);
+  //进行拓扑排序
+	sortAdvisors(eligibleAdvisors);
+}
+```
+
 
 
 # Spring事务
@@ -351,6 +500,32 @@ ProxyTransactionManagementConfiguration -> BeanFactoryTransactionAttributeSource
 **common suffix：**AutoProxyCreator
 
 ![image-20221104175940869](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221104175940869.png)
+
+## Advice执行顺序
+
+```java
+//未异常
+@Around
+@Before
+business process
+@AfterReturning
+@After
+@Around
+//异常
+@Around
+@Before
+business process
+@AfterThrowing
+@After
+@Around
+//抛异常
+```
+
+Introduction 是对于类级别的切面
+
+ClassFilter
+
+MethodMatcher
 
 ## 五种Advice
 
@@ -679,12 +854,12 @@ EvaluationContext：评估/计算的上下文，表达式在计算上下文中�
 
 **MDC 全称是 Mapped Diagnostic Context，可以粗略的理解成是一个线程安全的存放诊断日志的容器。**
 
-log4j
+**log4j**
 log4j可以控制日志信息输送的目的地是控制台、文件、GUI组件，甚至是套接口服务器、NT的时间记录器、UNIX Syslog护进程等。
 
 可以控制每一条日志信息的级别，能够更加细致的控制日志的生产过程，可以通过一个配置文件来灵活的进行配置，不需要修改应用代码。
 
-logback
+**logback**
 是由log4j创始人设计的又一个开源日志组件。logback当前分成三个模块：logback-core,logback- classic和logback-access。logback-core是其它两个模块的基础模块。logback-classic是log4j的一个 改良版本。此外logback-classic完整实现SLF4J API使你可以很方便地更换成其它日志系统如log4j或JDK14 Logging。logback-access访问模块与Servlet容器集成提供通过Http来访问日志的功能。
 
 SLF4J所提供的核心API是一些接口以及一个LoggerFactory的工厂类。从某种程度上，SLF4J有点类似JDBC，不过比JDBC更简单，在JDBC中，你需要指定驱动程序，而在使用SLF4J的时候，不需要在代码中或配置文件中指定你打算使用那个具体的日志系统。如同使用JDBC基本不用考虑具体数据库一样，SLF4J提供了统一的记录日志的接口，只要按照其提供的方法记录即可，最终日志的格式、记录级别、输出方式等通过具体日志系统的配置来实现，因此可以在应用中灵活切换日志系统。
@@ -862,6 +1037,32 @@ ApplicationListenerDetector 在 prepareBeanFactory 注入的
 
 ​		首先，ConfigurationClassPostProcessor后置处理器的处理入口为`postProcessBeanDefinitionRegistry()`方法。其主要使用了`ConfigurationClassParser`配置类解析器解析`@Configuration`配置类上的诸如`@ComponentScan`、`@Import`、`@Bean`等注解，并尝试发现所有的配置类；还使用了`ConfigurationClassBeanDefinitionReader`注册所发现的所有配置类中的所有Bean定义；结束执行的条件是所有配置类都被发现和处理，相应的bean定义注册到容器。
 
+**@Configuration的类为什么会生成代理?**
+
+目的是防止@Bean方法的手动重复调用造成单例的破坏。类被分为full模式和lite模式，加了**@Configuration的是full模式**，**@Bean、@Component、@ComponentScan、@Import、@ImportResource注解的就是lite**，之后会在BeanDefinition上设置configurationClass的属性值。
+
+**当配置类使用@Component修饰的时候**
+
+```java
+@Bean
+public MyService myService() {
+   MyService myService = new MyService();
+   myService.setUserService(userService());
+   return myService;
+}
+
+@Bean
+public UserService userService() {
+   return new UserService();
+}
+```
+
+**⚠️注意**：就会出现myService使用的是自己new出来的，**走的正常方法调用**，正常想使用的是spring中的userService，所以就会导致用的不是同一个对象，比较的话可定是false。
+
+@Bean修饰的方法走的是工厂方法方式创建对象（**createBeanInstance()&instantiateUsingFactoryMethod()**），之后会把当前工厂方法存入到一个isCurrentlyInvokedFactoryMethod() Threadlocal之中，再然后调用方法走到拦截器，拦截器里面判断isCurrentlyInvokedFactoryMethod()是否有值，如果有值说明是spring正常在创建对象，如果没值的话说明是方法里面自己调用的，当执行到userService的时候由于该配置类每个方法都有拦截器所以又回到了拦截器的逻辑，又因为在isCurrentlyInvokedFactoryMethod()中不是当前工厂方法，所以获取的对象从spring中获取，存入到一级缓存，正常获取对象的逻辑，完事之后回到myService方法继续执行。当spring加载配置类下一个userSerivice方法创建对象的时候，由于spring容器中已经有该对象，就不需要创建了。
+
+参考文章：https://blog.csdn.net/weixin_37689658/article/details/125664876
+
 
 
 # RefreshScope
@@ -1019,23 +1220,25 @@ nacos divcovery是通过事件发布的方式注册的
 finishRefresh() -> WebServerInitializedEvent（ServletWebServerInitializedEvent） 事件发布的，AbstractAutoServiceRegistration 监听了这个事件，通过他的 onApplicationEvent 方法就会走到，NacosServiceRegistry 最后就会走到这个的register
 ```
 
+
+
 # springboot2.0默认创建什么代理？
 
-参考文章：https://note.youdao.com/ynoteshare/index.html?id=ca8cc5711375e0fd4e605aa4f5aa4be3&type=note&_time=1656590927414
+**为了防止某些讨厌的人在类属性上不用接口注入，所以使用的是Cglib代理，AopAutoConfiguration默认设置的。**
+
+**参考文章：**https://note.youdao.com/ynoteshare/index.html?id=ca8cc5711375e0fd4e605aa4f5aa4be3&type=note&_time=1656590927414
 
 # BeanDefinition
+
+**参考文章：**https://cloud.tencent.com/developer/article/1497805
 
 ![image-20221104215842689](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221104215842689.png)
 
 ![img](https://ask.qcloudimg.com/http-save/yehe-6158873/mku1x7r0xe.png?imageView2/2/w/1620)
 
-**参考文章：**https://cloud.tencent.com/developer/article/1497805
+**@Configuration注解的类会成为一个工厂类，而所有的@Bean注解的方法会成为工厂方法，通过工厂方法实例化Bean，而不是直接通过构造函数初始化。**
 
-**@Configuration注解的类会成为一个工厂类，而所有的@Bean注解的方法会成为工厂方法，通过工厂方法实例化Bean，而不是直接通过构造函数初始化**（
-
-
-
-
+**一个`RootBeanDefinition`定义表明它是一个可合并的bean definition：即在spring beanFactory运行期间，可以返回一个特定的bean。但在Spring2.5以后，我们绝大多数情况还是可以使用`GenericBeanDefinition`来做。**
 
 # Spring获取运行主类Class对象
 
@@ -1055,3 +1258,142 @@ private Class<?> deduceMainApplicationClass() {
    return null;
 }
 ```
+
+
+
+# IDEA中External Libraries多余的jar删除办法
+
+**原因分析：External Libraries中显示的jar，都是从iml文件中读取的，所以我们及时更新iml文件即可解决该问题重新生成iml文件即可。**
+**生成.iml文件: mvn idea:module**
+
+**参考文章：**https://blog.csdn.net/qq_30054961/article/details/102938002
+
+```java
+public int intValue() {
+    return value;
+}
+
+
+@FunctionalInterface
+public interface ToIntFunction<T> {
+
+    /**
+     * Applies this function to the given argument.
+     *
+     * @param value the function argument
+     * @return the function result
+     */
+    int applyAsInt(T value);
+}
+Integer::intValue
+```
+
+# refresh()
+
+```java
+@Override
+public void refresh() throws BeansException, IllegalStateException {
+   synchronized (this.startupShutdownMonitor) {
+      prepareRefresh();
+
+			/*
+			 * 1、创建BeanFactory对象
+			 * 2、xml解析
+			 *  传统标签解析：bean、import等
+			 *  自定义标签解析 如：<context:component-scan base-package="com.xiangxue.jack"/>
+			 *  自定义标签解析流程：
+			 *     a、根据当前解析标签的头信息找到对应的namespaceUri
+			 *     b、加载spring所以jar中的spring.handlers文件。并建立映射关系
+			 *     c、根据namespaceUri从映射关系中找到对应的实现了NamespaceHandler接口的类
+			 *     d、调用类的init方法，init方法是注册了各种自定义标签的解析类
+			 *     e、根据namespaceUri找到对应的解析类，然后调用paser方法完成标签解析
+			 * 3、把解析出来的xml标签封装成BeanDefinition对象
+			 * */
+      ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+
+      // Prepare the bean factory for use in this context.
+      // 准备两个BeanPostProcessor和排除一些aware
+      // ApplicationContextAwareProcessor
+      // ApplicationListenerDetector
+      prepareBeanFactory(beanFactory);
+
+      try {
+         // Allows post-processing of the bean factory in context subclasses.
+         postProcessBeanFactory(beanFactory);
+
+         //最为关键的类通过 ConfigurationClassPostProcessor
+        //有两个核心实现方法postProcessBeanDefinitionRegistry（定位、加载、解析、注册相关注解，如：@Controller、@Service、@Component等注解类到IOC容器之中，自动化配置类的解析、注册）、			postProcessBeanFactory（添加CGLIB增强处理及ImportAwareBeanPostProcessor（BeanPostProcessor）后处理类）
+         invokeBeanFactoryPostProcessors(beanFactory);
+
+         // Register bean processors that intercept bean creation.
+       	 // 已经把所有的BeanPostProcessor注册到了容器中是指的是写入到了singletonOjbects中
+        
+         registerBeanPostProcessors(beanFactory);
+
+         // Initialize message source for this context.
+         initMessageSource();
+
+         // Initialize event multicaster for this context.
+         initApplicationEventMulticaster();
+
+         // Initialize other special beans in specific context subclasses.
+         onRefresh();
+
+         // Check for listener beans and register them.
+         registerListeners();
+
+         // Instantiate all remaining (non-lazy-init) singletons.
+         finishBeanFactoryInitialization(beanFactory);
+
+         // Last step: publish corresponding event.
+         finishRefresh();
+      }
+
+      catch (BeansException ex) {
+         if (logger.isWarnEnabled()) {
+            logger.warn("Exception encountered during context initialization - " +
+                  "cancelling refresh attempt: " + ex);
+         }
+
+         // Destroy already created singletons to avoid dangling resources.
+         destroyBeans();
+
+         // Reset 'active' flag.
+         cancelRefresh(ex);
+
+         // Propagate exception to caller.
+         throw ex;
+      }
+
+      finally {
+         // Reset common introspection caches in Spring's core, since we
+         // might not ever need metadata for singleton beans anymore...
+         resetCommonCaches();
+      }
+   }
+}
+```
+
+**XSD**是指XML结构定义( XML Schemas Definition )XML Schema 是DTD的替代品。 XML Schema语言也就是XSD。 XML Schema描述了XML文档的结构。 **可以用一个指定的XML Schema来验证某个XML文档，以检查该XML文档是否符合其要求。**
+
+
+
+# 须知
+
+**加载有参构造器缺失参数流程**
+
+```java
+AbstractAutowireCapableBeanFactory
+createBeanInstance -> autowireConstructor -> resolvePreparedArguments -> resolveValueIfNecessary -> resolveInnerBean -> createBean
+```
+
+instantiateBean
+
+isSynthetic
+
+
+
+**advisor是spring内部实现的方式，封装切点和通知的，而切面类就是真实声明我们通知以及切点的类。**
+
+有两处地方可以进行注入Aop一个是getEarlyBeanReference，另一个是postProcessAfterInitialization。
+
