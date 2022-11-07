@@ -6,6 +6,7 @@ import com.mdm.pojo.Invitee;
 import com.mdm.pojo.Teacher;
 import com.mdm.pojo.Apple;
 import com.mdm.pojo.User;
+import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.builder.ToStringExclude;
 import org.apache.curator.shaded.com.google.common.collect.Lists;
@@ -61,9 +62,9 @@ public class ListStreamPractice {
         //存放apple对象集合
 
         Apple apple1 = new Apple(1, "苹果1", new BigDecimal("3.25"), 10);
-        Apple apple2 = new Apple(2, "香蕉", new BigDecimal("2.89"), 30);
+        Apple apple2 = new Apple(2, "苹果2", new BigDecimal("2.89"), 30);
         Apple apple3 = new Apple(3, "荔枝", new BigDecimal("9.99"), 40);
-        Apple apple4 = new Apple(4, "苹果2", new BigDecimal("1.35"), 20);
+        Apple apple4 = new Apple(4, "香蕉", new BigDecimal("1.35"), 20);
 
         //验证对过滤后的集合修改会影响原集合的内容
         affectTheOriginalCollection(apple1,apple2,apple3,apple4);
@@ -127,6 +128,7 @@ public class ListStreamPractice {
 
     }
 
+    @SneakyThrows
     private static void affectTheOriginalCollection(Apple apple1, Apple apple2, Apple apple3, Apple apple4) {
         System.out.println("begin of method： affectTheOriginalCollection");
         ArrayList<Apple> originalCollection = Lists.newArrayList(apple1, apple2, apple3, apple4);

@@ -18,10 +18,15 @@ import java.util.Properties;
 
 public class ClassLoaderPractice {
     public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factories";
-
+    ClassLoaderPractice(){
+        System.out.println(this.getClass().getName());
+    }
     @SneakyThrows
     public static void main(String[] args) {
+        ClassLoaderPractice classLoaderPractice = new ClassLoaderPractice();
+        System.out.println(classLoaderPractice);
         System.out.println(String.class.getClassLoader());
+        System.out.println(ClassLoaderPractice.class.getName());
 //        System.out.println(com.sun.crypto.provider.DESKeyFactory.class.getClassLoader().getClass().getName());
         System.out.println(ClassLoaderPractice.class.getClassLoader().getClass().getName());
 
@@ -46,7 +51,7 @@ public class ClassLoaderPractice {
 
         System.out.println();
         System.out.println("appClassLoader加载以下文件：");
-        System.out.println(System.getProperty("java.class.path"));
+//        System.out.println(System.getProperty("java.class.path"));
         // 出发都是舍弃小数位
         System.out.println(String.class.getClassLoader());
         System.out.println(ClassLoaderPractice.class.getClassLoader());
