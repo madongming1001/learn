@@ -738,7 +738,7 @@ System.out.println(i);
 | -XX:+PrintGCDateStamps                | 输出GC的时间戳（以日期的形式，如 2017-09-04T21:53:59.234+0800） |
 | -XX:+PrintGCApplicationStoppedTime    | 打印GC时，应用停顿时间                                       |
 | -XX:+PrintGCApplicationConcurrentTime | GC时打印应用执行时间                                         |
-| -XX:+PrintSafepointStatistics         |                                                              |
+| -XX:+PrintStatistics                  |                                                              |
 | -XX:PrintSafepointStatisticsCount     |                                                              |
 
 `Client、Server模式默认GC` 
@@ -1061,7 +1061,7 @@ HotSpot虚拟机为了避免安全点过多带来过重的负担，对循环还�
 
 ## 为啥需要 Stop The World
 
-​		有时候我们需要全局所有线程进入 Safepoint 这样才能统计出那些内存可以回收用于 GC，以及回收不再使用的代码清理 CodeCache，以及执行某些 Java instrument 命令或者 JDK 工具，例如：jstack 打印堆栈就需要 Stop The World 获取当前所有线程快照。
+​		有时候我们需要全局所有线程进入 Safepoint 这样才能统计出那些内存可以回收用于 GC，以及回收不再使用的代码清理 CodeCache，以及执行某些 Java instrument 命令或者 JDK 工具，例如：**jstack 打印堆栈就需要 Stop The World 获取当前所有线程快照。**
 
 参考文章：https://www.modb.pro/db/170162
 

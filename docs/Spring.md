@@ -248,8 +248,6 @@ applicationEventMulticaster（spring上下文监听器）
 注册一个 AnnotationAwareAspectJAutoProxyCreator.java
 ```
 
-
-
 ## Advice的执行顺序
 
 ```java
@@ -382,6 +380,7 @@ fci.f2 = 代理对象
 ![image-20220701190744135](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220701190744135.png)
 
 ```java
+只有注解方式声明aop的时候才组装类上面添加@Aspectj
 InstantiationModelAwarePointcutAdvisorImpl
 内部注解所对应的AspectAdvice对象
 AtAround -> AspectJAroundAdvice
@@ -497,7 +496,21 @@ ProxyTransactionManagementConfiguration -> BeanFactoryTransactionAttributeSource
 																					 TransactionInterceptor
 ```
 
-**common suffix：**AutoProxyCreator
+**注意⚠️：只有事务没有aop链条中没有ExposeInvocationInterceptor**
+
+**注意⚠️：如果内层方法出现了异常外层没有捕获，那会使得外层方法也会回滚，影响到了外层方法。 外层方法异常不会影响内层方法的异常。内层是nested的时候。**
+
+
+
+当项目中只有事务没有aop的时候链条里面是不会有**ExposeInvocationInterceptor**，因为InfrastructureAdvisorAutoProxyCreator和AnnotationAwareAspectJAutoProxyCreator的父类AspectJAwareAdvisorAutoProxyCreator是同级的，而往链条里面添加**ExposeInvocationInterceptor**的方法extendAdvisors()就是在父类里面。
+
+**有两个地方回加载TransactionAttribute!!!**
+
+1、一个是后置处理器Aop的时候会走getAdvicesAndAdvisorsForBean()最里面会走一个叫findAdvisorsThatCanApply(),这个时候会拿类的所有方法和advisor一一匹配有一个匹配上就会认为需要aop，匹配条件是classFilter和MethodMatcher，在methodMatcher的时候就会读取方法的注解信息并放到Map<Object, TransactionAttribute> 里面
+
+2、在执行到拦截器getInterceptorsAndDynamicInterceptionAdvice()的时候会再次调用classFilter和MethodMatch进行比较。
+
+common suffix：**AutoProxyCreator
 
 ![image-20221104175940869](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221104175940869.png)
 
@@ -579,17 +592,6 @@ ConfigurationClassPostprocessor.java加载的类多了3个
 ![image-20220401225005587](/Users/madongming/notes/noteImg/image-20220401225005587.png)
 
 
-
-##Springboot整合Naocs Config位置
-https://www.jianshu.com/p/903c01cb2a77
-
-springboot提供加载资源.properties .yml
-PropertySourceLoader.java
-
-SpringApplication&run&prepareEnvironment去加载bootstrap.yml文件
-读取nacos配置文件是在SpringApplication&run&prepareContext方法&applyInitializers&PropertySourceBootstrapConfiguration&PropertySourceLocator.locateCollection&NacosPropertySourceLocator.locate
-
-参考文章：https://juejin.cn/post/6887751198737170446
 
 ## 事务传播行为
 
@@ -695,9 +697,13 @@ public void testTransaction() {
 }
 ```
 
+
+
+
+
 ### 非编程式事务
 
-### 声明式事务管理
+**声明式事务管理**
 
 推荐使用（代码侵入性最小），实际是通过 AOP 实现（基于`@Transactional` 的全注解方式使用最多）。
 
@@ -714,8 +720,147 @@ public void aMethod {
 }
 ```
 
-**如果内层事务需要回滚，他会在rollack里面判断globalrollack是不是true 如果是true就是记录在threadlocal里面一个true的变量，**
-**外层事务由于catch了异常，就会在commit的时候判断threadlocal是否有这个变量，然后决定是否会滚**
+
+
+**<u>如果外层方法是Propagation.REQUIRED，并且捕获了内层方法的异常，对于整个数据库连接来说是否回滚？</u>**
+
+**内层Propagation.REQUIRED：**
+
+使用的是同一个连接，**processRollback()**进行回滚的时候设置标记
+
+```java
+if (status.hasTransaction()) {
+  //globalRollbackOnParticipationFailure始终是true
+   if (status.isLocalRollbackOnly() || isGlobalRollbackOnParticipationFailure()) {
+      if (status.isDebug()) {
+         logger.debug("Participating transaction failed - marking existing transaction as rollback-only");
+      }
+      // 直接将rollbackOnly设置到ConnectionHolder中去，表示整个事务的sql都需要回滚
+      // 设置连接要回滚标记，也就是全局回滚 设置当前的 ConnectionHolder的rollbackOnly = true
+      doSetRollbackOnly(status);
+   }
+   else {
+      if (status.isDebug()) {
+         logger.debug("Participating transaction failed - letting transaction originator decide on rollback");
+      }
+   }
+}
+```
+
+由于外层事务本身catch了所以走正常的**commitTransactionAfterReturning()**方法，由于内层事务设置了**rollbackOnly=true**，也因为外层事务是一个新事务，所以会直接走**doRollback(status)**;。
+
+
+
+**内层PROPAGATION_NESTED：**
+
+使用的也是同一个连接，在刚一执行到内层的**intercept()**的时候，因为之前已经存在事务，所以会走存在事务逻辑**handleExistingTransaction()**，会进入**PROPAGATION_NESTED**这个分支的代码，
+
+```java
+//嵌套事务
+if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NESTED) {
+   //不允许就报异常
+   if (!isNestedTransactionAllowed()) {
+      throw new NestedTransactionNotSupportedException(
+            "Transaction manager does not allow nested transactions by default - " +
+            "specify 'nestedTransactionAllowed' property with value 'true'");
+   }
+   if (debugEnabled) {
+      logger.debug("Creating nested transaction with name [" + definition.getName() + "]");
+   }
+   //嵌套事务的处理
+   if (useSavepointForNestedTransaction()) {
+      // Create savepoint within existing Spring-managed transaction,
+      // through the SavepointManager API implemented by TransactionStatus.
+      // Usually uses JDBC 3.0 savepoints. Never activates Spring synchronization.
+      //如果没有可以使用的保存点的方式控制事务回滚，那么在嵌入式事务的建立出时建立保存点
+      DefaultTransactionStatus status =
+            prepareTransactionStatus(definition, transaction, false, false, debugEnabled, null);
+      //调用jdbc的con创建一个保存点，并把 ConnectionHolder 也标记一下
+      status.createAndHoldSavepoint();
+      return status;
+   }
+   else {
+      // Nested transaction through nested begin and commit/rollback calls.
+      // Usually only for JTA: Spring synchronization might get activated here
+      // in case of a pre-existing JTA transaction.
+      return startTransaction(definition, transaction, debugEnabled, null);
+   }
+}
+```
+
+在这里往当前ConnectionHolder设置一个保存点，当方法出现异常的时候，内层事务走到异常捕获分支，**completeTransactionAfterThrowing()**,刚开始进入**intercept()**方法的时候设置了保存点，
+
+```java
+//有保存点回滚到保存点
+if (status.hasSavepoint()) {
+   if (status.isDebug()) {
+      logger.debug("Rolling back transaction to savepoint");
+   }
+   status.rollbackToHeldSavepoint();
+}
+```
+
+这里回退保存点，并把**rollbackOnly = false;**再回到外层事务的时候，没有rollbackonly和异常被捕获所以外层事务正常commit；
+
+为什么**PROPAGATION_REQUIRES_NEW**内层可以使用新事务？
+
+因为在**handleExistingTransaction()**方法里面走到**PROPAGATION_REQUIRES_NEW**分支的时候，**suspend(transaction);**会把当前线程事务状态清空，并返回一个清空前数据的封装对象**SuspendedResourcesHolder**，之后会重新调用**startTransaction()**常见新线程新事务，在business logic方法执行结束之后，如果有异常会执行**completeTransactionAfterThrowing()**、没有异常会执行**commitTransactionAfterReturning()**方法，都会执行**cleanupAfterCompletion()**，方法里面就会清空当前事务信息对象，如果有挂起的事务要恢复就走**resume()**方法。
+
+```java
+/**
+	*根据条件，完成后数据清除，和线程的私有资源解绑，重置连接自动提交，隔离级别，是否只读，释放连接，恢复挂起事务等
+	*/
+private void cleanupAfterCompletion(DefaultTransactionStatus status) {
+   //设置完成状态
+   status.setCompleted();
+   if (status.isNewSynchronization()) {
+      //线程同步状态清除
+      TransactionSynchronizationManager.clear();
+   }
+   //如果是新事务的话，进行数据清除，线程的私有资源解绑，重制连接自动提交，隔离级别，是否只读，释放连接等
+   if (status.isNewTransaction()) {
+      doCleanupAfterCompletion(status.getTransaction());
+   }
+   //有挂起的事务要恢复
+   if (status.getSuspendedResources() != null) {
+      if (status.isDebug()) {
+         logger.debug("Resuming suspended transaction after completion of inner transaction");
+      }
+      Object transaction = (status.hasTransaction() ? status.getTransaction() : null);
+      //结束之前事务的挂起状态
+      resume(transaction, (SuspendedResourcesHolder) status.getSuspendedResources());
+   }
+}
+```
+
+**为什么需要resume之前的事务？**
+
+因为在外层方法的时候很正常的情况下一个方法中会调用很多事务方法，而每个事务的方法传播行为不一样，有的需要依赖外层事务，并且当前方法执行结束还需要commit，保证原子性。  
+
+#### **事务执行中可以修改事务状态的几种方式**
+
+```java
+commitTransactionAfterReturning()
+可以通过 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();来设置
+会检查当前如果在事务涟中已经被标记回滚，那么不会尝试提交事务，直接回滚
+
+//			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+//				@Override
+//				public void suspend() {
+//
+//				}
+//			});
+```
+
+![image-20221108180630321](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221108180630321.png)
+
+![image-20221108180953857](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221108180953857.png)
+
+```
+AbstractPlatformTransactionManager$prepareForCommit()提交事务之前回掉方法
+```
+
+
 
 ### 事务失效几种方式
 
@@ -749,6 +894,120 @@ public void aMethod {
 
 3、this.本方法的调用，被调用方法上注解是不生效的，因为无法再次进行切面增强
 
+## 重要对象
+
+```java
+protected static final class TransactionInfo {
+		/**
+
+- 事务管理器 作为和数据库操作的中转
+  */
+     @Nullable
+     private final PlatformTransactionManager transactionManager;
+   // @Transactional注解的信息内容
+     @Nullable
+     private final TransactionAttribute transactionAttribute;
+   // 表示类名+方法名
+     private final String joinpointIdentification;
+   // 当前事务状态
+     @Nullable
+     private TransactionStatus transactionStatus;
+   // 外层事务信息
+     @Nullable
+     private TransactionInfo oldTransactionInfo;
+  }
+```
+
+```java
+public abstract class TransactionSynchronizationManager {
+
+   private static final Log logger = LogFactory.getLog(TransactionSynchronizationManager.class);
+   //线程私有事务资源 key为DataSource对象，value为ConnectionHolder对象
+   private static final ThreadLocal<Map<Object, Object>> resources =
+         new NamedThreadLocal<>("Transactional resources");
+   //事务同步
+   private static final ThreadLocal<Set<TransactionSynchronization>> synchronizations =
+         new NamedThreadLocal<>("Transaction synchronizations");
+   //当前事务的名称
+   private static final ThreadLocal<String> currentTransactionName =
+         new NamedThreadLocal<>("Current transaction name");
+   //当前事务是否只读
+   private static final ThreadLocal<Boolean> currentTransactionReadOnly =
+         new NamedThreadLocal<>("Current transaction read-only status");
+   //当前事务隔离级别
+   private static final ThreadLocal<Integer> currentTransactionIsolationLevel =
+         new NamedThreadLocal<>("Current transaction isolation level");
+   //当前事务是否激活
+   private static final ThreadLocal<Boolean> actualTransactionActive =
+         new NamedThreadLocal<>("Actual transaction active");
+}
+```
+
+```java
+	public class DefaultTransactionStatus{
+		//新创建事务
+		this.transaction = transaction;
+		//是都需要新事务
+		this.newTransaction = newTransaction;
+		//是都需要新同步
+		this.newSynchronization = newSynchronization;
+		//是否只读
+		this.readOnly = readOnly;
+		//是否要debug
+		this.debug = debug;
+		//是否有挂起的连接资源
+		this.suspendedResources = suspendedResources;
+	}
+
+```
+
+```java
+
+class TransactionDefinition{
+//propagation 传播行为
+//isolation 隔离级别
+//timeout 超时时间
+//readOnly 只读
+//rollbackFor 回滚类
+//rollbackForClassName 回滚类名称
+//noRollbackFor 不让回滚类
+//noRollbackForClassName 不让回滚类名称
+}
+```
+
+```java
+//数据库资源持有对象
+private static class DataSourceTransactionObject extends JdbcTransactionObjectSupport {
+	
+   private boolean newConnectionHolder;
+
+   private boolean mustRestoreAutoCommit;
+}
+public class ConnectionHolder extends ResourceHolderSupport {
+
+	/**
+	 * Prefix for savepoint names.
+	 */
+	public static final String SAVEPOINT_NAME_PREFIX = "SAVEPOINT_";
+
+	@Nullable
+	private ConnectionHandle connectionHandle;
+  /**
+  	* 数据库资源
+  	*/
+	@Nullable
+	private Connection currentConnection;
+
+	private boolean transactionActive = false;
+
+	@Nullable
+	private Boolean savepointsSupported;
+
+	private int savepointCounter = 0;
+  //rollbackOnly 不是本类属性 调用父类方法赋值
+}
+```
+
 ## mybatis使用spring事务创建的数据库连接
 
 参考文章：https://qiuyadongsite.github.io/2019/01/15/mybatis-sources-code-6/
@@ -764,7 +1023,6 @@ class FeignClientsRegistrar
 		implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
 
 }
-.
 ```
 
 **通过import注解来注册bean有几种方式**
@@ -980,7 +1238,17 @@ public void await() {
 
 在await方法中，实际上当前线程在一个while循环中每10秒检查一次 stopAwait这个变量，它是一个volatile类型变量，用于确保被另一个线程修改后，当前线程能够立即看到这个变化。如果没有变化，就会一直处于while循环中。这就是该线程不退出的原因，也就是整个spring-boot应用不退出的原因。
 
+## Springboot整合Naocs Config位置
 
+https://www.jianshu.com/p/903c01cb2a77
+
+springboot提供加载资源.properties .yml
+PropertySourceLoader.java
+
+SpringApplication&run&prepareEnvironment去加载bootstrap.yml文件
+读取nacos配置文件是在SpringApplication&run&prepareContext方法&applyInitializers&PropertySourceBootstrapConfiguration&PropertySourceLocator.locateCollection&NacosPropertySourceLocator.locate
+
+参考文章：https://juejin.cn/post/6887751198737170446
 
 # spring扩展点
 
@@ -995,7 +1263,7 @@ public void await() {
 - Aware 
 - InitializingBean （afterPropertiesSet）
 - FactoryBean （getObject，getObjectType，isSingleton）
-- SmartInitializingSingleton (获取完所有单里bean之后，preInstantiateSingletons)
+- SmartInitializingSingleton (获取完所有单例bean之后，afterSingletonsInstantiated)
 - ApplicationListener
 - Lifecycle （finishRefresh）
   - SmartLifecycle 

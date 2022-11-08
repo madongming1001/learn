@@ -3,9 +3,9 @@ package com.madm.learnroute.javaee;
 import lombok.SneakyThrows;
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Period;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
 import java.util.TimeZone;
@@ -48,6 +48,11 @@ public class java8DateTimePractice {
         LocalDate now = LocalDate.now();
         LocalDate lastWeek = now.minusWeeks(1);
         LocalDate nextWeek = now.plusWeeks(1);
+        now.isAfter(nextWeek);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        System.out.println(dateTimeFormatter.format(LocalDateTime.now()));
+        System.out.println("==========================================");
+        System.out.println(LocalDateTime.ofInstant(Instant.now(), ZoneId.of("UTC")));
         //asia亚洲
         TimeZone timeZone = TimeZone.getDefault();
         System.out.println(timeZone);
@@ -59,6 +64,9 @@ public class java8DateTimePractice {
 
         // 比较两个LocalDate相差多少年、月、天
         Period period = Period.between(lastWeek, nextWeek);
+        System.out.println("period ..." + period.get(ChronoUnit.DAYS));
+        Duration duration = Duration.ofDays(LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8")));
+        System.out.println("duration ..." + duration.getNano());
         Instant instant = Instant.now();
 
 //        Assert.isTrue(LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8")) == System.currentTimeMillis(),"比较的数是不相等的");
