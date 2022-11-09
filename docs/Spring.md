@@ -1465,12 +1465,15 @@ public class UserServiceImpl implements UserService{
 
 ## Spring默认启动的时候就会创建几个BeanDefinition
 
-```
-new SpringApplication()的时候构造方法完成了几件事情，本地设置从spring.factories加载的 ApplicationContextInitializer.class相关的类，本地设置从spring.factories加载的 ApplicationListener.class相关的类。
+```java
+new SpringApplication()
+//的时候构造方法完成了几件事情，本地设置从spring.factories加载的 ApplicationContextInitializer.class相关的类，本地设置从spring.factories加载的 ApplicationListener.class相关的类。
 执行run方法（）主要步骤
 1、获取 SpringApplicationRunListener
 2、prepareEnvironment 发布事件 ApplicationEnvironmentPreparedEvent(BootstrapApplicationListener) 去加载 bootstrap.yml 文件
-3、createApplicationContext，根据 webApplicationType 类型不同创建 ConfigurableApplicationContext，这个时候就会通过其创建对象的构造方法，创建两个对象，一个是 AnnotatedBeanDefinitionReader，一个是ClassPathBeanDefinitionScanner对象，其中AnnotatedBeanDefinitionReader 在new对象的时候就是往容器里面注册几个beandefinition，其中比较重要的是，
+3、createApplicationContext，根据 webApplicationType 类型不同创建 ConfigurableApplicationContext，这个时候就会通过其创建对象的构造方法，创建两个对象，一个是 AnnotatedBeanDefinitionReader，一个是ClassPathBeanDefinitionScanner对象，其中
+//AnnotationConfigUtils.java
+AnnotatedBeanDefinitionReader 在new对象的时候就是往容器里面注册几个beandefinition，其中比较重要的是，
 	1. AutowiredAnnotationBeanPostProcessor.java
 	2. CommonAnnotationBeanPostProcessor.java
 	3. ConfigurationClassPostProcessor.java
@@ -1484,7 +1487,7 @@ new SpringApplication()的时候构造方法完成了几件事情，本地设置
 
 nacos divcovery是通过事件发布的方式注册的
 
-```text
+```java
 finishRefresh() -> WebServerInitializedEvent（ServletWebServerInitializedEvent） 事件发布的，AbstractAutoServiceRegistration 监听了这个事件，通过他的 onApplicationEvent 方法就会走到，NacosServiceRegistry 最后就会走到这个的register
 ```
 
@@ -1665,3 +1668,8 @@ isSynthetic
 
 有两处地方可以进行注入Aop一个是getEarlyBeanReference，另一个是postProcessAfterInitialization。
 
+# 面试题
+
+## **说一下Spring @Autowired 注解自动注入流程**
+
+**参考文章：**https://blog.51cto.com/u_14849432/2553615

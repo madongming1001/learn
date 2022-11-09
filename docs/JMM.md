@@ -271,17 +271,6 @@ public class Jmm04_CodeAtomic {
 
 volatile 关键字另一个作用就是禁止指令重排优化，从而避免多线程环境下程序出现乱序执行的现象，关于指令重排优化前面已经分析过，这里主要简单说明一下 volatile 是如何实现禁止指令重排优化的。先了解一个概念，**内存屏障**（Memory Barrier）
 
-#### 硬件层的内存屏障
-
-Intel 硬件提供了一系列的内存屏障，主要有：
-
-1. lfence，是一种 Load Barrier 读屏障；
-2. sfence，是一种 Store Barrier 写屏障；
-3. mfence，是一种全能型的屏障，具备 lfence 和 sfence 的能力；
-4. Lock 前缀，Lock 不是一种内存屏障，但是它能完成类似内存屏障的功能。**Lock 会对 CPU总线和高速缓存加锁**，可以理解为 CPU 指令级的一种锁。它后面可以跟 ADD、ADC、AND、BTC、BTR、BTS、CMPXCHG、CMPXCH8B、DEC、INC、NEG、NOT、OR、SBB、SUB、XOR、XADD、and XCHG 等指令。
-
-字节码层面acc_flags：ACC_VOLATILE
-
 #### 指令重排种类
 
 1）**编译器重排序。**编译器在不改变单线程程序语义的前提下，可以重新安排语句的执行顺序。
@@ -328,6 +317,17 @@ Java分为三个体系，分别为**Java SE**（J2SE，Java2Platform Standard Ed
 | Store1;StoreLoad;Load2   | 在store1的写操作已刷新到主内存之后，load2及其后的读操作才能执行 |
 
 **以常见的x86处理器来说，它是拥有相对较强的处理器内存模型，只允许Store-Load重排序。也因此在x86处理器的时候会省略掉这3种操作类型对应的内存屏障，在x86中，JMM仅需在volatile写后面插入一个StoreLoad屏障即可正确实现volatile写-读的内存语义。**
+
+#### 硬件层的内存屏障
+
+Intel 硬件提供了一系列的内存屏障，主要有：
+
+1. lfence，是一种 Load Barrier 读屏障；
+2. sfence，是一种 Store Barrier 写屏障；
+3. mfence，是一种全能型的屏障，具备 lfence 和 sfence 的能力；
+4. Lock 前缀，Lock 不是一种内存屏障，但是它能完成类似内存屏障的功能。**Lock 会对 CPU总线和高速缓存加锁**，可以理解为 CPU 指令级的一种锁。它后面可以跟 ADD、ADC、AND、BTC、BTR、BTS、CMPXCHG、CMPXCH8B、DEC、INC、NEG、NOT、OR、SBB、SUB、XOR、XADD、and XCHG 等指令。
+
+字节码层面acc_flags：ACC_VOLATILE
 
 内存屏障，又称**内存栅栏**，是一个CPU指令，它的作用有两个：
 
@@ -404,6 +404,162 @@ Locking operations typically operate like I/O operations in that they wait for a
 ```
 
 参考文章（具有用干货满满）：https://blog.csdn.net/qq_18433441/article/details/108585843
+
+
+
+a = 1;//由于cpu0的缓存中有a，a=1是个写指令，所以cpu0先把a=1放入到store buffer，然后发送invalidate消息。再执行下一条指令
+smp_mb();//写屏障，标记store buffer里面的所有条目（假设此时store buffer中只有a=1这个条目）
+b = 1;//由于cpu0的缓存中有b，且是独占(Exclusive)，所以按理来说不需要发送消息，直接把1写入到缓存，覆盖到b原来的值就完事了。但是呢，由于store buffer里面存在被标记的条目，所以只好把b=1也放入到store buffer，等待a=1执行完再执行b=1。此时store buffer中存在两个条目，a=1被标记，b=1没有被标记
+
+store buffer
+
+
+5.1 为什么引入store buffer
+
+如下图所示，假设cpu0、cpu1的缓存中都有x（值为5），cpu0想要执行x=8。那么cpu0发送Invalidate消息给cpu1，cpu1发送将自己包含x的缓存行置为invalid状态，然后发送Acknowledge给cpu0，然后cpu0才能修改自己缓存中x的值为8，并将缓存行的状态置为modify。从发送Invalidate到接收到Acknowledge消息的这段时间，cpu0在等待，白白浪费了时间。
+
+
+
+ 
+
+为了解决这个问题，在cpu和它的缓存之间，加上了store buffer。cpu0先将8（x=8）放入到store buffer，然后发出Invalidate消息，再等待Acknowledge消息返回的期间，cpu0可以继续执行下一条指令。当cpu0接收到Acknowledge消息时，可以将8从store buffer取出，刷入到自己的缓存中。
+
+假设cpu0 x=8之后的指令是y=x+1，它将8放入store buffer之后，执行y=x+1，此时的x是从store buffer取（值为8），还是从缓存中取（值为5）？store buffer有值的话，当然先从store buffer中取，这叫做store forwarding。
+
+#### storebuffer
+
+ 为了避免这种CPU运算能力的浪费，`Store Bufferes` 被引入使用。处理器把它想要写入到主存的值写到缓存，然后继续去处理其他事情。当所有**失效确认**（Invalidate Acknowledge）都接收到时，数据才会最终被提交。
+
+##### StoreBuffer带来的问题
+
+store buffer还会带来乱序的问题
+
+假设a,b的初始值为0，a在cpu1的缓存中，b在cpu0的缓存中
+
+**cpu0执行的伪代码如下**
+
+```java
+a = 1;//由于cpu0的缓存中没有a，a=1是个写指令，所以cpu0先把1放入到store buffer，然后发送read invalidate消息（可以看做read + invalidate两个消息）。再执行下一条指令
+b = 1;//由于cpu0的缓存中有b，且是独占(Exclusive)，所以不需要发送消息，直接把1写入到缓存，覆盖到b原来的值。实际上b=1在a=1之前执行，所以叫做乱序了
+```
+
+**cpu1执行的伪代码如下**
+
+```java
+while(b == 0) continue; //由于cpu1的缓存中没有b，它发送一个read消息。cpu0接收到read消息之后，把自己包含b的缓存行的状态改成共享（Share），然后发送read response消息给cpu1。此消息中包括cpu0缓存中b的值，cpu1接收到b的值（假设此时b的值已经是1），退出while循环
+assert(a == 1);//假设cpu1还没有接收到cpu0的read invalidate消息，此时cpu1的缓存中a的值还是0，所以执行这一行将会报错
+
+//假设执行完assert(a == 1)之后，cpu1接收到read invalidate消息，它将自己包含a的缓存行置为无效（invalid）状态，然后发送read response（包含a，值为0）和invalidate acknowledge消息给cpu0。cpu0接收到a的值之后，填入到自己的缓存中，然后从store buffer取出a=1执行，将1覆盖到自己缓存中的a的值
+```
+
+实际的执行顺序如下
+
+| cpu0   | cpu1                    |
+| ------ | ----------------------- |
+| b = 1; |                         |
+|        | while(b == 0) continue; |
+|        | assert(a == 1);         |
+| a = 1; |                         |
+
+那么怎么解决这个乱序问题呢？这就要引入写屏障的概念了。
+
+#### 写屏障
+
+**假设在两个写操作之间，插入了写屏障，那么在后面一个写操作将修改的值刷入到缓存之前，要么必须等待store buffer为空，要么自己也放入到store buffer，等待store buffer中排在它前面的所有写操作执行完。**
+
+以第二种情况举个例子
+
+依旧假设a,b的初始值为0，a在cpu1的缓存中，b在cpu0的缓存中
+
+**cpu0执行的伪代码如下**
+
+```java
+a = 1;//由于cpu0的缓存中没有a，a=1是个写指令，所以cpu0先把a=1放入到store buffer，然后发送read invalidate消息（可以看做read + invalidate两个消息）。再执行下一条指令
+smp_mb();//写屏障，标记store buffer里面的所有条目（假设此时store buffer中只有a=1这个条目）
+b = 1;//由于cpu0的缓存中有b，且是独占(Exclusive)，所以按理来说不需要发送消息，直接把1写入到缓存，覆盖到b原来的值就完事了。但是呢，由于store buffer里面存在被标记的条目，所以只好把b=1也放入到store buffer，等待a=1执行完再执行b=1。此时store buffer中存在两个条目，a=1被标记，b=1没有被标记
+```
+
+可以看到写屏障smp_mb()保证了a=1; b=1;的顺序
+
+但是呢？又有个问题了，假设有一连串的写操作：
+
+```java
+a=1；
+smp_mb();
+b = 1;
+c = 2;
+d = 3;
+```
+
+
+由于写屏障的存在，后面几条写操作，比如丢入store buffer，等待a=1操作完成，才能继续执行。这看起来效率就比较低，且store buffer的大小是有限的。那么怎么解决这个问题呢？这就要引入invalidate queue的概念了
+
+#### invalid queue
+
+执行失效也不是一个简单的操作，它需要处理器去处理。另外，**存储缓存（Store Buffers）并不是无穷大的，所以处理器有时需要等待失效确认的返回。这两个操作都会使得性能大幅降低。为了应付这种情况，引入了失效队列(invalid queue)**。
+
+当cpu接收到invalidate消息，它必须使得自己的缓存行无效（当缓存比较繁忙的时候，这个无效需要等一会才能轮到），然后再发送invalidate response消息出去当然了，当cpu接收到大量的invalidate消息时，可以想象有些invalidate消息的处理不会很及时。为了解决这个问题，cpu引入了invalidate queue：当cpu接收到invalidate消息之后，它把invalidate消息加入到invalidate queue（后续cpu会根据invalidate queue来无效缓存行），然后立刻发送invalidate response消息出去。这样子响应就很快了，当然了也引入了新的问题。
+
+##### invalidateQueue带来的问题
+
+由于cpu发送invalidate response的时候，它的缓存行可能并没有失效的。后续如果这个cpu执行一个读操作，那么可能取到老的值。下面举例说明：
+
+**假设a,b的初始值为0，a既在cpu0又在cpu1的缓存中（即缓存行是在cpu0和cpu1中都是share状态），b只在cpu0的缓存中（即缓存行在cpu0是exclusive状态，在cpu1中是invalidate状态）**
+
+**cpu0执行的伪代码如下**
+
+```java
+a = 1;//由于cpu0的缓存中有a，a=1是个写指令，所以cpu0先把a=1放入到store buffer，然后发送invalidate消息。再执行下一条指令
+smp_mb();//写屏障，标记store buffer里面的所有条目（假设此时store buffer中只有a=1这个条目）
+b = 1;//由于cpu0的缓存中有b，且是独占(Exclusive)，所以按理来说不需要发送消息，直接把1写入到缓存，覆盖到b原来的值就完事了。但是呢，由于store buffer里面存在被标记的条目，所以只好把b=1也放入到store buffer，等待a=1执行完再执行b=1。此时store buffer中存在两个条目，a=1被标记，b=1没有被标记
+```
+
+**cpu1执行的伪代码如下**
+
+```java
+//假设cpu1接收到invalidate消息，它将消息放入invalidate queue，然后立刻发送invalidate response消息。cpu0接收到response消息之后，从store buffer中取出a=1，进行执行，即将自己的包含a的缓存行的状态置为Modify，值置为1。然后继续从store buffer中取出b=1，进行执行，即将自己的包含b的缓存行的状态置为Modify，值置为1
+while(b == 0) continue; //由于cpu1的缓存中没有b，它发送一个read消息。cpu0接收到read消息之后，把自己包含b的缓存行的状态改成共享（Share），并刷入到主存，然后发送read response消息给cpu1。此消息中包括cpu0缓存中b的值，cpu1接收到b的值（假设此时b的值已经是1），退出while循环
+assert(a == 1);//cpu1的缓存中有a，且值为0，于是执行这一行时报错
+//cpu1从invalidate queue取出invalidate消息，将自己包含a的缓存行的状态置为失效。但是为时已晚，assert(a == 1)已经报错了
+```
+
+#### 读屏障
+
+读屏障会标记invalidate queue中的所有条目，读屏障之后的读操作，必须等待invalidate queue中所有被标记的条目执行完之后，才能执行
+
+**依旧假设a,b的初始值为0，a既在cpu0又在cpu1的缓存中（即缓存行是在cpu0和cpu1中都是share状态），b只在cpu0的缓存中（即缓存行在cpu0是exclusive状态，在cpu1中是invalidate状态）**
+
+```java
+a = 1;//由于cpu0的缓存中有a，a=1是个写指令，所以cpu0先把a=1放入到store buffer，然后发送invalidate消息。再执行下一条指令
+smp_mb();//写屏障，标记store buffer里面的所有条目（假设此时store buffer中只有a=1这个条目）
+b = 1;//由于cpu0的缓存中有b，且是独占(Exclusive)，所以按理来说不需要发送消息，直接把1写入到缓存，覆盖到b原来的值就完事了。但是呢，由于store buffer里面存在被标记的条目，所以只好把b=1也放入到store buffer，等待a=1执行完再执行b=1。此时store buffer中存在两个条目，a=1被标记，b=1没有被标记
+```
+
+```java
+//假设cpu1接收到invalidate消息，它将消息放入invalidate queue，然后立刻发送invalidate response消息。cpu0接收到response消息之后，从store buffer中取出a=1，进行执行，即将自己的包含a的缓存行的状态置为Modify，值置为1。然后继续从store buffer中取出b=1，进行执行，即将自己的包含b的缓存行的状态置为Modify，值置为1
+​
+while(b == 0) continue; //由于cpu1的缓存中没有b，它发送一个read消息（为什么不是read invalidate？因为这里不是个写指令）。cpu0接收到read消息之后，把自己包含b的缓存行的状态改成共享（Share），并刷入到主存，然后发送read response消息给cpu1。此消息中包括cpu0缓存中b的值，cpu1接收到b的值（假设此时b的值已经是1），退出while循环
+​
+smp_mb();//读屏障，标记invalidate queue里面的所有条目（假设invalidate queue中只有【a失效】这个条目）
+​
+assert(a == 1);//cpu1读取a，但是invalidate queue里面存在被标记的条目，所以必须等待。等啊等啊，终于cpu1开始取出invalidate queue的【a失效】这个条目，然后将包含a的缓存行的状态置为无效（invalid）
+​
+//invalidate queue中没有被标记的条目，于是cpu1可以继续执行a==1了。cpu1包含a的缓存行已经是失效状态了，于是它发送read消息。cpu0接收到read消息，将自己的包含a的缓存行的状态置为共享（share），并刷入到主存中，然后发送read response（包含a，值为1）。cpu1接收到read response之后，将a放入到自己的缓存行，此时a的值为1，那么执行assert(a == 1)不报错
+```
+
+
+
+#### 有了volatile为什么还会有可见性问题？
+
+- MESI协议只是保证了CPU的缓存一致性，volatile是java语言层面给出的保证。它们之间还差着java编译器、java虚拟机、JIT、操作系统、CPU核心
+
+
+- 为了优化MESI协议的性能，cpu引入了store buffer、invalidate queue，它们也会导致可见性问题
+
+
+- 有些CPU并没有支持MESI协议
+
+
 
 # CPU有缓存一致性协议(MESI)，为何还需要volatile
 

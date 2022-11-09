@@ -11,10 +11,15 @@ import java.util.Arrays;
 public class QuickSortPractice {
     public static void main(String[] args) {
 //        int[] ints = {6, 1, 2, 7, 9};
-//        int[] ints = {7, 6, 5, 3, 1, 4, 5, 6, 7};
-        int[] ints = {3, 5, 4, 7};
-        quick_sort1(ints, 0, ints.length - 1);
-        Arrays.stream(ints).forEach(System.out::println);
+//        int[] ints = {3, 6, 5, 3, 1, 4, 5, 6, 7};
+//        int[] ints = {3, 5, 4, 7};
+        int[] ints = {4, 4, 4, 6, 6};
+        quick_sort1(ints);
+        System.out.println(Arrays.toString(ints));
+    }
+
+    private static void quick_sort1(int[] arr) {
+        quick_sort1(arr, 0, arr.length - 1);
     }
 
     /**
@@ -25,7 +30,7 @@ public class QuickSortPractice {
      * @param end
      */
     private static void quick_sort1(int[] arr, int begin, int end) {
-        if (begin > end) {
+        if (begin >= end) {
             return;
         }
         int pivot = arr[begin];
@@ -80,7 +85,7 @@ public class QuickSortPractice {
             if (left < right) {
                 int temp = arr[left];
                 arr[left] = arr[right];
-                arr[right] = left;
+                arr[right] = temp;
             }
         }
         arr[startIndex] = arr[left];
