@@ -1502,7 +1502,13 @@ alter table account add unique (appId, accountId)
 
 ## 添加字段
 
-alter table 表名 add字段 类型 其他;
+alter table 表名 add 字段 类型 其他;
+
+## 修改表字段类型
+
+```sql
+alter table book_stock modify stock bigint;
+```
 
 ## 生成数据脚本
 

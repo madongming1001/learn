@@ -1672,4 +1672,53 @@ isSynthetic
 
 ## **说一下Spring @Autowired 注解自动注入流程**
 
+核心两个地方
+
+在**doCreateBean()**的时候会收集当前类需要的属性注入的信息
+
+```java
+// Allow post-processors to modify the merged bean definition.
+// 允许beanPostProcessor去修改合并的beanDefinition
+synchronized (mbd.postProcessingLock) {
+   if (!mbd.postProcessed) {
+      try {
+         // 收集信息 所有实现 MergedBeanDefinitionPostProcessor 接口的类
+         // AutowiredAnnotationBeanPostProcessor 找到所有注解 生成InjectionMetadata对象保存到 injectionMetadataCache
+         // CommonAnnotationBeanPostProcessor 父类解析 @PostConstruct 和 @PreDestory 本类解析 @Resource注解 @WebServceRef注解 @EJB注解
+         applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
+      } catch (Throwable ex) {
+         throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Post-processing of merged bean definition failed", ex);
+      }
+      mbd.postProcessed = true;
+   }
+```
+
+在**populateBean()**的时候由于实现了**InstantiationAwareBeanPostProcessor**接口所以后走这里的方法进行属性注入
+
+```java
+if (hasInstAwareBpps) {
+   if (pvs == null) {
+      pvs = mbd.getPropertyValues();
+   }
+   for (BeanPostProcessor bp : getBeanPostProcessors()) {
+      //CommonAnnotationBeanPostProcessor @Resource（JDK提供的）
+      //AnnotationAutowiredPostPorcessor @Value @autowired（Spring提供）
+      if (bp instanceof InstantiationAwareBeanPostProcessor) {
+         InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
+         PropertyValues pvsToUse = ibp.postProcessProperties(pvs, bw.getWrappedInstance(), beanName);
+         if (pvsToUse == null) {
+            if (filteredPds == null) {
+               filteredPds = filterPropertyDescriptorsForDependencyCheck(bw, mbd.allowCaching);
+            }
+            pvsToUse = ibp.postProcessPropertyValues(pvs, filteredPds, bw.getWrappedInstance(), beanName);
+            if (pvsToUse == null) {
+               return;
+            }
+         }
+         pvs = pvsToUse;
+      }
+   }
+}
+```
+
 **参考文章：**https://blog.51cto.com/u_14849432/2553615
