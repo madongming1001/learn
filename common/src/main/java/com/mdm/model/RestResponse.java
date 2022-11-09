@@ -1,11 +1,14 @@
 package com.mdm.model;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
 /**
  * @author dongming.ma
  * @date 2022/5/28 18:23
  */
+@Data
 public class RestResponse<T> implements Serializable {
 
     private static final long serialVersionUID = 6095433538316185017L;
@@ -35,28 +38,8 @@ public class RestResponse<T> implements Serializable {
         this.setMessage(message);
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public T getBody() {
-        return body;
-    }
-
-    public void setBody(T body) {
-        this.body = body;
+    public static RestResponse OK() {
+        return new RestResponse(200, "success");
     }
 
     public boolean ok() {

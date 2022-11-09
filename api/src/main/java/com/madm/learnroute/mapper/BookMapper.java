@@ -1,6 +1,11 @@
-package com.madm.learnroute.mapper;/**
- * @author  dongming.ma
- * @date  2022/11/9 22:05
+package com.madm.learnroute.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.madm.learnroute.model.Book;
+
+/**
+ * @author dongming.ma
+ * @date 2022/11/9 22:05
  */
-public class BookMapper {
+public interface BookMapper extends BaseMapper<Book> {
 }

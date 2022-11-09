@@ -1,4 +1,4 @@
-package madm.interview_guide;
+package madm.sort;
 
 import java.util.Arrays;
 
@@ -7,6 +7,9 @@ import java.util.Arrays;
  * 快排优化
  * 1. 三数取中法
  * 2. 随机法
+ * <p>
+ * 快速排序就是每一轮挑选一个基准元素，并让其他比它大的元素移动到数列一边，
+ * 比它小的元素移动到数列的另一边，从而把数列拆解成两部分
  */
 public class QuickSortPractice {
     public static void main(String[] args) {
@@ -68,7 +71,7 @@ public class QuickSortPractice {
         }
         int pivotIndex = partition2(arr, startIndex, endIndex);
         quick_sort2(arr, startIndex, pivotIndex - 1);
-        quick_sort1(arr, pivotIndex + 1, endIndex);
+        quick_sort2(arr, pivotIndex + 1, endIndex);
     }
 
     private static int partition2(int[] arr, int startIndex, int endIndex) {
@@ -101,12 +104,13 @@ public class QuickSortPractice {
      * @param endIndex
      */
     public static void quick_sort3(int[] arr, int startIndex, int endIndex) {
-        if (startIndex >= endIndex) {
-            return;
+        if (startIndex < endIndex) {
+            //得到基准元素位置
+            int pivotIndex = partition3(arr, startIndex, endIndex);
+            //根据基准元素，分成两部分进行递归排序
+            quick_sort3(arr, startIndex, pivotIndex - 1);
+            quick_sort3(arr, pivotIndex + 1, endIndex);
         }
-        int pivotIndex = partition3(arr, startIndex, endIndex);
-        quick_sort2(arr, startIndex, pivotIndex - 1);
-        quick_sort1(arr, pivotIndex + 1, endIndex);
     }
 
     private static int partition3(int[] arr, int startIndex, int endIndex) {

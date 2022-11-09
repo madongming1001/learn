@@ -1,5 +1,7 @@
 package madm.interview_guide;
 
+import madm.sort.MergeSortPractice;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -8,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author dongming.ma
@@ -75,7 +75,7 @@ public class LargeFileSort {
                 tmpReader.close();
 //                map.put(tmpReader, tmpReader.readLine());
             }
-            MergeSortPractice.group(littleNumbers, 0, littleNumbers.length - 1);
+            MergeSortPractice.group(littleNumbers);
             for (int littleNumber : littleNumbers) {
                 writer.write(littleNumber + LINE_SEPARATOR);
             }

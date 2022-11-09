@@ -27,7 +27,7 @@ public class MapperConfig {
                 //这里设置慢查询阈值为1毫秒，便于测试
                 properties.setProperty("time", "1");
                 myPlugin.setProperties(properties);
-                configuration.addInterceptor(myPlugin);
+//                configuration.addInterceptor(myPlugin);
             }
         };
     }

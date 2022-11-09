@@ -1,6 +1,7 @@
 package madm.interview_guide;
 
 import com.mdm.utils.RandomGeneratorNumberUtil;
+import madm.sort.MergeSortPractice;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public class BiggestElementsSort {
 
-    private static final Map<String,Object> cache = new ConcurrentHashMap<String,Object>();
+    private static final Map<String, Object> cache = new ConcurrentHashMap();
 
 
     public static void main(String[] args) {
@@ -37,8 +38,7 @@ public class BiggestElementsSort {
         for (Integer i = 0; i < partition; i++) {
             result[i] = sourcesData[i];
         }
-        grouping(result, 0, partition - 1);
-
+        MergeSortPractice.group(Arrays.stream(result).mapToInt(Integer::intValue).toArray());
         // 2.分段比较开始
         while (index < sourcesData.length) {
             for (Integer i = 0; i < partition; i++) {
@@ -56,7 +56,7 @@ public class BiggestElementsSort {
         int leftIndex = 0;
         int rightIndex = 0;
         int index = 0;
-        grouping(rightArr, 0, partition - 1);
+        MergeSortPractice.group(Arrays.stream(rightArr).mapToInt(Integer::intValue).toArray());
         while ((leftIndex < partition) && (rightIndex < partition) && (index < partition)) {
             help[index++] = leftArr[leftIndex] < rightArr[rightIndex] ? rightArr[rightIndex++] : leftArr[leftIndex++];
         }
@@ -64,36 +64,5 @@ public class BiggestElementsSort {
 //             leftArr[i]=help[i];
 //         }
         leftArr = help;
-    }
-
-    public static void grouping(Integer[] arr, int L, int R) {
-        if (L >= R) {
-            return;
-        }
-        int mid = L + ((R - L) >> 1);
-        grouping(arr, L, mid);
-        grouping(arr, mid + 1, R);
-        merge(arr, L, mid, R);
-    }
-
-    public static void merge(Integer[] arr, int L, int Mid, int R) {
-        int[] help = new int[R - L + 1];
-        int i = 0;
-        int left = L;
-        int right = Mid + 1;
-        while (left <= Mid && right <= R) {
-            help[i++] = arr[right] >= arr[left] ? arr[right++] : arr[left++];
-        }
-
-        while (left <= Mid) {
-            help[i++] = arr[left++];
-        }
-        while (right <= R) {
-            help[i++] = arr[right++];
-        }
-
-        for (i = 0; i < help.length; i++) {
-            arr[L + i] = help[i];
-        }
     }
 }

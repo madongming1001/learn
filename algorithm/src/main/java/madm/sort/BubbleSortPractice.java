@@ -1,4 +1,4 @@
-package madm.interview_guide;
+package madm.sort;
 
 /**
  * 我们要把相邻的元素两两比较，当一个元素大于右侧相邻元素时，交换交换它们的位置：当一个元素小于或等于右侧相邻元素时，位置不变

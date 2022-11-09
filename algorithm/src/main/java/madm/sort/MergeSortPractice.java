@@ -1,4 +1,4 @@
-package madm.interview_guide;
+package madm.sort;
 
 import java.util.Arrays;
 
@@ -66,7 +66,7 @@ public class MergeSortPractice {
     }
 
     private static void merge(int[] arr, int start, int mid, int end) {
-        int[] help = new int[end - start + 1];
+        int[] help = new int[end - start + 1];//传的是下标位置所以需要加1
         int p = 0;
         int p1 = start;
         int p2 = mid + 1;
