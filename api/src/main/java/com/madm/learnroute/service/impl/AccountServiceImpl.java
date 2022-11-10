@@ -1,6 +1,5 @@
 package com.madm.learnroute.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.madm.learnroute.mapper.AccountMapper;
 import com.madm.learnroute.model.Account;
@@ -21,4 +20,10 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     JdbcTemplate jdbcTemplate;
     @Autowired
     NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    @Override
+    public int saveForJdbc(Account account) {
+        //使用的还是DataSourceUtils.getConnection(obtainDataSource());
+        return jdbcTemplate.update("update account set " + account.userName() + " = left(" + account.userName() + ",9) where id = " + account.id());
+    }
 }

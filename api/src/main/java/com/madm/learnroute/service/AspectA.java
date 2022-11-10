@@ -10,7 +10,7 @@ public class AspectA {
 
     @Before(value = "execution(public void com.madm.learnroute.service.CircularServiceA.methodA(..)) && args(a, b)", argNames = "a,b")
     public void before(String a, String b) {
-        System.out.println(a + ":" + b);
+//        System.out.println(a + ":" + b);
 //        System.out.println("Before advice exec ...");
     }
 

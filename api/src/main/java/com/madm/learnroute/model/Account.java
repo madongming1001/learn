@@ -3,6 +3,7 @@ package com.madm.learnroute.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,6 +31,6 @@ public class Account {
     private String userName;
 
     public static Account create() {
-        return new Account().balance(BigDecimal.valueOf((int) Math.random() * 88 + 1)).userName(RandomUtils.nextInt(0, 1000000000) + "_" + "auto");
+        return new Account().balance(BigDecimal.valueOf((int) Math.random() * 88 + 1)).userName(RandomUtils.nextInt(0, 1000000000) + StringPool.UNDERSCORE + "auto");
     }
 }

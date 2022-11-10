@@ -405,30 +405,9 @@ Locking operations typically operate like I/O operations in that they wait for a
 
 参考文章（具有用干货满满）：https://blog.csdn.net/qq_18433441/article/details/108585843
 
-
-
-a = 1;//由于cpu0的缓存中有a，a=1是个写指令，所以cpu0先把a=1放入到store buffer，然后发送invalidate消息。再执行下一条指令
-smp_mb();//写屏障，标记store buffer里面的所有条目（假设此时store buffer中只有a=1这个条目）
-b = 1;//由于cpu0的缓存中有b，且是独占(Exclusive)，所以按理来说不需要发送消息，直接把1写入到缓存，覆盖到b原来的值就完事了。但是呢，由于store buffer里面存在被标记的条目，所以只好把b=1也放入到store buffer，等待a=1执行完再执行b=1。此时store buffer中存在两个条目，a=1被标记，b=1没有被标记
-
-store buffer
-
-
-5.1 为什么引入store buffer
-
-如下图所示，假设cpu0、cpu1的缓存中都有x（值为5），cpu0想要执行x=8。那么cpu0发送Invalidate消息给cpu1，cpu1发送将自己包含x的缓存行置为invalid状态，然后发送Acknowledge给cpu0，然后cpu0才能修改自己缓存中x的值为8，并将缓存行的状态置为modify。从发送Invalidate到接收到Acknowledge消息的这段时间，cpu0在等待，白白浪费了时间。
-
-
-
- 
-
-为了解决这个问题，在cpu和它的缓存之间，加上了store buffer。cpu0先将8（x=8）放入到store buffer，然后发出Invalidate消息，再等待Acknowledge消息返回的期间，cpu0可以继续执行下一条指令。当cpu0接收到Acknowledge消息时，可以将8从store buffer取出，刷入到自己的缓存中。
-
-假设cpu0 x=8之后的指令是y=x+1，它将8放入store buffer之后，执行y=x+1，此时的x是从store buffer取（值为8），还是从缓存中取（值为5）？store buffer有值的话，当然先从store buffer中取，这叫做store forwarding。
-
 #### storebuffer
 
- 为了避免这种CPU运算能力的浪费，`Store Bufferes` 被引入使用。处理器把它想要写入到主存的值写到缓存，然后继续去处理其他事情。当所有**失效确认**（Invalidate Acknowledge）都接收到时，数据才会最终被提交。
+ 为了避免这种CPU运算能力的浪费，`Store Bufferes` 被引入使用。**处理器把它想要写入到主存的值写到缓存，然后继续去处理其他事情。**当所有**失效确认**（Invalidate Acknowledge）都接收到时，数据才会最终被提交。
 
 ##### StoreBuffer带来的问题
 
@@ -462,6 +441,8 @@ assert(a == 1);//假设cpu1还没有接收到cpu0的read invalidate消息，此�
 | a = 1; |                         |
 
 那么怎么解决这个乱序问题呢？这就要引入写屏障的概念了。
+
+**如果缓存中也有store buffer也有那么先从strore buffer读取，这个叫做store forwarding。**
 
 #### 写屏障
 

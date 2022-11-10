@@ -1,4 +1,4 @@
-package com.madm.learnroute.javaee;
+package com.madm.learnroute.javaee.concurrent.juc.reentrantlock;
 
 import java.util.concurrent.locks.StampedLock;
 

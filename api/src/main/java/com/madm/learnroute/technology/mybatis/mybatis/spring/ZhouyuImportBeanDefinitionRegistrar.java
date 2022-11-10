@@ -7,6 +7,7 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.TypeFilter;
+import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.Map;
 /**
  * @author 周瑜
  */
+@Component
 public class ZhouyuImportBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar {
 
 	@Override
