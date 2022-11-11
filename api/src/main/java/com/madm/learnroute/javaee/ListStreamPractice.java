@@ -24,6 +24,20 @@ import java.util.stream.Collectors;
 public class ListStreamPractice {
 
     public static void main(String[] args) throws Exception {
+        List<String> list1 = new ArrayList<>(10);
+        list1.add("Bannana");
+        list1.add("Apple");
+        list1.add("Pear");
+        list1.add("Pear");
+        list1.add("Carrot");
+
+        if (list1.remove("pear")) {
+            System.out.println("删除成功");
+        }else{
+            list1.remove("Pear");
+            System.out.println(list1);
+        }
+
         int init = 0;
         List<String> userIds = new ArrayList<>();
         userIds.add("11");

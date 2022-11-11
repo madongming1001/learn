@@ -1,5 +1,6 @@
 package com.madm.learnroute.javaee;
 
+import cn.hutool.core.util.RandomUtil;
 import com.mdm.utils.RandomGeneratorNumberUtil;
 import lombok.Data;
 
@@ -48,7 +49,7 @@ public class ForkJoinPoolPractice extends RecursiveTask<Integer> {
             }
             return subCount;
         } else {
-            int mid = (first + last) >>> 1;
+            int mid = (first + last) >> 1;
             ForkJoinPoolPractice left = new ForkJoinPoolPractice(first, mid, null);
             ForkJoinPoolPractice right = new ForkJoinPoolPractice(mid + 1, last, null);
             invokeAll(left, right);
@@ -65,7 +66,8 @@ public class ForkJoinPoolPractice extends RecursiveTask<Integer> {
 
 class ForkJoinTestMain {
     public static void main(String[] args) {
-        ForkJoinPoolPractice task = new ForkJoinPoolPractice(0, 999, RandomGeneratorNumberUtil.createArrayOf(1000));
+
+        ForkJoinPoolPractice task = new ForkJoinPoolPractice(0, 999, RandomUtil.randomInts(1000));
         long startTime = System.currentTimeMillis();
         int result = ForkJoinPool.commonPool().invoke(task);
         long endTime = System.currentTimeMillis();
