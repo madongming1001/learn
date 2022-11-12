@@ -4,8 +4,6 @@ package com.madm.learnroute.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 public class CircularServiceA {
@@ -22,7 +20,7 @@ public class CircularServiceA {
 //
 //            }
 //        });
-//        int i = 1 / 0;//测试 @AfterThrowing 通知
-//        System.out.println("方法 A 执行");
+        int i = 1 / 0;//测试 @AfterThrowing 通知
+        System.out.println("方法 A 执行");
     }
 }

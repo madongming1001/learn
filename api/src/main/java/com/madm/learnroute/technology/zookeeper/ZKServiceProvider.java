@@ -29,6 +29,7 @@ public class ZKServiceProvider implements Watcher {
     public void process(WatchedEvent event) {
         if (Event.KeeperState.SyncConnected == event.getState()) {
             if (Event.EventType.None == event.getType() && null == event.getPath()) {
+
                 connectedSempahore.countDown();
             }
         }
