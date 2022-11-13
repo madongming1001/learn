@@ -4,7 +4,10 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -24,5 +27,8 @@ public class User implements Serializable {
 
     public User(Integer id, String... name) {
         this.id = id;
+        if (Objects.nonNull(name)) {
+            this.auth = Arrays.stream(name).map(AuthParam::new).collect(Collectors.toList());
     }
+}
 }

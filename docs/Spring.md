@@ -1171,7 +1171,7 @@ beanDefinition类为FeignClientFactoryBean，故在Spring获取类的时候实�
 
 ## Spring实例化bean的5种方式
 
-1. 通过BeanPostProcessor实现InstantiationBeanPostProcessor来返回一个cglib执行的bean，resolveBeforeInstantiation(beanName, mbdToUse);
+1. 通过BeanPostProcessor实现 InstantiationBeanPostProcessor 来返回一个cglib执行的bean，resolveBeforeInstantiation(beanName, mbdToUse);
 2. 通过无参构造器实例化bean
 3. 通过实例供应器创建bean，mbd.getInstanceSupplier()
 4. 通过factoryMethod工厂方法创建bean，getFactoryMethodName

@@ -847,7 +847,17 @@ select * from t1 join temp_t on (t1.b=temp_t.b);
 
 参考文章：http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/16%20%20%E2%80%9Corder%20by%E2%80%9D%E6%98%AF%E6%80%8E%E4%B9%88%E5%B7%A5%E4%BD%9C%E7%9A%84%EF%BC%9F.md
 
-**先按照索引把所需要的所有字段数据放入到sort_buffer,然后对 sort_buffer 中的数据按照字段 name 做快速排序，按照排序结果返回给客户端。**
+**先按照索引把所需要的所有字段数据放入到sort_buffer,然后对 sort_buffer 中的数据按照字段 name 做归并排序，按照排序结果返回给客户端。**
+
+**通常情况下，这个语句执行流程如下所示 ：**
+
+1. 初始化 sort_buffer，确定放入 name、city、age 这三个字段；
+2. 从索引 city 找到第一个满足 city='杭州’条件的主键 id，也就是图中的 ID_X；
+3. 到主键 id 索引取出整行，取 name、city、age 三个字段的值，存入 sort_buffer 中；
+4. 从索引 city 取下一个记录的主键 id；
+5. 重复步骤 3、4 直到 city 的值不满足查询条件为止，对应的主键 id 也就是图中的 ID_Y；
+6. 对 sort_buffer 中的数据按照字段 name 做快速排序；
+7. 按照排序结果取前 1000 行返回给客户端。
 
 “按 name 排序”这个动作，可能在内存中完成，也可能需要使用外部排序，这取决于排序所需的内存和参数 sort_buffer_size。
 
@@ -1044,8 +1054,6 @@ alter table t add index city_user_age(city, name, age);
 可以看到，Extra 字段里面多了“Using index”，表示的就是使用了覆盖索引，性能上会快很多。
 
 当然，这里并不是说要为了每个查询能用上覆盖索引，就要把语句中涉及的字段都建上联合索引，毕竟索引还是有维护代价的。这是一个需要权衡的决定。
-
-
 
 
 
