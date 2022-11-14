@@ -1,5 +1,6 @@
 package com.madm.learnroute.controller;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -9,17 +10,12 @@ import javax.annotation.PostConstruct;
  * @date 2022/11/9 22:50
  */
 @Component
+@AllArgsConstructor
 public class CalledAfterStartupController {
 
     AccountController accountController;
     BookController bookController;
     BookStockController bookStockController;
-
-    public CalledAfterStartupController(AccountController accountController, BookController bookController, BookStockController bookStockController) {
-        this.accountController = accountController;
-        this.bookController = bookController;
-        this.bookStockController = bookStockController;
-    }
 
     @PostConstruct
     public void initializeCall() {

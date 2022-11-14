@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * 什么是GMT（Greenwich Mean Time）格林尼治标准时间（也称格林威治时间）
@@ -61,11 +62,22 @@ public class java8DateTimePractice {
 //        testLocalDateAndTime();
 //        testPeriod();
 //        testDuration();
-        long ctm = System.currentTimeMillis();
-        long ztm = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
-        long zdt = ZonedDateTime.now().toInstant().toEpochMilli();
-        System.out.println("ctm = " + ctm + " ztm = " + ztm + " zdt = " + zdt);
+//        long ctm = System.currentTimeMillis();
+//        long ztm = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+//        long zdt = ZonedDateTime.now().toInstant().toEpochMilli();
+//        System.out.println("ctm = " + ctm + " ztm = " + ztm + " zdt = " + zdt);
 //        Assert.isTrue(ctm == ztm);
+
+        String[] levelArray = messageDelayLevel.split(" ");
+        for (int i = 0; i < levelArray.length; i++) {
+            String value = levelArray[i];
+            long num = Long.parseLong(value.substring(0, value.length() - 1));
+            String ch = value.substring(value.length() - 1);
+            Long tu = timeUnitTable.get(ch);
+            System.out.println("ch = " + ch + "; tu = " + tu + "; num = " + num);
+        }
+
+
     }
 
     private static void testLocalDateAndTime() {

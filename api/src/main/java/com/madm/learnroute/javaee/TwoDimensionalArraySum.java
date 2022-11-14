@@ -1,7 +1,7 @@
 package com.madm.learnroute.javaee;
 
 /**
- * 而为数组的第一个参数是宽 第二个参数是长
+ * 二维数组为长✖️宽
  * 相当于是第一个参数个第二个参数
  */
 public class TwoDimensionalArraySum {

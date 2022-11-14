@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
 @Data
 public class ScheduleThreadPoolConfig implements SchedulingConfigurer {
 
-    @Value("${printTime.cron}")
+    @Value("${printTime.cron:1000}")
     private String cron;
 
     private Long timer = 10000L;
