@@ -20,7 +20,7 @@ public class CircularServiceA {
 //
 //            }
 //        });
-        int i = 1 / 0;//测试 @AfterThrowing 通知
+        //int i = 1 / 0;//测试 @AfterThrowing 通知
         System.out.println("方法 A 执行");
     }
 }

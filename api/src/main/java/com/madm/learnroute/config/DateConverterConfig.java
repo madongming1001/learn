@@ -32,7 +32,7 @@ import static org.springframework.data.elasticsearch.annotations.DateFormat.date
  * @author dongming.ma
  * @date 2022/11/15 15:01
  */
-@Configuration
+//@Configuration
 public class DateConverterConfig {
 
     /**

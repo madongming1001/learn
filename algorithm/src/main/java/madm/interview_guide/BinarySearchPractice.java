@@ -19,16 +19,18 @@ public class BinarySearchPractice {
 
     private static int binarrySort(int[] arr, int target) {
         int left = 0, right = arr.length - 1;
-        while (left < right) {
+        while (left <= right) {
             int mid = left + ((right - left) >> 1);
-//            int mid = (right + left) + 2;
-            if (arr[mid] < target) {
-                left = mid + 1;
+//            int mid = (right + left) / 2;
+            if (arr[mid] == target) {
+                return mid;
+            } else if (arr[mid] > target) {
+                right = mid - 1;
             } else {
-                right = mid;
+                left = mid + 1;
             }
         }
-        return arr[left] == target ? left : -1;
+        return -1;
     }
 
     public int bsearch(int[] a, int n, int value) {
@@ -44,7 +46,7 @@ public class BinarySearchPractice {
         }
 
         if (low < n && a[low] == value) return low;
-        else return -1;
+        return -1;
     }
 
     /**
