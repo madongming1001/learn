@@ -1348,18 +1348,6 @@ public void await() {
 
 在await方法中，实际上当前线程在一个while循环中每10秒检查一次 stopAwait这个变量，它是一个volatile类型变量，用于确保被另一个线程修改后，当前线程能够立即看到这个变化。如果没有变化，就会一直处于while循环中。这就是该线程不退出的原因，也就是整个spring-boot应用不退出的原因。
 
-## Springboot整合Naocs Config位置
-
-https://www.jianshu.com/p/903c01cb2a77
-
-springboot提供加载资源.properties .yml
-PropertySourceLoader.java
-
-SpringApplication&run&prepareEnvironment去加载bootstrap.yml文件
-读取nacos配置文件是在SpringApplication&run&prepareContext方法&applyInitializers&PropertySourceBootstrapConfiguration&PropertySourceLocator.locateCollection&NacosPropertySourceLocator.locate
-
-参考文章：https://juejin.cn/post/6887751198737170446
-
 # spring扩展点
 
 - BeanFactoryPostProcessor 
@@ -1597,13 +1585,28 @@ ClassPathBeanDefinitionScanner是一个扫描器对象
   4、NacosPropertySourceLocator.locate
 ```
 
+# SpringBoot整合Naocs
+
+## 配置中心整合spring
+
+springboot提供加载资源properties .yml
+PropertySourceLoader.java
+SpringApplication&run&prepareEnvironment去加载bootstrap.yml文件
+读取nacos配置文件是在SpringApplication&run&prepareContext方法&applyInitializers&PropertySourceBootstrapConfiguration&PropertySourceLocator.locateCollection&NacosPropertySourceLocator.locate
+
+## 注册中心整合spring
+
+**参考文章：**https://ost.51cto.com/posts/16647
+
 nacos divcovery是通过事件发布的方式注册的
 
-```java
-finishRefresh() -> WebServerInitializedEvent（ServletWebServerInitializedEvent） 事件发布的，AbstractAutoServiceRegistration 监听了这个事件，通过他的 onApplicationEvent 方法就会走到，NacosServiceRegistry 最后就会走到这个的register
-```
+**onRefresh()**方法的时候往bean工厂注入一个类**WebServerStartStopLifecycle**，在**finishRefresh()**会调用**getLifecycleProcessor().onRefresh();**方法走到**startBeans()**，会先获取所有实现了**Lifecycle**接口的bean
 
+，然后调用他的**start()**,因为**WebServerStartStopLifecycle**父类实现了**Lifecycle**接口，所有最终会走到他的strat()发布一个**ServletWebServerInitializedEvent**事件。
 
+又因为Nacos的**spring.factories**中有一个自动注入类**NacosServiceRegistryAutoConfiguration**，注入了一个**bean**，**NacosAutoServiceRegistration**父类实现了**ApplicationListener**监听了**WebServerInitializedEvent**时间所以会走到他的**onApplicationEvent**方法,最终就会调到**NacosServiceRegistry**的**register**方法进行注册。
+
+![Spring Cloud集成Nacos服务发现源码解析?翻了三套源码,保质保鲜-开源基础软件社区](https://dl-harmonyos.51cto.com/images/202208/27ecf1915beee9dbedf34436233880453a1cdf.jpg)
 
 # springboot2.0默认创建什么代理？
 
@@ -1854,3 +1857,76 @@ public BeanCurrentlyInCreationException(String beanName) {
 ```
 
 **参考文章：**https://blog.csdn.net/csdn_wyl2016/article/details/108146174
+
+# Condition注解原理
+
+**ConfigurationClassParser**构造方法会创建一个对象**ConditionEvaluator（用来验证@Conditional注解的）**，
+
+因为对于每个类来说可能包含内部类bean之类的，所以整个是递归调用的。**processConfigurationClass**主要用来判断是否符合**Conditional**条件。
+
+```java
+protected void processConfigurationClass(ConfigurationClass configClass, Predicate<String> filter) throws IOException {
+   // 检查当前解析的配置bean是否包含Conditional注解，如果不包含则不需要跳过
+   // 如果包含了则进行match方法得到匹配结果
+   if (this.conditionEvaluator.shouldSkip(configClass.getMetadata(), ConfigurationPhase.PARSE_CONFIGURATION)) {
+      return;
+   }
+
+   ConfigurationClass existingClass = this.configurationClasses.get(configClass);
+   if (existingClass != null) {
+      if (configClass.isImported()) {
+         if (existingClass.isImported()) {
+            existingClass.mergeImportedBy(configClass);
+         }
+         // Otherwise ignore new imported config class; existing non-imported class overrides it.
+         return;
+      }
+      else {
+         // Explicit bean definition found, probably replacing an import.
+         // Let's remove the old one and go with the new one.
+         this.configurationClasses.remove(configClass);
+         this.knownSuperclasses.values().removeIf(configClass::equals);
+      }
+   }
+
+   // Recursively process the configuration class and its superclass hierarchy.
+   SourceClass sourceClass = asSourceClass(configClass, filter);
+   do {
+      sourceClass = doProcessConfigurationClass(configClass, sourceClass, filter);
+   }
+   while (sourceClass != null);
+
+   this.configurationClasses.put(configClass, configClass);
+}
+```
+
+## 1.处理@Component注解
+
+```java
+// Process any @Component annotations
+if (configClass.getMetadata().isAnnotated(Component.class.getName())) {
+   // Recursively process any member (nested) classes first
+   processMemberClasses(configClass, sourceClass, filter);
+}
+```
+
+## 2.处理@Import注解的时候
+
+```java
+// Candidate class not an ImportSelector or ImportBeanDefinitionRegistrar ->
+// process it as an @Configuration class
+this.importStack.registerImport(
+      currentSourceClass.getMetadata(), candidate.getMetadata().getClassName());
+processConfigurationClass(candidate.asConfigClass(configClass), exclusionFilter);
+```
+
+## 3.最外层解析入口处do while循环
+
+```java
+do {
+   //主要调用 doProcessConfigurationClass() 解析配置类，并将解析得到的 Bean 缓存在Map集合 configurationClasses 中供后续注册使用
+   parser.parse(candidates);
+   parser.validate();
+```
+
+参考文章：https://blog.csdn.net/One_L_Star/article/details/114058971**

@@ -14,5 +14,7 @@ public class ObtainPlatformDefaultCharsetPractice {
         //方法二
         System.out.println(Charset.defaultCharset());
         System.out.println(Integer.MAX_VALUE);
+
+        System.out.println(System.getProperty("sun.reflect.inflationThreshold"));
     }
 }

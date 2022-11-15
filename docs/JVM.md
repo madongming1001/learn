@@ -863,6 +863,8 @@ MethodHandle详解：https://juejin.cn/post/6844904177131323406
 
 在发生Minor GC之前，虚拟机必须先检查老年代最大可用的连续空间是否大于新生代所有对象总空间，如果这个条件成立，那这一次Minor GC可以确保是安全的。如果不成立，则虚拟机会先查看-XX:HandlePromotionFailure参数的设置值是否允许担保失败（Handle Promotion Failure）；如果允许，那会继续检查老年代最大可用的连续空间是否大于历次晋升到老年代对象的平均大小，如果大于，将尝试进行一次Minor GC，尽管这次Minor GC是有风险的；如果小于，或者-XX: HandlePromotionFailure设置不允许冒险，那这时就要改为进行一次Full GC。
 
+避免第一次检查老年代连续空间小于新生代而直接进行FullGC，避免直接老FullGC。
+
 **(在JDK 6 Update 24之后，这个参数将不会影响虚拟机的空间分配担保策略)**
 
 

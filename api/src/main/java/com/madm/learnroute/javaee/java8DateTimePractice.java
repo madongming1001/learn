@@ -60,24 +60,18 @@ public class java8DateTimePractice {
     @SneakyThrows
     public static void main(String[] args) {
 //        testLocalDateAndTime();
-//        testPeriod();
-//        testDuration();
+        testPeriod();
+        testDuration();
 //        long ctm = System.currentTimeMillis();
 //        long ztm = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
 //        long zdt = ZonedDateTime.now().toInstant().toEpochMilli();
 //        System.out.println("ctm = " + ctm + " ztm = " + ztm + " zdt = " + zdt);
 //        Assert.isTrue(ctm == ztm);
 
-        String[] levelArray = messageDelayLevel.split(" ");
-        for (int i = 0; i < levelArray.length; i++) {
-            String value = levelArray[i];
-            long num = Long.parseLong(value.substring(0, value.length() - 1));
-            String ch = value.substring(value.length() - 1);
-            Long tu = timeUnitTable.get(ch);
-            System.out.println("ch = " + ch + "; tu = " + tu + "; num = " + num);
-        }
 
-
+//        System.out.println(LocalDate.now());
+//        System.out.println(LocalTime.now());
+//        System.out.println(LocalDateTime.now());//中间T代表时间分割的字符
     }
 
     private static void testLocalDateAndTime() {
@@ -104,17 +98,20 @@ public class java8DateTimePractice {
         //时间转字符串格式化
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
         String dateTime = LocalDateTime.now(ZoneOffset.of("+8")).format(formatter);
-
         //字符串转时间
         String dateTimeStr = "2018-07-28 14:11:15";
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime localDateTime = LocalDateTime.parse(dateTimeStr, df);
+
+        LocalDateTime time = LocalDateTime.now();
+        String localTime = df.format(time);
+        LocalDateTime ldt = LocalDateTime.parse("2017-09-28 17:07:05",df);
     }
 
     private static void testDuration() {
-        Duration duration = Duration.ofDays(LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8")));
-        System.out.println("duration ..." + duration.getNano());
-
+//        Duration duration = Duration.ofDays(LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8")));
+        Duration between = Duration.between(LocalDateTime.now(), LocalDateTime.of(2022, 11, 15, 24, 35));
+        LocalDateTime before = LocalDateTime.now();
         Instant start = Instant.parse("2017-10-03T10:15:30.00Z");
         Instant end = Instant.parse("2017-10-03T10:16:30.00Z");
         Duration.between(start, end);
