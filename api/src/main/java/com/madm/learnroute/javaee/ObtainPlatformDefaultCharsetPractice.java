@@ -1,6 +1,7 @@
 package com.madm.learnroute.javaee;
 
 import java.nio.charset.Charset;
+import java.util.Properties;
 
 /**
  * @author dongming.ma
@@ -14,7 +15,8 @@ public class ObtainPlatformDefaultCharsetPractice {
         //方法二
         System.out.println(Charset.defaultCharset());
         System.out.println(Integer.MAX_VALUE);
-
-        System.out.println(System.getProperty("sun.reflect.inflationThreshold"));
+        System.out.println(System.getProperty("logImpl"));
+        Object logImpl = System.getProperties().get("logImpl");
+        System.out.println(logImpl);
     }
 }
