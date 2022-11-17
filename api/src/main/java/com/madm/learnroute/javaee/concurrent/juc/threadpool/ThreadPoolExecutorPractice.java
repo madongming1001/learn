@@ -50,7 +50,7 @@ public class ThreadPoolExecutorPractice {
         System.out.println(Integer.toBinaryString(0 << 29) + "0<<29");
         System.out.println(Integer.toBinaryString(-536870912));
 //        System.out.println(CAPACITY);
-//        executeSchedule();
+        executeSchedule();
         System.out.println(Integer.toBinaryString(-1 - 1));//11111111111111111111111111111110
         System.out.println(-1 - 1);
         System.out.println(Long.valueOf("10100000000000000000000000000000", 2));
@@ -92,17 +92,19 @@ public class ThreadPoolExecutorPractice {
             }
         });
 
-        List<Callable<Integer>> callables = Arrays.asList(() -> index++, () -> index++);
+//        List<Callable<Integer>> callables = Arrays.asList(() -> index++, () -> index++);
 
-        threadPoolExecutor.invokeAny(callables);
+//        threadPoolExecutor.invokeAny(callables);
 
         for (int i = 0; i < 100; i++) {
             int finalI = i;
-            threadPoolExecutor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    System.out.println("第" + finalI + "个任务被执行！");
+            threadPoolExecutor.execute(() -> {
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
+                System.out.println("第" + finalI + "个任务被执行！");
             });
         }
 

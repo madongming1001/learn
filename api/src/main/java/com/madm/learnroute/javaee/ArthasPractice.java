@@ -1,6 +1,7 @@
 package com.madm.learnroute.javaee;
 
 import java.util.HashSet;
+import java.util.concurrent.CompletableFuture;
 
 public class ArthasPractice {
 
@@ -10,9 +11,9 @@ public class ArthasPractice {
 
     public static void main(String[] args) {
         //模拟CPU过高
-//        cpuHigh();
         // 模拟线程死锁
-        deadThread();
+        //无异常类型 CancellationException CompletionException 未经检查异常 不强制抛出
+        CompletableFuture.allOf(CompletableFuture.runAsync(() -> cpuHigh()),CompletableFuture.runAsync(() -> deadThread())).join();
         // 不断的向 hashSet 集合增加数据
 //        addHashSetThread();
         while (viability) System.out.println("111");

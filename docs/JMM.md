@@ -22,11 +22,11 @@ JMM 与 JVM 内存区域的划分是不同的概念层次，更恰当说 JMM 描
 
 根据 JVM 虚拟机规范主内存与工作内存的数据存储类型以及操作方式，对于一个实例对象中的成员方法而言，如果方法中包括本地变量是基本数据类型（boolean、type、short、char、int、long、float、double），将直接存储在工作内存的帧栈中，而对象实例将存储在主内存（共享数据区域，堆）中。但对于实例对象的成员变量，不管它是基本数据类型或者包装类型（Integer、Double等）还是引用类型，都会被存储到堆区。至于 static 变量以及类本身相关信息将会存储在主内存中。
 
-**针对long和double型变量的特殊规则** 
+#### **针对long和double型变量的特殊规则** 
 
-​		Java内存模型要求lock、unlock、read、load、assign、use、store、write这八种操作都具有原子性， 但是对于64位的数据类型（long和double），在模型中特别定义了一条宽松的规定：允许虚拟机将没有 被volatile修饰的64位数据的读写操作划分为两次32位的操作来进行，即允许虚拟机实现自行选择是否 要保证64位数据类型的load、store、read和write这四个操作的原子性，这就是所谓的“long和double的非 原子性协定”（Non-Atomic Treatment of double and long Variables）。 
+​		Java内存模型要求lock、unlock、read、load、assign、use、store、write这八种操作都具有原子性， 但是对于64位的数据类型（long和double），在模型中特别定义了一条宽松的规定：允许虚拟机将没有被volatile修饰的64位数据的读写操作划分为两次32位的操作来进行，即允许虚拟机实现自行选择是否 要保证64位数据类型的load、store、read和write这四个操作的原子性，这就是所谓的“long和double的非 原子性协定”（Non-Atomic Treatment of double and long Variables）。 
 
-​		如果有多个线程共享一个并未声明为volatile的long或double类型的变量，并且同时对它们进行读取 和修改操作，那么某些线程可能会读取到一个既不是原值，也不是其他线程修改值的代表了“半个变 量”的数值。不过这种读取到“半个变量”的情况是非常罕见的，经过实际测试[1]，在目前主流平台下商 用的64位Java虚拟机中并不会出现非原子性访问行为，但是对于32位的Java虚拟机，譬如比较常用的32 位x86平台下的HotSpot虚拟机，对long类型的数据确实存在非原子性访问的风险。从JDK 9起， HotSpot增加了一个实验性的参数-XX：+AlwaysAtomicAccesses（这是JEP 188对Java内存模型更新的 一部分内容）来约束虚拟机对所有数据类型进行原子性的访问。而针对double类型，由于现代中央处 理器中一般都包含专门用于处理浮点数据的**浮点运算器（Floating Point Unit，FPU）**，用来专门处理 单、双精度的浮点数据，所以哪怕是32位虚拟机中通常也不会出现非原子性访问的问题，实际测试也证实了这一点。笔者的看法是，在实际开发中，除非该数据有明确可知的线程竞争，否则我们在编写代码时一般不需要因为这个原因刻意把用到的long和double变量专门声明为volatile。 
+​		如果有多个线程共享一个并未声明为volatile的long或double类型的变量，并且同时对它们进行读取 和修改操作，那么某些线程可能会读取到一个既不是原值，也不是其他线程修改值的代表了“半个变 量”的数值。不过这种读取到“半个变量”的情况是非常罕见的，经过实际测试[1]，在目前主流平台下商 用的64位Java虚拟机中并不会出现非原子性访问行为，但是对于32位的Java虚拟机，譬如比较常用的32 位x86平台下的HotSpot虚拟机，**对long类型的数据确实存在非原子性访问的风险。**从JDK 9起， HotSpot增加了一个实验性的参数-XX：+AlwaysAtomicAccesses（这是JEP 188对Java内存模型更新的 一部分内容）来约束虚拟机对所有数据类型进行原子性的访问。而针对double类型，由于现代中央处理器中一般都包含专门用于处理浮点数据的**浮点运算器（Floating Point Unit，FPU）**，用来专门处理单、双精度的浮点数据，所以哪怕是32位虚拟机中通常也不会出现非原子性访问的问题，实际测试也证实了这一点。笔者的看法是，在实际开发中，除非该数据有明确可知的线程竞争，否则我们在编写代码时一般不需要因为这个原因刻意把用到的long和double变量专门声明为volatile。 
 
 
 
@@ -129,7 +129,7 @@ Java语言规范规定 JVM 线程内部维持顺序化语义。即只要程序�
 
 #### happens-before 原则
 
-**只靠 synchronized 和 volatile 关键字来保证原子性、可见性以及有序性，那么编写并发程序可能会显得十分麻烦**，幸运的是，从JDK 5 开始，Java 使用新的 JSR-133 内存模型，提供了 `happens-before 原则` 来辅助保证程序执行的原子性、可见性和有序性的问题，它是判断数据十分存在竞争、线程十分安全的一句。happens-before 原则内容如下：
+**屏蔽不同硬件环境下的指令重排序的规则不仅相同，提供了happends-before原则来辅助保证程序执行的原子性，只靠 synchronized 和 volatile 关键字来保证原子性、可见性以及有序性，那么编写并发程序可能会显得十分麻烦**，幸运的是，从JDK 5 开始，**Java 使用新的 JSR-133 内存模型，提供了 `happens-before 原则` 来辅助保证程序执行的原子性、可见性和有序性的问题**，它是判断数据十分存在竞争、线程十分安全的一句。happens-before 原则内容如下：
 
 1. **程序顺序原则**，即在一个线程内必须保证语义串行，也就是说按照代码顺序执行。
 2. **锁规则**，解锁（unlock）操作必然发生在后续的同一个锁的加锁（lock）之前，也就是说，如果对于一个锁解锁后，再加锁，那么加锁的动作必须在解锁动作之后（同一个锁）。
@@ -142,7 +142,7 @@ Java语言规范规定 JVM 线程内部维持顺序化语义。即只要程序�
 
 > finalize()是Object中的方法，当垃圾回收器将要回收对象所占内存之前被调用，即当一个对象被虚拟机宣告死亡时会先调用它finalize()方法，让此对象处理它生前的最后事情（这个对象可以趁这个时机挣脱死亡的命运）。
 
-# volatile 内存语义
+# volatile
 
 **volatile** 是Java虚拟机提供的轻量级的同步机制。volatile 关键字有如下两项特性：
 
@@ -150,7 +150,7 @@ Java语言规范规定 JVM 线程内部维持顺序化语义。即只要程序�
 
 - **禁止指令重排：**在CPU、编译器进行指令优化时，不能把volatile变量后面的语句放到其前面执行，也不能把volatile变量前面的语句放到其后面执行
 
-### volatile 的可见性
+## volatile 的可见性
 
 关于 volatile 的可见性作用，我们必须意识到被 volatile 修饰的变量对所有线程总是立即可见的，对于 volatile 变量的所有写操作总是能立刻反应到其他线程中。
 
@@ -206,7 +206,7 @@ public class Jmm03_CodeVisibility {
 }
 ```
 
-### volatile 无法保证原子性
+## volatile 无法保证原子性
 
 ```java
 //示例
@@ -267,11 +267,11 @@ public class Jmm04_CodeAtomic {
 
 其实counter++不是一步完成的. 他是分为多步完成的. 我们用下面的图来解释 ![img](https:////p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ce37d6fdd2a7403a826e3dfd8a60637e~tplv-k3u1fbpfcp-watermark.awebp) **原因：**线程A通过read, load将变量加载到工作内存, 通过use将变量发送到执行引擎, 执行引擎执行counter++，这时线程B启动了, 通过read, load将变量加载到工作内存, 通过user将变量发送到执行引擎, 然后执行复制操作assign, stroe, write操作. 我们看到这是经过了n个步骤. 虽然看起来就是简单的一句话。当线程B执行store将数据回传到主内存的时候, 同时会通知线程A, 丢弃counter++, 而这时counter已经自加了1, 将自加后的counter丢掉, 就导致总数据少1。
 
-### volatile 禁止重排优化
+## volatile 禁止重排优化
 
 volatile 关键字另一个作用就是禁止指令重排优化，从而避免多线程环境下程序出现乱序执行的现象，关于指令重排优化前面已经分析过，这里主要简单说明一下 volatile 是如何实现禁止指令重排优化的。先了解一个概念，**内存屏障**（Memory Barrier）
 
-#### 指令重排种类
+### 指令重排种类
 
 1）**编译器重排序。**编译器在不改变单线程程序语义的前提下，可以重新安排语句的执行顺序。
 
@@ -283,17 +283,17 @@ volatile 关键字另一个作用就是禁止指令重排优化，从而避免�
 
 **时钟周期：**由CPU时钟定义的定长时间间隔，是CPU工作的最小时间单位，也称节拍脉冲或T周期，完成一个基本动作所需要的时间。
 
-#### JSR是什么
+### JSR是什么
 
 Java分为三个体系，分别为**Java SE**（J2SE，Java2Platform Standard Edition，标准版），**JavaEE**（J2EE，Java 2Platform, Enterprise Edition，企业版），**Java ME**（J2ME，Java 2Platform Micro Edition，微型版）。
 
 **JSR**是Java Specification Requests的缩写，意思是“Java 规范提案”。**是指向JCP(JavaCommunity Process)提出新增一个标准化技术规范的正式请求。** 
 
-**JCP**（ Java Community Process) 是一个开放的国际组织，主要由Java开发者以及被授权者组成，职能是发展和更新Java技术规范、参考实现（RI）、技术兼容包（TCK）。Java技术和JCP两者的原创者都是SUN计算机公司。然而，JCP已经由SUN于1995年创造Java的非正式过程，演进到如今有数百名来自世界各地Java代表成员一同监督Java发展的正式程序。
+**JCP**（ Java Community Process) 是一个开放的国际组织，**主要由Java开发者以及被授权者组成，职能是发展和更新Java技术规范、参考实现（RI）、技术兼容包（TCK）**。Java技术和JCP两者的原创者都是SUN计算机公司。然而，JCP已经由SUN于1995年创造Java的非正式过程，演进到如今有数百名来自世界各地Java代表成员一同监督Java发展的正式程序。
 
 **过程：**事物发展变化所经过的程序。
 
-#### Java有两个编译期
+### Java有两个编译期
 
 1、调用javac命令将java代码编译成java字节码
 
@@ -305,7 +305,7 @@ Java分为三个体系，分别为**Java SE**（J2SE，Java2Platform Standard Ed
 
 类属性在JVM中存储的时候会有一个属性：Access flags。JVM在运行的时候就是通过该属性来判断操作的类属性有没有加volatile修饰。
 
-#### JVM的内存屏障
+### JVM的内存屏障
 
 为了保证内存可见性，java编译器在生成指令序列的适当位置会插入内存屏障指令来禁止指定类型的处理器重排序。
 
@@ -316,9 +316,10 @@ Java分为三个体系，分别为**Java SE**（J2SE，Java2Platform Standard Ed
 | Load1;LoadStore;Store2   | 在store2及其后的写操作执行前，保证load1的读操作已经读取结束  |
 | Store1;StoreLoad;Load2   | 在store1的写操作已刷新到主内存之后，load2及其后的读操作才能执行 |
 
-**以常见的x86处理器来说，它是拥有相对较强的处理器内存模型，只允许Store-Load重排序。也因此在x86处理器的时候会省略掉这3种操作类型对应的内存屏障，在x86中，JMM仅需在volatile写后面插入一个StoreLoad屏障即可正确实现volatile写-读的内存语义。**
-
-#### 硬件层的内存屏障
+**以常见的x86处理器（包括x64(也叫 x86-64, amd64)）来说，它是拥有相对较强的处理器内存模型，只允许Store-Load重排序。也因此在x86处理器的时候会省略掉这3种操作类型对应的内存屏障，在x86中，JMM仅需在volatile写后面插入一个StoreLoad屏障即可正确实现volatile写-读的内存语义。**
+生产 x86 架构的 CPU 除了因特尔，它还把专利授权给了现在比较出名的超微（AMD）。然后在 1999 年 AMD 首次公开 64 位集以扩展 x86，此架构称为 AMD64。后来英特尔也推出了与之兼容的处理器，并命名Intel 64。两者一般被统称为 x86-64 或 x64，开创了 x86 的 64 位时代。
+**x86指的是32位以前的处理器的指令集架构，x86-64是一个处理器的指令集架构，基于x86架构的64位拓展，向后兼容于16位及32位的x86架构。**
+### 硬件层的内存屏障
 
 Intel 硬件提供了一系列的内存屏障，主要有：
 
@@ -395,21 +396,25 @@ private volatile static DoubleCheckLock instance;
 复制代码
 ```
 
-#### **lock指令的主要作用**
+### **lock指令的主要作用**
 
-lock指令要等待前面的指令全部执行完、会把buffered write刷入主存,把store buffer中缓存的修改刷入L1 cache，再通过MESI保证可见性。
+**lock指令要等待前面的指令全部执行完、会把buffered write刷入主存,写到主存之后，可见性由MESI协议保证。**
 
 ```java
 Locking operations typically operate like I/O operations in that they wait for all previous instructions to complete and for all buffered writes to drain to memory
 ```
 
-参考文章（具有用干货满满）：https://blog.csdn.net/qq_18433441/article/details/108585843
+参考文章（具有用干货满满）
 
-#### storebuffer
+**从硬件层面理解volatile（java）：**https://blog.csdn.net/qq_18433441/article/details/108585843
+
+**面试官：说一下 volitile 的内存语义，底层如何实现：**https://www.cxyxiaowu.com/20270.html
+
+### storebuffer
 
  为了避免这种CPU运算能力的浪费，`Store Bufferes` 被引入使用。**处理器把它想要写入到主存的值写到缓存，然后继续去处理其他事情。**当所有**失效确认**（Invalidate Acknowledge）都接收到时，数据才会最终被提交。
 
-##### StoreBuffer带来的问题
+#### StoreBuffer带来的问题
 
 store buffer还会带来乱序的问题
 
@@ -444,7 +449,7 @@ assert(a == 1);//假设cpu1还没有接收到cpu0的read invalidate消息，此�
 
 **如果缓存中也有store buffer也有那么先从strore buffer读取，这个叫做store forwarding。**
 
-#### 写屏障
+### 写屏障
 
 **假设在两个写操作之间，插入了写屏障，那么在后面一个写操作将修改的值刷入到缓存之前，要么必须等待store buffer为空，要么自己也放入到store buffer，等待store buffer中排在它前面的所有写操作执行完。**
 
@@ -475,13 +480,13 @@ d = 3;
 
 由于写屏障的存在，后面几条写操作，比如丢入store buffer，等待a=1操作完成，才能继续执行。这看起来效率就比较低，且store buffer的大小是有限的。那么怎么解决这个问题呢？这就要引入invalidate queue的概念了
 
-#### invalid queue
+### invalid queue
 
 执行失效也不是一个简单的操作，它需要处理器去处理。另外，**存储缓存（Store Buffers）并不是无穷大的，所以处理器有时需要等待失效确认的返回。这两个操作都会使得性能大幅降低。为了应付这种情况，引入了失效队列(invalid queue)**。
 
 当cpu接收到invalidate消息，它必须使得自己的缓存行无效（当缓存比较繁忙的时候，这个无效需要等一会才能轮到），然后再发送invalidate response消息出去当然了，当cpu接收到大量的invalidate消息时，可以想象有些invalidate消息的处理不会很及时。为了解决这个问题，cpu引入了invalidate queue：当cpu接收到invalidate消息之后，它把invalidate消息加入到invalidate queue（后续cpu会根据invalidate queue来无效缓存行），然后立刻发送invalidate response消息出去。这样子响应就很快了，当然了也引入了新的问题。
 
-##### invalidateQueue带来的问题
+#### invalidateQueue带来的问题
 
 由于cpu发送invalidate response的时候，它的缓存行可能并没有失效的。后续如果这个cpu执行一个读操作，那么可能取到老的值。下面举例说明：
 
@@ -504,9 +509,11 @@ assert(a == 1);//cpu1的缓存中有a，且值为0，于是执行这一行时报
 //cpu1从invalidate queue取出invalidate消息，将自己包含a的缓存行的状态置为失效。但是为时已晚，assert(a == 1)已经报错了
 ```
 
-#### 读屏障
+### 读屏障
 
 读屏障会标记invalidate queue中的所有条目，读屏障之后的读操作，必须等待invalidate queue中所有被标记的条目执行完之后，才能执行
+
+**读取modify状态的值会被刷入主存，之后改为share状态**
 
 **依旧假设a,b的初始值为0，a既在cpu0又在cpu1的缓存中（即缓存行是在cpu0和cpu1中都是share状态），b只在cpu0的缓存中（即缓存行在cpu0是exclusive状态，在cpu1中是invalidate状态）**
 
@@ -530,7 +537,7 @@ assert(a == 1);//cpu1读取a，但是invalidate queue里面存在被标记的条
 
 
 
-#### 有了volatile为什么还会有可见性问题？
+### 有了volatile为什么还会有可见性问题？
 
 - MESI协议只是保证了CPU的缓存一致性，volatile是java语言层面给出的保证。它们之间还差着java编译器、java虚拟机、JIT、操作系统、CPU核心
 
@@ -699,6 +706,8 @@ MESI 是指4个状态的首字母。每个 `Cache line` 有4个状态，可用2�
 ### 什么是伪共享？
 
 CPU缓存系统中是以缓存行（cache line）为单位存储的。目前主流的CPU Cache 的 Cache Line 大小都是64Bytes。在多线程情况下，如果需要修改“**共享同一个缓存行的变量**”，就会无意中影响彼此的性能，这就是伪共享（False Sharing）。
+伪共享指的是多个线程同时读写同一个缓存行的不同变量时导致的 CPU缓存失效。尽管这些变量之间没有任何关系，但由于在主内存中邻近，存在于同一个缓存行之中，它们的相互覆盖会导致频繁的缓存未命中，引发性能下降。
+缓存行填充对于大多数原子来说是繁琐的，因为它们通常不规则地分散在内存中，因此彼此之间不会有太大的干扰。但是，驻留在数组中的原子对象往往彼此相邻，因此在没有这种预防措施的情况下，通常会共享缓存行数据（对性能有巨大的负面影响）。
 
 **举个例子**: 现在有2个long 型变量 a 、b，如果有t1在访问a，t2在访问b，而a与b刚好在同一个cache line中，此时t1先修改a，将导致b被刷新！
 
@@ -840,6 +849,8 @@ void executedOnCpu1() {
 
 # 指令集 ISA Instruction Set Architecture
 
+所谓指令集，**可以理解成硬件对外的接口**。我们运行程序是通过操作系统调度，操作系统然后让硬件去计算。
+
 - 程序在执行之前要被编译为CPU能够理解的语言，这种语言或者说是规范就是指令集ISA
 - *反映了CPU软件层面的设计*
 - 指令集的Example - x86,Arm v8,Mipz
@@ -850,9 +861,22 @@ void executedOnCpu1() {
 
 # 计算机系统
 
+**x86指的是32位以前的处理器的指令集架构，x86-64是一个处理器的指令集架构，基于x86架构的64位拓展，向后兼容于16位及32位的x86架构。**x64于1999年由AMD设计，AMD首次公开64位集以扩展给x86，称为“AMD64”。其后也为英特尔所采用，现时英特尔称之为“Intel 64”，在之前曾使用过“Clackamas Technology” 、“IA-32e”及“EM64T”。
+苹果公司和RPM包管理员以“x86-64”或“x86_64”称呼此64位架构。甲骨文公司及Microsoft称之为“x64”。BSD家族及其他Linux发行版则使用“amd64”，32位版本则称为“i386”，Arch Linux及其派生发行版用x86_64称呼此64位架构。
+
+**现在 `x86` 一般指 `32` 位的架构。**
+
+**该系列较早期的处理器名称是以数字来表示 `80x86`。由于以 `86` 作为结尾，包括 `Intel 8086`、`80186`、`80286`、`80386` 以及 `80486`，因此其架构被称为 `x86`。**
+
+复杂指令集是 `x86`、`x64(也叫 x86-64, amd64)` 两种架构，专利在 `Intel` 和 `AMD` 两家公司手里， 该架构 `CPU` 主要是 `Intel` 和 `AMD` 两家公司，这种 `CPU` 常用在 `PC` 机上，包括 `Windows`，`macOS` 和 `Linux`。
+
+简单指令集是 `arm` 一种架构，专利在 `ARM` 公司手里，该架构 `CPU` 主要有高通、三星、苹果、华为海思、联发科等公司。这种 `CPU` 常用在手机上，包括安卓和苹果。
+
+**复杂指令集和精简指令集比较的话**，区别在于我们编程（直接写机器语言代码在 `CPU`上运行）的时候，比如实现乘法。根据提供的指令，复杂指令集可能一条命令就够了，而简单指令集我们可能需要加法、循环等多条指令。
+
 ## Intel系列处理器
 
-- 8086
+- 8086处理器16位处理器 x86指令集
 
 - [Pentium](https://baike.baidu.com/item/Pentium/2946980?fromModule=lemma_inlink)处理器
 

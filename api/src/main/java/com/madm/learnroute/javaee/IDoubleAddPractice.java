@@ -5,20 +5,24 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 
 /**
+ * -XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly
+ *
  * @author dongming.ma
  * @date 2022/7/6 20:06
  */
 public class IDoubleAddPractice {
+    public volatile int num = 0;
+
     public static void main(String[] args) {
 //        int i = 1;
         //表达式的返回值是 i++ 之前的值;
 //        i++;
 //        ++i;
-        int  count = 0;
+//        int  count = 0;
 //        for (int i = 0; i < 100; i++) {
 //            count++;
 //        }
-        count = count;
+//        count = count;
 
 
         /**
@@ -45,6 +49,11 @@ public class IDoubleAddPractice {
 //            System.out.println(k);
 //        }
     }
+
+    public void numPlusPlus() {
+        num++;
+    }
+
 
 //    public void nonStaticMain() {
 //        double b = 2.0d;

@@ -1008,119 +1008,7 @@ public class ConnectionHolder extends ResourceHolderSupport {
 }
 ```
 
-## mybatis使用spring事务创建的数据库连接
 
-**mybatis的datasource是创建MybatisSqlSessionFactoryBean的时候必须传的所以在后面调用他的getObject()方法的时候可以拿到。**
-
-```java
-MybatisPlusAutoConfiguration.java
-@Bean
-    @ConditionalOnMissingBean
-    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
-        // TODO 使用 MybatisSqlSessionFactoryBean 而不是 SqlSessionFactoryBean
-        MybatisSqlSessionFactoryBean factory = new MybatisSqlSessionFactoryBean();
-        factory.setDataSource(dataSource);
-    }
-    
-
-```
-
-通过Configuration的方式创建的DefaultSqlSessionFactory()。**里面有一个很重要的参数决定了mybatis是否使用spring的事务连接(transactionFactory)**，Mybatis在创建**SqlSession**时，需要为其**添加一个Executor执行器**，**构建Executor执行器时需要的Transaction对象就是通过TransactionFactory的newTransaction方法创建的**，后续Executor执行sql命令时会**通过Transaction的getConnection方法获取数据库连接。**而这里面获取连接靠的也是DataSourceUtils.getConnection(this.dataSource)的连接。也就是事务的连接。从**TransactionSynchronizationManager.getResource(dataSource);**获取ConnectionHolder。
-
-```java
-@Override
-public Connection getConnection() throws SQLException {
-  if (this.connection == null) {
-    openConnection();
-  }
-  return this.connection;
-}
-
-/**
- * Gets a connection from Spring transaction manager and discovers if this {@code Transaction} should manage
- * connection or let it to Spring.
- * <p>
- * It also reads autocommit setting because when using Spring Transaction MyBatis thinks that autocommit is always
- * false and will always call commit/rollback so we need to no-op that calls.
- */
-private void openConnection() throws SQLException {
-  this.connection = DataSourceUtils.getConnection(this.dataSource);
-  this.autoCommit = this.connection.getAutoCommit();
-  this.isConnectionTransactional = DataSourceUtils.isConnectionTransactional(this.connection, this.dataSource);
-
-  LOGGER.debug(() -> "JDBC Connection [" + this.connection + "] will"
-      + (this.isConnectionTransactional ? " " : " not ") + "be managed by Spring");
-}
-```
-
-**MapperScannerConfigurer 它 将 会 查 找 类 路 径 下 的 映 射 器 并 自 动 将 它 们 创 建 成 MapperFactoryBean。**
-
-![image-20221110152120016](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221110152120016.png)
-
-1. 实现BeanDefinitionRegistryPostProcessor接口中的**postProcessBeanDefinitionRegistry**方法，扫描 basePackage 路径下的类，并注册到 Spring 容器中。
-2. 实现 InitializingBean 中的 **afterPropertiesSet** 方法，校验 basePackage 属性不能为空。
-3. 实现 ApplicationContextAware 中的 **setApplicationContext** 方法，用于获取 Spring 容器 applicationContext。
-4. 实现 BeanNameAware 中的 **setBeanName** 方法动态的设置 beanName。
-
-**BeanDefinitionRegistries** 是在应用启动的早期，且在**BeanFactoryPostProcessors**之前运行的。
-这意味着**PropertyPlaceholderConfigurer**还不会被加载，并且此类的所有属性的占位符替换都将会失败。
-为了避免这种情况，需要查找在上下文中定义的**PropertyResourceConfigurer**配置，并且在此类的定义过程中运行它们，然后更新 basePackage、sqlSessionFactoryBeanName、sqlSessionTemplateBeanName的值。
-
-**PropertyPlaceholderConfigurer自定义的解析器还没有加载，只能用spring中有的。通过PropertySourcesPlaceholderConfigurer注入的。**
-
-**mybatisPlus 的整个加载过程概括如下：**
-
-1. **MapperScan注入或者MybatisPlusAutoConfiguration in missing bean注入 MapperScannerConfigurer** 扫描 mapper 接口，并在 spring 中注册 deanDefinition，类型为 **MapperFactoryBean**
-2. **MybatisPlusAutoConfiguration**自动注入**SessionFactory** 解析 mapper.xml 和 mapper 接口 中的 sql 语句保存到 Configuration 中，同时加入 mybatisPlus 提供的动态 sql。 最后注册对应 mapper 的 MybatisMapperProxyFactory。
-3. **MybatisPlusAutoConfiguration（自动注入）SqlSessionTemplate** 使用 **SqlSessionInterceptor** 代理实现一个线程安全的 spring 管理的 SqlSession，并最终通过 **MybatisMapperProxyFactory** 获取 mapper 的代理对象 **MybatisMapperProxy**.
-
-**参考文章：**https://blog.csdn.net/Wu_Shang001/article/details/125356883
-
-### **入口**
-
-**@MapperScan("com.madm.learnroute.mapper") -> @Import(MapperScannerRegistrar.class)**
-
-```java
-public class MapperScannerConfigurer
-    implements BeanDefinitionRegistryPostProcessor, InitializingBean, ApplicationContextAware, BeanNameAware {
-		  @Override
-  public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
-    if (this.processPropertyPlaceHolders) {
-      //找到一个 PropertyResourceConfigurer 的bean，这个bean是通过PropertySourcesPlaceholderConfigurer注入的，通过这个去声明一个DefaultListableBeanFactory然后注册一个MapperScannerRegistrar对象，在通过prc获取到注解的属性值 basepackage
-      processPropertyPlaceHolders();
-    }
-
-    ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
-    scanner.setAddToConfig(this.addToConfig);
-    scanner.setAnnotationClass(this.annotationClass);
-    scanner.setMarkerInterface(this.markerInterface);
-    scanner.setSqlSessionFactory(this.sqlSessionFactory);
-    scanner.setSqlSessionTemplate(this.sqlSessionTemplate);
-    scanner.setSqlSessionFactoryBeanName(this.sqlSessionFactoryBeanName);
-    scanner.setSqlSessionTemplateBeanName(this.sqlSessionTemplateBeanName);
-    scanner.setResourceLoader(this.applicationContext);
-    scanner.setBeanNameGenerator(this.nameGenerator);
-    scanner.setMapperFactoryBeanClass(this.mapperFactoryBeanClass);
-    if (StringUtils.hasText(lazyInitialization)) {
-      scanner.setLazyInitialization(Boolean.valueOf(lazyInitialization));
-    }
-    if (StringUtils.hasText(defaultScope)) {
-      scanner.setDefaultScope(defaultScope);
-    }
-    scanner.registerFilters();
-    scanner.scan(
-        StringUtils.tokenizeToStringArray(this.basePackage, ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS));
-  }
-}
-//processPropertyPlaceHolders()方法就会
-
-```
-
-
-
-
-
-**参考文章：**https://qiuyadongsite.github.io/2019/01/15/mybatis-sources-code-6/
 
 # Feign底层实现细节
 
@@ -1135,10 +1023,10 @@ class FeignClientsRegistrar
 }
 ```
 
-**通过import注解来注册bean有几种方式**
+**通过@import注解来注册bean有几种方式**
 
-1. 实现ImportSelector接口，spring容器就会实例化类，并且调用其selectImports方法,原类不需要家任何注解；
-2. 实现ImportBeanDefinitionRegistrar接口，spring容器就会调用其registerBeanDefinitions方法，原类不需要家任何注解；
+1. 实现ImportSelector接口，spring容器就会实例化类，并且调用其selectImports方法,原类不需要加任何注解；
+2. 实现ImportBeanDefinitionRegistrar接口，spring容器就会调用其registerBeanDefinitions方法，原类不需要加任何注解；
 3. 带有Configuration注解的配置类。
 4. 带有Component的注解
 
@@ -1350,24 +1238,41 @@ public void await() {
 
 # spring扩展点
 
-- BeanFactoryPostProcessor 
-  - BeanDefinitionRegistryPostProcessor （ConfigurationClassPostProcessor）
-- BeanPostProcessor 
-  - InstantiationAwareBeanPostProcessor （resolveBeforeInstantiation返回一个代理对象）
-  - AbstractAutoProxyCreator （代理）
-- @Import
-  - ImportBeanDefinitionRegistrar 
-  - ImportSelector 
-- Aware 
-- InitializingBean （afterPropertiesSet）
-- FactoryBean （getObject，getObjectType，isSingleton）
-- SmartInitializingSingleton (获取完所有单例bean之后，afterSingletonsInstantiated)
-- ApplicationListener
-- Lifecycle （finishRefresh）
-  - SmartLifecycle 
-  - LifecycleProcessor 
-- HandlerInterceptor （mvc）
-- MethodInterceptor （mvc）
+- **BeanFactoryPostProcessor** 
+  
+  - **BeanDefinitionRegistryPostProcessor （ConfigurationClassPostProcessor）**
+  
+- **BeanPostProcessor** 
+  - **InstantiationAwareBeanPostProcessor （resolveBeforeInstantiation返回一个代理对象）**
+  - **AbstractAutoProxyCreator （代理）**
+  
+- **@Import**
+  
+  - **ImportBeanDefinitionRegistrar** 
+  - **ImportSelector** 
+  
+- **Aware** 
+
+- **InitializingBean （afterPropertiesSet）**
+
+- **FactoryBean （getObject，getObjectType，isSingleton）**
+
+- **SmartInitializingSingleton (获取完所有单例bean之后，afterSingletonsInstantiated)**
+
+- ```java
+  ConfigurationPropertiesRebinderAutoConfiguration
+  ```
+
+- **ApplicationListener**
+
+- **Lifecycle （finishRefresh）**
+  
+  - **SmartLifecycle** 
+  - **LifecycleProcessor** 
+  
+- **HandlerInterceptor （mvc）**
+
+- **MethodInterceptor （mvc）**
 
 
 
@@ -1602,11 +1507,123 @@ nacos divcovery是通过事件发布的方式注册的
 
 **onRefresh()**方法的时候往bean工厂注入一个类**WebServerStartStopLifecycle**，在**finishRefresh()**会调用**getLifecycleProcessor().onRefresh();**方法走到**startBeans()**，会先获取所有实现了**Lifecycle**接口的bean
 
-，然后调用他的**start()**,因为**WebServerStartStopLifecycle**父类实现了**Lifecycle**接口，所有最终会走到他的strat()发布一个**ServletWebServerInitializedEvent**事件。
+，然后调用他的**start()**,因为**WebServerStartStopLifecycle**父类实现了**Lifecycle**接口，所有最终会走到他的**strat()**发布一个**ServletWebServerInitializedEvent**事件。
 
 又因为Nacos的**spring.factories**中有一个自动注入类**NacosServiceRegistryAutoConfiguration**，注入了一个**bean**，**NacosAutoServiceRegistration**父类实现了**ApplicationListener**监听了**WebServerInitializedEvent**时间所以会走到他的**onApplicationEvent**方法,最终就会调到**NacosServiceRegistry**的**register**方法进行注册。
 
 ![Spring Cloud集成Nacos服务发现源码解析?翻了三套源码,保质保鲜-开源基础软件社区](https://dl-harmonyos.51cto.com/images/202208/27ecf1915beee9dbedf34436233880453a1cdf.jpg)
+
+# SpringBoot整合Mybatis
+
+## mybatis使用spring事务创建的数据库连接
+
+**mybatis的datasource是创建MybatisSqlSessionFactoryBean的时候必须传的所以在后面调用他的getObject()方法的时候可以拿到。**
+
+```java
+MybatisPlusAutoConfiguration.java
+@Bean
+    @ConditionalOnMissingBean
+    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+        // TODO 使用 MybatisSqlSessionFactoryBean 而不是 SqlSessionFactoryBean
+        MybatisSqlSessionFactoryBean factory = new MybatisSqlSessionFactoryBean();
+        factory.setDataSource(dataSource);
+    }
+    
+
+```
+
+通过Configuration的方式创建的DefaultSqlSessionFactory()。**里面有一个很重要的参数决定了mybatis是否使用spring的事务连接(transactionFactory)**，Mybatis在创建**SqlSession**时，需要为其**添加一个Executor执行器**，**构建Executor执行器时需要的Transaction对象就是通过TransactionFactory的newTransaction方法创建的**，后续Executor执行sql命令时会**通过Transaction的getConnection方法获取数据库连接。**而这里面获取连接靠的也是DataSourceUtils.getConnection(this.dataSource)的连接。也就是事务的连接。从**TransactionSynchronizationManager.getResource(dataSource);**获取ConnectionHolder。
+
+```java
+@Override
+public Connection getConnection() throws SQLException {
+  if (this.connection == null) {
+    openConnection();
+  }
+  return this.connection;
+}
+
+/**
+ * Gets a connection from Spring transaction manager and discovers if this {@code Transaction} should manage
+ * connection or let it to Spring.
+ * <p>
+ * It also reads autocommit setting because when using Spring Transaction MyBatis thinks that autocommit is always
+ * false and will always call commit/rollback so we need to no-op that calls.
+ */
+private void openConnection() throws SQLException {
+  this.connection = DataSourceUtils.getConnection(this.dataSource);
+  this.autoCommit = this.connection.getAutoCommit();
+  this.isConnectionTransactional = DataSourceUtils.isConnectionTransactional(this.connection, this.dataSource);
+
+  LOGGER.debug(() -> "JDBC Connection [" + this.connection + "] will"
+      + (this.isConnectionTransactional ? " " : " not ") + "be managed by Spring");
+}
+```
+
+**MapperScannerConfigurer 它 将 会 查 找 类 路 径 下 的 映 射 器 并 自 动 将 它 们 创 建 成 MapperFactoryBean。**
+
+![image-20221110152120016](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221110152120016.png)
+
+1. 实现BeanDefinitionRegistryPostProcessor接口中的**postProcessBeanDefinitionRegistry**方法，扫描 basePackage 路径下的类，并注册到 Spring 容器中。
+2. 实现 InitializingBean 中的 **afterPropertiesSet** 方法，校验 basePackage 属性不能为空。
+3. 实现 ApplicationContextAware 中的 **setApplicationContext** 方法，用于获取 Spring 容器 applicationContext。
+4. 实现 BeanNameAware 中的 **setBeanName** 方法动态的设置 beanName。
+
+**BeanDefinitionRegistries** 是在应用启动的早期，且在**BeanFactoryPostProcessors**之前运行的。
+这意味着**PropertyPlaceholderConfigurer**还不会被加载，并且此类的所有属性的占位符替换都将会失败。
+为了避免这种情况，需要查找在上下文中定义的**PropertyResourceConfigurer**配置，并且在此类的定义过程中运行它们，然后更新 basePackage、sqlSessionFactoryBeanName、sqlSessionTemplateBeanName的值。
+
+**PropertyPlaceholderConfigurer自定义的解析器还没有加载，只能用spring中有的。通过PropertySourcesPlaceholderConfigurer注入的。**
+
+**mybatisPlus 的整个加载过程概括如下：**
+
+1. **（MapperScan注入或者MybatisPlusAutoConfiguration in missing bean注入） MapperScannerConfigurer** 扫描 mapper 接口，并在 spring 中注册 deanDefinition，类型为 **MapperFactoryBean**
+2. **MybatisPlusAutoConfiguration**自动注入**SessionFactory** 解析 mapper.xml 和 mapper 接口 中的 sql 语句保存到 Configuration 中，同时加入 mybatisPlus 提供的动态 sql。 最后注册对应 mapper 的 MybatisMapperProxyFactory。
+3. **MybatisPlusAutoConfiguration（自动注入）SqlSessionTemplate** 使用 **SqlSessionInterceptor** 代理实现一个线程安全的 spring 管理的 SqlSession，并最终通过 **MybatisMapperProxyFactory** 获取 mapper 的代理对象 **MybatisMapperProxy**.
+
+**参考文章：**https://blog.csdn.net/Wu_Shang001/article/details/125356883
+
+### **入口**
+
+**@MapperScan("com.madm.learnroute.mapper") -> @Import(MapperScannerRegistrar.class)**
+
+```java
+public class MapperScannerConfigurer
+    implements BeanDefinitionRegistryPostProcessor, InitializingBean, ApplicationContextAware, BeanNameAware {
+		  @Override
+  public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
+    if (this.processPropertyPlaceHolders) {
+      //找到一个 PropertyResourceConfigurer 的bean，这个bean是通过PropertySourcesPlaceholderConfigurer注入的，通过这个去声明一个DefaultListableBeanFactory然后注册一个MapperScannerRegistrar对象，在通过prc获取到注解的属性值 basepackage
+      processPropertyPlaceHolders();
+    }
+
+    ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
+    scanner.setAddToConfig(this.addToConfig);
+    scanner.setAnnotationClass(this.annotationClass);
+    scanner.setMarkerInterface(this.markerInterface);
+    scanner.setSqlSessionFactory(this.sqlSessionFactory);
+    scanner.setSqlSessionTemplate(this.sqlSessionTemplate);
+    scanner.setSqlSessionFactoryBeanName(this.sqlSessionFactoryBeanName);
+    scanner.setSqlSessionTemplateBeanName(this.sqlSessionTemplateBeanName);
+    scanner.setResourceLoader(this.applicationContext);
+    scanner.setBeanNameGenerator(this.nameGenerator);
+    scanner.setMapperFactoryBeanClass(this.mapperFactoryBeanClass);
+    if (StringUtils.hasText(lazyInitialization)) {
+      scanner.setLazyInitialization(Boolean.valueOf(lazyInitialization));
+    }
+    if (StringUtils.hasText(defaultScope)) {
+      scanner.setDefaultScope(defaultScope);
+    }
+    scanner.registerFilters();
+    scanner.scan(
+        StringUtils.tokenizeToStringArray(this.basePackage, ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS));
+  }
+}
+//processPropertyPlaceHolders()方法就会
+
+```
+
+**参考文章：**https://qiuyadongsite.github.io/2019/01/15/mybatis-sources-code-6/
 
 # springboot2.0默认创建什么代理？
 
@@ -1929,4 +1946,98 @@ do {
    parser.validate();
 ```
 
-参考文章：https://blog.csdn.net/One_L_Star/article/details/114058971**
+**参考文章：**https://blog.csdn.net/One_L_Star/article/details/114058971
+
+
+
+## application.yml提示配置信息原理
+
+我们在编写 `application.yml` 文件时，当你输入一个字母时，IDE 是不是会提示很多选项供你选择，这个就要归功于 `META-INF/spring-configuration-metadata.json`、`META-INF/additional-spring-configuration-metadata.json` 两个文件，在这两个文件里面可以定义你需要的配置的信息，例如 Spring Boot 提供的：
+
+```json
+{
+  "groups": [
+    {
+      "name": "logging",
+      "type": "org.springframework.boot.context.logging.LoggingApplicationListener"
+    }
+  ],
+  "properties": [
+    {
+      "name": "logging.config",
+      "type": "java.lang.String",
+      "description": "Location of the logging configuration file. For instance, `classpath:logback.xml` for Logback.",
+      "sourceType": "org.springframework.boot.context.logging.LoggingApplicationListener"
+    },
+    {
+      "name": "spring.application.name",
+      "type": "java.lang.String",
+      "description": "Application name.",
+      "sourceType": "org.springframework.boot.context.ContextIdApplicationContextInitializer"
+    },
+    {
+      "name": "spring.profiles",
+      "type": "java.util.List<java.lang.String>",
+      "description": "Comma-separated list of profile expressions that at least one should match for the document to be included.",
+      "sourceType": "org.springframework.boot.context.config.ConfigFileApplicationListener"
+    },
+    {
+      "name": "spring.profiles.active",
+      "type": "java.util.List<java.lang.String>",
+      "description": "Comma-separated list of active profiles. Can be overridden by a command line switch.",
+      "sourceType": "org.springframework.boot.context.config.ConfigFileApplicationListener"
+    }
+  ],
+  "hints": [
+    {
+      "name": "logging.level.values",
+      "values": [
+        {
+          "value": "trace"
+        },
+        {
+          "value": "debug"
+        },
+        {
+          "value": "info"
+        },
+        {
+          "value": "warn"
+        },
+        {
+          "value": "error"
+        },
+        {
+          "value": "fatal"
+        },
+        {
+          "value": "off"
+        }
+      ],
+      "providers": [
+        {
+          "name": "any"
+        }
+      ]
+    }
+  ]
+}
+```
+
+上面仅列出了部分内容，可以看到定义了每个配置的名称、类型、描述和来源，同时可以定义每个配置能够输入的值，这样一来，我们就能够在 IDE 中快速的输入需要的配置项。
+
+这个文件是通过 Spring Boot 提供的 `spring-boot-configuration-processor` 工具模块生成的，借助于 SPI 机制配置了一个 `ConfigurationMetadataAnnotationProcessor` 注解处理器，它继承 `javax.annotation.processing.AbstractProcessor` 抽象类。也就是说这个处理器在编译阶段，会解析每个 `@ConfigurationProperties` 注解标注的类，将这些类对应的一些配置项（key）的信息保存在 `META-INF/spring-configuration-metadata.json` 文件中，例如类型、默认值，来帮助你编写 `application.yml` 的时候会有相关提示。
+
+而且，当我们使用 `@ConfigurationProperties` 注解后，IDE 会提示我们引入这个工具类：
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-configuration-processor</artifactId>
+    <optional>true</optional>
+</dependency>
+```
+
+关于这部分内容可参考 [Spring Boot 官方文档](https://docs.spring.io/spring-boot/docs/2.2.13.RELEASE/reference/html/appendix-configuration-metadata.html#configuration-metadata-annotation-processor)
+
+**参考文章：**https://www.cnblogs.com/lifullmoon/p/14957836.html

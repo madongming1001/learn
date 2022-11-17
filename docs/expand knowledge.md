@@ -48,6 +48,24 @@ public class TestC {
 
 **break retry示例**
 
+```java
+public class TestC {
+    public static void main(String[] args) {
+        retry:
+        for (;;){
+            int count = 1;
+            System.out.println(count++);
+            for (;;){
+                System.out.println(count++);
+                if (count == 5){
+                    break retry;
+                }
+            }
+        }
+    }
+}
+```
+
 **参考文章：**https://blog.csdn.net/elsostal/article/details/109630920
 
 # 错误
@@ -128,3 +146,13 @@ b>25, b = 100
 # NTP是什么？
 
 网络时间协议，英文名称：Network Time Protocol（NTP）是用来使计算机[时间同步](https://baike.baidu.com/item/时间同步?fromModule=lemma_inlink)化的一种协议，它可以使[计算机](https://baike.baidu.com/item/计算机/140338?fromModule=lemma_inlink)对其[服务器](https://baike.baidu.com/item/服务器/100571?fromModule=lemma_inlink)或[时钟源](https://baike.baidu.com/item/时钟源/3219811?fromModule=lemma_inlink)（如石英钟，GPS等等)做同步化，它可以提供高精准度的时间校正（LAN上与标准间差小于1毫秒，WAN上几十毫秒），且可介由加密确认的方式来防止恶毒的[协议](https://baike.baidu.com/item/协议/670528?fromModule=lemma_inlink)攻击。NTP的目的是在无序的Internet环境中提供精确和健壮的时间服务
+
+# Data Race是什么？
+
+Data Race是指多个线程在没有正确加锁的情况下，同时访问同一块数据，并且至少有一个线程是写操作，对数据的读取和修改产生了竞争，从而导致各种不可预计的问题。
+
+
+
+# RFO什么意思？
+
+RFO(Read for Ownership)广播报文

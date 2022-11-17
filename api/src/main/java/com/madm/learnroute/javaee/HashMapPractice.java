@@ -40,7 +40,7 @@ public class HashMapPractice {
 
         //不存在添加 存在重新计算remappingFunction
         //创建一个 HashMap
-        HashMap<String, Integer> prices = new HashMap<>();
+        HashMap<String, Integer> prices = new HashMap<>(2);
 
         // 往HashMap中添加映射项
         prices.put("Shoes", 200);
@@ -109,12 +109,9 @@ public class HashMapPractice {
     }
 
     private static void threadSafeQuestion() {
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < 1000; i++) {
-                    new Thread(() -> map.put(UUID.randomUUID().toString(), ""), "ftf" + i).start();
-                }
+        Thread t = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                new Thread(() -> map.put(UUID.randomUUID().toString(), ""), "ftf" + i).start();
             }
         }, "ftf");
         try {
