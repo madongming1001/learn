@@ -14,10 +14,12 @@ public class ConcurrentHashMapPractice {
         ConcurrentHashMap<String, Boolean> conMap = new ConcurrentHashMap<>(2);
 //        System.out.println(5 << 2 == 5 * 2);
 //        System.out.println(31 - Integer.numberOfLeadingZeros(29));
-        System.out.println(5<<2);
+        System.out.println(5 << 2);
         calculateArrayElementPosition();
         System.out.println(1 << (16 - 1));
         System.out.println(245275 << 16);
+        System.out.println(12 >>> 3);
+        System.out.println(64 < 64 == true);
         System.out.println(Integer.numberOfLeadingZeros(16) | (1 << (16 - 1)));
     }
 

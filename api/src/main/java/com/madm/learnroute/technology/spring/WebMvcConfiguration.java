@@ -1,8 +1,10 @@
 package com.madm.learnroute.technology.spring;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
@@ -14,18 +16,18 @@ import java.util.List;
 //implements WebMvcConfigurer
 
 //继承 WebMvcConfigurationSupport
-//extends WebMvcConfigurationSupport
-//@Configuration
+@Configuration
 public class WebMvcConfiguration extends WebMvcConfigurationSupport {
+
     @Override
-    protected void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AppkeyInterceptor()).addPathPatterns("/*").order(1);
-        registry.addInterceptor(new AuthInterceptor()).addPathPatterns("/*").order(2);
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new AppkeyInterceptor()).addPathPatterns("/**").order(1);
+        registry.addInterceptor(new AuthInterceptor()).addPathPatterns("/**").order(2);
         // 这里可以配置拦截器启用的 path 的顺序，在有多个拦截器存在时，任一拦截器返回 false 都会使后续的请求方法不再执行
     }
 
-    @Override
-    protected void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        argumentResolvers.add((HandlerMethodArgumentResolver) new AuthParamResolver());
-    }
+//    @Override
+//    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+    //argumentResolvers.add((HandlerMethodArgumentResolver) new AuthParamResolver());
+//    }
 }

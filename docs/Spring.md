@@ -788,7 +788,7 @@ if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NES
 }
 ```
 
-在这里往当前ConnectionHolder设置一个保存点，当方法出现异常的时候，内层事务走到异常捕获分支，**completeTransactionAfterThrowing()**,刚开始进入**intercept()**方法的时候设置了保存点，
+在这里往当前ConnectionHolder设置一个保存点，当方法出现异常的时候，内层事务走到异常捕获分支，**completeTransactionAfterThrowing()**
 
 ```java
 //有保存点回滚到保存点
@@ -801,6 +801,8 @@ if (status.hasSavepoint()) {
 ```
 
 这里回退保存点，并把**rollbackOnly = false;**再回到外层事务的时候，没有rollbackonly和异常被捕获所以外层事务正常commit；
+
+
 
 为什么**PROPAGATION_REQUIRES_NEW**内层可以使用新事务？
 
@@ -1874,6 +1876,34 @@ public BeanCurrentlyInCreationException(String beanName) {
 ```
 
 **参考文章：**https://blog.csdn.net/csdn_wyl2016/article/details/108146174
+
+**HandlerInterceptor是什么时候被调用的？**
+
+**WebMvcAutoConfiguration**类会注入一个**@ConditionalOnMissingBean(WebMvcConfigurationSupport.class)**类，里面创建了一个**RequestMappingHandlerMapping**,
+
+```java
+mapping.setInterceptors(getInterceptors(conversionService, resourceUrlProvider));
+```
+
+里面会注册所有的interceptor。
+
+调用的地方在DispatcherServlet
+
+```java
+// Determine handler for the current request.
+mappedHandler = getHandler(processedRequest);//1016
+if (!mappedHandler.applyPreHandle(processedRequest, response)) //1035
+mappedHandler.applyPostHandle(processedRequest, response, mv);//1047
+processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);//1057
+```
+
+其他的类似
+
+（1）**preHandle**: 在执行controller处理之前执行，返回值为boolean ,返回值为true时接着执行postHandle和afterCompletion，如果我们返回false则中断执行
+（2）**postHandle**:在执行controller的处理后，在ModelAndView处理前执行
+（3）**afterCompletion** ：在DispatchServlet执行完ModelAndView之后执行
+
+
 
 # Condition注解原理
 

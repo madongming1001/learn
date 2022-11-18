@@ -1,11 +1,13 @@
 package madm.data_structure;
 
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Stack;
 
-public class BinaryTree {
+public class BinaryTreeTraverse {
     private Node head;
 
     static class Node<T> {
@@ -22,18 +24,22 @@ public class BinaryTree {
 
     public static Node createBinaryTree(LinkedList<Integer> inputList) {
         Node node = null;
-        if (inputList == null || inputList.isEmpty()) {
+        if (CollectionUtils.isEmpty(inputList)) {
             return null;
         }
         Integer data = inputList.removeFirst();
         if (data != null) {
-            node = new Node<Integer>(data);
+            node = new Node(data);
             node.left = createBinaryTree(inputList);
             node.right = createBinaryTree(inputList);
         }
         return node;
     }
 
+    /**
+     * 前序遍历
+     * @param node
+     */
     public static void preOrderTraveral(Node node) {
         if (Objects.isNull(node)) {
             return;
@@ -43,6 +49,10 @@ public class BinaryTree {
         preOrderTraveral(node.right);
     }
 
+    /**
+     * 中序遍历
+     * @param node
+     */
     public static void inOrderTraveral(Node node) {
         if (Objects.isNull(node)) {
             return;
@@ -52,6 +62,10 @@ public class BinaryTree {
         preOrderTraveral(node.right);
     }
 
+    /**
+     * 后序遍历
+     * @param node
+     */
     public static void postOrderTraveral(Node node) {
         if (Objects.isNull(node)) {
             return;

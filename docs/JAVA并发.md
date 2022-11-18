@@ -576,7 +576,16 @@ HASH算法的基本要求
 
 ## HashMap1.8ConcurrentModificationException问题
 
-https://blog.csdn.net/weixin_30587025/article/details/96339354
+```java
+// new EntryIterator() extends HashIterator 构造方法就会设置 expectedModCount = modCount;
+Iterator<Map.Entry<String, Integer>> iterator = prices.entrySet().iterator();
+```
+
+
+
+
+
+**参考文章：**https://blog.csdn.net/weixin_30587025/article/details/96339354
 
 ## hashmap流程图
 

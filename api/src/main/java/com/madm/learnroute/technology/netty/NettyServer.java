@@ -49,7 +49,7 @@ public class NettyServer {
                     }
                 }
             });*/
-            //对通道关闭进行监听，closeFuture是异步操作，监听通道关闭
+            // 对通道关闭进行监听，closeFuture是异步操作，监听通道关闭
             // 通过sync方法同步等待通道关闭处理完毕，这里会阻塞等待通道关闭完成
             cf.channel().closeFuture().sync();
         } finally {

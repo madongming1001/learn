@@ -22,7 +22,7 @@ public class MyRegister implements SmartInitializingSingleton {
     public void afterSingletonsInstantiated() {
         String[] beanNames = beanFactory.getBeanNamesForType(TeacherStrategy.class);
         for (String beanName : beanNames) {
-            System.out.println(beanName);
+//            System.out.println(beanName);
         }
     }
 

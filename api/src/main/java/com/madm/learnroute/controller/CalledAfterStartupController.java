@@ -1,6 +1,7 @@
 package com.madm.learnroute.controller;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -17,11 +18,14 @@ public class CalledAfterStartupController {
     BookController bookController;
     BookStockController bookStockController;
 
+    ScheduleController scheduleController;
+
     @PostConstruct
     public void initializeCall() {
         accountController.save(null);
         bookController.save(null);
         bookStockController.save(null);
+        scheduleController.updateCron(StringUtils.EMPTY);
     }
 
 }
