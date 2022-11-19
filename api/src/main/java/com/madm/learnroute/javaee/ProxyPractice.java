@@ -150,6 +150,8 @@ public class ProxyPractice {
     @SneakyThrows
     private static void testReflectMethod() {
         Class<Cat> catClass = Cat.class;
+        Class<?> declaringClass = catClass.getDeclaringClass();
+        System.out.println(declaringClass);
         Method[] methods = catClass.getDeclaredMethods();
         for (Method method : methods) {
 //            Dog cat = new Dog(); cause：object is not an instance of declaring class

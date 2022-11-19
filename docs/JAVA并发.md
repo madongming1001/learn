@@ -1162,3 +1162,57 @@ SMP能够保证内存一致性，但这些共享的资源很可能成为性能�
 CountDownLatch 主要由外部线程来控制线程是否往下执行，而 CyclicBarrier 是由一组线程自身来控制。比如，我们有一个计算任务，必须等到前置的若干个计算完成后才能启动，这时候就可以用 CountDownLatch 来实现。又比如，我们要测试一个服务的瞬间响应能力，希望启动一批线程，当线程全部准备好后，同时执行调用该服务，就可以用 CyclicBarrier 来实现。
 
 **参考文章：**https://xie.infoq.cn/article/96d4f3c1f8308f3d2adaad798
+
+
+
+
+
+# 枚举
+
+**参考文章：**https://zhuanlan.zhihu.com/p/353868533
+
+**使用方式**
+
+1. 编码枚举 **字段值用枚举**
+2. 属性枚举 **根据不同业务做枚举映射**
+3. 业务枚举 **根据不同key返回不同的value**
+4. 枚举工厂 **根据key返回不同的bean进行调用**
+5. 枚举回掉 **枚举value存储断言工厂 返回boolean类似，value存储业务处理方法**
+
+**底层实现**
+
+枚举类通过静态代码块初始化，类首先继承Enum，静态代码块生成对应数量的静态常量字段的值，还生成了还生成了$VALUES字段，用于保存枚举类定义的枚举常量。所以表面上，只是加了一个enum关键字定义枚举，但是底层一旦确认是枚举类，则会由编译器对枚举类进行特殊处理，通过静态代码块初始化枚举，只要是枚举就一定会提供values()方法。
+
+```java
+Season extends java.lang.Enum<Season>
+Season SPRING = new Season1();
+Season SUMMER = new Season2();
+Season AUTUMN = new Season3();
+Season WINTER = new Season4();
+Season[] $VALUES = new Season[4];
+$VALUES[0] = SPRING;
+$VALUES[1] = SUMMER;
+$VALUES[2] = AUTUMN;
+$VALUES[3] = WINTER;
+```
+
+第三个，关于values()方法，这是一个静态方法，作用是返回该枚举类的数组，底层实现原理，其实是这样的。其实是将静态代码块初始化的$VALUES数组克隆一份，然后强转成Season[]返回。
+
+```java
+public static Season[] values(){
+ return (Season[])$VALUES.clone();
+}
+```
+
+# JDK8特性流
+
+**reduce**：对流中的数据按照你指定的计算方式计算出一个结果
+
+```java
+T result = identity；
+for(T element: this stream){
+	result = accumulate.apply(result,element);
+}
+return result;
+```
+

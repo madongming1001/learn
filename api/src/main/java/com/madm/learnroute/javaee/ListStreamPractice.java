@@ -31,6 +31,8 @@ public class ListStreamPractice {
         list1.add("Pear");
         list1.add("Carrot");
 
+
+
         if (list1.remove("pear")) {
             System.out.println("删除成功");
         }else{
@@ -48,8 +50,9 @@ public class ListStreamPractice {
         List<String> subList = userIds.subList(init, 2);
         init = 2;
         List<String> subList1 = userIds.subList(init, userIds.size());
-        long count = userIds.stream().filter(i -> Integer.parseInt(i) > 10).mapToInt(Integer::parseInt).count();
-        System.out.println(count);
+        userIds.stream().
+                filter(i -> Integer.parseInt(i) > 10).
+                mapToInt(Integer::parseInt).count();
 
         Random generate = new Random();
         int nextInt = generate.nextInt(500);
