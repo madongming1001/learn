@@ -241,7 +241,9 @@ EventLoop。相当于线程池中的线程
 
 ![https://note.youdao.com/yws/public/resource/b8970e44473486a48178193d68929008/xmlnote/B401EBCE53ED4A959BDD4CC702D70B6E/85302](https://note.youdao.com/yws/public/resource/b8970e44473486a48178193d68929008/xmlnote/B401EBCE53ED4A959BDD4CC702D70B6E/85302)
 
-ChannelPipeline负责将多个Channelhandler链接在一起
+ChannelPipeline负责将多个Channelhandler链接在一起，数据结构上是一个双向链表
+
+![image-20221119162810671](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221119162810671.png)
 
 ChannelHandler针对IO数据的处理器，数据接收后，通过指定的Handler进行处理。
 
@@ -249,11 +251,7 @@ ChannelHandlerContext用来保存ChannelHandler的上下文信息
 
 
 
-
-
-
-
-EventExecutor NioEventLoop
+**EventExecutor NioEventLoop**
 
 ```java
 DefaultEventExecutorChooserFactory.java
@@ -282,6 +280,44 @@ public static final int OP_ACCEPT = 1 << 4;
 ```
 
 
+
+## **解决粘包半包**
+
+1. LineBasedFrameDecoder 换行符
+2. DelimiterBasedFrameDecoder 自定义分隔符
+3. FixedLengthFrameDecoder 定长
+4. LengthFieldBasedFrameDecoder LengthFieldPrepender字段标注大小
+
+## 序列化
+
+**如何选择序列化框架**
+
+1. 是否需要跨语言支持
+2. 空间：编码后占用空间
+3. 时间：编解码速度
+4. 是否追求可读性
+
+**参考文章：**（**几种Java常用序列化框架的选型与对比**）https://developer.aliyun.com/article/783611?spm=5176.21213303.J_6704733920.7.34fe53c9BlcfJj&scm=20140722.S_community%40%40%E6%96%87%E7%AB%A0%40%40783611._.ID_community%40%40%E6%96%87%E7%AB%A0%40%40783611-RL_%E5%87%A0%E7%A7%8Djava%E5%B8%B8%E7%94%A8%E5%BA%8F%E5%88%97%E5%8C%96%E6%A1%86%E6%9E%B6%E7%9A%84%E9%80%89%E5%9E%8B%E4%B8%8E%E5%AF%B9%E6%AF%94-LOC_main-OR_ser-V_2-P0_0
+
+## SSL和TLS
+
+SSL 是指安全套接字层，简而言之，它是一项标准技术，可确保互联网连接安全，保护两个系统之间发送的任何敏感数据，防止网络犯罪分子读取和修改任何传输信息，包括个人资料。两个系统可能是指服务器和客户端（例如，浏览器和购物网站），或两个服务器之间（例如，含个人身份信息或工资单信息的应用程序）。
+
+此举可确保在用户和站点之间，或两个系统之间传输的数据无法被读取。它使用加密算法打乱传输中的数据，防止数据通过连接传输时被黑客读取。这里所说的数据是指任何敏感或个人信息，例如信用卡号和其他财务信息、个人姓名和住址等。
+
+TLS（传输层安全）是更为安全的升级版 SSL。由于 SSL 这一术语更为常用，因此我们仍然将我们的安全证书称作 SSL。但当您从DigiCert[购买 SSL](https://www.websecurity.digicert.com/zh/cn/ssl-certificate?inid=infoctr_buylink_sslhome) 时，您真正购买的是最新的 TLS 证书，有[ ECC、RSA 或 DSA 三种加密方式](https://www.websecurity.digicert.com/zh/cn/security-topics/how-ssl-works)可以选择。
+
+```java
+//添加编码解码handler
+HttpClientCodec
+HttpServerCodec
+
+HttpResponseEncoder
+HttpRequestDecoder
+
+SSLContext
+SSLEngine
+```
 
 ## 零拷贝
 

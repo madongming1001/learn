@@ -1,18 +1,20 @@
 package com.madm.learnroute.javaee;
 
-import org.openjdk.jol.info.ClassLayout;
-
-
-
-class MyCustomClassLoader {
-    private Long initStatus;
-}
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ThreadLocalRandomPractice {
 
-    static Object obj = new Object();
-
     public static void main(String[] args) {
-        System.out.println(ClassLayout.parseInstance(obj).toPrintable());
+        //多线程的情况下会导致大量线程重试
+        Random random = new Random();
+        for (int i = 0; i < 5; i++) {
+            System.out.println(random.nextInt(10));
+        }
+
+        ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
+        for (int i = 0; i < 5; i++) {
+            System.out.println(threadLocalRandom.nextInt(10));
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.madm.learnroute.controller;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.madm.learnroute.model.Book;
 import com.madm.learnroute.service.BookService;
 import com.mdm.model.RestResponse;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author dongming.ma
@@ -21,8 +24,8 @@ public class BookController {
     BookService bookService;
 
     @RequestMapping("/save")
-    public RestResponse save(@RequestBody @Nullable Book book) {
-        bookService.save(Book.create());
+    public RestResponse save(@RequestBody Book... book) {
+        bookService.save(ArrayUtil.isNotEmpty(book) ? book[0] : Book.create());
         return RestResponse.OK();
     }
 }

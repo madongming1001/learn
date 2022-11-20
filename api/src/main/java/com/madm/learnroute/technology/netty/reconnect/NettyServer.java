@@ -8,6 +8,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LineBasedFrameDecoder;
 
 public class NettyServer {
 
@@ -33,6 +34,11 @@ public class NettyServer {
                             //对workerGroup的SocketChannel设置处理器
                             ch.pipeline().addLast(new LifeCycleInBoundHandler());
                             ch.pipeline().addLast(new NettyServerHandler());
+                            ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
+//                            LineBasedFrameDecoder
+//                            DelimiterBasedFrameDecoder
+//                            FixedLengthFrameDecoder
+//                            LengthFieldBasedFrameDecoder
                         }
                     });
             System.out.println("netty server start。。");

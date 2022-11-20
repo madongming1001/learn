@@ -17,15 +17,14 @@ public class CalledAfterStartupController {
     AccountController accountController;
     BookController bookController;
     BookStockController bookStockController;
-
     ScheduleController scheduleController;
 
     @PostConstruct
     public void initializeCall() {
-        accountController.save(null);
-        bookController.save(null);
-        bookStockController.save(null);
-        scheduleController.updateCron(StringUtils.EMPTY);
+        accountController.save();
+        bookController.save();
+        bookStockController.save();
+        scheduleController.updateCron();
     }
 
 }
