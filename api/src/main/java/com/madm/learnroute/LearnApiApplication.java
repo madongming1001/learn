@@ -19,7 +19,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableFeignClients
 @EnableJSONDoc
 @EnableScheduling
-@EnableBinding(MySource.class)
+//@EnableBinding(MySource.class)
 public class LearnApiApplication {
 
     public static void main(String[] args) {

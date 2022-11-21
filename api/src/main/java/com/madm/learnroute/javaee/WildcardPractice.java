@@ -23,7 +23,7 @@ import java.util.Map;
  * @author dongming.ma
  * @date 2022/7/4 23:56
  */
-public class NormativePractice {
+public class WildcardPractice {
     public static void main(String[] args) {
         //编译器会认为装苹果的盘子 not is a 装水果的盘子
         //所以，就算容器里装的东西之间有继承关系，但容器之间是没有继承关系的。所以我们不可以把Plate的引用传递给Plate。

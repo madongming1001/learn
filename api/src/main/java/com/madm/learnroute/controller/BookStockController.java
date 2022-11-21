@@ -24,7 +24,7 @@ public class BookStockController {
     BookStockService bookStockService;
 
     @RequestMapping("/save")
-    public RestResponse save(@RequestBody BookStock... bookStock) {
+    public RestResponse save(@RequestBody @Nullable BookStock... bookStock) {
         bookStockService.save(ArrayUtil.isNotEmpty(bookStock) ? bookStock[0] : BookStock.create());
         return RestResponse.OK();
     }

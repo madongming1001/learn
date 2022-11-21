@@ -24,7 +24,7 @@ public class BookController {
     BookService bookService;
 
     @RequestMapping("/save")
-    public RestResponse save(@RequestBody Book... book) {
+    public RestResponse save(@RequestBody @Nullable Book... book) {
         bookService.save(ArrayUtil.isNotEmpty(book) ? book[0] : Book.create());
         return RestResponse.OK();
     }

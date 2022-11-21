@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Nullable;
+
 /**
  * @author dongming.ma
  * @date 2022/11/12 13:49
@@ -32,14 +34,14 @@ public class ScheduleController /*extends TransactionAspectSupport */ {
 
     @GetMapping("/updateCron")
     @Transactional
-    public RestResponse updateCron(String... cron) {
+    public RestResponse updateCron(@Nullable String... cron) {
         log.info("new cron :{}", cron);
 //        jdbcTemplate.update("update account set username = left(username,9) where id = " + 1);
 //        System.out.println(currentTransactionInfo().getTransactionStatus());
         redisTemplate.opsForValue().setIfAbsent("count", 1);
         // null when used in pipeline / transaction.
         redisTemplate.opsForValue().increment("count");
-        if (ArrayUtil.isEmpty(cron)) {
+        if (ArrayUtil.isNotEmpty(cron)) {
             scheduleTask.setCron(cron[0]);
         }
         return RestResponse.OK();

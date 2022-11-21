@@ -42,8 +42,8 @@ public class PracticeController {
     @Autowired
     CircularServiceA circularServiceA;
 
-    @Autowired
-    MySource mySource;
+//    @Autowired
+//    MySource mySource;
 
     private ThreadLocal<MessageUserLogin.MessageUserLoginResponse.Builder> localCache = new ThreadLocal();
 
@@ -113,53 +113,52 @@ public class PracticeController {
         return Response.success(faultToleranceTime);
     }
 
-    @GetMapping("/send")
-    public boolean send() {
-        // <2>创建 Message
-        User message = new User(1);
-        // <3>创建 Spring Message 对象
-        Message<User> springMessage = MessageBuilder.withPayload(message).build();
-        // <4>发送消息
-        return mySource.erbadagangOutput().send(springMessage);
-    }
-
-    @GetMapping("/sendTrek")
-    public boolean sendTrek() {
-        // <2>创建 Message
-        User message = new User(2);
-        // <3>创建 Spring Message 对象
-        Message<User> springMessage = MessageBuilder.withPayload(message).build();
-        // <4>发送消息
-        return mySource.trekOutput().send(springMessage);
-    }
-
-    @GetMapping("/send_delay")
-    public boolean sendDelay() {
-        // 创建 Message
-        User message = new User(3);
-        // 创建 Spring Message 对象
-        Message<User> springMessage = MessageBuilder.withPayload(message).setHeader(MessageConst.PROPERTY_DELAY_TIME_LEVEL, "3") // 设置延迟级别为 3，10 秒后消费。
-                .build();
-        // 发送消息
-        boolean sendResult = mySource.erbadagangOutput().send(springMessage);
-        log.info("[sendDelay][发送消息完成, 结果 = {}]", sendResult);
-        return sendResult;
-    }
-
-    @GetMapping("/send_tag")
-    public boolean sendTag() {
-        for (String tag : new String[]{"trek", "specialized", "look"}) {
-            // 创建 Message
-            User message = new User(4);
-            // 创建 Spring Message 对象
-            Message<User> springMessage = MessageBuilder.withPayload(message).setHeader(MessageConst.PROPERTY_TAGS, tag) // 设置 Tag
-                    .build();
-            // 发送消息
-            mySource.erbadagangOutput().send(springMessage);
-        }
-        return true;
-    }
-
+//    @GetMapping("/send")
+//    public boolean send() {
+//        // <2>创建 Message
+//        User message = new User(1);
+//        // <3>创建 Spring Message 对象
+//        Message<User> springMessage = MessageBuilder.withPayload(message).build();
+//        // <4>发送消息
+//        return mySource.erbadagangOutput().send(springMessage);
+//    }
+//
+//    @GetMapping("/sendTrek")
+//    public boolean sendTrek() {
+//        // <2>创建 Message
+//        User message = new User(2);
+//        // <3>创建 Spring Message 对象
+//        Message<User> springMessage = MessageBuilder.withPayload(message).build();
+//        // <4>发送消息
+//        return mySource.trekOutput().send(springMessage);
+//    }
+//
+//    @GetMapping("/send_delay")
+//    public boolean sendDelay() {
+//        // 创建 Message
+//        User message = new User(3);
+//        // 创建 Spring Message 对象
+//        Message<User> springMessage = MessageBuilder.withPayload(message).setHeader(MessageConst.PROPERTY_DELAY_TIME_LEVEL, "3") // 设置延迟级别为 3，10 秒后消费。
+//                .build();
+//        // 发送消息
+//        boolean sendResult = mySource.erbadagangOutput().send(springMessage);
+//        log.info("[sendDelay][发送消息完成, 结果 = {}]", sendResult);
+//        return sendResult;
+//    }
+//
+//    @GetMapping("/send_tag")
+//    public boolean sendTag() {
+//        for (String tag : new String[]{"trek", "specialized", "look"}) {
+//            // 创建 Message
+//            User message = new User(4);
+//            // 创建 Spring Message 对象
+//            Message<User> springMessage = MessageBuilder.withPayload(message).setHeader(MessageConst.PROPERTY_TAGS, tag) // 设置 Tag
+//                    .build();
+//            // 发送消息
+//            mySource.erbadagangOutput().send(springMessage);
+//        }
+//        return true;
+//    }
 }
 
 

@@ -17,7 +17,7 @@ import java.util.UUID;
  * @author dongming.ma
  * @date 2022/11/14 21:25
  */
-@RestController
+//@RestController
 public class TransactionalController {
 
     @Autowired

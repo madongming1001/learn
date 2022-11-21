@@ -5,6 +5,7 @@ import com.madm.learnroute.model.Account;
 import com.madm.learnroute.service.AccountService;
 import com.mdm.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,8 +25,8 @@ public class AccountController {
     @Autowired
     AccountService accountService;
 
-    @RequestMapping("/save")
-    public RestResponse save(@RequestBody Account... account) {
+    @GetMapping("/save")
+    public RestResponse save(@RequestBody @Nullable Account... account) {
         accountService.save(ArrayUtil.isNotEmpty(account) ? account[0] : Account.create());
         return RestResponse.OK();
     }
