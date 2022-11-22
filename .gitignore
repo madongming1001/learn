@@ -45,3 +45,4 @@ bootstrap.yml
 */com
 
 */rebel.xml
+/api/src/main/resources/rebel.xml
