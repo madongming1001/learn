@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
         return RestResponse.code(500).withMsg(ExceptionUtil.getCauseMsg(ex)).build();
     }
 
-    @InitBinder
+//    @InitBinder
     protected void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(LocalDate.class, new PropertyEditorSupport() {
             @Override

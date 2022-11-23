@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
  * @Author MaDongMing
  * @Date 2022/3/30 7:02 PM
  */
-@Configuration
+//@Configuration
 public class FilterConfiguration {
     @Bean
     public FilterRegistrationBean someFilterRegistration() {

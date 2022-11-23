@@ -1,22 +1,25 @@
 package com.mdm.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
 
 /**
  * @author dongming.ma
  * @date 2022/5/28 18:23
  */
+@Accessors(chain = true)
 @Data
-public class RestResponse<T> implements Serializable {
-
-    private static final long serialVersionUID = 6095433538316185017L;
-
+public class RestResponse<T>{
     private int code;
 
     private String message;
 
+    @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private T body;
 
     public RestResponse() {

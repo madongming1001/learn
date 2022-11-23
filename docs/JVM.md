@@ -1004,6 +1004,12 @@ jinfo（Configuration Info for Java）的作用是实时查看和调整虚拟机
 
 jmap（Memory Map for java）命令用于生成堆转出快照。也可以在内存溢出异常出现之后自动生成堆转储快照文件，通过-XX:+HeapDumpOnOutOfMemoryError参数
 
+**用法**
+
+jmap -dump:format=b,file=dumpFileName <pid>
+
+**Mat工具可以用来分析dump文件，也可以使用JDK自带的Jvisualvm来进行分析。**
+
 ## Jhat
 
 jhat（JVM Heap Analysis Tool）命令与jmap命令搭配使用，来分析jmap生成的堆转储快照。

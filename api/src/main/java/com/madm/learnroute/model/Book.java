@@ -17,7 +17,7 @@ import java.math.BigDecimal;
  */
 @Data
 @Builder
-@Accessors(fluent = true)
+@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Book {
@@ -27,6 +27,6 @@ public class Book {
     private BigDecimal price;
 
     public static Book create() {
-        return new Book().price(BigDecimal.valueOf((int) Math.random() * 88 + 1));
+        return new Book().setPrice(BigDecimal.valueOf((int) Math.random() * 88 + 1));
     }
 }

@@ -24,6 +24,6 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     @Override
     public int saveForJdbc(Account account) {
         //使用的还是DataSourceUtils.getConnection(obtainDataSource());
-        return jdbcTemplate.update("update account set " + account.userName() + " = left(" + account.userName() + ",9) where id = " + account.id());
+        return jdbcTemplate.update("update account set " + account.getUserName() + " = left(" + account.getUserName() + ",9) where id = " + account.getId());
     }
 }

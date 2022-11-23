@@ -19,5 +19,7 @@ public class InheritableThreadLocalPractice {
         inheritableThread.start();
         inheritableThread.join();
         System.out.println("主线程：" + threadLocal.get());
+        threadLocal.remove();
+        inheritableThreadLocal.remove();
     }
 }

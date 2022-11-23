@@ -3,16 +3,11 @@ package com.madm.learnroute.controller;
 import cn.hutool.core.util.ArrayUtil;
 import com.madm.learnroute.model.Account;
 import com.madm.learnroute.service.AccountService;
-import com.mdm.model.*;
+import com.mdm.model.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * @author dongming.ma
@@ -29,5 +24,10 @@ public class AccountController {
     public RestResponse save(@RequestBody @Nullable Account... account) {
         accountService.save(ArrayUtil.isNotEmpty(account) ? account[0] : Account.create());
         return RestResponse.OK();
+    }
+
+    @GetMapping("/findAccountById")
+    public RestResponse findAccountById(@RequestParam Integer id) {
+        return RestResponse.OK().setBody(accountService.getById(id));
     }
 }

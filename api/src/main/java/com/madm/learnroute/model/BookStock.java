@@ -16,7 +16,7 @@ import org.apache.commons.lang3.RandomUtils;
  */
 @Data
 @Builder
-@Accessors(fluent = true)
+@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookStock {
@@ -26,6 +26,6 @@ public class BookStock {
     private Long stock;
 
     public static BookStock create() {
-        return new BookStock().stock(RandomUtils.nextLong(0, 1000000000));
+        return new BookStock().setStock(RandomUtils.nextLong(0, 1000000000));
     }
 }

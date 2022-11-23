@@ -45,11 +45,9 @@ struct __attribute__ ((__packed__)) sdshdr64 {
 
 
 
+# Redis数据结构
 
-
-# Redis的五种数据结构
-
-# ![image-20220704183224690](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220704183224690.png)
+# ![img](https://pdai.tech/_images/db/redis/db-redis-object-2-2.png)
 
 **遵循空字符结尾这一惯例的好处是，SDS可以直接重用一部分C字符串函数库里面的函数。**
 
@@ -180,7 +178,19 @@ int zslRandomLevel(void) {
 
 ## 脑裂问题
 
-**主库的数据还没有同步到从库，结果主库发生了故障，等从库升级为主库后，未同步的数据就丢失了。**
+由于某些原因比如数据采集占用cpu利用率特别高（偶发现象），导致 Redis 主库无法响应心跳了，sentinal超过一定时间内没有收到redis实例的响应会认为主观下线，当询问同sentinal超过预设预设数量（quorum 配置项）的哨兵就会认为主库客观下线，主从切换开始，这是主库恢复过来继续接受客户端请求，此时主从切换完成，让原主库同步进行全量同步，这是原主库主从切换期间的数据就丢失了。**主从切换中由于原主库还能够接收到数据叫做脑裂。**
+
+**解决方法**
+
+- min-slaves-to-write：这个配置项设置了主库能进行数据同步的最少从库数量；
+- min-slaves-max-lag：这个配置项设置了主从库间进行数据复制时，**从库给主库发送 ACK 消息的最大延迟**（以秒为单位）。
+
+**这两个配置项组合后的要求是，主库连接的从库中至少有 N 个从库，和主库进行数据复制时的 ACK 消息延迟不能超过 T 秒，否则，主库就不会再接收客户端的请求了。**
+
+**脑裂发生的原因主要是原主库发生了假故障，我们来总结下假故障的两个原因。**
+
+1. 和主库部署在同一台服务器上的其他程序临时占用了大量资源（例如 CPU 资源），导致主库资源使用受限，短时间内无法响应心跳。其它程序不再使用资源时，主库又恢复正常。
+2. 主库自身遇到了阻塞的情况，例如，处理 bigkey 或是发生内存 swap（你可以复习下【第 19 讲】中总结的导致实例阻塞的原因），短时间内无法响应心跳，等主库阻塞解除后，又恢复正常的请求处理了。
 
 **参考文章：**https://www.jianshu.com/p/8d045424042f
 
@@ -366,7 +376,7 @@ typedef struct intset {
 | entry   | 列表节点 | 不定  | 压缩列表包含的各个节点，节点的长度由节点保存的内容决定。     |
 | zlend   | uint8_t  | 1字节 | 特殊值0XFF（十进制255），用于标记压缩力表的末端。            |
 
-每个压缩列表节点由previous_entry_length、encoding、content
+每个压缩列表节点由**previous_entry_length**、**encoding**、**content**
 
 previous_entry_length记录的是压缩列表中前一个节点的长度，小于254字节用1字节长度保存，添加节点和删除节点可能引起连锁更新（多个节点长度都是介于250危险空间大小，突然头插入了一个需要5字节保存的数值，导致后边的所有前指针都需要改变）
 
@@ -499,8 +509,6 @@ typedef struct quicklistNode {
 quicklist 实际上是 zipList 和 linkedList 的混合体，它将 linkedList 按段切分，每一段使用 zipList 来紧凑存储，多个 zipList 之间使用双向指针串接起来。
 
 ![img](https://hunter-image.oss-cn-beijing.aliyuncs.com/redis/quicklist/QuickList.png)
-
-
 
 ### 编码转换
 
@@ -705,7 +713,7 @@ sentinel配置文件中的down-after-milliseconds选项指定了sentinel判断�
 
 ### 检测客观下线
 
-当sentinel将一个主服务器判断为主观下线之后，为了确认这个主服务器是否真的下线了，他会想同样监视这 一主服务器的其他sentinel进行询问，看他们是否也认为主服务器已经经入了下线状态（可以是主观下线或者客观下线）。当sentinel从其他sentinel哪里接收到足够数量的已下线判断之后，sentienl就会将从服务器判定为客观下线，并对主服务器执行故障转移操作。
+当sentinel将一个主服务器判断为主观下线之后，为了确认这个主服务器是否真的下线了，他会像同样监视这 一主服务器的其他sentinel进行询问，看他们是否也认为主服务器已经经入了下线状态（可以是主观下线或者客观下线）。当sentinel从其他sentinel哪里接收到足够数量的已下线判断之后，sentienl就会将从服务器判定为客观下线，并对主服务器执行故障转移操作。
 
 
 
@@ -1310,7 +1318,7 @@ Redis的SORT命令可以对列表键（List）、集合键（Set）、或者有�
 | T4       |                                 | 查询缓存，缓存缺失，查询数据库得到当前值99 |                                       |                                         |
 | T5       |                                 | 将99写入缓存                               |                                       |                                         |
 
-可以看到，大体上，采取先更新数据库再删除缓存的策略是没有问题的，仅在更新数据库成功到缓存删除之间的时间差内，可能会被别的线程读取到老值。
+可以看到，**大体上，采取先更新数据库再删除缓存的策略是没有问题的**，仅在更新数据库成功到缓存删除之间的时间差内，可能会被别的线程读取到老值。
 
 而在开篇的时候我们说过，缓存不一致性的问题无法在客观上完全消灭，因为我们无法保证数据库和缓存的操作是一个事务里的，而我们能做到的只是尽量缩短不一致的时间窗口。
 
@@ -1368,8 +1376,8 @@ Biggest string found '"ballcat:oauth:refresh_auth:f6cdb384-9a9d-4f2f-af01-dc3f28
 
 网上有现成的代码/工具可以直接拿来使用：
 
-- [redis-rdb-toolsopen in new window](https://github.com/sripathikrishnan/redis-rdb-tools) ：Python 语言写的用来分析 Redis 的 RDB 快照文件用的工具
-- [rdb_bigkeysopen in new window](https://github.com/weiyanwei412/rdb_bigkeys) : Go 语言写的用来分析 Redis 的 RDB 快照文件用的工具，性能更好。
+- [redis-rdb-tools](https://github.com/sripathikrishnan/redis-rdb-tools) ：Python 语言写的用来分析 Redis 的 RDB 快照文件用的工具
+- [rdb_bigkeys](https://github.com/weiyanwei412/rdb_bigkeys) : Go 语言写的用来分析 Redis 的 RDB 快照文件用的工具，性能更好。
 
 ### 大量 key 集中过期问题
 

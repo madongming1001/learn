@@ -10,8 +10,8 @@ public class Topic_21 {
         ListNode head = head1.val < head2.val ? head1 : head2;
         ListNode cur1 = head == head1 ? head1 : head2;
         ListNode cur2 = head == head1 ? head2 : head1;
-        ListNode pre = null;
-        ListNode next = null;
+        //pre是为了保存剩下没有遍历到的节点然后赋值给以排序好的节点
+        ListNode pre = null, next;
 
         while (cur1 != null && cur2 != null) {
             if (cur1.val <= cur2.val) {

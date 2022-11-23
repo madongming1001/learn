@@ -275,7 +275,7 @@ Double Write 分为了两个组成部分：
 
 ![image-20220208203449226](noteImg/image-20220208203449226.png)
 
-所以在对某个处在 old 区域的缓存页进行第一次访问时就在它对应的控制块中记录下来这个访问时间，如果后续的访问时间与第一次访问的时间在某个时间间隔内，那么该页面就不会被从 old 区域移动到 young 区域的头部，否则将它移动到 young 区域的头部。上述的这个间隔时间是由系统变量innodb_old_blocks_time 控制的：
+所以在对某个处在 old 区域的缓存页进行第一次访问时就在它对应的控制块中记录下来这个访问时间，**如果后续的访问时间与第一次访问的时间在某个时间间隔内，那么该页面就不会被从 old 区域移动到 young 区域的头部**，否则将它移动到 young 区域的头部。上述的这个间隔时间是由系统变量innodb_old_blocks_time 控制的：
 
 ![image-20220208203815265](noteImg/image-20220208203815265.png)
 
@@ -1289,6 +1289,66 @@ InnoDB存储引擎默认的事务隔离级别是Repeatable Read，在该隔离�
 
 2、重做日志文件（redo log file）
 
+**重做日志格式**
+
+|               |       |         |               |
+| ------------- | ----- | ------- | ------------- |
+| redo_log_type | space | page_no | redo log body |
+
+**LSN**
+
+LSN是Log Sequence Number的缩写，在InnoDB存储引擎中，表示**事务写入重做日志的字节的总量。**
+
+在每个页的头部，有一个值FIL_PAGE_LSN，记录了该页的LSN。在页中，**LSN表示该页最后刷新时LSN的大小。**
+
+用户可以通过命令 **SHOW ENGINE INNODB STATUS** 查看LSN的情况。
+
+```sql
+Log sequence number          1083803833
+Log buffer assigned up to    1083803833
+Log buffer completed up to   1083803833
+Log written up to            1083803833
+Log flushed up to            1083803833
+Added dirty pages up to      1083803833
+Pages flushed up to          1083803833
+Last checkpoint at           1083803833
+```
+
+**Log sequence number**就是当前的redo log(in buffer)中的lsn；
+**Log flushed up to**是刷到redo log file on disk中的lsn；
+**Pages flushed up to**是数据页上已经刷到磁盘的LSN
+**Last checkpoint at**是上一次检查点所在位置的LSN。上一次刷新脏页到磁盘的字节量。
+
+**checkpoint**    表示最后一次检查点的log位置。它的值表示系统启动时从哪个点去恢复，redo log做崩溃恢复时指定的起点。去做崩溃恢复时，终点是最新的一条logfile，起点就是checkpoint，记录的最早脏的点。
+
+**checkpoint的工作机制**
+
+checkpoint有两种方式，**sharp checkpoint**和**fuzzy checkpoint**。
+
+1. **sharp checkpoint：**完全检查点，数据库正常关闭时，会触发把所有的脏页都写入到磁盘上，这就是完全检查点，数据库正常运行过程中不会使用sharp checkpoint。
+
+2. **fuzzy checkpoint：**模糊检查点，主要有以下四种情况：
+
+- master thread checkpoint：以每秒或者每十秒的速度从缓冲池的脏页列表中刷新一定比例的脏页回磁盘，这个过程是异步的，不会阻塞用户线程。
+- flush_lru_list checkpoint：通过参数 innodb_lru_scan_depth 控制LRU列表中可用页的数量，发生了这个checkpoint时，说明脏页写入速度过慢。
+- async/sync flush checkpoint：指的是重做日志不可用的情况。当重做日志不可用时， 如果不能被覆盖的脏页数量（2-3）达到 75%时，触发异步checkpoint。 不能被覆盖的脏页数量（2-3）达到90%时，同步并且阻塞用户线程，然后根据 flush 列表最早脏的顺序刷脏页。 当这个事件中的任何一个发生的时候，都会记录到errlog 中，一旦errlog出现这种日志提示，一定需要加大logfile的组数。
+- dirty page too much checkpoint：脏页太多时，也会发生强制写日志，会阻塞用户线程，由innodb_max_dirty_pages_pct参数（默认75%）控制。 
+
+虽然log block总是在redo log file的最后部分进行写入，有的读者可能以为对redo log file的写入都是顺序的。其实不然，因为redo log file除了保存log buffer刷新到磁盘的log block，还保存了一些其他信息，这些信息一共占用2kb大小，**即每个redo log file的前2kb的部分不保存log block的信息**。对于log group 中的第一个redo log file其前2kb的部分保存4个512字节大小的块，其中存放的内容如表所示。
+
+| 名称            | 大小（字节） |
+| --------------- | ------------ |
+| log file header | 512          |
+| Checkpoin1      | 512          |
+| 空              | 512          |
+| Checkpoint2     | 512          |
+
+需要特别注意的是，上述信息仅在每个log group的第一个redo log file 中进行存储。log group中的其余redo log file仅保留这些空间，但不保存上述信息。正因为保存了这些信息，就意味着对redo log file的写入并不是完全顺序的。因为其除了log block的写入操作，还需要更新前2kb部分的信息，这些信息对于InnoDB存储引擎的回复操作来说非常关键和重要。
+
+例如，页P1的LSN为10000，而数据库启动时，InnoDB检测到写入重做日志中的LSN为13000，并且该事务已经提交，那么数据库需要进行恢复操作，将重做日志应用到P1页中，同样的，对于重做日志中LSN小于P1页的LSN，不需要进行重做，因为P1页中的LSn表示页已经被刷新到该位置。
+
+
+
 **控制重做日志刷新到磁盘的策略**
 
 ```sql
@@ -1373,6 +1433,28 @@ mysql主从
 
 
 # 面试题
+
+## Count(1)和Count(星)和Count(列名)哪个快？
+
+count(星)计算所有数据中包含null值的行数
+
+count(1)计算所有数据中包含null值的行数
+
+count(列名)计算指定列中不包含null值的行数
+
+**inoodb下count(星)和count(1)一样快，快于count(列名)**
+
+innodb通过遍历最小可用的二级索引来处理语句，如果二级索引不存在，则会扫描聚集索引。
+
+**myisam下count(*)快于或者等于count(1)，快于count(列名)**
+
+myisam的存储了表的总行数，使用count(*)不走统计，直接读取，所以最快，那么当使用count(1)时，假如第一列为not null，myisam也会直接读取总行数进行优化。
+
+count(列名)因为只统计不为null的，所以要遍历整个表，性能下降。
+
+## MySQL 上亿大表，如何深度优化？
+
+**参考文章：**https://mp.weixin.qq.com/s/TZSyhI1WwrtBX1W86duxuQ
 
 ## 线上怎么修改列的数据类型的？
 
@@ -1544,6 +1626,49 @@ END;
 select mock_data();
 ```
 
+## 查看磁盘使用量，表大小
+
+```sql
+SELECT
+table_name,
+CONCAT(FORMAT(SUM(data_length) / 1024 / 1024,2),'M') AS dbdata_size,
+CONCAT(FORMAT(SUM(index_length) / 1024 / 1024,2),'M') AS dbindex_size,
+CONCAT(FORMAT(SUM(data_length + index_length) / 1024 / 1024 / 1024,2),'G') AS table_size,
+AVG_ROW_LENGTH,table_rows,update_time
+FROM
+information_schema.tables
+WHERE table_schema = 'badguy' and table_name='t2';
+```
+
+## 压缩数据表.ibd
+
+**mydumper并行压缩备份**
+
+```sql
+user=root
+passwd=xxxx
+socket=/datas/mysql/data/3316/mysqld.sock
+db=cq_new_cimiss
+table_name=arrival_record
+backupdir=/datas/dump_$table_name
+mkdir -p $backupdir
+  nohup echo `date +%T` && mydumper -u $user -p $passwd -S $socket -B $db -c -T $table_name -o $backupdir -t 32 -r 2000000 && echo `date +%T` &
+```
+
+**并行压缩备份所花时间（52s）和占用空间（1.2G，实际该表占用磁盘空间为48G，mydumper并行压缩备份压缩比相当高！）**
+
+## **拷贝dump数据到测试节点**
+
+```sql
+scp -rp /datas/dump_arrival_record root@10.230.124.19:/datas
+```
+
+## **多线程导入数据**
+
+```sql
+time myloader -u root -S /datas/mysql/data/3308/mysqld.sock -P 3308 -p root -B test -d /datas/dump_arrival_record -t 32
+```
+
 
 
 # 数据库设计范式
@@ -1698,10 +1823,10 @@ Stored（存储）：这个类型的列会在表中插入一条数据时自动�
 段（segment）
  段(Segment)分为**索引段**，**数据段**，**回滚段**等。其中索引段就是非叶子结点部分，而数据段就是叶子结点部分，回滚段用于数据的回滚和多版本控制。一个段包含256个区(256M大小)。
 
- 一个段包含多少区：256个区
+ **一个段包含多少区：**256个区
 
 区（extent）
- 区是页的集合，一个区包含64个连续的页，默认大小为 1MB (64*16K)。
+区是页的集合，一个区包含**64个连续的页**，默认大小为 1MB (64*16K)。
 
 页（page）
  页是 InnoDB 管理的最小单位，常见的有 FSP_HDR，INODE, INDEX 等类型。所有页的结构都是一样的，分为文件头(前38字节)，页数据和文件尾(后8字节)。页数据根据页的类型不同而不一样。
@@ -1731,3 +1856,21 @@ service mysqld status
 垂直分割指的是：表的记录并不多，但是字段却很长，表占用空间很大，检索表的时候需要执行大量的IO，严重降低了性能。这时需要把大的字段拆分到另一个表，并且该表与原表是一对一的关系。
 
 **参考文章：**https://blog.csdn.net/u012240455/article/details/81952906
+
+
+
+# 如何分析mysql-slow.log
+
+**pt-query-digest** 属于 Percona Toolkit 工具集中最常用的一种，号称 MySQL DBA 必备工具之一，其能够分析MySQL数据库的 slow log 、 general log 、 binary log 文件，同时也可以使用 show processlist 或从tcpdump 抓取的 MySQL 协议数据来进行分析。
+
+默认慢查询log是开启的
+
+```java
+show variables like 'slow%';
+```
+
+```sql
+slow_launch_time,2
+slow_query_log,ON
+slow_query_log_file,/usr/local/mysql/mysql-slow.log
+```

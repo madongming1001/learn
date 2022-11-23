@@ -14,10 +14,10 @@ public class WhitelistFilter implements javax.servlet.Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        // 判断是否需要拦截
-        filterChain.doFilter(servletRequest, servletResponse); // 请求通过要显示调用
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+
     }
+
 
     @Override
     public void destroy() {
