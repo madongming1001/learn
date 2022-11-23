@@ -1,6 +1,5 @@
 package com.madm.learnroute.model;
 
-import cn.hutool.core.lang.Editor;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -13,6 +12,8 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.math.BigDecimal;
+
+import static com.madm.learnroute.enums.GenderEnum.getRandomGender;
 
 /**
  * @author dongming.ma
@@ -31,7 +32,7 @@ public class Account {
     private GenderEnum gender;
 
     public static Account create() {
-        return new Account().setBalance(BigDecimal.valueOf((int) Math.random() * 88 + 1)).setUserName(RandomUtils.nextInt(0, 1000000000) + StringPool.UNDERSCORE + "auto").setGender(GenderEnum.MALE);
+        return new Account().setBalance(BigDecimal.valueOf((int) Math.random() * 88 + 1)).setUserName(RandomUtils.nextInt(0, 1000000000) + StringPool.UNDERSCORE + "auto").setGender(getRandomGender());
     }
 
 }

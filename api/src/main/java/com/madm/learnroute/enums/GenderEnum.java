@@ -23,4 +23,8 @@ public enum GenderEnum {
     public String toString() {
         return this.desc;
     }
+    public static GenderEnum getRandomGender() {
+        return values()[(int) (Math.random() * 2)];
+    }
 }
+
