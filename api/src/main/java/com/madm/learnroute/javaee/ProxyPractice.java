@@ -136,10 +136,10 @@ public class ProxyPractice {
 
     public static void main(String[] args) throws Exception {
         //JDK代理生成 InvocationHandler
-//        jdkProxyGenerate();
+        jdkProxyGenerate();
 
         //CGLIB代理生成 MethodInterceptor
-//        cglibProxyGenerate();
+        cglibProxyGenerate();
 
         testReflectMethod();
     }

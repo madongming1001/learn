@@ -32,7 +32,9 @@ public class Account {
     private GenderEnum gender;
 
     public static Account create() {
-        return new Account().setBalance(BigDecimal.valueOf((int) Math.random() * 88 + 1)).setUserName(RandomUtils.nextInt(0, 1000000000) + StringPool.UNDERSCORE + "auto").setGender(getRandomGender());
+        return new Account().setBalance(BigDecimal.valueOf((int) Math.random() * 88 + 1)).
+                                setUserName(RandomUtils.nextInt(0, 1000000000) + StringPool.UNDERSCORE + "auto").
+                                setGender(getRandomGender());
     }
 
 }
