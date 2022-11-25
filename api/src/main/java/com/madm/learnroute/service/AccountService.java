@@ -10,4 +10,6 @@ import com.madm.learnroute.model.Account;
 public interface AccountService extends IService<Account> {
 
     int saveForJdbc(Account account);
+
+    Account findAccountById(int id);
 }

@@ -22,12 +22,13 @@ public class AccountController {
 
     @GetMapping("/save")
     public RestResponse save(@RequestBody @Nullable Account... account) {
-        accountService.save(ArrayUtil.isNotEmpty(account) ? account[0] : Account.create());
+        accountService.saveForJdbc(ArrayUtil.isNotEmpty(account) ? account[0] : Account.create());
+//        accountService.save(ArrayUtil.isNotEmpty(account) ? account[0] : Account.create());
         return RestResponse.OK();
     }
 
     @GetMapping("/findAccountById")
-    public RestResponse findAccountById(@RequestParam Integer id) {
-        return RestResponse.OK().setBody(accountService.getById(id));
+    public RestResponse findAccountById(@RequestParam int id) {
+        return RestResponse.OK().setBody(accountService.findAccountById(id));
     }
 }
