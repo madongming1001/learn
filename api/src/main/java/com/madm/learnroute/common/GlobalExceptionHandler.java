@@ -1,10 +1,10 @@
 package com.madm.learnroute.common;
 
+import cn.hutool.http.HttpStatus;
 import com.mdm.model.RestResponse;
 import com.mdm.utils.ExceptionUtil;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.beans.PropertyEditorSupport;
@@ -26,11 +26,16 @@ public class GlobalExceptionHandler {
      * @throws IllegalArgumentException IllegalArgumentException.
      */
     @ExceptionHandler(IllegalArgumentException.class)
-    public RestResponse<String> handleIllegalArgumentException(Exception ex) {
-        return RestResponse.code(500).withMsg(ExceptionUtil.getCauseMsg(ex)).build();
+    public RestResponse<String> handleIllegalArgumentException(Exception e) {
+        return RestResponse.code(HttpStatus.HTTP_INTERNAL_ERROR).withMsg(ExceptionUtil.getCauseMsg(e)).build();
     }
 
-//    @InitBinder
+    @ExceptionHandler(RuntimeException.class)
+    public RestResponse<String> handleRuntimeException(Exception e) {
+        return RestResponse.code(HttpStatus.HTTP_INTERNAL_ERROR).withMsg(ExceptionUtil.getCauseMsg(e)).build();
+    }
+
+    //    @InitBinder
     protected void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(LocalDate.class, new PropertyEditorSupport() {
             @Override

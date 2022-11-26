@@ -39,5 +39,8 @@ public class ObtainPlatformDefaultCharsetPractice {
         System.out.println("clp = " + clp);
 
         System.out.println(System.getProperty("user.dir"));
+
+        String property = System.getProperty("sun.misc.ProxyGenerator.saveGeneratedFiles");
+        System.out.println(property);
     }
 }

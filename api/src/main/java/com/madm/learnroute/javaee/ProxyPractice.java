@@ -98,7 +98,7 @@ public class ProxyPractice {
         //恰好这个对象也需要动态代理生成
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(Cat.class);
-        //o是代理子类实例，method是父类方法，args是方法如入参，proxy是代理子类方法，用于委托基类中的原方法。
+        //obj是代理子类实例，method是父类方法，args是方法如入参，proxy是代理子类方法，用于委托基类中的原方法。
         enhancer.setCallbacks(new Callback[]{(MethodInterceptor) (obj, method, args, proxy) -> {
             System.out.println("before");
             Object result = proxy.invokeSuper(obj, args);//不报错
@@ -115,8 +115,8 @@ public class ProxyPractice {
     }
 
     private static void jdkProxyGenerate() throws Exception {
-//        System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");//jdk 1.8
-        System.setProperty("jdk.proxy.ProxyGenerator.saveGeneratedFiles", "true");//jdk 1.8 after
+        System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");//jdk 1.8
+//        System.setProperty("jdk.proxy.ProxyGenerator.saveGeneratedFiles", "true");//jdk 1.8 after
         Cat cat = new Cat();
         Animal proxy = (Animal) TargetInvoker.getProxy(cat);
         proxy.call();
@@ -136,10 +136,10 @@ public class ProxyPractice {
 
     public static void main(String[] args) throws Exception {
         //JDK代理生成 InvocationHandler
-        jdkProxyGenerate();
+//        jdkProxyGenerate();
 
         //CGLIB代理生成 MethodInterceptor
-        cglibProxyGenerate();
+//        cglibProxyGenerate();
 
         testReflectMethod();
     }
@@ -151,6 +151,7 @@ public class ProxyPractice {
     private static void testReflectMethod() {
         Class<Cat> catClass = Cat.class;
         Class<?> declaringClass = catClass.getDeclaringClass();
+        Method[] methods1 = catClass.getMethods();
         System.out.println(declaringClass);
         Method[] methods = catClass.getDeclaredMethods();
         for (Method method : methods) {

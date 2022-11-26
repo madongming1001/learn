@@ -8,7 +8,6 @@ import com.mdm.pojo.Apple;
 import com.mdm.pojo.User;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.builder.ToStringExclude;
 import org.apache.curator.shaded.com.google.common.collect.Lists;
 
 import java.math.BigDecimal;
@@ -32,10 +31,9 @@ public class ListStreamPractice {
         list1.add("Carrot");
 
 
-
         if (list1.remove("pear")) {
             System.out.println("删除成功");
-        }else{
+        } else {
             list1.remove("Pear");
             System.out.println(list1);
         }
@@ -50,9 +48,7 @@ public class ListStreamPractice {
         List<String> subList = userIds.subList(init, 2);
         init = 2;
         List<String> subList1 = userIds.subList(init, userIds.size());
-        userIds.stream().
-                filter(i -> Integer.parseInt(i) > 10).
-                mapToInt(Integer::parseInt).count();
+        userIds.stream().filter(i -> Integer.parseInt(i) > 10).mapToInt(Integer::parseInt).count();
 
         Random generate = new Random();
         int nextInt = generate.nextInt(500);
@@ -84,9 +80,9 @@ public class ListStreamPractice {
         Apple apple4 = new Apple(4, "香蕉", new BigDecimal("1.35"), 20);
 
         //验证对过滤后的集合修改会影响原集合的内容
-        affectTheOriginalCollection(apple1,apple2,apple3,apple4);
+        affectTheOriginalCollection(apple1, apple2, apple3, apple4);
 
-        List<Invitee> invitees = Lists.newArrayList(new Invitee("1", "1", "1"), new Invitee("2", "2", "2"));
+        List<Invitee> invitees = Lists.newArrayList(new Invitee(1l, "1", "1"), new Invitee(2l, "2", "2"));
         List<String> newInstance = Lists.newArrayList("1", "2", "3", "4", "5", "6", "1");
         List<String> oldInstance = Lists.newArrayList("3", "232", "35", "24", "5", "6", "1");
 
@@ -99,8 +95,14 @@ public class ListStreamPractice {
 
         System.out.println(CollectionUtils.isNotEmpty(newInstance));
 
-        Map<String, Integer> collect4 = invitees.stream().collect(Collectors.toMap(key -> key.getUserId(), value -> 1, Integer::sum));
-        System.out.println(collect4);
+        Map<Long, Invitee> collect4 = invitees.stream().collect(Collectors.toMap(key -> key.getUserId(), Function.identity()));
+        Map<Long, List<Invitee>> collect5 = invitees.stream().collect(Collectors.groupingBy(Invitee::getUserId));
+        Map<Long, LongSummaryStatistics> collect6 = invitees.stream().collect(Collectors.groupingBy(Invitee::getUserId, Collectors.summarizingLong(Invitee::getUserId)));
+        Map<Long, List<String>> collect7 = invitees.stream().collect(Collectors.groupingBy(Invitee::getUserId, LinkedHashMap::new,Collectors.mapping(Invitee::getNickName, Collectors.toList())));
+        System.out.println("collect4 :" + collect4);
+        System.out.println("collect5 :" + collect5);
+        System.out.println("collect6 :" + collect6);
+        System.out.println("collect7 :" + collect7);
 
         if (!CollectionUtils.containsAny(null, 2)) {
             System.out.println("不包含");

@@ -8,8 +8,7 @@ import org.springframework.data.relational.core.sql.In;
 @Data
 @AllArgsConstructor
 public class Invitee implements Comparable<Invitee> {
-
-    private String userId;
+    private Long userId;
     public String nickName;
     public String avatarUrl;
 
