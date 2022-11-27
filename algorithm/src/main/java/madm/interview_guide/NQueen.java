@@ -24,8 +24,8 @@ public class NQueen {
 
     public List<List<String>> solveNQueens(int n) {
         char[][] chessboard = new char[n][n];
-        for (char[] c : chessboard) {
-            Arrays.fill(c, '.');
+        for (char[] sub : chessboard) {
+            Arrays.fill(sub, '.');
         }
         backTrack(n, 0, chessboard);
         return res;
