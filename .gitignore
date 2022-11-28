@@ -41,8 +41,8 @@ application-local.yml
 
 bootstrap.yml
 
-*/proxy
-*/com
 
 */rebel.xml
 /api/src/main/resources/rebel.xml
+/proxy/
+/com/
