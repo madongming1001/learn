@@ -44,7 +44,7 @@ Runnable firstTask;
 volatile long completedTasks;
 ```
 
-ThreadPoolExecutor实现的顶层接口是Executor，顶层接口Executor提供了一种思想：**将任务提交和任务执行进行解耦。**用户无需关注如何创建线程，如何调度线程来执行任务，用户只需提供Runnable对象，将任务的运行逻辑提交到执行器(Executor)中，由Executor框架完成线程的调配和任务的执行部分。**ExecutorService接口增加了一些能力：（1）扩充执行任务的能力，补充可以为一个或一批异步任务生成Future的方法；**（2）提供了管控线程池的方法，比如停止线程池的运行。**AbstractExecutorService则是上层的抽象类，将执行任务的流程串联了起来，保证下层的实现只需关注一个执行任务的方法即可。最下层的实现类ThreadPoolExecutor实现最复杂的运行部分，ThreadPoolExecutor将会一方面维护自身的生命周期，另一方面同时管理线程和任务，使两者良好的结合从而执行并行任务。**
+ThreadPoolExecutor实现的顶层接口是**Executor**，顶层接口Executor提供了一种思想：**将任务提交和任务执行进行解耦。**用户无需关注如何创建线程，如何调度线程来执行任务，用户只需提供Runnable对象，将任务的运行逻辑提交到执行器(Executor)中，由Executor框架完成线程的调配和任务的执行部分。**ExecutorService接口增加了一些能力：（1）扩充执行任务的能力，补充可以为一个或一批异步任务生成Future的方法；**（2）提供了管控线程池的方法，比如停止线程池的运行。**AbstractExecutorService则是上层的抽象类，将执行任务的流程串联了起来，保证下层的实现只需关注一个执行任务的方法即可。最下层的实现类ThreadPoolExecutor实现最复杂的运行部分，ThreadPoolExecutor将会一方面维护自身的生命周期，另一方面同时管理线程和任务，使两者良好的结合从而执行并行任务。**
 
 
 
@@ -55,8 +55,6 @@ ThreadPoolExecutor实现的顶层接口是Executor，顶层接口Executor提供�
 
 
 ## Worker线程管理
-
-Worker线程
 
 **线程池为了掌握线程的状态并维护线程的生命周期**，设计了线程池内的工作线程Worker。我们来看一下它的部分代码：
 
@@ -103,19 +101,17 @@ Worker这个工作线程，实现了Runnable接口，并持有一个线程thread
 
 ### java如何创建thread线程，jvm回掉run方法
 
-从C/C++方法中调用的一些Java方法主要有：
+**从C/C++方法中调用的一些Java方法主要有：**
 
 （1）Java主类中的main()方法；
 
 （2）Java主类装载时，调用JavaCalls::call()函数执行checkAndLoadMain()方法；
 
-（3）类的初始化过程中，调用JavaCalls::call()函数执行的Java类初始化方法<clinit>，可以查看JavaCalls::call_default_constructor()函数，有对<clinit>方法的调用逻辑；
+（3）类的**初始化过程**中，调用JavaCalls::call()函数执行的Java类初始化方法<clinit>，可以查看JavaCalls::call_default_constructor()函数，有对<clinit>方法的调用逻辑；
 
 （4）我们先省略main方法的执行流程（其实main方法的执行也是先启动一个JavaMain线程，套路都是一样的），单看某个JavaThread的启动过程。JavaThread的启动最终都要通过一个native方法java.lang.Thread#start0()完成的，这个方法经过解释器的native_entry入口，调用到了JVM_StartThread()函数。其中的static void thread_entry(JavaThread* thread, TRAPS)函数中会调用JavaCalls::call_virtual()函数。JavaThread最终会通过JavaCalls::call_virtual()函数来调用字节码中的run()方法；
 
 （5）在SystemDictionary::load_instance_class()这个能体现双亲委派的函数中，如果类加载器对象不为空，则会调用这个类加载器的loadClass()函数（通过call_virtual()函数来调用）来加载类。
-
-
 
 
 
