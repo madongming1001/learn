@@ -32,7 +32,7 @@ public class ThreadCreationPractice {
         }
         futureTaskList.stream().forEach(f -> {
             try {
-                System.out.println("线程号为：" + f.get());
+                System.out.println("线程号为：" + f.get() + " 当前线程为：" + Thread.currentThread().getName());
             } catch (Exception e) {
             }
         });
@@ -40,14 +40,17 @@ public class ThreadCreationPractice {
         thread.run();
     }
 
-    public class ExpensiveObject{};
+    public class ExpensiveObject {
+    }
+
+    ;
 
     @NotThreadSafe
-    public class LazyInitRaceO{
+    public class LazyInitRaceO {
         private ExpensiveObject instance = null;
 
         public ExpensiveObject getInstance() {
-            if(instance == null){
+            if (instance == null) {
                 instance = new ExpensiveObject();
             }
             return instance;
@@ -56,7 +59,7 @@ public class ThreadCreationPractice {
 }
 
 
-@SuppressWarnings(value = {"unused","Tash"})
+@SuppressWarnings(value = {"unused", "Tash"})
 class RunableTash implements Runnable {
 
     @Override

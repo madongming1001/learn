@@ -21,8 +21,11 @@ public class HashCodeAndEqualsPractice {
         int j = (i = 3) * i;
         System.out.println(j);
 
+        System.out.println("==============================================");
+
         User user1 = new User("通话");
         User user2 = new User("重地");
+        System.out.println(user1.hashCode());
         System.out.println(user1.hashCode() == user2.hashCode());//true
         System.out.println(user1.equals(user2));//false
 

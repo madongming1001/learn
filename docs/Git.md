@@ -17,7 +17,7 @@
 - `git push`
 - `git pull`
 - `touch .gitignore` 
--  git commit -m '补交Oct18' --date "Mon Jan 27 18:18:18 2023 +0800"
+-  git commit -m '补交Oct18' --date "Mon Nov 29 18:18:18 2022 +0800"
 
 ####修改分支名称
 
