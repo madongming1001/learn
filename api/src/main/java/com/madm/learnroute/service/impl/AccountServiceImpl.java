@@ -1,9 +1,11 @@
 package com.madm.learnroute.service.impl;
 
+import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.madm.learnroute.model.Account;
 import com.madm.learnroute.service.AccountService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -26,6 +28,9 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
 
     @Override
     public int saveForJdbc(Account account) {
+        Object sqlSessionTemplate = SpringUtil.getBean("sqlSessionTemplate");
+        Object sqlSessionFactory = SpringUtil.getBean("sqlSessionFactory");
+        System.out.println(sqlSessionTemplate + "" + sqlSessionFactory);
         return accountMapper.insert(account);
         //使用的还是DataSourceUtils.getConnection(obtainDataSource());
 //        return jdbcTemplate.update("update account set " + account.getUserName() + " = left(" + account.getUserName() + ",9) where id = " + account.getId());

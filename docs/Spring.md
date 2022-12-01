@@ -41,11 +41,11 @@ spring.main.allow-circular-references=true
 ```java
 // 6. 存在提前曝光情况下
 if (earlySingletonExposure) {
-   // earlySingletonReference：二级缓存，缓存的是经过提前曝光提前Spring AOP代理的bean 经过实力话 没有经过属性填充和初始化
+   // earlySingletonReference：二级缓存，缓存的是经过提前曝光提前Spring AOP代理的bean 经过实例化 没有经过属性填充和初始化
    Object earlySingletonReference = getSingleton(beanName, false);
    // earlySingletonReference只有在检测到有循环依赖的情况下才会不为空
    if (earlySingletonReference != null) {
-      // exposedObject跟bean一样，说明初始化操作没用应用Initialization后置处理器(指AOP操作)改变exposedObject
+      // exposedObject跟bean一样，说明初始化操作没有应用Initialization后置处理器(指AOP操作)改变exposedObject
       // 主要是因为exposedObject如果提前代理过，就会跳过Spring AOP代理，所以exposedObject没被改变，也就等于bean了
       // 如果exposedObject没有在初始化方法中改变，说明没有被增强
       if (exposedObject == bean) {
@@ -75,7 +75,7 @@ if (earlySingletonExposure) {
 ```
 
 ```java
-createBean
+createBean()
 //遇到Aop的 BeanPostProcessor 的话就findCandidateAdvisors找到所有的advisor放到容器中，advisor指的是spring中封装pointcut和notify的对象，这里不会对具体需要代理的对象创建代理类，而是有一个插口（getCustomTargetSource）让我们可以做，但一般不会做。
 标注@Aspectj的对象是在shouldSkip方法返回null，而普通的bean在方法结束返回null，因为没有自定义targetSource
 @Nullable
@@ -232,10 +232,6 @@ ConfigurationClassParser#doProcessConfigurationClass
 initialMulticaster（springboot的监听器）
 applicationEventMulticaster（spring上下文监听器）
 ```
-
-
-
-# spring-configuration-metadata.json配置文件用来在配置文件输入的时候提示
 
 
 
@@ -2681,7 +2677,7 @@ private void openConnection() throws SQLException {
 **mybatisPlus 的整个加载过程概括如下：**
 
 1. **（MapperScan注入或者MybatisPlusAutoConfiguration in missing bean注入） MapperScannerConfigurer** 扫描 mapper 接口，并在 spring 中注册 deanDefinition，类型为 **MapperFactoryBean**
-2. **MybatisPlusAutoConfiguration**自动注入**SessionFactory** 解析 mapper.xml 和 mapper 接口 中的 sql 语句保存到 Configuration 中，同时加入 mybatisPlus 提供的动态 sql。 最后注册对应 mapper 的 MybatisMapperProxyFactory。
+2. **MybatisPlusAutoConfiguration**自动注入**SessionFactory** 解析 mapper.xml 和 mapper 接口 中的 sql 语句保存到 Configuration 中，同时加入 mybatisPlus 提供的动态 sql。 最后注册对应 mapper 的 **MybatisMapperProxyFactory**。
 3. **MybatisPlusAutoConfiguration（自动注入）SqlSessionTemplate** 使用 **SqlSessionInterceptor** 代理实现一个线程安全的 spring 管理的 SqlSession，并最终通过 **MybatisMapperProxyFactory** 获取 mapper 的代理对象 **MybatisMapperProxy**.
 
 **参考文章：**https://blog.csdn.net/Wu_Shang001/article/details/125356883

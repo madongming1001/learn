@@ -1,6 +1,7 @@
 package com.madm.learnroute.controller;
 
 import cn.hutool.core.util.ArrayUtil;
+import com.madm.learnroute.controller.param.AccountRequest;
 import com.madm.learnroute.model.Account;
 import com.madm.learnroute.service.AccountService;
 import com.mdm.model.RestResponse;
@@ -28,7 +29,7 @@ public class AccountController {
     }
 
     @GetMapping("/findAccountById")
-    public RestResponse findAccountById(@RequestParam int id) {
-        return RestResponse.OK().setBody(accountService.findAccountById(id));
+    public RestResponse findAccountById(@RequestBody AccountRequest requestParam) {
+        return RestResponse.OK().setBody(accountService.findAccountById(requestParam.getId()));
     }
 }

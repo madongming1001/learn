@@ -36,6 +36,8 @@ public class ThreadCreationPractice {
             } catch (Exception e) {
             }
         });
+        Thread thread = new Thread(new RunableTash());
+        thread.run();
     }
 
     public class ExpensiveObject{};
@@ -59,6 +61,7 @@ class RunableTash implements Runnable {
 
     @Override
     public void run() {
+        System.out.println(Thread.currentThread().getName());
         System.out.println("I am a child thread");
     }
 }

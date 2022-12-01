@@ -837,6 +837,16 @@ void executedOnCpu1() {
 
 # Java中的native是如何实现的（JNI）
 
+```java
+// Linux下是.so文件，Windows下是.dll文件
+```
+
+1. 编写带有native声明的方法的java类
+2. 使用javac命令编译所编写的java类
+3. 然后使用javah + java类名生成扩展名为h的头文件
+4. 使用C/C++实现本地方法
+5. 将C/C++编写的文件生成动态连接库 gcc命令
+
 **参考文章：**https://segmentfault.com/a/1190000022812099
 
 # CPU核心数

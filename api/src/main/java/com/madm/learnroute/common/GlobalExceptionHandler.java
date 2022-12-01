@@ -5,6 +5,7 @@ import com.mdm.model.RestResponse;
 import com.mdm.utils.ExceptionUtil;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.beans.PropertyEditorSupport;
@@ -33,27 +34,5 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public RestResponse<String> handleRuntimeException(Exception e) {
         return RestResponse.code(HttpStatus.HTTP_INTERNAL_ERROR).withMsg(ExceptionUtil.getCauseMsg(e)).build();
-    }
-
-    //    @InitBinder
-    protected void initBinder(WebDataBinder binder) {
-        binder.registerCustomEditor(LocalDate.class, new PropertyEditorSupport() {
-            @Override
-            public void setAsText(String text) throws IllegalArgumentException {
-                setValue(LocalDate.parse(text, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-            }
-        });
-        binder.registerCustomEditor(LocalDateTime.class, new PropertyEditorSupport() {
-            @Override
-            public void setAsText(String text) throws IllegalArgumentException {
-                setValue(LocalDateTime.parse(text, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            }
-        });
-        binder.registerCustomEditor(LocalTime.class, new PropertyEditorSupport() {
-            @Override
-            public void setAsText(String text) throws IllegalArgumentException {
-                setValue(LocalTime.parse(text, DateTimeFormatter.ofPattern("HH:mm:ss")));
-            }
-        });
     }
 }

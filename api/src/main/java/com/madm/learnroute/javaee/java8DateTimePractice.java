@@ -55,7 +55,7 @@ public class java8DateTimePractice {
 
     @SneakyThrows
     public static void main(String[] args) {
-//        testLocalDateAndTime();
+        testLocalDateAndTime();
         testPeriod();
         testDuration();
 //        long ctm = System.currentTimeMillis();
@@ -72,6 +72,7 @@ public class java8DateTimePractice {
 
     private static void testLocalDateAndTime() {
         LocalDate now = LocalDate.now();
+        System.out.println(now);
         LocalDate lastWeek = now.minusWeeks(1);
         LocalDate nextWeek = now.plusWeeks(1);
         now.isAfter(nextWeek);

@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 
 @SpringBootApplication
-@MapperScan("com.madm.learnroute.mapper")
+@MapperScan(basePackages = "com.madm.learnroute.mapper")
 @EnableFeignClients
 @EnableJSONDoc
 @EnableScheduling

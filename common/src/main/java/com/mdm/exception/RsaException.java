@@ -10,4 +10,8 @@ public class RsaException extends RuntimeException {
         super(message);
     }
 
+    public RsaException() {
+        super(null,null);
+    }
+
 }

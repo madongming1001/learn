@@ -1,7 +1,6 @@
 package com.madm.learnroute.javaee;
 
 import cn.hutool.core.util.RandomUtil;
-import com.mdm.utils.RandomGeneratorNumberUtil;
 import lombok.Data;
 
 import javax.annotation.Nullable;

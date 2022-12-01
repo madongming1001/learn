@@ -1,6 +1,7 @@
 package com.madm.learnroute.javaee;
 
-class ThreadLocalTask extends Thread {
+class ThreadLocalTask
+        extends Thread {
     ThreadLocal<Integer> threadLocal;
     Integer threadId;
 

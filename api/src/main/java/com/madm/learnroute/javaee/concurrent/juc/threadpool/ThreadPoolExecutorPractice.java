@@ -2,6 +2,7 @@ package com.madm.learnroute.javaee.concurrent.juc.threadpool;
 
 import lombok.SneakyThrows;
 
+import java.sql.SQLOutput;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
@@ -27,8 +28,28 @@ public class ThreadPoolExecutorPractice {
         return rs | wc;
     }
 
+    @SneakyThrows
     public static void main(String[] args) {
+//        ExecutorService executorService = Executors.newFixedThreadPool(1);
+//
+//        executorService.submit(() -> {
+//            System.out.println(Thread.currentThread().getName());
+//            int i = 1 / 0;
+//        });
+//
+//        Thread.sleep(2000L);
+//        executorService.submit(() -> {
+//            System.out.println(Thread.currentThread().getName());
+//            System.out.println("当线程池抛出异常后继续新的任务");
+//        });
+
 //        executeSchedule();
+//        threadPoolParameterTest();
+        firstThreadBlockingOtherThreads();
+//        test();
+    }
+
+    private static void threadPoolParameterTest() {
         System.out.println(Long.toBinaryString(4294967296l));
         System.out.println(Integer.MAX_VALUE);
         System.out.println(Integer.toBinaryString(2147483647));
@@ -44,7 +65,6 @@ public class ThreadPoolExecutorPractice {
         System.out.println(Integer.toBinaryString(65535));
         System.out.println(Integer.parseInt("111111111111", 2));
 
-
         System.out.println(RUNNING);
         System.out.println(Integer.toBinaryString(-1));
         System.out.println(Integer.toBinaryString(0 << 29) + "0<<29");
@@ -56,6 +76,110 @@ public class ThreadPoolExecutorPractice {
         System.out.println(Long.valueOf("10100000000000000000000000000000", 2));
         System.out.println(Integer.toBinaryString(~3) + 1);//按位取反
         System.out.println((~3) + 1);
+    }
+
+    @SneakyThrows
+    private static void test() {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 20, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+        AtomicInteger atomicInteger = new AtomicInteger();
+        for (int i = 0; i < 3; i++) {
+            System.out.println(i + "1111");
+            threadPoolExecutor.execute(() -> {
+                int number = atomicInteger.incrementAndGet();
+                while (true) {
+//                    try {
+                    System.out.println(number + "等待下次执行～");
+//                            try {
+                    try {
+                        int a = 1 / 0;
+                        Thread.sleep(1000L);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+//                    } catch (Exception e) {
+
+//                        try {
+                    System.out.println(number + "睡觉10s");
+//                            Thread.sleep(10000L);
+//                        } catch (InterruptedException ex) {
+////                            throw new RuntimeException(ex);
+//                        }
+//                        threadPoolExecutor.shutdown();
+//                        throw new RuntimeException(e);
+//                        log.error("失败，err={}",e.toString());
+//                    }
+
+//                    } catch (Exception e) {
+//                        throw new RuntimeException(e);
+//                    }
+                }
+            });
+        }
+        threadPoolExecutor.execute(() -> {
+            System.out.println("任务发布完成～，开始执行退出操作");
+        });
+
+        System.out.println("===============");
+//        Thread.sleep(6000L);
+//        threadPoolExecutor.shutdownNow();
+        threadPoolExecutor.shutdown();
+        boolean b = threadPoolExecutor.awaitTermination(5, TimeUnit.MINUTES);
+        System.out.println(threadPoolExecutor.isShutdown());
+//        if (!b) {
+//            threadPoolExecutor.shutdownNow();
+//            System.out.println("shutdownNow!");
+//        }
+        System.out.println("shutdown完成～" + b);
+    }
+
+    private static void firstThreadBlockingOtherThreads() {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 20, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue(), (runnable) -> {
+            //1.实现一个自己的线程池工厂
+            //创建一个线程
+            Thread thread = new Thread(runnable);
+            //给创建的线程设置UncaughtExceptionHandler对象 里面实现异常的默认逻辑
+//            thread.setDefaultUncaughtExceptionHandler((Thread t1, Throwable e) -> {
+//                System.out.println("线程工厂设置的exceptionHandler" + e.getMessage());
+//            });
+            return thread;
+        }) {
+            @Override
+            protected void beforeExecute(Thread t, Runnable r) {
+
+            }
+
+            @Override
+            protected void afterExecute(Runnable r, Throwable t) {
+
+            }
+        };
+        AtomicInteger atomicInteger = new AtomicInteger();
+        for (int i = 0; i < 5; i++) {
+            threadPoolExecutor.execute(() -> {
+                int number = atomicInteger.getAndIncrement();
+                System.out.println("当前线程名称 ：" + Thread.currentThread().getName());
+                while (true) {
+                    int a = 1 / 0;
+                    try {
+                        System.out.println(number + "等下次运行");
+                        System.out.println("当前线程名称 ：" + Thread.currentThread().getName());
+                        Thread.sleep(2000L);
+
+                    } catch (Exception e) {
+//                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+        while (!(threadPoolExecutor.getActiveCount() == 5)) {
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("任务发布完成");
     }
 
     @SneakyThrows
@@ -73,7 +197,6 @@ public class ThreadPoolExecutorPractice {
         // AbortPolicy
         // DiscardOldestPolicy
 
-
         //线程池线程预热，线程池的预热仅仅针对核心线程 ⚠️
         ThreadPoolExecutor fixedThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
         //启动所有的核心线程
@@ -82,7 +205,6 @@ public class ThreadPoolExecutorPractice {
         fixedThreadPool.prestartCoreThread();
         // allowCoreThreadTimeOut，线程池中 corePoolSize 线程空闲时间达到keepAliveTime也将关闭
         // shutdownNow
-
 
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(5, 5, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(1), Executors.defaultThreadFactory(), new RejectedExecutionHandler() {
             @SneakyThrows

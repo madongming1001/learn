@@ -1,5 +1,6 @@
 package com.madm.learnroute.technology.mybatis.plugin;
 
+import com.mdm.utils.GsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.CachingExecutor;
 import org.apache.ibatis.executor.Executor;
@@ -17,7 +18,7 @@ import java.util.Properties;
  */
 @Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
 @Slf4j
-public class SlowSqlPlugin implements Interceptor  {
+public class SlowSqlPlugin implements Interceptor {
     private long slowTime;
 
     //拦截后需要处理的业务
@@ -33,11 +34,11 @@ public class SlowSqlPlugin implements Interceptor  {
         Object proceed = invocation.proceed();
         long end = System.currentTimeMillis();
         long timeCost = end - start;
-        System.out.println(sql);
-        System.out.println("耗时=" + timeCost);
+        System.out.println(GsonObject.createGson().toJson(sql));
         if (timeCost > slowTime) {
+            System.out.println("慢耗时= " + timeCost);
             System.out.println("本次数据库操作是慢查询，sql是:");
-            System.out.println(sql);
+            System.out.println(GsonObject.createGson().toJson(sql));
         }
         return proceed;
     }
