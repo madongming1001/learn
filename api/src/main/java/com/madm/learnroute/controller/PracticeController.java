@@ -11,6 +11,7 @@ import com.madm.learnroute.service.CircularServiceA;
 import com.madm.learnroute.technology.messagequeue.rocketmq.message.MySource;
 import com.mdm.model.Response;
 import com.mdm.pojo.User;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.common.message.MessageConst;
 import org.jsondoc.core.annotation.Api;
@@ -21,10 +22,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.util.InstanceFilter;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.servlet.AsyncContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -159,6 +166,54 @@ public class PracticeController {
 //        }
 //        return true;
 //    }
+
+    /**
+     * 第二个getParameter()有的时候可能获取不到值，因为在request是复用的，会执行recycle方法，它和异步线程获取的时间不定，所以有可能是null，
+     * 而第二次请求的时候由于复用了第一次的request，里有一个参数didQueryParameters参数是true就不会创建map了，所以第二次是都为null
+     */
+    @GetMapping("/getTest")
+    public String getTest(HttpServletRequest request) {
+        String age = request.getParameter("age");
+        System.out.println("age=" + age);
+        new Thread(() -> {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            String age1 = request.getParameter("age");
+            System.out.println("age1=" + age1);
+        }).start();
+        return "success";
+    }
+
+    /**
+     * 正确的异步线程传送reqeust的方式是
+     * 1、request 的 startAsync 方法
+     * 2、AsyncContext 的 complete 方法
+     */
+    @GetMapping("/getTestSuccess")
+    public String getTestSuccess(HttpServletRequest request, HttpServletResponse response) {
+        AsyncContext asyncContext = request.startAsync(request, response);
+        String age = request.getParameter("age");
+        System.out.println("age=" + age);
+        new Thread(() -> {
+            try {
+                Thread.sleep(200);
+                PrintWriter out = response.getWriter();
+                out.println("hello why:" + Instant.now());
+                out.flush();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            String age1 = request.getParameter("age");
+            System.out.println("age1=" + age1);
+
+            asyncContext.complete();
+        }).start();
+        return "success";
+    }
+
 }
 
 
