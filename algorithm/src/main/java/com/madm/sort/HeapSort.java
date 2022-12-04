@@ -75,9 +75,9 @@ public class HeapSort {
     //从index的位置，往下看，不断的下沉
     //停：较大的孩子都不再比index位置的数大；已经没孩子了
     private static void heapify(int[] arr, int index, int heapSize) {
-        int left = index * 2 + 1;
+        int left = index * 2 + 1, right;
         while (left < heapSize) {//如果有左孩子，有没有右孩子，可能有可能没有！
-            int largest = left + 1 < heapSize && arr[left + 1] > arr[left] ? left + 1 : left;//把较大孩子的下标，给largest
+            int largest = (right = left + 1) < heapSize && arr[right] > arr[left] ? right : left;//把较大孩子的下标，给largest
             largest = arr[largest] > arr[index] ? largest : index;
             if (largest == index) {
                 break;
