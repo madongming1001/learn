@@ -1874,3 +1874,7 @@ slow_launch_time,2
 slow_query_log,ON
 slow_query_log_file,/usr/local/mysql/mysql-slow.log
 ```
+
+# 优化SQL
+
+![图片](https://mmbiz.qpic.cn/mmbiz_png/JdLkEI9sZfdv9IRLWRd3WRGKO1lFtlcib38ezD5NtzjFeuUbfJPQ1icZ3ZjyS0woTXtUBzEic64xSkM7aZsmjcrDw/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
