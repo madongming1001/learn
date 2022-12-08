@@ -5,6 +5,8 @@ import com.madm.learnroute.controller.param.AccountRequest;
 import com.madm.learnroute.model.Account;
 import com.madm.learnroute.service.AccountService;
 import com.mdm.model.RestResponse;
+import org.redisson.Redisson;
+import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,9 @@ public class AccountController {
     @Autowired
     AccountService accountService;
 
+    @Autowired
+    Redisson redisson;
+
     @GetMapping("/save")
     public RestResponse save(@RequestBody @Nullable Account... account) {
         accountService.saveForJdbc(ArrayUtil.isNotEmpty(account) ? account[0] : Account.create());
@@ -32,6 +37,10 @@ public class AccountController {
     @Async("requestExecutor")
     @GetMapping("/findAccountById")
     public Account findAccountById(@RequestBody @Nullable AccountRequest requestParam) {
-        return accountService.findAccountById(requestParam.getId());
+        RLock rLock = redisson.getLock("accountSearch");
+        rLock.lock();
+        Account account = accountService.findAccountById(requestParam.getId());
+        rLock.unlock();
+        return account;
     }
 }
