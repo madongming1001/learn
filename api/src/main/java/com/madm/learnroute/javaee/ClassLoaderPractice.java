@@ -1,6 +1,7 @@
 package com.madm.learnroute.javaee;
 
 import cn.hutool.core.io.resource.UrlResource;
+import com.mdm.utils.PrintUtil;
 import lombok.SneakyThrows;
 import org.apache.ibatis.io.Resources;
 import org.springframework.core.io.Resource;
@@ -16,11 +17,15 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 
+import static com.mdm.utils.PrintUtil.printSplitLine;
+
 public class ClassLoaderPractice {
     public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factories";
-    ClassLoaderPractice(){
+
+    ClassLoaderPractice() {
         System.out.println(this.getClass().getName());
     }
+
     @SneakyThrows
     public static void main(String[] args) {
         ClassLoaderPractice classLoaderPractice = new ClassLoaderPractice();
@@ -38,12 +43,9 @@ public class ClassLoaderPractice {
         System.out.println("the extClassloader : " + extClassloader);
         System.out.println("the appClassLoader : " + appClassLoader);
 
-        System.out.println();
-        System.out.println("bootstrapLoader加载以下文件：");
-//        URL[] urls = Launcher.getBootstrapClassPath().getURLs();
-//        for (int i = 0; i < urls.length; i++) {
-//            System.out.println(urls[i]);
-//        }
+        printSplitLine();
+        System.out.println("bootstrapLoader加载以下文件：");//-Xbootclasspath
+        System.out.println(System.getProperty("sun.boot.class.path"));
 
         System.out.println();
         System.out.println("extClassloader加载以下文件：");
@@ -51,7 +53,8 @@ public class ClassLoaderPractice {
 
         System.out.println();
         System.out.println("appClassLoader加载以下文件：");
-//        System.out.println(System.getProperty("java.class.path"));
+        System.out.println(System.getProperty("java.class.path"));
+
         // 出发都是舍弃小数位
         System.out.println(String.class.getClassLoader());
         System.out.println(ClassLoaderPractice.class.getClassLoader());
@@ -93,6 +96,30 @@ public class ClassLoaderPractice {
             System.out.println(result);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static class TestClassForName {
+        public static void main(String[] args) {
+            try {
+                System.out.println("======= begin =======");
+                Class.forName("com.madm.learnroute.javaee.ClassLoaderPractice");
+                System.out.println("======= end =======");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static class TestClassLoader {
+        public static void main(String[] args) {
+            try {
+                System.out.println("======= begin =======");
+                ClassLoader.getSystemClassLoader().loadClass("com.madm.learnroute.javaee.ClassLoaderPractice");
+                System.out.println("======= end =======");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
