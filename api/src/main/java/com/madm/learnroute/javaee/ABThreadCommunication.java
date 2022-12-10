@@ -19,8 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ABThreadCommunication {
 
-    private volatile static boolean a = false;
-
+    private volatile static boolean flag = false;
 
     public static void main(String[] args) {
         ABCommunicationForVolatile();
@@ -58,8 +57,8 @@ public class ABThreadCommunication {
     private static void ABCommunicationForVolatile() {
         Thread t1 = new Thread(() -> {
             System.out.println("发送a线程的信号");
-            a = true;
-            while (a) {
+            flag = true;
+            while (flag) {
                 try {
                     TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
@@ -69,7 +68,7 @@ public class ABThreadCommunication {
             System.out.println("收到b线程的信号");
         });
         Thread t2 = new Thread(() -> {
-            while (!a) {
+            while (!flag) {
                 try {
                     TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
@@ -78,7 +77,7 @@ public class ABThreadCommunication {
             }
             System.out.println("收到a线程的信号");
             System.out.println("发送b线程的信号");
-            a = false;
+            flag = false;
         });
         t1.start();
         t2.start();
