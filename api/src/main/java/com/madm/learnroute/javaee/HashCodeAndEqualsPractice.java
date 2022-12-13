@@ -3,6 +3,7 @@ package com.madm.learnroute.javaee;
 import com.mdm.pojo.User;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author dongming.ma
@@ -28,6 +29,8 @@ public class HashCodeAndEqualsPractice {
         System.out.println(user1.hashCode());
         System.out.println(user1.hashCode() == user2.hashCode());//true
         System.out.println(user1.equals(user2));//false
+        System.out.println(UUID.randomUUID());
+
 
         int[] ints = new int[5];
         System.out.println(System.identityHashCode(user2) % ints.length);
