@@ -47,11 +47,16 @@ public class StringEqualsPractice {
         System.out.println(Integer.toBinaryString(-4));
 
 //        System.out.println(Integer.valueOf("11111",2));
-        System.out.println(Integer.valueOf("11111",2));
-        System.out.println(Integer.toBinaryString(65535));
-
-        System.out.println(Integer.toBinaryString(65));
-        System.out.println(Integer.toBinaryString(97));
+        System.out.println(Integer.valueOf("11111", 2));
+        System.out.println("65535  二进制：" + Integer.toBinaryString(65535));
+        System.out.println("32767  二进制：" + Integer.toBinaryString(32767));
+        System.out.println("4个1：" + Integer.valueOf("1111", 2));//15
+        System.out.println("8个1：" + Integer.valueOf("11111111", 2));//255
+        System.out.println("12个1：" + Integer.valueOf("111111111111", 2));//4095
+        System.out.println("16个1：" + Integer.valueOf("1111111111111111", 2));//65535
+        System.out.println(Integer.parseInt("1111", 2));
+//        System.out.println(Integer.toBinaryString(65));
+//        System.out.println(Integer.toBinaryString(97));
 
     }
 
