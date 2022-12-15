@@ -19,7 +19,7 @@ public class ObjectMemorySizeView {
 //        int[] a = new int[1024];
 //
 //
-//        System.out.println(System.getProperties());
+        System.out.println(System.getProperties());
 //        System.out.println(RamUsageEstimator.sizeOf(a));
 
         obj = new Object();
