@@ -8,4 +8,8 @@ public class PrintUtil {
         System.out.println(Arrays.toString(arr));
     }
 
+    public static void printSplitLine() {
+        System.out.println("===============================================");
+    }
+
 }
