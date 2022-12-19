@@ -1432,6 +1432,82 @@ mysql主从
 
 # 面试题
 
+## Mysql 查看死锁和解除死锁? 
+
+**死锁是指两个或两个以上的事务在执行过程中，因争夺锁资源而造成的一种互相等待的现象。**
+
+```sql
+死锁检查，默认开启
+show variables like '%innodb_deadlock_detect%';
+```
+
+#### 1. 查看正在进行中的事务
+
+```sql
+SELECT * FROM information_schema.INNODB_TRX
+```
+
+#### 2. 查看正在锁的事务
+
+```sql
+#mysql 8.0 版本之前
+SELECT * FROM information_schema.INNODB_LOCKS;
+#mysql 8.0
+select * from performance_schema.data_locks;
+```
+
+#### 3. 查看等待锁的事务
+
+```sql
+#mysql 8.0 版本之前
+SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS;
+#mysql 8.0
+select * from performance_schema.data_lock_waits;
+```
+
+#### 4. 查询是否锁表
+
+```sql
+SHOW OPEN TABLES where In_use > 0;
+```
+
+#### 5. 查看最近死锁的日志
+
+```sql
+show engine innodb status
+```
+
+### 解除死锁
+
+如果需要解除死锁，有一种最简单粗暴的方式，那就是找到进程id之后，直接干掉。
+
+查看当前正在进行中的进程
+
+```sql
+show processlist
+
+// 也可以使用
+SELECT * FROM information_schema.INNODB_TRX;
+```
+
+这两个命令找出来的进程id 是同一个。
+
+杀掉进程对应的进程 id
+
+```command
+kill id
+```
+
+验证（kill后再看是否还有锁）
+
+```sql
+SHOW OPEN TABLES where In_use > 0;
+```
+
+
+
+**参考文章：**https://segmentfault.com/a/1190000038352601
+
 ## MySQL 批量操作，一次插入多少行数据效率最高？
 
 **参考文章：**https://mp.weixin.qq.com/s/RhilSmmfmqwt_mkQUkQiGQ
