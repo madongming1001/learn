@@ -496,11 +496,9 @@ ProxyTransactionManagementConfiguration -> BeanFactoryTransactionAttributeSource
 
 **注意⚠️：如果内层方法出现了异常外层没有捕获，那会使得外层方法也会回滚，影响到了外层方法。 外层方法异常不会影响内层方法的异常。内层是nested的时候。**
 
-
-
 当项目中只有事务没有aop的时候链条里面是不会有**ExposeInvocationInterceptor**，因为InfrastructureAdvisorAutoProxyCreator和AnnotationAwareAspectJAutoProxyCreator的父类AspectJAwareAdvisorAutoProxyCreator是同级的，而往链条里面添加**ExposeInvocationInterceptor**的方法extendAdvisors()就是在父类里面。
 
-**有两个地方回加载TransactionAttribute!!!**
+**有两个地方会加载TransactionAttribute!!!**
 
 1、一个是后置处理器Aop的时候会走getAdvicesAndAdvisorsForBean()最里面会走一个叫findAdvisorsThatCanApply(),这个时候会拿类的所有方法和advisor一一匹配有一个匹配上就会认为需要aop，匹配条件是classFilter和MethodMatcher，在methodMatcher的时候就会读取方法的注解信息并放到Map<Object, TransactionAttribute> 里面
 
