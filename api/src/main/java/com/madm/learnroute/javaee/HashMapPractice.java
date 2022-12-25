@@ -78,14 +78,14 @@ public class HashMapPractice {
 //
 //        Iterator<Map.Entry<String, Integer>> iterator = prices.entrySet().iterator();
 //
-//        // 重新计算鞋子打了10%折扣后的值
-//        int newPrice = prices.compute("Shoes2", (k, v) -> {
-//            if (v == null) {
-//                return 20;
-//            }
-//            return v - v * 10 / 100;
-//        });
-//        System.out.println("Discounted Price of Shoes: " + newPrice);
+        // 重新计算鞋子打了10%折扣后的值
+        int newPrice = prices.compute("Shoes2", (k, v) -> {
+            if (v == null) {
+                return 20;
+            }
+            return v - v * 10 / 100;
+        });
+        System.out.println("Discounted Price of Shoes: " + newPrice);
 //
 //        // 输出更新后的HashMap
 //        System.out.println("Updated HashMap: " + prices);
@@ -100,19 +100,21 @@ public class HashMapPractice {
 //        values.stream().forEach(System.out::println);
 //        System.out.println(values.size());
 //
-//        ArrayList<Map<String, Long>> mapArrayList = new ArrayList();
-//        HashMap<String, Long> hashMap1 = new HashMap<>();
-//        hashMap1.put("1", 1L);
-//        HashMap<String, Long> hashMap2 = new HashMap<>();
-//        hashMap2.put("2", 2L);
-//        HashMap<String, Long> hashMap3 = new HashMap<>();
-//        hashMap3.put("3", 3L);
-//        HashMap<String, Long> hashMap4 = new HashMap<>();
-//        hashMap4.put("4", 4L);
-//        mapArrayList.add(hashMap1);
-//        mapArrayList.add(hashMap2);
-//        mapArrayList.add(hashMap3);
-//        mapArrayList.add(hashMap4);
+        ArrayList<Map<String, Long>> mapArrayList = new ArrayList();
+        HashMap<String, Long> hashMap1 = new HashMap<>();
+        hashMap1.put("1", 1L);
+        HashMap<String, Long> hashMap2 = new HashMap<>();
+        hashMap2.put("2", 2L);
+        HashMap<String, Long> hashMap3 = new HashMap<>();
+        hashMap3.put("3", 3L);
+        HashMap<String, Long> hashMap4 = new HashMap<>();
+        hashMap4.put("4", 4L);
+        mapArrayList.add(hashMap1);
+        mapArrayList.add(hashMap2);
+        mapArrayList.add(hashMap3);
+        mapArrayList.add(hashMap4);
+
+
 //
 //        Map<String, Long> masterId = new HashMap<>();
 //        mapArrayList.stream().forEach(e -> {
