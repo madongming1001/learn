@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * @author dongming.ma
@@ -34,7 +35,6 @@ public class AccountController {
         return RestResponse.OK();
     }
 
-    @Async("requestExecutor")
     @GetMapping("/findAccountById")
     public Account findAccountById(@RequestBody @Nullable AccountRequest requestParam) {
         RLock rLock = redisson.getLock("accountSearch");
@@ -42,5 +42,20 @@ public class AccountController {
         Account account = accountService.findAccountById(requestParam.getId());
         rLock.unlock();
         return account;
+    }
+
+    @GetMapping("/findAll")
+    public List<Account> findAll() {
+        return accountService.findAll();
+    }
+
+    @GetMapping("/findAllForCursor")
+    public List<Account> findAllForCursor() {
+        return accountService.findAllForCursor();
+    }
+
+    @GetMapping("/findAllForCursorFetchSize")
+    public List<Account> findAllForCursorFetchSize() {
+        return accountService.findAllForCursorFetchSize();
     }
 }
