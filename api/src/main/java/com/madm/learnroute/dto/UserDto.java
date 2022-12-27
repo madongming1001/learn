@@ -1,5 +1,8 @@
 package com.madm.learnroute.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mdm.pojo.AuthParam;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +23,9 @@ import java.util.stream.Collectors;
 public class UserDto implements Serializable {
     private Integer id;
     @NonNull
+    @JsonProperty("name")//用于反序列化和序列化都为name
+    @JsonAlias(value = {"userName", "accountName"})//用于反序列化，把设置的值都映射为name jackson
+    @JSONField(name = "name")//fastjson
     private String name;
     private List<AuthParam> auth;
 
@@ -33,6 +39,6 @@ public class UserDto implements Serializable {
         this.id = id;
         if (Objects.nonNull(name)) {
             this.auth = Arrays.stream(name).map(AuthParam::new).collect(Collectors.toList());
+        }
     }
-}
 }
