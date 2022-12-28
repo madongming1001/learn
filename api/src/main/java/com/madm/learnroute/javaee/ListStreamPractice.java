@@ -32,6 +32,8 @@ public class ListStreamPractice {
         list1.add("Pear");
         list1.add("Carrot");
 
+        System.out.println((Object) list1);
+
 
         if (list1.remove("pear")) {
             System.out.println("删除成功");
