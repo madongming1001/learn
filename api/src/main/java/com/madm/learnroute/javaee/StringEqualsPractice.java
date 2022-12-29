@@ -53,6 +53,8 @@ public class StringEqualsPractice {
         System.out.println("4个1：" + Integer.valueOf("1111", 2));//15
         System.out.println("8个1：" + Integer.valueOf("11111111", 2));//255
         System.out.println("12个1：" + Integer.valueOf("111111111111", 2));//4095
+        System.out.println("14个1：" + Integer.valueOf("11111111111111", 2));//16383
+        System.out.println("15个1：" + Integer.valueOf("111111111111111", 2));//32767
         System.out.println("16个1：" + Integer.valueOf("1111111111111111", 2));//65535
         System.out.println(Integer.parseInt("1111", 2));
 //        System.out.println(Integer.toBinaryString(65));
