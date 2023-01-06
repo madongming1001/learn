@@ -18,9 +18,8 @@ import java.util.Properties;
  * @author dongming.ma
  * @date 2022/6/12 19:35
  */
-@Intercepts({
-        @Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
-        //@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class
+@Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
+//@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class
 @Slf4j
 public class SlowSqlPlugin implements Interceptor {
     private long slowTime;
@@ -39,6 +38,7 @@ public class SlowSqlPlugin implements Interceptor {
         long end = System.currentTimeMillis();
         long timeCost = end - start;
 //        System.out.println(GsonObject.createGson().toJson(sql));
+        log.info(sql);
         if (timeCost > slowTime) {
             System.out.println("慢耗时 = " + timeCost);
             System.out.println("本次数据库操作是慢查询，sql是: " + GsonObject.createGson().toJson(sql));
