@@ -2,6 +2,7 @@ package com.madm.learnroute.technology.spring;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringApplicationRunListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -13,8 +14,11 @@ import java.time.LocalDateTime;
  * @date 2023/3/5 11:24
  */
 @Slf4j
-@NoArgsConstructor
 public class SpringBootStartupMonitor implements SpringApplicationRunListener {
+
+    public SpringBootStartupMonitor(SpringApplication springApplication, String[] args) {
+    }
+
     @Override
     public void starting() {
         log.info("starting {}", LocalDateTime.now());
