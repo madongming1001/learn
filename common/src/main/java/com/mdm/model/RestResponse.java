@@ -15,7 +15,7 @@ public class RestResponse<T> {
 
     private String msg;
 
-    @JsonInclude(value = JsonInclude.Include.NON_NULL)
+//    @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private T body;
 
     public RestResponse() {
@@ -23,7 +23,7 @@ public class RestResponse<T> {
 
     public RestResponse(int code, String msg, T body) {
         this.code = code;
-        this.setMsg(msg);
+        this.msg = msg;
         this.body = body;
     }
 
@@ -34,7 +34,7 @@ public class RestResponse<T> {
 
     public RestResponse(int code, String msg) {
         this.code = code;
-        this.setMsg(msg);
+        this.msg = msg;
     }
 
     public RestResponse(Object body) {
@@ -66,7 +66,7 @@ public class RestResponse<T> {
 
         private int code;
 
-        private String errMsg;
+        private String msg;
 
         private T body;
 
@@ -82,8 +82,8 @@ public class RestResponse<T> {
             return this;
         }
 
-        public ResResultBuilder<T> withMsg(String errMsg) {
-            this.errMsg = errMsg;
+        public ResResultBuilder<T> withMsg(String msg) {
+            this.msg = msg;
             return this;
         }
 
@@ -100,7 +100,7 @@ public class RestResponse<T> {
         public RestResponse<T> build() {
             RestResponse<T> RestResponse = new RestResponse<T>();
             RestResponse.setCode(this.code);
-            RestResponse.setMsg(this.errMsg);
+            RestResponse.setMsg(this.msg);
             RestResponse.setBody(this.body);
             return RestResponse;
         }
