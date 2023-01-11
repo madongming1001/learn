@@ -1633,13 +1633,15 @@ canal是阿里巴巴旗下的一款开源项目，纯Java开发。基于数据�
 
 总页数公式：totalRecord是总记录数；pageSize是一页分多少条记录
 
-```sql
+```java
 int totalPageNum = (totalRecord + pageSize - 1) / pageSize;
 ```
 
-参考文章：https://blog.csdn.net/m0_45899013/article/details/10735764
+limit分页公式：（curPage - 1）* pageSize，pageSize
 
-
+```java
+limit (curPage - 1) * pageSize, pageSize
+```
 
 
 
