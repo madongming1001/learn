@@ -1505,9 +1505,11 @@ public class UserServiceImpl implements UserService{
 
 ```java
 new SpringApplication()
-//的时候构造方法完成了几件事情，本地设置从spring.factories加载的 ApplicationContextInitializer.class相关的类，本地设置从spring.factories加载的 ApplicationListener.class相关的类。
+//的时候构造方法完成了几件事情，本地设置从spring.factories加载的 ApplicationContextInitializer.class相关的类，本地设置从spring.factories加载的 ApplicationListener.class相关的类。两个比较重要的类
+//BootstrapApplicationListener
+//ConfigFileApplicationListener
 执行run方法（）主要步骤
-1、获取 SpringApplicationRunListener
+1、获取 SpringApplicationRunListener相关的类
 2、prepareEnvironment 发布事件 ApplicationEnvironmentPreparedEvent(BootstrapApplicationListener) 去加载 bootstrap.yml 文件
 3、createApplicationContext，根据 webApplicationType 类型不同创建 ConfigurableApplicationContext，这个时候就会通过其创建对象的构造方法，创建两个对象，一个是 AnnotatedBeanDefinitionReader，
 一个是ClassPathBeanDefinitionScanner对象，其中
