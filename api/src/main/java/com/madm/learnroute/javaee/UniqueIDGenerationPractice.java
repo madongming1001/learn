@@ -16,8 +16,8 @@ public class UniqueIDGenerationPractice {
         System.out.println(DigestUtils.md5Hex("meituan").endsWith(DigestUtils.md5Hex("meituans")));
 
 //        System.out.println(Long.toHexString(1512326079740776448L));
-//        Integer uuid= UUID.randomUUID().toString().replaceAll("-","").hashCode();
-//        System.out.println(uuid);
+        Integer uuid = UUID.randomUUID().toString().replaceAll("-", "").hashCode();
+        System.out.println(uuid);
 //        uuid = uuid < 0 ? -uuid : uuid;//String.hashCode() 值会为空
 //        System.out.println(uuid);
 //        System.out.println(IdUtil.fastSimpleUUID());
