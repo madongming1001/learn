@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SemaphorePractice {
 
     public static void main(String[] args) throws InterruptedException {
-        //test02();
+        test02();
     }
 
     public static void test02() throws InterruptedException {
@@ -18,6 +18,7 @@ public class SemaphorePractice {
 
         CountDownLatch countDownLatch = new CountDownLatch(3);
         AtomicBoolean release = new AtomicBoolean(false);
+        System.out.println(release.get());
         for (int i = 0; i < 1; i++) {
             boolean acquire = semaphore.tryAcquire(3000, TimeUnit.MILLISECONDS);
             if (acquire) {

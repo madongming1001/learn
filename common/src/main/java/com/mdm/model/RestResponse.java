@@ -1,12 +1,8 @@
 package com.mdm.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import javax.annotation.Nullable;
-import java.io.Serializable;
 
 /**
  * @author dongming.ma
@@ -14,10 +10,10 @@ import java.io.Serializable;
  */
 @Accessors(chain = true)
 @Data
-public class RestResponse<T>{
+public class RestResponse<T> {
     private int code;
 
-    private String message;
+    private String msg;
 
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private T body;
@@ -25,9 +21,9 @@ public class RestResponse<T>{
     public RestResponse() {
     }
 
-    public RestResponse(int code, String message, T body) {
+    public RestResponse(int code, String msg, T body) {
         this.code = code;
-        this.setMessage(message);
+        this.setMsg(msg);
         this.body = body;
     }
 
@@ -36,9 +32,13 @@ public class RestResponse<T>{
         this.body = body;
     }
 
-    public RestResponse(int code, String message) {
+    public RestResponse(int code, String msg) {
         this.code = code;
-        this.setMessage(message);
+        this.setMsg(msg);
+    }
+
+    public RestResponse(Object body) {
+        this.body = (T) body;
     }
 
     public static RestResponse OK() {
@@ -55,7 +55,7 @@ public class RestResponse<T>{
 
     @Override
     public String toString() {
-        return "RestResponse{" + "code=" + code + ", message='" + message + '\'' + ", body=" + body + '}';
+        return "RestResponse{" + "code=" + code + ", message='" + msg + '\'' + ", body=" + body + '}';
     }
 
     public static <T> ResResultBuilder<T> builder() {
@@ -99,9 +99,9 @@ public class RestResponse<T>{
          */
         public RestResponse<T> build() {
             RestResponse<T> RestResponse = new RestResponse<T>();
-            RestResponse.setCode(code);
-            RestResponse.setMessage(errMsg);
-            RestResponse.setBody(body);
+            RestResponse.setCode(this.code);
+            RestResponse.setMsg(this.errMsg);
+            RestResponse.setBody(this.body);
             return RestResponse;
         }
     }

@@ -19,6 +19,7 @@ import com.madm.learnroute.mapper.AccountMapper;
 @Service
 public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> implements AccountService {
 
+
     @Autowired
     JdbcTemplate jdbcTemplate;
     @Autowired
@@ -38,6 +39,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
 
     @Override
     public Account findAccountById(int id) {
+        super.baseMapper.delete(Wrappers.<Account>lambdaQuery().eq(Account::getId, id));
         return accountMapper.selectOne(Wrappers.<Account>lambdaQuery().eq(Account::getId, id));
     }
 }

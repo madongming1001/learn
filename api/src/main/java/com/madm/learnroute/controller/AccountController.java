@@ -29,7 +29,7 @@ public class AccountController {
     }
 
     @GetMapping("/findAccountById")
-    public RestResponse findAccountById(@RequestBody AccountRequest requestParam) {
-        return RestResponse.OK().setBody(accountService.findAccountById(requestParam.getId()));
+    public Account findAccountById(@RequestBody @Nullable AccountRequest requestParam) {
+        return accountService.findAccountById(requestParam.getId());
     }
 }

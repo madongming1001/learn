@@ -26,15 +26,15 @@ public class LearnApiApplication {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext applicationContext = SpringApplication.run(LearnApiApplication.class, args);
-        while (true) {
-            String configValue = applicationContext.getEnvironment().getProperty("config.info");
-            try {
-                log.info("config.info property value ：{}", configValue);
-                TimeUnit.SECONDS.sleep(1L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//        while (true) {
+        String configValue = applicationContext.getEnvironment().getProperty("config.info");
+        try {
+            log.info("config.info property value ：{}", configValue);
+            TimeUnit.SECONDS.sleep(1L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+//        }
     }
 
 }
