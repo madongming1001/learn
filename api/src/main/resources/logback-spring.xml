@@ -15,7 +15,7 @@
         <!-- layout代表输出格式 -->
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>
-                %d{yyyy-MM-dd HH:mm:ss.SSS}  %green(%-5level) %magenta(${PID:- }) --- [%t] [%X{MEETING_TRACE_LOG_ID}] %cyan(%logger) [%file:%line] [%X{logid}]- %m%n
+                %d{yyyy-MM-dd HH:mm:ss.SSS}  %green(%-5level) %magenta(${PID:- }) --- [%t] [%X{TRACE_LOG_ID}] %cyan(%logger) [%file:%line] [%X{logid}]- %m%n
             </pattern>
         </layout>
     </appender>
@@ -25,7 +25,7 @@
         <file>logs/learn-api.log</file>
         <encoder>
             <pattern>
-                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread][%X{MEETING_TRACE_LOG_ID}] %-5level %logger [%file:%line] [%X{logid}]- %msg%n
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread][%X{TRACE_LOG_ID}] %-5level %logger [%file:%line] [%X{logid}]- %msg%n
             </pattern>
         </encoder>
         <!-- 滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 RollingFileAppender-->
