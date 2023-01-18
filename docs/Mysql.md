@@ -177,13 +177,11 @@ MySQL中磁盘和内存交互的基本单位是`页`，一个页的大小一般�
 
 InnoDB 规定一页至少存储两条记录，如果页中只能存放下一条记录，InnoDB存储引擎会自动将行数据存放到溢出页中。在一般情况下，InnoDB 的数据都是存放在 `FIL_PAGE_INDEX` 类型的数据页中的。但是当发生行溢出时，溢出的数据会存放到 `FIL_PAGE_TYPE_BLOB` 类型的溢出页中。
 
-当发生行溢出时，数据页只保存了前768字节的前缀数据，接着是20个字节的偏移量，指向行溢出页，大致如下图所示。
+当发生行溢出时，**数据页只保存了前768字节的前缀数据**，接着是20个字节的偏移量，指向行溢出页，大致如下图所示。
 
 ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/20da3f98a3ce4a2d89561ee7feff7e81~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp)
 
 **参考文章：**https://juejin.cn/post/6970934163973079048
-
-
 
 
 
