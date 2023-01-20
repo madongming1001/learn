@@ -43,10 +43,10 @@ public class ThreadPoolExecutorPractice {
 //            System.out.println("当线程池抛出异常后继续新的任务");
 //        });
 
-//        executeSchedule();
-//        threadPoolParameterTest();
+        executeSchedule();
+        threadPoolParameterTest();
         firstThreadBlockingOtherThreads();
-//        test();
+        test();
     }
 
     private static void threadPoolParameterTest() {
