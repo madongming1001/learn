@@ -40,6 +40,7 @@ public class CountTask extends RecursiveTask<Integer> {
     }
 
     public static void main(String[] args) {
+
         ForkJoinPool forkJoinPool = new ForkJoinPool();
         CountTask task = new CountTask(1, 4);
         ForkJoinTask<Integer> result = forkJoinPool.submit(task);
