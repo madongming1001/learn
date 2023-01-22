@@ -24,7 +24,7 @@ public class ReentrantLockPractice {
     public static void await() {
         try {
             lock.lock();
-            System.out.println("await时间为：" + System.currentTimeMillis());
+            System.out.println("await时间为：" +  System.currentTimeMillis());
             condition.await();
             System.out.println("await等待结束");
         } catch (InterruptedException e) {
