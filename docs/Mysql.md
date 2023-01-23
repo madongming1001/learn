@@ -1432,6 +1432,10 @@ mysql主从
 
 # 面试题
 
+## MySQL 批量操作，一次插入多少行数据效率最高？
+
+**参考文章：**https://mp.weixin.qq.com/s/RhilSmmfmqwt_mkQUkQiGQ
+
 ## Count(1)和Count(星)和Count(列名)哪个快？
 
 count(星)计算所有数据中包含null值的行数
