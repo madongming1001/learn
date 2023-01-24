@@ -13,10 +13,10 @@ import java.util.Arrays;
  */
 public class QuickSortPractice {
     public static void main(String[] args) {
-//        int[] ints = {6, 1, 2, 7, 9};
+        int[] ints = {6, 1, 2, 7, 9};
 //        int[] ints = {3, 6, 5, 3, 1, 4, 5, 6, 7};
 //        int[] ints = {3, 5, 4, 7};
-        int[] ints = {4, 4, 4, 6, 6};
+//        int[] ints = {4, 4, 4, 6, 6};
         quick_sort1(ints);
         System.out.println(Arrays.toString(ints));
     }
