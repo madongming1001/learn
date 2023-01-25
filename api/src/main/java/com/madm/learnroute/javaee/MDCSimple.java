@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Slf4j
 public class MDCSimple {
-    //    private static final log log = logFactory.getlog(SimpleMDC.class);
+
     public static final String REQ_ID = "REQ_ID";
 
     public static void main(String[] args) {
