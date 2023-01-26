@@ -18,8 +18,8 @@ public class MDCSimple {
     public static final String REQ_ID = "REQ_ID";
 
     public static void main(String[] args) {
-//        singleThreadLog();
-//        multiThreadLog();
+        singleThreadLog();
+        multiThreadLog();
         ArrayList<String> meetingList = Lists.newArrayList("1", "2", "3");
         log.info("save batch meeting OK, size [{}] , data : {}", 1, meetingList);
 
