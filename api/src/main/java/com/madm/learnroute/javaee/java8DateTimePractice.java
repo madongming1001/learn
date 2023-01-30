@@ -58,16 +58,17 @@ public class java8DateTimePractice {
         testLocalDateAndTime();
         testPeriod();
         testDuration();
-//        long ctm = System.currentTimeMillis();
-//        long ztm = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
-//        long zdt = ZonedDateTime.now().toInstant().toEpochMilli();
-//        System.out.println("ctm = " + ctm + " ztm = " + ztm + " zdt = " + zdt);
-//        Assert.isTrue(ctm == ztm);
+        long ctm = System.currentTimeMillis();
+        long ztm = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+        long zdt = ZonedDateTime.now().toInstant().toEpochMilli();
+        System.out.println("ctm = " + ctm + " ztm = " + ztm + " zdt = " + zdt);
+        Assert.isTrue(ctm == ztm);
 
+        System.out.println(LocalDate.now());
+        System.out.println(LocalTime.now());
+        System.out.println(LocalDateTime.now());//中间T代表时间分割的字符
 
-//        System.out.println(LocalDate.now());
-//        System.out.println(LocalTime.now());
-//        System.out.println(LocalDateTime.now());//中间T代表时间分割的字符
+        System.out.println(timeUnitTable.get("s"));
     }
 
     private static void testLocalDateAndTime() {
@@ -102,12 +103,12 @@ public class java8DateTimePractice {
 
         LocalDateTime time = LocalDateTime.now();
         String localTime = df.format(time);
-        LocalDateTime ldt = LocalDateTime.parse("2017-09-28 17:07:05",df);
+        LocalDateTime ldt = LocalDateTime.parse("2017-09-28 17:07:05", df);
     }
 
     private static void testDuration() {
 //        Duration duration = Duration.ofDays(LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8")));
-        Duration between = Duration.between(LocalDateTime.now(), LocalDateTime.of(2022, 11, 15, 24, 35));
+        Duration between = Duration.between(LocalDateTime.now(), LocalDateTime.of(2022, 11, 15, 23, 35));
         LocalDateTime before = LocalDateTime.now();
         Instant start = Instant.parse("2017-10-03T10:15:30.00Z");
         Instant end = Instant.parse("2017-10-03T10:16:30.00Z");
