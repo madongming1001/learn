@@ -9,6 +9,7 @@ import com.madm.learnroute.feign.UserInfoFeignClient;
 import com.madm.learnroute.proto.MessageUserLogin;
 import com.madm.learnroute.service.CircularServiceA;
 import com.madm.learnroute.technology.messagequeue.rocketmq.message.MySource;
+import com.mdm.exception.APIException;
 import com.mdm.model.Response;
 import com.mdm.pojo.User;
 import lombok.SneakyThrows;
@@ -76,6 +77,7 @@ public class PracticeController {
             } catch (InterruptedException e) {
             }
         });
+//        return Response.exception(new APIException("自定义异常"));
         return Response.success(userInfoFeignClient.getNacosConfig().getBody());
     }
 
