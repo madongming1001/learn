@@ -8,6 +8,8 @@ import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.session.ResultHandler;
+import org.apache.ibatis.session.RowBounds;
 
 import java.sql.Connection;
 import java.util.Properties;
@@ -16,7 +18,9 @@ import java.util.Properties;
  * @author dongming.ma
  * @date 2022/6/12 19:35
  */
-@Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
+@Intercepts({
+        @Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
+        //@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class
 @Slf4j
 public class SlowSqlPlugin implements Interceptor {
     private long slowTime;
@@ -36,9 +40,8 @@ public class SlowSqlPlugin implements Interceptor {
         long timeCost = end - start;
         System.out.println(GsonObject.createGson().toJson(sql));
         if (timeCost > slowTime) {
-            System.out.println("慢耗时= " + timeCost);
-            System.out.println("本次数据库操作是慢查询，sql是:");
-            System.out.println(GsonObject.createGson().toJson(sql));
+            System.out.println("慢耗时 = " + timeCost);
+            System.out.println("本次数据库操作是慢查询，sql是: " + GsonObject.createGson().toJson(sql));
         }
         return proceed;
     }
