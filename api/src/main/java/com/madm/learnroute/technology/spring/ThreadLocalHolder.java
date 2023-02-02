@@ -14,7 +14,7 @@ public class ThreadLocalHolder {
      * 不同业务设置不同的业务场景，如：业务A设置值为1，业务B设置值为2...
      */
     private static class InnerClass {
-        private static final ThreadLocal<Integer> sceneThreadLocal = new ThreadLocal<>();
+        private static final ThreadLocal<String> sceneThreadLocal = new ThreadLocal<>();
     }
 
     public ThreadLocalHolder() {
@@ -25,11 +25,11 @@ public class ThreadLocalHolder {
         this.currentTime = System.currentTimeMillis();
     }
 
-    public static Integer getScene() {
+    public static String getScene() {
         return InnerClass.sceneThreadLocal.get();
     }
 
-    public static void initScene(Integer scene) {
+    public static void initScene(String scene) {
         InnerClass.sceneThreadLocal.set(scene);
     }
 

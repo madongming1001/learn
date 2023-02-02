@@ -25,6 +25,7 @@ public class TraceLogInterceptor implements HandlerInterceptor {
             traceId = getTraceId();
         }
         MDC.put(TRACE_LOG_ID.getValue(), traceId);
+        ThreadLocalHolder.initScene(traceId);
         return true;
     }
 
