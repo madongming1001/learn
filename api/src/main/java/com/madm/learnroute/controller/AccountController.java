@@ -6,6 +6,7 @@ import com.madm.learnroute.model.Account;
 import com.madm.learnroute.service.AccountService;
 import com.mdm.model.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Nullable;
@@ -28,6 +29,7 @@ public class AccountController {
         return RestResponse.OK();
     }
 
+    @Async("requestExecutor")
     @GetMapping("/findAccountById")
     public Account findAccountById(@RequestBody @Nullable AccountRequest requestParam) {
         return accountService.findAccountById(requestParam.getId());
