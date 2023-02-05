@@ -28,6 +28,14 @@ public class ThreadPoolExecutorMdcWrapper extends ThreadPoolExecutor {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
     }
 
+    public ThreadPoolExecutorMdcWrapper(String threadFactoryName) {
+        super(10, 10, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), (r) -> {
+            Thread thread = new Thread(r);
+            thread.setName(threadFactoryName);
+            return thread;
+        });
+    }
+
     @Override
     public void execute(Runnable task) {
         super.execute(ThreadMdcUtil.wrap(task, MDC.getCopyOfContextMap()));
