@@ -1,5 +1,8 @@
-package com.madm.learnroute.technology.spring;
+package com.madm.learnroute.config;
 
+import com.madm.learnroute.technology.spring.interceptor.AppkeyInterceptor;
+import com.madm.learnroute.technology.spring.interceptor.AuthInterceptor;
+import com.madm.learnroute.technology.spring.interceptor.TraceLogInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
