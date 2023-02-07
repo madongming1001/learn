@@ -1,4 +1,4 @@
-package com.madm.learnroute.technology.spring;
+package com.madm.learnroute.technology.spring.interceptor;
 
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.cloud.nacos.NacosConfigProperties;
