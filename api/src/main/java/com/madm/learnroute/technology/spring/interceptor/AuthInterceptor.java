@@ -1,4 +1,4 @@
-package com.madm.learnroute.technology.spring;
+package com.madm.learnroute.technology.spring.interceptor;
 
 import com.madm.learnroute.annotation.UserAuthenticate;
 import org.springframework.web.method.HandlerMethod;
