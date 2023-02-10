@@ -24,7 +24,7 @@ public class AccountController {
     @GetMapping("/save")
     public RestResponse save(@RequestBody @Nullable Account... account) {
         accountService.saveForJdbc(ArrayUtil.isNotEmpty(account) ? account[0] : Account.create());
-//        accountService.save(ArrayUtil.isNotEmpty(account) ? account[0] : Account.create());
+        accountService.save(ArrayUtil.isNotEmpty(account) ? account[0] : Account.create());
         return RestResponse.OK();
     }
 
