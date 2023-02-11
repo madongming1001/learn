@@ -1,6 +1,7 @@
-package com.madm.learnroute.technology.spring;
+package com.madm.learnroute.technology.spring.interceptor;
 
 import cn.hutool.core.util.RandomUtil;
+import com.madm.learnroute.technology.spring.ThreadLocalHolder;
 import org.slf4j.MDC;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
