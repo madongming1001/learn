@@ -15,8 +15,6 @@ public class GenericPractice {
         // 强转成 参数化类型 实体.
         ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
         System.out.println(parameterizedType);
-
-
         // 获取超类的泛型类型数组. 即SuperClass<User>的<>中的内容, 因为泛型可以有多个, 所以用数组表示
         Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
         Type genericType = actualTypeArguments[0];
