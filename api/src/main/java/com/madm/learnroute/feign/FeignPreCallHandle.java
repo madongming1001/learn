@@ -27,7 +27,6 @@ public class FeignPreCallHandle implements RequestInterceptor {
         String dispatcherURI = rs.url();
         String traceId = ThreadLocalHolder.getScene();
         log.info("set traceId: requestURI[{}], dispatcherURI[{}], traceId[{}]", requestURI, dispatcherURI, traceId);
-        rs.path();
     }
 
 }
