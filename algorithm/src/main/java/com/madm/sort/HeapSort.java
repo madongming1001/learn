@@ -1,13 +1,13 @@
-package com.madm.interview_guide;
+package com.madm.sort;
 
-public class KthLargestNumber {
+public class HeapSort {
 
     public static void main(String[] args) {
         int[] array = {7, 5, 15, 3, 17, 2, 20, 24, 1, 9, 12, 8};
-        System.out.println(findKthLargestNumber(array, 5));
+        System.out.println(findLargestNumberThanK(array, 5));
     }
 
-    public static int findKthLargestNumber(int[] array, int k) {
+    public static int findLargestNumberThanK(int[] array, int k) {
         // 用前k个元素构建最小堆
         buildHeap(array, k);
         // 继续遍历数组，和堆顶比较
