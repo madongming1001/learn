@@ -411,6 +411,14 @@ LinkedBlockingDeque：一个由链表结构组成的双向阻塞队列
 
 **地址：**https://www.processon.com/view/link/618ce3941e0853689b0818e2
 
+**阻塞队列插入和移除操作的4种处理方式**
+
+| 方法/处理方式 | 抛出异常    | 返回特殊值 | 超时退出               | 一直阻塞 |
+| ------------- | ----------- | ---------- | ---------------------- | -------- |
+| 插入方法      | add（e）    | offer（）  | offer（e，time，unit） | put（e） |
+| 移除方法      | remove（）  | poll（）   | poll（time，unit）     | take（） |
+| 检查方法      | element（） | peek（）   | 不可用                 | 不可用   |
+
 
 
 ### 原子操作类
