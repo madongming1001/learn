@@ -419,8 +419,6 @@ LinkedBlockingDeque：一个由链表结构组成的双向阻塞队列
 | 移除方法      | remove（）  | poll（）   | poll（time，unit）     | take（） |
 | 检查方法      | element（） | peek（）   | 不可用                 | 不可用   |
 
-
-
 ### 原子操作类
 
 #### 原子更新基本类型类

@@ -105,17 +105,17 @@ public class Heap {
     /**
      * 优先级队列实现小顶堆
      */
-    private static <T> void siftUpComparable(int k, T x, Object[] array) {
+    private static <T> void siftUpComparable(int k, T x, Object[] arr) {
         Comparable<? super T> key = (Comparable<? super T>) x;
         while (k > 0) {
             int parent = (k - 1) >>> 1;
-            Object e = array[parent];
+            Object e = arr[parent];
             if (key.compareTo((T) e) >= 0)
                 break;
-            array[k] = e;
+            arr[k] = e;
             k = parent;
         }
-        array[k] = key;
+        arr[k] = key;
     }
 
     public static void main(String[] args) {

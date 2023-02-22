@@ -12,10 +12,10 @@ public class OutputDigitalCombination {
      */
     public static void main(String[] args) {
         // TODO Auto-generated method stub
-        String[] array = new String[]{
+        String[] arr = new String[]{
                 "1", "2", "3", "4"
         };
-        listAll(Arrays.asList(array), " ");
+        listAll(Arrays.asList(arr), " ");
 
     }
 

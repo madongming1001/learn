@@ -1,5 +1,7 @@
 package com.madm.sort;
 
+import java.util.Arrays;
+
 import static cn.hutool.core.util.ArrayUtil.swap;
 
 /**
@@ -13,21 +15,23 @@ import static cn.hutool.core.util.ArrayUtil.swap;
 public class HeapSort {
 
     public static void main(String[] args) {
-        int[] array = {7, 5, 15, 3, 17, 2, 20, 24, 1, 9, 12, 8};
-        System.out.println(findLargestNumberThanK(array, 5));
+        int[] arr = {7, 5, 15, 3, 17, 2, 20, 24, 1, 9, 12, 8};
+        System.out.println(findLargestNumberThanK(arr, 5));
+        heapSort(arr);
+        System.out.println(Arrays.toString(arr));
     }
 
-    public static int findLargestNumberThanK(int[] array, int k) {
+    public static int findLargestNumberThanK(int[] arr, int k) {
         // 用前k个元素构建最小堆
-        buildHeap(array, k);
+        buildHeap(arr, k);
         // 继续遍历数组，和堆顶比较
-        for (int i = k; i < array.length; i++) {
-            if (array[i] > array[0]) {
-                array[0] = array[i];
-                downAdjust(array, 0, k);
+        for (int i = k; i < arr.length; i++) {
+            if (arr[i] > arr[0]) {
+                arr[0] = arr[i];
+                downAdjust(arr, 0, k);
             }
         }
-        return array[0];
+        return arr[0];
     }
 
     private static void buildHeap(int[] arr, int index) {
@@ -38,25 +42,25 @@ public class HeapSort {
         }
     }
 
-    private static void downAdjust(int[] array, int index, int length) {
+    private static void downAdjust(int[] arr, int index, int length) {
         //temp保存父节点的值，用于最后的赋值
-        int temp = array[index];
+        int temp = arr[index];
         int childIndex = (2 * index) + 1;
         while (childIndex < length) {
             // 如果有右孩子，且右孩子小于左孩子的值，则定位到右孩子
-            if (((childIndex + 1) < length) && (array[childIndex + 1] < array[childIndex])) {
+            if (((childIndex + 1) < length) && (arr[childIndex + 1] < arr[childIndex])) {
                 childIndex++;
             }
             // 如果父节点的值小于任何一个孩子的值，直接跳出
-            if (temp <= array[childIndex]) {
+            if (temp <= arr[childIndex]) {
                 break;
             }
             // 无需真正的交换，单向赋值即可
-            array[index] = array[childIndex];
+            arr[index] = arr[childIndex];
             index = childIndex;
             childIndex = (2 * childIndex) + 1;
         }
-        array[index] = temp;
+        arr[index] = temp;
     }
 
     private static void initializeHeap(int[] arr, int index) {
