@@ -1,5 +1,6 @@
 package com.madm.interview_guide;
 
+import com.mdm.utils.PrintUtil;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -19,7 +20,10 @@ public class NQueen {
     }
 
     public static void main(String[] args) {
-        System.out.println(new NQueen(4).getRes());
+//        System.out.println(new NQueen(4).getRes());
+        int[] chars = new int[256];
+        Arrays.fill(chars, -1);
+        System.out.println(Arrays.toString(chars));
     }
 
     public List<List<String>> solveNQueens(int n) {
