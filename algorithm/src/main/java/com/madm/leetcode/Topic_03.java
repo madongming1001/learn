@@ -62,7 +62,7 @@ public class Topic_03 {
         int start = 0; // 窗口开始位置
         for (int i = 0; i < s.length(); i++) {
             int index = s.charAt(i);
-            start = Math.max(start, last[index] + 1);
+            start = Math.max(start, last[index] + 1);//上一次字符出现的位置
             max = Math.max(max, i - start + 1);
             last[index] = i;
         }
