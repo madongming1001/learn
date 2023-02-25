@@ -24,7 +24,7 @@ public class AccountController {
     @Autowired
     AccountService accountService;
 
-    @Autowired
+//    @Autowired
     Redisson redisson;
 
     @GetMapping("/save")
