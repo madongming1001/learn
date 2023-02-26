@@ -24,11 +24,11 @@ public class AccountController {
     @Autowired
     AccountService accountService;
 
-//    @Autowired
+    //    @Autowired
     Redisson redisson;
 
     @GetMapping("/save")
-    public RestResponse save(@RequestBody @Nullable Account... account) {
+    public RestResponse save(@RequestBody Account... account) {
         accountService.saveForJdbc(ArrayUtil.isNotEmpty(account) ? account[0] : Account.create());
         accountService.save(ArrayUtil.isNotEmpty(account) ? account[0] : Account.create());
         return RestResponse.OK();
