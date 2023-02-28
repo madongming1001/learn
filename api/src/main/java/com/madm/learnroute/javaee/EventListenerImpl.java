@@ -11,6 +11,6 @@ public class EventListenerImpl implements EventListener {
 
     @Override
     public void onEvent() {
-        System.out.println("EventListenerImpl");
+        System.out.println("service loader test");
     }
 }
