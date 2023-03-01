@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
 
 /**
@@ -16,10 +17,19 @@ import java.util.concurrent.RecursiveTask;
 /**
  * 特点：
  * 1、分裂的父线程不必等待子线程的结果，线程暂停
- * 2、工作窃取
+ * 2、工作窃取,每个线程都有自己的工作队列，对于工作线程来说执行任务是后进先出，窃取线程执行任务是先进先出
  */
 @Data
 public class ForkJoinPoolPractice extends RecursiveTask<Integer> {
+
+    public static void main(String[] args) {
+        ForkJoinPoolPractice task = new ForkJoinPoolPractice(0, 999, RandomUtil.randomInts(1000));
+        long startTime = System.nanoTime();
+        ForkJoinTask<Integer> submit = ForkJoinPool.commonPool().submit(task);
+        long endTime = System.nanoTime();
+        System.out.println("Forkjoin compare: " + submit.join() + " in " + (endTime - startTime) / 1000 / 1000 + " ms.");
+    }
+
     private static int[] dou;
     private int first;
     private int last;
@@ -58,18 +68,4 @@ public class ForkJoinPoolPractice extends RecursiveTask<Integer> {
         return subCount;
     }
 
-    public void setThreadShould(int threadShould) {
-        this.threadShould = threadShould;
-    }
-}
-
-class ForkJoinTestMain {
-    public static void main(String[] args) {
-
-        ForkJoinPoolPractice task = new ForkJoinPoolPractice(0, 999, RandomUtil.randomInts(1000));
-        long startTime = System.currentTimeMillis();
-        int result = ForkJoinPool.commonPool().invoke(task);
-        long endTime = System.currentTimeMillis();
-        System.out.println("Fork/join compare: " + result + " in " + (endTime - startTime) + " ms.");
-    }
 }
