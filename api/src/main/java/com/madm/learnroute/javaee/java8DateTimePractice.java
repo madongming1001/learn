@@ -55,20 +55,20 @@ public class java8DateTimePractice {
 
     @SneakyThrows
     public static void main(String[] args) {
-        testLocalDateAndTime();
+//        testLocalDateAndTime();
         testPeriod();
-        testDuration();
-        long ctm = System.currentTimeMillis();
-        long ztm = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
-        long zdt = ZonedDateTime.now().toInstant().toEpochMilli();
-        System.out.println("ctm = " + ctm + " ztm = " + ztm + " zdt = " + zdt);
-        Assert.isTrue(ctm == ztm);
-
-        System.out.println(LocalDate.now());
-        System.out.println(LocalTime.now());
-        System.out.println(LocalDateTime.now());//中间T代表时间分割的字符
-
-        System.out.println(timeUnitTable.get("s"));
+//        testDuration();
+//        long ctm = System.currentTimeMillis();
+//        long ztm = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+//        long zdt = ZonedDateTime.now().toInstant().toEpochMilli();
+//        System.out.println("ctm = " + ctm + " ztm = " + ztm + " zdt = " + zdt);
+//        Assert.isTrue(ctm == ztm);
+//
+//        System.out.println(LocalDate.now());
+//        System.out.println(LocalTime.now());
+//        System.out.println(LocalDateTime.now());//中间T代表时间分割的字符
+//
+//        System.out.println(timeUnitTable.get("s"));
     }
 
     private static void testLocalDateAndTime() {
@@ -118,8 +118,8 @@ public class java8DateTimePractice {
 
     private static void testPeriod() {
         // 比较两个LocalDate相差多少年、月、天
-        LocalDate startDate = LocalDate.of(2015, 2, 20);
-        LocalDate endDate = LocalDate.of(2017, 1, 15);
+        LocalDate startDate = LocalDate.of(2023, 1, 30);
+        LocalDate endDate = LocalDate.of(2023, 2, 25);
         Period period = Period.between(startDate, endDate);
         log.info("Years:" + period.getYears() + " months:" + period.getMonths() + " days:" + period.getDays());
         Assert.isFalse(period.isNegative());

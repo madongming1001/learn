@@ -2,6 +2,7 @@ package com.madm.learnroute.technology.disruptor;
 
 import com.madm.learnroute.service.AccountService;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -17,11 +18,11 @@ import java.util.Map;
  * @date 2023/1/18 17:52
  */
 @Component
-public class BeanManager implements ApplicationContextAware, InitializingBean {
+public class BeanManager implements ApplicationContextAware, InitializingBean, DisposableBean {
 
     private static ApplicationContext applicationContext;
 
-    private final Map<Integer, AccountService> handlerMap = new HashMap<>();
+    private final static Map<String, AccountService> handlerMap = new HashMap<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -44,16 +45,19 @@ public class BeanManager implements ApplicationContextAware, InitializingBean {
     public void afterPropertiesSet() {
         Map<String, AccountService> beanMap = applicationContext.getBeansOfType(AccountService.class);
         beanMap.forEach((k, v) -> {
-            handlerMap.put(beanMap.get(k).hashCode(), v);
+            handlerMap.put(k, v);
         });
     }
 
-    public AccountService getHandler(Integer type) {
-        if (handlerMap.containsKey(type)) {
-            return handlerMap.get(type);
+    public static AccountService getHandler(String className) {
+        if (handlerMap.containsKey(className)) {
+            return handlerMap.get(className);
         }
         return null;
     }
 
+    @Override
+    public void destroy() throws Exception {
 
+    }
 }

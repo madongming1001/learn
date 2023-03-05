@@ -26,40 +26,60 @@
 
 ## **1、常量传播**
 
-常量传播，就是说在编译期时，能够直接计算出结果（这个结果往往是常量）的变量，将被编译器由直接计算出的结果常量来替换这个变量。
+常量传播，就是说在编译期时，能够直接计算出结果（这个结果往往是常量）的变量，将被编译器由直接计算出的结果常量来替换这个变量。**能够直接计算出结果就用直接计算的结果**。
 
 例：
 
 ```java
-intmain(intargc,char**argv){intx=1;std::cout<<x<<std::endl;return0;}
+int main(int argc,char **argv){
+    int x = 1;
+    std::cout<<x<<std::endl;
+    return 0;
+}
 ```
 
 上例种，编译器会直接用常量1替换变量x，优化成：
 
 ```java
-intmain(intargc,char**argv){std::cout<<1<<std::endl;return0;}
+int main(int argc,char **argv){
+    std::cout<<1<<std::endl;
+    return 0;
+}
 ```
 
 ## **2、常量折叠**
 
-常量折叠，就是说在编译期间，**如果有可能，多个变量的计算可以最终替换为一个变量的计算，通常是多个变量的多级冗余计算被替换为一个变量的一级计算**
+常量折叠，就是说在编译期间，**如果有可能，多个变量的计算可以最终替换为一个变量的计算，通常是多个变量的多级冗余计算被替换为一个变量的一级计算。**
 
 例：
 
-```
-intmain(intargc,char**argv){inta=1;intb=2;intx=a+b;std::cout<<x<<std::endl;return0;}
+```java
+int main(int argc,char **argv){
+    int a = 1;
+    int b = 2;
+    int x = a + b;
+    std::cout<<x<<std::endl;
+    return 0;
+}
 ```
 
 常量折叠优化后：
 
-```
-intmain(intargc,char**argv){intx=1+2;std::cout<<x<<std::endl;return0;}
+```java
+int main(int argc,char **argv){
+    int x = 1 + 2;
+    std::cout<<x<<std::endl;
+    return 0;
+}
 ```
 
 当然，可以再进行进一步的常量替换优化：
 
-```
-intmain(intargc,char**argv){std::cout<<3<<std::endl;return0;}
+```java
+int main(int argc,char **argv){
+    std::cout<<3<<std::endl;
+    return 0;
+}
 ```
 
 通常，编译优化是一件综合且连贯一致的复杂事情，下文就不再赘述了。
@@ -70,14 +90,23 @@ intmain(intargc,char**argv){std::cout<<3<<std::endl;return0;}
 
 例：
 
-```
-intmain(intargc,char**argv){inty=1;intx=y;std::cout<<x<<std::endl;return0;}
+```java
+int main(int argc,char **argv){
+    int y = 1;
+    int x = y;
+    std::cout<<x<<std::endl;
+    return 0;
+}
 ```
 
 优化后：
 
-```
-intmain(intargc,char**argv){intx=1;std::cout<<x<<std::endl;return0;}
+```java
+int main(int argc,char **argv){
+    int x = 1;
+    std::cout<<x<<std::endl;
+    return 0;
+}
 ```
 
 上例有两个变量y和x，但是其实是两个相同的变量，并且其它地方并未区分它们两个，所以它们是重复的，可称为“复写”，编译器可以将其优化，将x“传播”给y，只剩下一个变量x，当然，反过来优化掉x只剩下一个y也是可以的。
@@ -88,20 +117,40 @@ intmain(intargc,char**argv){intx=1;std::cout<<x<<std::endl;return0;}
 
 例：
 
-```
-intmain(intargc,char**argv){inta=1;intb=2;intx=（a+b)*2+(b+a)*6;std::cout<<x<<std::endl;return0;}
+```java
+int main(int argc,char **argv){
+    int a = 1;
+    int b = 2;
+    int x = （a+b) * 2 + (b+a) * 6;
+    std::cout<<x<<std::endl;
+    return 0;
+}
 ```
 
 优化后：
 
-```
-intmain(intargc,char**argv){inta=1;intb=2;intE=a+b;intx=E*2+E*6;std::cout<<x<<std::endl;return0;}
+```java
+int main(int argc,char **argv){
+    int a = 1;
+    int b = 2;
+    int E = a + b;
+    int x = E * 2 + E * 6;
+    std::cout<<x<<std::endl;
+    return 0;
+}
 ```
 
 当然，也有可能会直接变成：
 
-```
-intmain(intargc,char**argv){inta=1;intb=2;intE=a+b;intx=E*8;std::cout<<x<<std::endl;return0;}
+```java
+int main(int argc,char **argv){
+    int a = 1;
+    int b = 2;
+    int E = a + b;
+    int x = E * 8;
+    std::cout<<x<<std::endl;
+    return 0;
+}
 ```
 
 ## **5、无用代码消除**
@@ -110,14 +159,23 @@ intmain(intargc,char**argv){inta=1;intb=2;intE=a+b;intx=E*8;std::cout<<x<<std::e
 
 例：
 
-```
-intmain(intargc,char**argv){intx=1;intx=x;std::cout<<x<<std::endl;return0;}
+```java
+int main(int argc,char **argv){
+    int x = 1;
+    int x = x;
+    std::cout<<x<<std::endl;
+    return 0;
+}
 ```
 
 上例中，x变量自我赋值显然是无用代码，将会被优化掉：
 
-```
-intmain(intargc,char**argv){intx=1;std::cout<<x<<std::endl;return0;}
+```java
+int main(int argc,char **argv){
+    int x = 1;
+    std::cout<<x<<std::endl;
+    return 0;
+}
 ```
 
 ## **6、数组范围检查消除**
@@ -142,7 +200,7 @@ intmain(intargc,char**argv){intx=1;std::cout<<x<<std::endl;return0;}
 
 **同步消除（SynchronizationElimination）**：线程同步本身是一个相对耗时的过程，如果逃逸分析能够确定一个变量不会逃逸出线程，无法被其他线程访问，那么这个变量的读写肯定就不会有竞争，对这个变量实施的同步措施也就可以安全地消除掉。
 
-
+**参考文章：**https://zhuanlan.zhihu.com/p/381490718
 
 # quasar
 
@@ -711,7 +769,7 @@ System.out.println(i);
 
 ## C1和C2编译器的优化策略不同
 
-C1主要有方法内联，去虚拟化冗余消除
+C1主要有**方法内联，去虚拟化冗余消除**
 
 ​				**方法内联：**将引用函数代码编译到引用点处，这样可以减少栈帧的生成，减少参数传递以及跳转过程
 
@@ -719,7 +777,7 @@ C1主要有方法内联，去虚拟化冗余消除
 
 　　　　**冗余消除：**在运行期间，把一些不会运行的代码折叠掉
 
-C2的优化主要是在全局层面，逃逸分析是优化的基础，基于逃逸分析在C2上有如下几种优化
+C2的优化主要是在**全局层面，逃逸分析**是优化的基础，基于逃逸分析在C2上有如下几种优化
 
 　　　　**标量替换：**用标量值替换聚合对象的属性值
 
@@ -731,7 +789,7 @@ C2的优化主要是在全局层面，逃逸分析是优化的基础，基于逃
 
 　　　　程序解释执行（不开启性能监控）可以触发C1编译，将字节码编译成机器码，可以进行简单优化，也可以加上性能监控，C2编译会根据性能监控信息进行激进优化。
 
-　　　　当显式指定了-server   时，默认开启分层编译策略，由C1编译器和C2编译器相互协作共同来执行编译任务。
+　　　　当显式指定了-server时，默认开启分层编译策略，由C1编译器和C2编译器相互协作共同来执行编译任务。
 
 **运行过程中会被即时编译器编译的“热点代码”有两类：**
 

@@ -1,7 +1,7 @@
 package com.madm.interview_guide;
 
 import com.madm.sort.MergeSort;
-import com.mdm.utils.RandomGeneratorNumberUtil;
+import com.mdm.utils.RandomUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +19,7 @@ public class BiggestElementsSort {
 
     public static void main(String[] args) {
         // 1.获取数据源
-        int[] sourcesData = RandomGeneratorNumberUtil.createArrayOf(1000_0000);
+        int[] sourcesData = RandomUtil.createArrayOf(1000_0000);
         // 2.开始排序
         long begin = System.currentTimeMillis();
         Integer[] processor = BiggestElementsSort.processor(sourcesData, 2);

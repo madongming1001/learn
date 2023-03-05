@@ -1,12 +1,15 @@
 package com.madm.learnroute.javaee.concurrent.juc.threadpool;
 
 import lombok.SneakyThrows;
+import org.junit.Test;
 
 import java.sql.SQLOutput;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ThreadPoolExecutorPractice {
 
@@ -30,23 +33,25 @@ public class ThreadPoolExecutorPractice {
 
     @SneakyThrows
     public static void main(String[] args) {
-        ExecutorService executorService = Executors.newFixedThreadPool(1);
-
-        executorService.submit(() -> {
-            System.out.println(Thread.currentThread().getName());
-            int i = 1 / 0;
-        });
-
-        Thread.sleep(2000L);
-        executorService.submit(() -> {
-            System.out.println(Thread.currentThread().getName());
-            System.out.println("当线程池抛出异常后继续新的任务");
-        });
-
-        executeSchedule();
-        threadPoolParameterTest();
+//        ExecutorService executorService = Executors.newFixedThreadPool(1);
+//
+//        executorService.submit(() -> {
+//            System.out.println(Thread.currentThread().getName());
+//            int i = 1 / 0;
+//        });
+//
+//        Thread.sleep(2000L);
+//        executorService.submit(() -> {
+//            System.out.println(Thread.currentThread().getName());
+//            System.out.println("当线程池抛出异常后继续新的任务");
+//        });
+//
+//        executeSchedule();
+//        threadPoolParameterTest();
+//        firstThreadBlockingOtherThreads();
+//        test();
+//        workStealingPoolTest();
         firstThreadBlockingOtherThreads();
-        test();
     }
 
     private static void threadPoolParameterTest() {
@@ -139,9 +144,7 @@ public class ThreadPoolExecutorPractice {
             //创建一个线程
             Thread thread = new Thread(runnable);
             //给创建的线程设置UncaughtExceptionHandler对象 里面实现异常的默认逻辑
-//            thread.setDefaultUncaughtExceptionHandler((Thread t1, Throwable e) -> {
-//                System.out.println("线程工厂设置的exceptionHandler" + e.getMessage());
-//            });
+            thread.setDefaultUncaughtExceptionHandler((Thread t1, Throwable e) -> System.out.println("线程工厂设置的exceptionHandler" + e.getMessage()));
             return thread;
         }) {
             @Override
@@ -153,12 +156,17 @@ public class ThreadPoolExecutorPractice {
             protected void afterExecute(Runnable r, Throwable t) {
 
             }
+
+            @Override
+            protected void terminated() {
+
+            }
         };
         AtomicInteger atomicInteger = new AtomicInteger();
         for (int i = 0; i < 5; i++) {
             threadPoolExecutor.execute(() -> {
                 int number = atomicInteger.getAndIncrement();
-                System.out.println("当前线程名称 ：" + Thread.currentThread().getName());
+                System.out.println("当前线程名称 ：" + Thread.currentThread().getThreadGroup().getName());
                 while (true) {
                     int a = 1 / 0;
                     try {
@@ -184,7 +192,6 @@ public class ThreadPoolExecutorPractice {
 
     @SneakyThrows
     private static void executeSchedule() {
-        ExecutorService ws = Executors.newWorkStealingPool();
         // 线程池的对应状态：
         // RUNNING
         // SHUTDOWN
@@ -234,6 +241,34 @@ public class ThreadPoolExecutorPractice {
 //        ExecutorService executorService2 = Executors.newFixedThreadPool(10);
 //        ScheduledExecutorService executorService3 = Executors.newScheduledThreadPool(10);
 //        ExecutorService executorService4 = Executors.newSingleThreadExecutor();
+    }
+
+    private static void workStealingPoolTest() throws InterruptedException {
+        System.out.println("获得JAVA虚拟机可用的最大CPU处理器数量：" + Runtime.getRuntime().availableProcessors());
+        ExecutorService executorService = Executors.newWorkStealingPool();
+        /**
+         * call方法存在返回值futureTask的get方法可以获取这个返回值。
+         * 使用此种方法实现线程的好处是当你创建的任务的结果不是立即就要时，
+         * 你可以提交一个线程在后台执行，而你的程序仍可以正常运行下去，
+         * 在需要执行结果时使用futureTask去获取即可。
+         */
+        List<Callable<String>> callableList = IntStream.range(0, 20).boxed().map(i -> (Callable<String>) () -> {
+            TimeUnit.SECONDS.sleep(3);
+            System.out.println(String.format("当前【%s】线程正在执行>>>", Thread.currentThread().getName()));
+            return "callable type thread task：" + i;
+        }).collect(Collectors.toList());
+
+        // 执行给定的任务，返回持有他们的状态和结果的所有完成的期待列表。
+        executorService.invokeAll(callableList).stream().map(futureTask -> {
+            try {
+                return futureTask.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).forEach(System.out::println);
     }
 
 }

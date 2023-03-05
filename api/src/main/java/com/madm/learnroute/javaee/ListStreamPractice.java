@@ -1,5 +1,6 @@
 package com.madm.learnroute.javaee;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.mdm.pojo.Invitee;
@@ -19,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ListStreamPractice {
 
@@ -37,6 +39,7 @@ public class ListStreamPractice {
             list1.remove("Pear");
             System.out.println(list1);
         }
+        RandomUtil.randomChinese();
 
         int init = 0;
         List<String> userIds = new ArrayList<>();
@@ -86,6 +89,10 @@ public class ListStreamPractice {
         List<String> newInstance = Lists.newArrayList("1", "2", "3", "4", "5", "6", "1");
         List<String> oldInstance = Lists.newArrayList("3", "232", "35", "24", "5", "6", "1");
 
+        List<Invitee> inviteeCompression = Stream.of(invitees, Arrays.asList(new Invitee(3l, "2", "3"), new Invitee(36l, "36", "36")))
+                .flatMap(invitee -> invitee.stream()).collect(Collectors.toList());
+
+
         //add：加、subtract：减、multiply：乘、divide：除
         System.out.println(CollectionUtils.union(newInstance, oldInstance));//并集：给定两个集合A，B，把他们所有的元素合并在一起组成的集合
         System.out.println(CollectionUtils.intersection(newInstance, oldInstance));//交集：对于给定的两个集合，返回一个包含两个集合中共有元素的新集合。
@@ -98,7 +105,7 @@ public class ListStreamPractice {
         Map<Long, Invitee> collect4 = invitees.stream().collect(Collectors.toMap(key -> key.getUserId(), Function.identity()));
         Map<Long, List<Invitee>> collect5 = invitees.stream().collect(Collectors.groupingBy(Invitee::getUserId));
         Map<Long, LongSummaryStatistics> collect6 = invitees.stream().collect(Collectors.groupingBy(Invitee::getUserId, Collectors.summarizingLong(Invitee::getUserId)));
-        Map<Long, List<String>> collect7 = invitees.stream().collect(Collectors.groupingBy(Invitee::getUserId, LinkedHashMap::new,Collectors.mapping(Invitee::getNickName, Collectors.toList())));
+        Map<Long, List<String>> collect7 = invitees.stream().collect(Collectors.groupingBy(Invitee::getUserId, LinkedHashMap::new, Collectors.mapping(Invitee::getNickName, Collectors.toList())));
         System.out.println("collect4 :" + collect4);
         System.out.println("collect5 :" + collect5);
         System.out.println("collect6 :" + collect6);

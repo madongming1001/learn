@@ -1,7 +1,6 @@
 package com.madm.learnroute.javaee.concurrent.juc;
 
 import com.mdm.exception.DataCenterRuntimeException;
-import com.mdm.exception.RsaException;
 import jodd.exception.ExceptionUtil;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -14,7 +13,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @author dongming.ma
  * @date 2022/10/28 12:58
  */
-public class ExecutorsExceptionPractice {
+public class ThreadPoolExceptionPractice {
     public static void main(String[] args) {
         ThreadPoolTaskExecutor executorService = buildThreadPoolTaskExecutor();
         executorService.execute(() -> sayHi("execute"));

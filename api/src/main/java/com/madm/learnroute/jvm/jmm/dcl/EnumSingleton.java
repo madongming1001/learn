@@ -32,5 +32,6 @@ public class EnumSingleton {
         EnumSingleton a = EnumSingleton.getInstance();
         EnumSingleton b = EnumSingleton.getInstance();
         System.out.println(a == b);//true
+        assert a == b;
     }
 }

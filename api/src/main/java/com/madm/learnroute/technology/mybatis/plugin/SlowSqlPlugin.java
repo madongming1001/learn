@@ -38,7 +38,7 @@ public class SlowSqlPlugin implements Interceptor {
         Object proceed = invocation.proceed();
         long end = System.currentTimeMillis();
         long timeCost = end - start;
-        System.out.println(GsonObject.createGson().toJson(sql));
+//        System.out.println(GsonObject.createGson().toJson(sql));
         if (timeCost > slowTime) {
             System.out.println("慢耗时 = " + timeCost);
             System.out.println("本次数据库操作是慢查询，sql是: " + GsonObject.createGson().toJson(sql));

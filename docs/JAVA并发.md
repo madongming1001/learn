@@ -113,6 +113,59 @@ Worker这个工作线程，实现了Runnable接口，并持有一个线程thread
 
 （5）在SystemDictionary::load_instance_class()这个能体现双亲委派的函数中，如果类加载器对象不为空，则会调用这个类加载器的loadClass()函数（通过call_virtual()函数来调用）来加载类。
 
+## 线程设置统一异常
+
+`Thread`类的`setDefaultUncaughtExceptionHandler()`方法设置当线程由于未捕获的异常而突然终止时调用的默认处理程序，并且没有为该线程定义其他处理程序。**入口是由JVM调用**。
+
+调用过程 **dispatchUncaughtException**() -> **uncaughtException**()，每个main线程new出来的线程在没有指定子线程的threadgroup的时候用的都是main线程，这个时候**Thread.currentThread().getThreadGroup().getName()**会是main的名字，而main线程的**parent.getThreadGroup().getName()**是system
+
+```java
+private void dispatchUncaughtException(Throwable e) {
+    getUncaughtExceptionHandler().uncaughtException(this, e);
+}
+public void uncaughtException(Thread t, Throwable e) {
+    if (parent != null) {
+      parent.uncaughtException(t, e);
+    } else {
+      Thread.UncaughtExceptionHandler ueh =
+        Thread.getDefaultUncaughtExceptionHandler();
+      if (ueh != null) {
+        ueh.uncaughtException(t, e);
+      } else if (!(e instanceof ThreadDeath)) {
+        System.err.print("Exception in thread \""
+                         + t.getName() + "\" ");
+        e.printStackTrace(System.err);
+      }
+    }
+}
+```
+
+```java
+ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 20, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue(), (runnable) -> {
+    //1.实现一个自己的线程池工厂
+    //创建一个线程
+    Thread thread = new Thread(runnable);
+    //给创建的线程设置UncaughtExceptionHandler对象 里面实现异常的默认逻辑
+    thread.setDefaultUncaughtExceptionHandler((Thread t1, Throwable e) -> System.out.println("线程工厂设置的exceptionHandler" + e.getMessage()));
+    return thread;
+}) {
+    @Override
+    protected void beforeExecute(Thread t, Runnable r) {
+
+    }
+
+    @Override
+    protected void afterExecute(Runnable r, Throwable t) {
+
+    }
+
+    @Override
+    protected void terminated() {
+        
+    }
+};
+```
+
 
 
 ## Thread和Runnable的关系？
@@ -727,7 +780,7 @@ private static class InstanceHolder {
 
 ![image-20220711125639043](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220711125639043.png)
 
-
+**参考文章：**https://www.cnblogs.com/hongdada/p/14087177.html
 
 ## 偏向锁
 
@@ -998,7 +1051,11 @@ ObjectMonitor::ObjectMonitor() {
 
 锁是用来控制多个线程访问共享资源的方式，一般来说，一个锁能够防止多个线程同时访问共享资源（但是有些锁可以允许多个线程并发的访问共享资源，比如读写锁）。在Lock接口出现之前，java程序是靠synchronized关键字实现锁功能的，而**java SE 5**之后，并发包中新增了Lock接口（以及相关实现类）用来实现锁功能，它提供了与synchronized关键字类似的同步功能，只是在使用时需要显示地获取和释放锁。虽然它缺少了（通过synchronized块或者方法所提供的）隐式获取释放锁的便携性，但是却拥有了锁获取与释放的可操作性、可中断的获取锁以及超时获取锁等多种synchronized关键字所不具备的同步特性。
 
-**AbstractQueuedSynchronizer（以下简称同步器），是用来构建锁或者其他同步组建的基础框架，他是用了一个int成员变成表示同步状态，通过内置的FIFO队列来完成资源获取线程的排队工作。** 
+**AbstractQueuedSynchronizer（以下简称同步器），是用来构建锁或者其他同步组建的基础框架，他是用了一个int成员变成表示同步状态，通过内置的FIFO队列来完成资源获取线程的排队工作。临界资源是一次仅允许一个进程使用的共享资源。每个进程中访问临界资源的那段代码称为临界区。** 
+
+## ReentrankLock
+
+![img](https://p0.meituan.net/travelcube/412d294ff5535bbcddc0d979b2a339e6102264.png)
 
 ## 公平非公平锁区别jdk1.8
 
@@ -1056,6 +1113,14 @@ ObjectMonitor::ObjectMonitor() {
             }
             return false;
         }
+```
+
+```java
+public final void acquire(int arg) {
+    if (!tryAcquire(arg) &&
+        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+        selfInterrupt();
+}
 ```
 
 **核心方法**
