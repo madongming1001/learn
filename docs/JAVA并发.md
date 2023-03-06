@@ -1296,3 +1296,11 @@ for(T element: this stream){
 return result;
 ```
 
+
+
+# ServiceLoader
+
+```java
+ClassLoader.getSystemResources(fullName);
+loader.getResources(fullName);
+```

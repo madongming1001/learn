@@ -2,7 +2,7 @@ package com.mdm.headfirst.proxy.javaproxy;
  
 import java.lang.reflect.*;
  
-public class NonOwnerInvocationHandler implements InvocationHandler { 
+public class NonOnerInvocationHandler implements InvocationHandler {
 	Person person;
  
 	public NonOwnerInvocationHandler(Person person) {

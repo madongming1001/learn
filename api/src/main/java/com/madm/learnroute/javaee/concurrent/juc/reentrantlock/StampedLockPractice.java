@@ -15,32 +15,32 @@ import java.util.concurrent.locks.StampedLock;
 public class StampedLockPractice {
     private double x, y;
 
-    private final StampedLock sl = new StampedLock();
+    private final StampedLock stampedLock = new StampedLock();
 
     void move(double deltaX, double deltaY) { // an exclusively locked method
         // 获取写锁
-        long stamp = sl.writeLock();
+        long stamp = stampedLock.writeLock();
         try {
             x += deltaX;
             y += deltaY;
         } finally {
-            sl.unlockWrite(stamp);
+            stampedLock.unlockWrite(stamp);
         }
     }
 
     double distanceFromOrigin() { // A read-only method
         // 获取乐观读锁
-        long stamp = sl.tryOptimisticRead();
+        long stamp = stampedLock.tryOptimisticRead();
         double currentX = x, currentY = y;
         // 检查乐观读锁后是否有其他写锁发生
-        if (!sl.validate(stamp)) {
+        if (!stampedLock.validate(stamp)) {
             // 乐观锁加成失败，重新获取读锁
-            stamp = sl.readLock();
+            stamp = stampedLock.readLock();
             try {
                 currentX = x;
                 currentY = y;
             } finally {
-                sl.unlockRead(stamp);
+                stampedLock.unlockRead(stamp);
             }
         }
         return Math.sqrt(currentX * currentX + currentY * currentY);
@@ -49,11 +49,11 @@ public class StampedLockPractice {
     void moveIfAtOrigin(double newX, double newY) { // upgrade
         // Could instead start with optimistic, not read mode
         // 获取读锁
-        long stamp = sl.readLock();
+        long stamp = stampedLock.readLock();
         try {
             while (x == 0.0 && y == 0.0) {
                 // 尝试升级为写锁
-                long ws = sl.tryConvertToWriteLock(stamp);
+                long ws = stampedLock.tryConvertToWriteLock(stamp);
                 // 如果失败，返回0
                 if (ws != 0L) {
                     stamp = ws;
@@ -61,12 +61,12 @@ public class StampedLockPractice {
                     y = newY;
                     break;
                 } else {
-                    sl.unlockRead(stamp);
-                    stamp = sl.writeLock();
+                    stampedLock.unlockRead(stamp);
+                    stamp = stampedLock.writeLock();
                 }
             }
         } finally {
-            sl.unlock(stamp);
+            stampedLock.unlock(stamp);
         }
     }
 }
