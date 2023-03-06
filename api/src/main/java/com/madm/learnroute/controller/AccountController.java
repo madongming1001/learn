@@ -58,4 +58,10 @@ public class AccountController {
     public List<Account> findAllForCursorFetchSize() {
         return accountService.findAllForCursorFetchSize();
     }
+
+    @GetMapping("/updateAllUserName")
+    public RestResponse updateAllUserName() {
+        accountService.updateAllUserName();
+        return RestResponse.OK();
+    }
 }

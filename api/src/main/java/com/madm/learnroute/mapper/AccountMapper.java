@@ -11,12 +11,14 @@ import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.mapping.ResultSetType;
 import org.apache.ibatis.session.ResultHandler;
 
+import java.io.Closeable;
+
 /**
  * @author dongming.ma
  * @date 2022/11/9 22:05
  */
 @Mapper
-public interface AccountMapper extends BaseMapper<Account> {
+public interface AccountMapper extends BaseMapper<Account>, Closeable {
     //分页查询
     @Select("SELECT * FROM account ${ew.customSqlSegment} ")
     IPage<Account> pageList(IPage<Account> page, @Param(Constants.WRAPPER) QueryWrapper<Account> queryWrapper);

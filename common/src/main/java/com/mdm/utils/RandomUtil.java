@@ -54,8 +54,9 @@ public class RandomUtil {
     public static List<String> randomChinese2(int count, int length) {
         List<String> res = new ArrayList<>();
         for (int i = 0; i < length; i++) {
-            StringBuilder str = new StringBuilder(count);
-            for (int j = 0; j < count; j++) {
+            int nameLength = randomInt(2, 5);
+            StringBuilder str = new StringBuilder(nameLength);
+            for (int j = 0; j < nameLength; j++) {
                 char word = (char) randomInt('\u4E00', '\u9FFF');//\\u是转义字符，表示后面跟一个十六进制数 19968 ~ 40959
                 str.append(word);
             }

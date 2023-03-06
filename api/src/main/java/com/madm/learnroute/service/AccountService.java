@@ -20,4 +20,6 @@ public interface AccountService extends IService<Account> {
     List<Account> findAllForCursor();
 
     List<Account> findAllForCursorFetchSize();
+
+    void updateAllUserName();
 }

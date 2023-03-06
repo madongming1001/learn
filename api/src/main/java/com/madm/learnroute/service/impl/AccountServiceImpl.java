@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.madm.learnroute.mapper.AccountMapper;
 import com.madm.learnroute.model.Account;
 import com.madm.learnroute.service.AccountService;
+import com.mdm.utils.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.shaded.com.google.common.collect.Lists;
 import org.apache.ibatis.cursor.Cursor;
@@ -84,5 +85,18 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
             log.error("findAllForCursorFetchSize method execution exception :{}", ExceptionUtil.getMessage(e));
         }
         return result;
+    }
+
+    @Override
+    public void updateAllUserName() {
+        try (SqlSession sqlSession = sqlSessionFactory.openSession(); AccountMapper accountMapper = sqlSession.getMapper(AccountMapper.class)) {
+            List<Account> accountList = accountMapper.selectList(Wrappers.emptyWrapper());
+            List<String> userNames = RandomUtil.randomChinese2(0, accountList.size());
+            for (int i = 0; i < accountList.size(); i++) {
+                accountMapper.updateById(new Account().setId(accountList.get(i).getId()).setUserName(userNames.get(i)));
+            }
+        } catch (Exception e) {
+            log.error("updateAllUserName method execution exception :{}", ExceptionUtil.getMessage(e));
+        }
     }
 }

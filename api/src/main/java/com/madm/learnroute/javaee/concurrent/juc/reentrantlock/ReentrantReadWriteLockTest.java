@@ -2,6 +2,7 @@ package com.madm.learnroute.javaee.concurrent.juc.reentrantlock;
 
 import com.mdm.pojo.User;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -33,24 +34,28 @@ public class ReentrantReadWriteLockTest {
     }
 }
 
+@Slf4j
 class CachedData {
     Object data;
     volatile boolean cacheValid;
     final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    ReentrantReadWriteLock.ReadLock readLock = readWriteLock.readLock();
+    ReentrantReadWriteLock.WriteLock writeLock = readWriteLock.writeLock();
 
     @SneakyThrows
     void execReadLock() {
-        readWriteLock.readLock().lock();
+        readLock.lock();
+        log.info("当前持有读锁线程数是：{}", readWriteLock.getReadHoldCount());
         TimeUnit.DAYS.sleep(2l);
-        readWriteLock.readLock().unlock();
+        readLock.unlock();
     }
 
     void processCachedData() {
-        readWriteLock.readLock().lock();
+        readLock.lock();
         if (!cacheValid) {
             // Must release read lock before acquiring write lock
-            readWriteLock.readLock().unlock();
-            readWriteLock.writeLock().lock();//如果有读锁或者不是当前线程获得的
+            readLock.unlock();
+            writeLock.lock();//如果有读锁或者不是当前线程获得的
             try {
                 // Recheck state because another thread might have
                 // acquired write lock and changed state before we did.
@@ -59,15 +64,15 @@ class CachedData {
                     cacheValid = true;
                 }
                 // Downgrade by acquiring read lock before releasing write lock
-                readWriteLock.readLock().lock();
+                readLock.lock();
             } finally {
-                readWriteLock.writeLock().unlock(); // Unlock write, still hold read
+                writeLock.unlock(); // Unlock write, still hold read
             }
         }
         try {
             use(data);
         } finally {
-            readWriteLock.readLock().unlock();
+            readLock.unlock();
         }
     }
 
