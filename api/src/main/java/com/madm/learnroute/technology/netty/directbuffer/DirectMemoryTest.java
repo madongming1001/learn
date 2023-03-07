@@ -4,6 +4,8 @@ import java.nio.ByteBuffer;
 
 /**
  * 直接内存与堆内存的区别
+ * <p>
+ * MaxDirectMemorySize
  */
 public class DirectMemoryTest {
 
@@ -27,6 +29,7 @@ public class DirectMemoryTest {
     }
 
     public static void directAccess() {
+
         long startTime = System.currentTimeMillis();
         //分配直接内存
         ByteBuffer buffer = ByteBuffer.allocateDirect(1000);

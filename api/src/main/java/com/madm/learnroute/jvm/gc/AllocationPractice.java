@@ -2,6 +2,13 @@ package com.madm.learnroute.jvm.gc;
 
 /**
  * cpu读取以缓存行为单位 一缓存行单位为64字节
+ * 先说VM选项， 三种：
+ * - : 标准VM选项，VM规范的选项
+ * -X: 非标准VM选项，不保证所有VM支持
+ * -XX: 高级选项，高级特性，但属于不稳定的选项
+ * <p>
+ * -Xmn：它可以用来设置新生代的大小,初始化大小用-XX:NewSize，最大大小用-XX:MaxNewSize
+ * -Xss：设置jvm启动的每个线程分配的内存大小(stack size)，默认JDK1.4中是256K，JDK1.5+中是1M，等同于-XX:ThreadStackSize
  */
 public class AllocationPractice {
     private static final int _1MB = 1024 * 1024;

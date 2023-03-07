@@ -35,6 +35,7 @@ public class InstructionRearrangement {
                 }
             });
             t1.start();
+            t1.run();
             t2.start();
             t1.join();
             t2.join();

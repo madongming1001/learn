@@ -1758,6 +1758,30 @@ END;
 select mock_data();
 ```
 
+## OVER 函数
+
+### ROW_NUMBER()
+
+MySQL `ROW_NUMBER()` 函数返回当前行所在的分区内的序号，从 1 开始。
+
+### RANK()
+
+MySQL `RANK()` 函数返回当前行所在的分区内的排名，从 1 开始，但有间隔。
+
+也就是说，相同的值具有相同的排名，但是下一个不同的值的排名采用 [`row_number()`](https://www.sjkjc.com/mysql-ref/row_number/) 编号。比如，如果有 2 个第一名，那么第三位的排名是 `3`。这与 [`dense_rank()`](https://www.sjkjc.com/mysql-ref/dense_rank/) 函数是不同的。
+
+### DENSE_RANK()
+
+MySQL `DENSE_RANK()` 函数返回当前行所在的分区内的排名，从 1 开始，但没有间隔。
+
+也就是说，相同的值具有相同的排名，但是下一个不同的值的排名按顺序增加。比如，如果有 2 个第一名，那么第三位的排名是 `2`。这与 [`rank()`](https://www.sjkjc.com/mysql-ref/rank/) 函数是不同的。
+
+### NTILE()
+
+MySQL `NTILE()` 函数将当前行所在的分区内的所有行尽可能平均的分成指定数量的区间，并返回当前行所在的区间编号。
+
+每个区间， MySQL 称之为一个排名桶。 `NTILE()` 根据指定排序为每个桶指设定排名。
+
 ## 查看磁盘使用量，表大小
 
 ```sql

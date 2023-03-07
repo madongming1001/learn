@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.madm.learnroute.javaee.ForkJoinPoolPractice;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.jni.Time;
+import org.elasticsearch.client.ml.EvaluateDataFrameRequest;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,6 +24,9 @@ import java.util.stream.Stream;
 @Slf4j
 public class ReentrantLockPractice {
     private ReentrantLock lock = new ReentrantLock();
+    private Condition putEmpty = lock.newCondition();
+    private Condition takeEmpty = lock.newCondition();
+
     private CountDownLatch countdown = new CountDownLatch(1);
 
 

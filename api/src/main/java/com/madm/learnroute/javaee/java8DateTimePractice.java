@@ -118,8 +118,8 @@ public class java8DateTimePractice {
 
     private static void testPeriod() {
         // 比较两个LocalDate相差多少年、月、天
-        LocalDate startDate = LocalDate.of(2023, 1, 30);
-        LocalDate endDate = LocalDate.of(2023, 2, 25);
+        LocalDate startDate = LocalDate.of(2022, 7, 1);
+        LocalDate endDate = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), LocalDate.now().getDayOfMonth());
         Period period = Period.between(startDate, endDate);
         log.info("Years:" + period.getYears() + " months:" + period.getMonths() + " days:" + period.getDays());
         Assert.isFalse(period.isNegative());

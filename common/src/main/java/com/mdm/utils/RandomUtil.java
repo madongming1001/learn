@@ -4,6 +4,7 @@ import cn.hutool.core.util.ArrayUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static cn.hutool.core.util.RandomUtil.randomInt;
 import static cn.hutool.core.util.RandomUtil.randomInts;

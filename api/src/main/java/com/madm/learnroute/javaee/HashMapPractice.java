@@ -1,5 +1,6 @@
 package com.madm.learnroute.javaee;
 
+import com.google.common.collect.Maps;
 import com.mdm.pojo.AuthParam;
 import com.mdm.pojo.User;
 import com.mdm.utils.GsonObject;
@@ -32,9 +33,9 @@ public class HashMapPractice {
 //        prices.put("111", 150);
         prices.put("Shoes" + (int) (Math.random() * 80) + 1, 200);
 //        System.out.println("HashMap: " + prices);
-        prices.forEach((key, value) -> {
-            System.out.println("key : " + key + "value :" + value);
-        });
+//        prices.forEach((value, value) -> {
+//            System.out.println("value : " + value + "value :" + value);
+//        });
 
         System.out.println(prices.values());
 
@@ -50,16 +51,26 @@ public class HashMapPractice {
 //        } while (!uniqueId.add(newId));
 //        System.out.println(uniqueId);
 //        System.out.println("runner");
-////        List<User> lists = Arrays.asList(new User(1, "group 1"),
-////                new User(2, "group 2"),
-////                new User(3, "group 3"),
-////                new User(4, "group 4"));
-////        Map<Integer, User> userMap = lists.stream().collect(Collectors.toConcurrentMap(x -> x.getId(), Function.identity(), (k, v) -> k));
-////        userMap.computeIfAbsent(1, v -> {
-////            System.out.println(v);
-////            return new User(1000, "group 1000");
-////        });
-////        System.out.println(userMap);
+        List<User> lists = Arrays.asList(new User(1, "group 1"), new User(2, "group 2"), new User(3, "group 3"), new User(4, "group 4"));
+        Map<Integer, User> userMap = lists.stream().collect(Collectors.toConcurrentMap(x -> x.getId(), Function.identity(), (k1, k2) -> k1));
+        userMap.computeIfAbsent(1, key -> {
+            System.out.println(key);
+            return new User(1000, "group 1000");
+        });
+//        System.out.println(userMap);
+        userMap.compute(1, (key, oldValue) -> {
+            if (key == 1) {
+                return new User();
+            }
+            return new User();
+        });
+
+        int newPrice = prices.compute("Shoes2", (k, v) -> {
+            if (v == null) {
+                return 20;
+            }
+            return v - v * 10 / 100;
+        });
 //
 //        //不存在添加 存在重新计算remappingFunction
 //        //创建一个 HashMap
@@ -72,20 +83,13 @@ public class HashMapPractice {
 //        prices.put("111", 150);
 //        System.out.println("HashMap: " + prices);
 //
-//        Integer key = prices.putIfAbsent("111", 32);
+//        Integer value = prices.putIfAbsent("111", 32);
 //        System.out.println("HashMap: " + prices);
-//        System.out.println("之前值是："+key);
+//        System.out.println("之前值是："+value);
 //
 //        Iterator<Map.Entry<String, Integer>> iterator = prices.entrySet().iterator();
 //
         // 重新计算鞋子打了10%折扣后的值
-        int newPrice = prices.compute("Shoes2", (k, v) -> {
-            if (v == null) {
-                return 20;
-            }
-            return v - v * 10 / 100;
-        });
-        System.out.println("Discounted Price of Shoes: " + newPrice);
 //
 //        // 输出更新后的HashMap
 //        System.out.println("Updated HashMap: " + prices);
@@ -119,9 +123,9 @@ public class HashMapPractice {
 //        Map<String, Long> masterId = new HashMap<>();
 //        mapArrayList.stream().forEach(e -> {
 //            for (Map.Entry<String, Long> map : e.entrySet()) {
-//                String key = map.getKey();
+//                String value = map.getKey();
 //                Long value = map.getValue();
-//                if (Long.parseLong(key) == value) {
+//                if (Long.parseLong(value) == value) {
 //
 //                }
 //            }
@@ -129,6 +133,18 @@ public class HashMapPractice {
 //        System.out.println(masterId);
 
 //        threadSafeQuestion();
+        Map<String, Object> map1 = Maps.newHashMap();
+        List<String> list = Lists.newArrayList("1", "2", "3", "2", "3", "2");
+        Object value = map1.get("value");
+        if (value == null) {
+            value = new Object();
+            map1.put("key", value);
+            //如果key对应的value值存在，进行相应的操作
+            // java8之后，上面的操作可以简化为一行，若key对应的value为空，会将第二个参数的返回值存入并返回
+        } else {
+            Object key2 = map1.computeIfAbsent("key1", key -> new Object());
+            System.out.println(map1);        //输出：{key1=java.lang.Object@708f5957, value=java.lang.Object@68999068}    }    /**
+        }
     }
 
     private static void threadSafeQuestion() {
@@ -147,7 +163,7 @@ public class HashMapPractice {
 
     public static void printIntegerDefaultValue() {
         userNumber.getAndIncrement();
-        System.out.println(userNumber);
+//        System.out.println(userNumber);
     }
 }
 

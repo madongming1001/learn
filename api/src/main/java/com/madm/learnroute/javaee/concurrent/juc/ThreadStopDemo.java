@@ -1,42 +1,37 @@
 package com.madm.learnroute.javaee.concurrent.juc;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author Fox
  */
+@Slf4j
 public class ThreadStopDemo {
 
     private static Object lock = new Object();
 
     public static void main(String[] args) throws InterruptedException {
-
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (lock) {
-                    System.out.println(Thread.currentThread().getName() + "获取锁");
-                    try {
-                        Thread.sleep(60000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+        Thread t1 = new Thread(() -> {
+            synchronized (lock) {
+                System.out.println(Thread.currentThread().getName() + "获取锁");
+                try {
+                    Thread.sleep(60000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                System.out.println(Thread.currentThread().getName() + "执行完成");
             }
+            System.out.println(Thread.currentThread().getName() + "执行完成");
         });
-        thread.start();
+        t1.start();
         Thread.sleep(2000);
         // 停止thread，并释放锁
-        thread.stop();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println(Thread.currentThread().getName() + "等待获取锁");
-                synchronized (lock) {
-                    System.out.println(Thread.currentThread().getName() + "获取锁");
-                }
+        t1.stop();
+        Thread t2 = new Thread(() -> {
+            System.out.println(Thread.currentThread().getName() + "等待获取锁");
+            synchronized (lock) {
+                System.out.println(Thread.currentThread().getName() + "获取锁");
             }
-        }).start();
-
+        });
+        t2.start();
     }
 }

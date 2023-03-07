@@ -22,10 +22,10 @@ public class CompletableFuturePractice {
         CompletableFuture<Object> objectCompletableFuture = CompletableFuture.supplyAsync(() -> 102);
         System.out.println(voidCompletableFuture.get());
         System.out.printf(String.valueOf(objectCompletableFuture.get()));
-        //无异常类型 CancellationException CompletionException 未经检查异常 不强制抛出
-        CompletableFuture.allOf(voidCompletableFuture, objectCompletableFuture).join();
         //有异常类型 CancellationException ExecutionException InterruptedException 检查异常 强制抛出
         CompletableFuture.allOf(voidCompletableFuture, objectCompletableFuture).get();
+        //无异常类型 CancellationException CompletionException 未经检查异常 不强制抛出
+        CompletableFuture.allOf(voidCompletableFuture, objectCompletableFuture).join();
     }
 
     private static void completableFutureTest() {

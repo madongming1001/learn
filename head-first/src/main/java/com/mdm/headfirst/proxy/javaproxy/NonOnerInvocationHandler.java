@@ -5,7 +5,7 @@ import java.lang.reflect.*;
 public class NonOnerInvocationHandler implements InvocationHandler {
 	Person person;
  
-	public NonOwnerInvocationHandler(Person person) {
+	public NonOnerInvocationHandler(Person person) {
 		this.person = person;
 	}
  

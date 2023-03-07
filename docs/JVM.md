@@ -1,12 +1,8 @@
-
-
 # JVM运行时数据区
 
 ## 栈
 
 ### 动态连接
-
-
 
 **每个栈帧都包含一个指向运行时常量池中该栈帧所属方法的引用**，持有这个引用是为了支持方法调用过程中的动态连接(DynamicLinking)。我们知道Class文件的常量池中存有大量的符号引用，字节码中的方法调用指令就以常量池里指向方法的符号引用作为参数。这些符号引用一部分会在类加载阶段或者第一次使用的时候就被转化为直接引用，这种转化被称为**静态解析**。另外一部分将在每一次运行期间都转化为直接引用，这部分就称为**动态连接**。
 
@@ -23,6 +19,8 @@
 方法区(MethodArea)与Java堆一样，是各个线程共享的内存区域，**它用于存储已被虚拟机加载的类型信息、常量、静态变量（jdk1.7已经把他移动到堆中与对象放在一起）、即时编译器编译后的代码缓存等数据。**虽然《Java虚拟机规范》中把方法区描述为堆的一个逻辑部分，但是它却有一个别名叫作“非堆”(Non-Heap)，目的是与Java堆区分开来。
 
 在JDK6的时候HotSpot开发团队就有放弃永久代，逐步改为采用本地内存(NativeMemory)来实现方法区的计划了，到了JDK7的HotSpot，已经把原本放在永久代的**字符串常量池、静态变量**等移出，而到了JDK8，终于完全废弃了永久代的概念，改用与JRockit、J9一样在本地内存中实现的元空间(Meta-space)来代替，把JDK7中永久代还剩余的内容(主要是类型信息)全部移到元空间中。
+
+
 
 # 编译器常用的8种优化方法
 
@@ -909,6 +907,8 @@ Server Compiler和Client Compiler两个编译器的编译过程是不一样的�
 
 # 类加载过程
 
+java虚拟机把描述类的数据从class文件加载到内存，并对数据进行校验，转换解析和初始化，最终形成可以被虚拟机直接使用的java类型，这个过程被称作类加载机制。
+
 ## 加载
 
 1、通过一个类的权限定名来获取定义此类的二进制字节流（不限制从哪读取）
@@ -975,9 +975,8 @@ Server Compiler和Client Compiler两个编译器的编译过程是不一样的�
 
 5. 当使用JDK 7新加入的动态语言支持时，如果一个java.lang.invoke.MethodHandle实例最后的解析结果为REF_getStatic、REF_putStatic、REF_invokeStatic、REF_newInvokeSpecial四种类型的方法句 柄，并且这个方法句柄对应的类没有进行过初始化，则需要先触发其初始化。
 
-6. 当一个接口中定义了JDK 8新加入的默认方法（被default关键字修饰的接口方法）时，如果有这个接口的实现类发生了初始化，那该接口要在其之前被初始化。
+6. 当一个接口中定义了JDK 8新加入的默认方法（被default关键字修饰的接口方法）时，**如果有这个接口的实现类发生了初始化，那该接口要在其之前被初始化。**
 
-   
 
 MethodHandle详解：https://juejin.cn/post/6844904177131323406
 
@@ -1251,3 +1250,63 @@ man命令可以查看系统参数详情 man pthread_create
 
 参考文章：https://segmentfault.com/a/1190000022812099
 
+# JVM 新生代为何需要两个 Survivor 空间？
+
+为什么不是0个 Survivor 空间？
+
+为什么不是1个 Survivor 空间？
+
+**参考文章：**https://cloud.tencent.com/developer/article/1787086
+
+
+
+# 如何监控和诊断JVM堆内和堆外内存使用？
+
+**参考文章：**http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/Java%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%E9%9D%A2%E8%AF%95%E7%B2%BE%E8%AE%B2/26%20%E5%A6%82%E4%BD%95%E7%9B%91%E6%8E%A7%E5%92%8C%E8%AF%8A%E6%96%ADJVM%E5%A0%86%E5%86%85%E5%92%8C%E5%A0%86%E5%A4%96%E5%86%85%E5%AD%98%E4%BD%BF%E7%94%A8%EF%BC%9F.md
+
+了解JVM内存的方法有很多，具体能力范围也有区别，简单总结如下：
+
+- 可以使用综合性的图形化工具，如JConsole、VisualVM（注意，从Oracle JDK 9开始，VisualVM已经不再包含在JDK安装包中）等。这些工具具体使用起来相对比较直观，直接连接到Java进程，然后就可以在图形化界面里掌握内存使用情况。
+
+以JConsole为例，其内存页面可以显示常见的**堆内存**和**各种堆外部分**使用状态。
+
+- 也可以使用命令行工具进行运行时查询，如jstat和jmap等工具都提供了一些选项，可以查看堆、方法区等使用数据。
+- 或者，也可以使用jmap等提供的命令，生成堆转储（Heap Dump）文件，然后利用jhat或Eclipse MAT,Visual vm 等堆转储分析工具进行详细分析。
+- 如果你使用的是Tomcat、Weblogic等Java EE服务器，这些服务器同样提供了内存管理相关的功能。
+- 另外，从某种程度上来说，GC日志等输出，同样包含着丰富的信息。
+
+我这里特别推荐[Java Mission Control](http://www.oracle.com/technetwork/java/javaseproducts/mission-control/java-mission-control-1998576.html)（JMC），这是一个非常强大的工具，不仅仅能够使用[JMX](https://en.wikipedia.org/wiki/Java_Management_Extensions)进行普通的管理、监控任务，还可以配合[Java Flight Recorder](https://docs.oracle.com/javacomponents/jmc-5-4/jfr-runtime-guide/about.htm#JFRUH171)（JFR）技术，以非常低的开销，收集和分析JVM底层的Profiling和事件等信息。
+
+这里有一个相对特殊的部分，就是是堆外内存中的直接内存，前面的工具基本不适用，可以使用JDK自带的**Native Memory Tracking（NMT）**特性，它会从JVM本地内存分配的角度进行解读。
+
+首先来做些准备工作，开启NMT并选择summary模式，
+
+```ruby
+    -XX:NativeMemoryTracking=summary
+```
+
+为了方便获取和对比NMT输出，选择在应用退出时打印NMT统计信息
+
+```ruby
+    -XX:+UnlockDiagnosticVMOptions -XX:+PrintNMTStatistics
+```
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/Java%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%E9%9D%A2%E8%AF%95%E7%B2%BE%E8%AE%B2/assets/55f1c7f0550adbbcc885c97a4dd426bb.png)
+
+**-XX:MaxMetaspaceSize=value** 设置元空间大小
+
+**-XX:InitialBootClassLoaderMetaspaceSize=4M** 主要指定BootClassLoader的存储非klass部分的数据的第一个Metachunk的大小
+
+**-XX:-TieredComplation** 关闭分层编译，JIT编译默认是开启了TieredCompilation的
+
+**-XX:+UseParallelGC** 开启并行GC
+
+**-XX:InitialCodeCacheSize=value** 初始化缓存池大小
+
+**-XX:ReservedCodeCacheSize=value** 预定的缓存池大小
+
+
+
+上面我们介绍了**MetaspaceSize**与**MaxMetaspaceSize**这两个参数，事实上，**这两个参数仅仅是用来控制Metaspace空间进行GC操作的**，并不是用来真正控制Metaspace的大小的，而真正控制Metaspace空间大小的参数，是CompressedClassSpaceSize、UseCompressedClassPointers、InitialBootClassLoaderMetaspaceSize。
+
+**参考文章：**https://blog.csdn.net/wtopps/article/details/106620292

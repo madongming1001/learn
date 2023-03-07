@@ -7,7 +7,7 @@ import java.util.concurrent.locks.LockSupport;
  * @author Fox
  *
  * -XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly -Xcomp
- * hsdis-amd64.dll
+ * hsdis-amd64.dll：HSDIS(HotSpot disassembler)，一个Sun官方推荐的HotSpot虚拟机JIT编译代码的反汇编插件，其实际上就是一个动态库。
  *  可见性案例
  */
 public class VisibilityPractice {

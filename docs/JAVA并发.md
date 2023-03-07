@@ -326,26 +326,27 @@ DiscardPolicy
 
 ```java
 //尚未启动的线程的线程状态
-NEW
+NEW，表示线程被创建出来还没真正启动的状态，可以认为它是个 Java 内部状态。
 //可运行线程的线程状态。 处于可运行状态的线程正在 Java 虚拟机中执行，但它可能正在等待来自操作系统的其他资源，例如处理器
-RUNNABLE
+RUNNABLE，表示该线程已经在 JVM 中执行，当然由于执行需要计算资源，它可能是正在运行，也可能还在等待系统分配给它 CPU 片段，在就绪队列里面排队。
 //线程阻塞等待监视器锁的线程状态。 处于阻塞状态的线程正在等待监视器锁进入同步块/方法或在调用Object.wait后重新进入同步块/方法。针对Synchronized
-BLOCKED
+在其他一些分析中，会额外区分一种状态 RUNNING，但是从 Java API 的角度，并不能表示出来。
+BLOCKED，这个状态和我们前面两讲介绍的同步非常相关，阻塞表示线程在等待 Monitor lock。比如，线程试图通过 synchronized 去获取某个锁，但是其他线程已经独占了，那么当前线程就会处于阻塞状态。
 //等待线程的线程状态。 由于调用以下方法之一，线程处于等待状态：
 //Object.wait没有超时
 //Thread.join没有超时
 //LockSupport.park
 //正在等待另一个对象的唤醒例如Object.notify()或者Object.notifyAll()
-WAITING
+WAITING，表示正在等待其他线程采取某些操作。一个常见的场景是类似生产者消费者模式，发现任务条件尚未满足，就让当前消费者线程等待（wait），另外的生产者线程去准备任务数据，然后通过类似 notify 等动作，通知消费线程可以继续工作了。Thread.join() 也会令线程进入等待状态。
 //具有指定等待时间的等待线程的线程状态。 由于使用指定的正等待时间调用以下方法之一，线程处于定时等待状态：
 //Thread.sleep睡眠
 //Object.wait超时
 //Thread.join超时
 //LockSupport.parkNanos
 //LockSupport.parkUntil
-TIMED_WAITING
+TIMED_WAITING，其进入条件和等待状态类似，但是调用的是存在超时条件的方法，比如 wait 或 join 等方法的指定超时版本，如下面示例：
 //终止线程的线程状态。 线程已完成执行
-TERMINATED
+TERMINATED，不管是意外退出还是正常执行结束，线程已经完成使命，终止运行，也有人把这个状态叫作死亡。
 ```
 
 
@@ -1005,7 +1006,7 @@ ObjectMonitor::ObjectMonitor() {
   _waiters      = 0,  
   _recursions   = 0;       //线程的重入次数
   _object       = NULL;  
-  _owner        = NULL;    //标识拥有该monitor的线程
+_owner        = NULL;    //标识拥有该monitor的线程
   _WaitSet      = NULL;    //等待线程组成的双向循环链表，_WaitSet是第一个节点
   _WaitSetLock  = 0 ;  
   _Responsible  = NULL ;  

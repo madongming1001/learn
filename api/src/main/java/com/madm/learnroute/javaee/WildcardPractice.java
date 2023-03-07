@@ -1,5 +1,6 @@
 package com.madm.learnroute.javaee;
 
+import cn.hutool.core.lang.Singleton;
 import com.google.common.collect.Lists;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -32,9 +33,12 @@ public class WildcardPractice {
         Map<String, Fruit> map1 = new HashMap();
         mapPrint1(map1);
         Map<String, List<? extends Fruit>> map2 = new HashMap();
-        List<Apple> plates = Lists.newArrayList(new Apple());
-        map2.put("plates", plates);
+        //同样地，出于对类型安全的考虑，我们可以加入Apple对象或者其任何子类（如RedApple）对象，但由于编译器并不知道List的内容究竟是Apple的哪个超类，因此不允许加入特定的任何超类型。
+        List<? super Apple> plates = Lists.newArrayList();
+        plates.add(new Apple());
         mapPrint2(map2);
+        WildcardPractice singleton = Singleton.get(WildcardPractice.class);
+
     }
 
     public static void mapPrint1(Map<String, ? extends Fruit> map1) {
