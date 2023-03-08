@@ -7,6 +7,9 @@ public class LockSupportTest {
     public static void main(String[] args) {
         Thread parkThread = new Thread(new ParkThread());
         parkThread.start();
+        System.out.println(parkThread.isInterrupted());//expect false
+        parkThread.interrupt();
+        System.out.println(parkThread.isInterrupted()); //actual true
 
         System.out.println("唤醒parkThread");
         //为指定线程parkThread提供“许可”

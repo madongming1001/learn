@@ -1,19 +1,11 @@
 package com.madm.learnroute.javaee.concurrent.juc;
 
-import com.google.common.collect.Lists;
-import com.madm.learnroute.javaee.ForkJoinPoolPractice;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.jni.Time;
-import org.elasticsearch.client.ml.EvaluateDataFrameRequest;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * CLH变种（同步队列）
@@ -23,27 +15,35 @@ import java.util.stream.Stream;
  */
 @Slf4j
 public class ReentrantLockPractice {
-    private ReentrantLock lock = new ReentrantLock();
-    private Condition putEmpty = lock.newCondition();
-    private Condition takeEmpty = lock.newCondition();
+    private static ReentrantLock lock = new ReentrantLock();
+    private static Condition putEmpty = lock.newCondition();
+    private static Condition takeEmpty = lock.newCondition();
 
     private CountDownLatch countdown = new CountDownLatch(1);
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
+//        debugReentrantLock();
+        debugCondition();
+    }
+
+    private static void debugReentrantLock() {
         ReentrantLockPractice rt = new ReentrantLockPractice();
-//        CompletableFuture.runAsync(ReentrantLockPractice::await);
-//        CompletableFuture.runAsync(ReentrantLockPractice::signal);
         Thread t1 = new Thread(() -> {
             rt.await();
         });
         Thread t2 = new Thread(() -> {
             rt.await();
         });
+        Thread t3 = new Thread(() -> {
+            rt.await();
+        });
         t1.setName("t1");
         t2.setName("t2");
+        t3.setName("t3");
         t1.start();
         t2.start();
+        t3.start();
     }
 
     public void await() {
@@ -51,7 +51,7 @@ public class ReentrantLockPractice {
             lock.lock();
             countdown.countDown();
             if (countdown.getCount() == 0) {
-                TimeUnit.DAYS.sleep(1L);
+//                TimeUnit.DAYS.sleep(1L);
             }
             System.out.println("await时间为：" + System.currentTimeMillis());
             System.out.println("await等待结束");
@@ -69,5 +69,52 @@ public class ReentrantLockPractice {
         } finally {
             lock.unlock();
         }
+    }
+
+    public static void debugCondition() throws InterruptedException {
+        ReentrantLock lock = new ReentrantLock();
+        //创建新的条件变量
+        Condition condition = lock.newCondition();
+        Thread thread0 = new Thread(() -> {
+            lock.lock();
+            try {
+                System.out.println("线程0获取锁");
+                // sleep不会释放锁
+                Thread.sleep(500);
+                //进入休息室等待
+                System.out.println("线程0释放锁，进入等待");
+                condition.await();
+                System.out.println("线程0被唤醒了");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                lock.unlock();
+            }
+        });
+        thread0.setName("thread-01");
+        thread0.start();
+        //叫醒
+        Thread thread1 = new Thread(() -> {
+            try {
+                TimeUnit.DAYS.sleep(2l);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            lock.lock();
+            try {
+                System.out.println("线程1获取锁");
+                //唤醒
+                condition.signal();
+                System.out.println("线程1唤醒线程0");
+            } finally {
+                lock.unlock();
+                System.out.println("线程1释放锁");
+            }
+        });
+        thread1.setName("thread-02");
+        thread1.start();
+
+        thread0.join();
+        thread1.join();
     }
 }

@@ -996,6 +996,10 @@ MethodHandle详解：https://juejin.cn/post/6844904177131323406
 
 
 
+# 内存模型
+
+《Java虚拟机规范》中曾试图定义一种“Java内存模型”(Java Memory Model，JMM）来屏蔽各种硬件和操作系统的内存访问差异，以实现让Java程序在各种平台下都能达到一致的内存访问效果。
+
 # Java对象进入老年代的四种方法
 
 - minor gc后，survivor区空间不能容纳全部存活对象

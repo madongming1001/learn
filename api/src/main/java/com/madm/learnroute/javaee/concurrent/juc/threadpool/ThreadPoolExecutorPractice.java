@@ -258,6 +258,8 @@ public class ThreadPoolExecutorPractice {
             return "callable type thread task：" + i;
         }).collect(Collectors.toList());
 
+        executorService.submit(() -> null);
+
         // 执行给定的任务，返回持有他们的状态和结果的所有完成的期待列表。
         executorService.invokeAll(callableList).stream().map(futureTask -> {
             try {

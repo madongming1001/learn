@@ -857,7 +857,7 @@ ObjectMonitor::ObjectMonitor() {
   _Responsible  = NULL ;  
   _succ         = NULL ;  
   _cxq          = NULL ;    //多线程竞争锁进入时的单向链表
-  FreeNext      = NULL ;  
+  _FreeNext     = NULL ;  
   _EntryList    = NULL ;    //_owner从该双向循环链表中唤醒线程结点，_EntryList是第一个节点
   _SpinFreq     = 0 ;  
   _SpinClock    = 0 ;  
