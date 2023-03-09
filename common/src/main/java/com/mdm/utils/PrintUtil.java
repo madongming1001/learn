@@ -9,7 +9,7 @@ public class PrintUtil {
     }
 
     public static void printSplitLine() {
-        System.out.println("===============================================");
+        System.err.println("---------------------华丽的分割线---------------------");
     }
 
 }

@@ -224,6 +224,12 @@
             </exclusions>
         </dependency>
 
+        <!--打印 SQL 组件-->
+        <dependency>
+            <groupId>p6spy</groupId>
+            <artifactId>p6spy</artifactId>
+            <version>3.5.1</version>
+        </dependency>
 
         <!--  swagger可理解为接口文档规范      -->
         <dependency>

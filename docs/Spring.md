@@ -678,7 +678,7 @@ DataSourceTransactionObject
 
 ### 编程式事务管理
 
-通过 `TransactionTemplate`或者`TransactionManager`手动管理事务，实际应用中很少使用，但是对于你理解 Spring 事务管理原理有帮助。
+通过 `TransactionTemplate`或者`TransactionManager`手动管理事务，实际应用中很少使用，但是对于你理解 Spring 事务管理原理有帮助。`TransactionTemplate`是执行事务，`PlatformTransactionManager`是提交事务
 
 使用`TransactionTemplate` 进行编程式事务管理的示例代码如下：
 
@@ -721,10 +721,6 @@ public void testTransaction() {
           }
 }
 ```
-
-
-
-
 
 ### 非编程式事务
 
@@ -2317,3 +2313,53 @@ Spring 为 Resource 接口提供了如下实现类：
 3. load-time：**在 JVM 进行类加载的时候进行织入**
 
 **参考文章：**https://www.javadoop.com/post/aspectj
+
+
+
+# SpringIOC执行流程
+
+1. 加载资源（ResourceLoader），解析配置（BeanDefinitionReader）**DocumentLoader将Bean定义资源转换成Document对象的源码如下：该解析过程调用JavaEE标准的JAXP标准进行处理。**
+2. 根据配置生成bean的实例，将bean放在容器中，生成常规其他应用bean
+3. 根据name/type获取bean
+
+![img](https://pdai.tech/images/spring/springframework/spring-framework-ioc-source-100.png)
+
+![img](https://pdai.tech/images/spring/springframework/spring-framework-ioc-source-9.png)
+
+- 初始化的入口在容器实现中的 refresh()调用来完成
+- 对 bean 定义载入 IOC 容器使用的方法是 loadBeanDefinition,其中的大致过程如下：
+  - 通过 ResourceLoader 来完成资源文件位置的定位，DefaultResourceLoader 是默认的实现，同时上下文本身就给出了 ResourceLoader 的实现，可以从类路径，文件系统, URL 等方式来定为资源位置。如果是 XmlBeanFactory作为 IOC 容器，那么需要为它指定 bean 定义的资源，也就是说 bean 定义文件时通过抽象成 Resource 来被 IOC 容器处理的
+  - 通过 **BeanDefinitionReader**来完成定义信息的解析和 Bean 信息的注册, 往往使用的是XmlBeanDefinitionReader 来解析 bean 的 xml 定义文件 - 实际的处理过程是委托给 BeanDefinitionParserDelegate 来完成的，从而得到 bean 的定义信息，这些信息在 Spring 中使用 BeanDefinition 对象来表示 - 这个名字可以让我们想到loadBeanDefinition,RegisterBeanDefinition 这些相关的方法 - 他们都是为处理 BeanDefinitin 服务的
+  - 容器解析得到 BeanDefinition 以后，需要把它在 IOC 容器中注册，这由 IOC 实现 **BeanDefinitionRegistry** 接口来实现。注册过程就是在 IOC 容器内部维护的一个HashMap 来保存得到的 BeanDefinitiond 的过程。这个 HashMap 是 IoC 容器持有 bean 信息的场所，以后对 bean 的操作都是围绕这个HashMap 来实现的.
+- 然后我们就可以通过 BeanFactory 和 ApplicationContext 来享受到 Spring IOC 的服务了,在使用 IOC 容器的时候，我们注意到除了少量粘合代码，绝大多数以正确 IOC 风格编写的应用程序代码完全不用关心如何到达工厂，因为容器将把这些对象与容器管理的其他对象钩在一起。基本的策略是把工厂放到已知的地方，最好是放在对预期使用的上下文有意义的地方，以及代码将实际需要访问工厂的地方。 Spring 本身提供了对声明式载入 web 应用程序用法的应用程序上下文,并将其存储在ServletContext 中的框架实现。
+
+# Bean的生命周期
+
+**doGetBean大体流程**
+
+- 解析bean的真正name，如果bean是工厂类，name前缀会加&，需要去掉
+- 无参单例先从缓存中尝试获取
+- 如果bean实例还在创建中，则直接抛出异常
+- 如果bean definition 存在于父的bean工厂中，委派给父Bean工厂获取
+- 标记这个beanName的实例正在创建
+- 确保它的依赖也被初始化
+- 真正创建 
+  - 单例时
+  - 原型时
+  - 根据bean的scope创建
+
+**Spring如何解决循环依赖问题**
+
+> Spring只是解决了单例模式下属性依赖的循环问题；Spring为了解决单例的循环依赖问题，使用了三级缓存。
+
+### 
+
+
+
+
+
+
+
+# 揭秘Java热部署原理及JRebel(Hotcode)的实现原理
+
+**参考文章：**https://blog.csdn.net/weixin_34221036/article/details/86264463

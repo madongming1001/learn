@@ -37,6 +37,8 @@ import java.util.TimeZone;
  * 从格林威治本初子午线起，经度每向东或者向西间隔15°，就划分一个时区，在这个区域内，大家使用同样的标准时间
  * <p>
  * 参考文章：https://www.cnblogs.com/theRhyme/p/9756154.html
+ *
+ * T表示分隔符，Z表示的是UTC。 UTC：世界标准时间，在标准时间上加上8小时，即东八区时间，也就是北京时间。
  */
 @Slf4j
 public class java8DateTimePractice {

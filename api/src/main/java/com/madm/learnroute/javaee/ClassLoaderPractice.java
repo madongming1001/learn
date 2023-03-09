@@ -19,6 +19,12 @@ import java.util.Properties;
 
 import static com.mdm.utils.PrintUtil.printSplitLine;
 
+
+/**
+ * bootstrapLoader加载以下文件：-Xbootclasspath、sun.boot.class.path
+ * extClassloader加载以下文件：java.ext.dirs
+ * appClassLoader加载以下文件：java.class.path
+ */
 public class ClassLoaderPractice {
     public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factories";
 
@@ -77,9 +83,7 @@ public class ClassLoaderPractice {
 
         try {
             //META-INF/spring.factories
-            Enumeration<URL> urls = (classLoader != null ?
-                    classLoader.getResources(FACTORIES_RESOURCE_LOCATION) :
-                    ClassLoader.getSystemResources(FACTORIES_RESOURCE_LOCATION));
+            Enumeration<URL> urls = (classLoader != null ? classLoader.getResources(FACTORIES_RESOURCE_LOCATION) : ClassLoader.getSystemResources(FACTORIES_RESOURCE_LOCATION));
             int files = 0;
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();

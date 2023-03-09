@@ -6,11 +6,14 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -25,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 @EnableAsync
 //@EnableBinding(MySource.class)
 @Slf4j
+@EnableCaching
 public class LearnApiApplication {
 
     public static void main(String[] args) {
@@ -32,8 +36,9 @@ public class LearnApiApplication {
 //        while (true) {
         String configValue = applicationContext.getEnvironment().getProperty("config.info");
         try {
-            log.info("config.info property value ：{}", configValue);
-            log.info("测试jrebel");
+            log.info("启动完成！当前时间是：{}", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now()));
+//            log.info("config.info property value ：{}", configValue);
+//            log.info("测试jrebel");
             TimeUnit.SECONDS.sleep(1L);
         } catch (InterruptedException e) {
             e.printStackTrace();

@@ -1,7 +1,5 @@
 package com.madm.learnroute.javaee;
 
-import org.springframework.util.ReflectionUtils;
-
 import java.io.FileInputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -11,11 +9,11 @@ import java.lang.reflect.Method;
  */
 public class MyClassLoaderTest {
 
-    static class MyClassLoader extends ClassLoader {
+    static class CustomClassLoader extends ClassLoader {
         private String classPath;
 
 
-        public MyClassLoader(String classPath) {
+        public CustomClassLoader(String classPath) {
             this.classPath = classPath;
         }
 
@@ -79,7 +77,12 @@ public class MyClassLoaderTest {
     }
 
     public static void main(String[] args) throws Exception {
-        MyClassLoader classLoader =  new MyClassLoader("/Users/madongming/IdeaProjects/learn/classloader");
+        /**
+         * bootstrapLoader加载以下文件：-Xbootclasspath、sun.boot.class.path
+         * extClassloader加载以下文件：java.ext.dirs
+         * appClassLoader加载以下文件：java.class.path
+         */
+        CustomClassLoader classLoader =  new CustomClassLoader("/Users/madongming/IdeaProjects/learn/classloader");
         Class clazz = classLoader.loadClass("com.madm.learnroute.model.Employee1");
         Constructor[] constructors = clazz.getConstructors();
         Object obj = null;

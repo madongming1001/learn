@@ -5,6 +5,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
  * @date 2022/6/30 11:40
  */
 @Component
-public class SetCustomTargetSourceCreator implements PriorityOrdered, BeanFactoryAware, InitializingBean {
+public class SetCustomTargetSourceCreator implements PriorityOrdered, BeanFactoryAware, InitializingBean, InstantiationAwareBeanPostProcessor {
 
     private BeanFactory beanFactory;
     private boolean load = false;
@@ -30,6 +31,11 @@ public class SetCustomTargetSourceCreator implements PriorityOrdered, BeanFactor
         this.beanFactory = beanFactory;
     }
 
+    @Override
+    public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
+
+        return InstantiationAwareBeanPostProcessor.super.postProcessBeforeInstantiation(beanClass, beanName);
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
