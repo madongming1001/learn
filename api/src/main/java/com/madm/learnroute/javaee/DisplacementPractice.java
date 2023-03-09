@@ -12,5 +12,6 @@ public class DisplacementPractice {
         System.out.println(properties.getProperty("java.vm.name"));
         System.out.println(Integer.toBinaryString(2));
         System.out.println(Integer.toBinaryString(2 << 68));
+        System.out.println(Integer.toBinaryString(-6));
     }
 }

@@ -1,9 +1,11 @@
 package com.madm.learnroute.javaee;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
 import com.mdm.pojo.AuthParam;
 import com.mdm.pojo.User;
 import com.mdm.utils.GsonObject;
+import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.curator.shaded.com.google.common.collect.Lists;
 
 import java.util.*;
@@ -21,6 +23,15 @@ public class HashMapPractice {
     static final HashMap<String, String> map = new HashMap<String, String>(2);
 
     public static void main(String[] args) {
+        HashBasedTable<String, String, String> table = HashBasedTable.create();
+        table.put("1", "2", "3");
+
+        MultiKeyMap multiKeyMap = new MultiKeyMap();
+        multiKeyMap.put("1", "2", "3", "1", "2", "3");
+        Object o = multiKeyMap.get("1");
+        System.out.println("多key" + o);
+
+
         HashMap<String, Integer> prices = new HashMap<>(2);
         for (int i = 0; i < 64; i++) {
             prices.put("Shoes" + (int) (Math.random() * 10000) + 1, 200);

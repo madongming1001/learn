@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * 通过 resolveBeforeInstantiation 自定义返回一个代理对象
+ *
  * @author dongming.ma
  * @date 2022/6/30 11:40
  */
@@ -32,7 +33,7 @@ public class SetCustomTargetSourceCreator implements PriorityOrdered, BeanFactor
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (!load) {
+        if (load) {
             AnnotationAwareAspectJAutoProxyCreator annotationAwareAspectJAutoProxyCreator = beanFactory.getBean(AnnotationAwareAspectJAutoProxyCreator.class);
             CustomTargetSourceCreator customTargetSourceCreator = new CustomTargetSourceCreator();
             customTargetSourceCreator.setBeanFactory(beanFactory);

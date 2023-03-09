@@ -15,7 +15,6 @@ public class SemaphorePractice {
     public static void test02() throws InterruptedException {
         Semaphore semaphore = new Semaphore(3);
 
-
         CountDownLatch countDownLatch = new CountDownLatch(3);
         AtomicBoolean release = new AtomicBoolean(false);
         System.out.println(release.get());
@@ -38,7 +37,7 @@ public class SemaphorePractice {
             }
         }
         boolean timeout = !countDownLatch.await(5000, TimeUnit.MILLISECONDS);
-        if(timeout){
+        if (timeout) {
             System.out.println("!11");
         }
     }

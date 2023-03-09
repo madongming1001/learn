@@ -244,6 +244,35 @@ applicationEventMulticaster（spring上下文监听器）
 注册一个 AnnotationAwareAspectJAutoProxyCreator.java
 ```
 
+**优先级**
+
+```java
+//AopConfigUtils.class 拿到数组下标最大的
+static {
+   // Set up the escalation list...
+   APC_PRIORITY_LIST.add(InfrastructureAdvisorAutoProxyCreator.class);
+   APC_PRIORITY_LIST.add(AspectJAwareAdvisorAutoProxyCreator.class);
+   APC_PRIORITY_LIST.add(AnnotationAwareAspectJAutoProxyCreator.class);
+}
+
+				int currentPriority = findPriorityForClass(apcDefinition.getBeanClassName());
+				int requiredPriority = findPriorityForClass(cls);
+				if (currentPriority < requiredPriority) {
+					apcDefinition.setBeanClassName(cls.getName());
+				}
+
+	private static int findPriorityForClass(@Nullable String className) {
+		for (int i = 0; i < APC_PRIORITY_LIST.size(); i++) {
+			Class<?> clazz = APC_PRIORITY_LIST.get(i);
+			if (clazz.getName().equals(className)) {
+				return i;
+			}
+		}
+		throw new IllegalArgumentException(
+				"Class name [" + className + "] is not a known auto-proxy creator class");
+	}
+```
+
 ## Advice的执行顺序
 
 ```java
@@ -371,6 +400,8 @@ fci.f2 = 代理对象
 
 **findCandidateAdvisors()找到了所有的advisor，并把每一个aspectj的切面方法给到了AbstractAspectJAdvice。InstantiationModelAwarePointcutAdvisorImpl**
 
+![image-20230308175427012](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230308175427012.png)
+
 ## 注解对应Advice接口
 
 ![image-20220701190744135](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220701190744135.png)
@@ -492,7 +523,7 @@ ProxyTransactionManagementConfiguration -> BeanFactoryTransactionAttributeSource
 																					 TransactionInterceptor
 ```
 
-**注意⚠️：只有事务没有aop链条中没有ExposeInvocationInterceptor**
+**注意⚠️：ExposeInvocationInterceptor是专属于AOP的，事务没有。**
 
 **注意⚠️：如果内层方法出现了异常外层没有捕获，那会使得外层方法也会回滚，影响到了外层方法。 外层方法异常不会影响内层方法的异常。内层是nested的时候。**
 
@@ -2167,3 +2198,122 @@ AOP 的实现并不是因为 Java 提供了什么神奇的钩子，可以把方�
 - ~~很快我会专门写一篇文章介绍 AspectJ 的使用，以及怎么在 Spring 应用中使用 AspectJ。~~
 
   > 已成文：https://www.javadoop.com/post/aspectj
+
+
+
+# Spring的设计模式
+
+1、**简单工厂**(非23种设计模式中的一种) 
+
+​	BeanFactory
+
+2、**工厂方法**
+
+​	FactoryBean接口。getObject(),getObjectType()
+
+![图片](https://mmbiz.qpic.cn/mmbiz_jpg/1J6IbIcPCLb9RusArEDib1jibcb4Q4r8ruKsyHOwyZAKneeRI8ib5EM0XxntF4gna7KJrXibsN3Ijich0r3p7cKpHMA/640?wx_fmt=jpeg&random=0.4829789242312086&wxfrom=5&wx_lazy=1&wx_co=1)
+
+3、**单例模式**	
+
+```java
+/** Cache of singleton objects: bean name to bean instance. */
+private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
+
+/** Cache of singleton factories: bean name to ObjectFactory. */
+private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
+
+/** Cache of early singleton objects: bean name to bean instance. */
+private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
+```
+
+4、**适配器模式**
+
+AOP 的注解解析出来时Advice，部分是实现了MethodInterceptor接口，而在调用链中，必须得是MethodInterceptor类型，这个时候就需要适配器了，需要一个类的方法返回实现了MethodInterceptor的类并包含advice属性。
+
+![image-20220701190744135](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220701190744135.png)
+
+5、**装饰器模式**
+
+Spring 的 `ApplicationContext` 中配置所有的 `DataSource`。这些 DataSource 可能是各种不同类型的， 比如不同的数据库：Oracle、 SQL Server、 MySQL 等， 也可能是不同的数据源。然后 SessionFactory 根据客户的每次请求， 将 DataSource 属性设置成不同的数据源， 以到达切换数据源的目的。
+
+在 spring 的命名体现：Spring 中用到的包装器模式在类名上有两种表现：一种是类名中含有 `Wrapper`， 另一种是类名中含有`Decorator`。基本上都是动态地给一个对象添加一些额外的职责，比如
+
+- `org.springframework.cache.transaction` 包下的 `TransactionAwareCacheDecorator` 类
+- `org.springframework.session.web.http` 包下的 `SessionRepositoryFilter` 内部类 `SessionRepositoryRequestWrapper`
+
+```java
+//AbstractAutowireCapableBeanFactory.class
+protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)
+      throws BeanCreationException {
+
+   // Instantiate the bean.
+   BeanWrapper instanceWrapper = null;
+   if (mbd.isSingleton()) {
+      instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
+   }
+   if (instanceWrapper == null) {
+      instanceWrapper = createBeanInstance(beanName, mbd, args);
+   }
+```
+
+BeanWrapper 相当于是Spring中的一个包装类，**对Bean 进行包装，具有（单独或批量）获取和设置属性值，获取属性描述符以及查询属性的可读性/可写性的能力。** **还可以进行类型的转换等功能**。
+
+6、**代理模式**
+
+​	AOP底层，就是动态代理模式的实现。
+
+7、**观察者模式**
+
+spring的事件驱动模型使用的是 观察者模式 ，Spring中Observer模式常用的地方是listener的实现。
+
+**ApplicationEvent** 事件
+
+**ApplicationListener** 监听事件
+
+**ApplicationEventPublisher** 发布事件
+
+**ApplicationEventMulticaster** 转发事件
+
+8、**策略模式**
+
+Spring框架的资源访问Resource接口。该接口提供了更强的资源访问能力，Spring 框架本身大量使用了 Resource 接口来访问底层资源。
+
+Resource 接口主要提供了如下几个方法:
+
+- **getInputStream()：** 定位并打开资源，返回资源对应的输入流。每次调用都返回新的输入流。调用者必须负责关闭输入流。
+- **exists()：** 返回 Resource 所指向的资源是否存在。
+- **isOpen()：** 返回资源文件是否打开，如果资源文件不能多次读取，每次读取结束应该显式关闭，以防止资源泄漏。
+- **getDescription()：** 返回资源的描述信息，通常用于资源处理出错时输出该信息，通常是全限定文件名或实际 URL。
+- **getFile：** 返回资源对应的 File 对象。
+- **getURL：** 返回资源对应的 URL 对象。
+
+最后两个方法通常无须使用，仅在通过简单方式访问无法实现时，Resource 提供传统的资源访问的功能。
+
+Resource 接口本身没有提供访问任何底层资源的实现逻辑，**针对不同的底层资源，Spring 将会提供不同的 Resource 实现类，不同的实现类负责不同的资源访问逻辑。**
+
+Spring 为 Resource 接口提供了如下实现类：
+
+- **UrlResource：** 访问网络资源的实现类。
+- **ClassPathResource：** 访问类加载路径里资源的实现类。
+- **FileSystemResource：** 访问文件系统里资源的实现类。
+- **ServletContextResource：** 访问相对于 ServletContext 路径里的资源的实现类.
+- **InputStreamResource：** 访问输入流资源的实现类。
+- **ByteArrayResource：** 访问字节数组资源的实现类。
+
+这些 Resource 实现类，针对不同的的底层资源，提供了相应的资源访问逻辑，并提供便捷的包装，以利于客户端程序的资源访问。
+
+9、**模版方法模式**
+
+好多都是这种方式，父类定义好总体逻辑，子类实现部分功能，好处代码复用，减少代码量，子类只需要关注部分功能的实现，整体功能的实现已在父类实现。
+
+
+
+# AspectJ
+
+[AspectJ](https://www.eclipse.org/aspectj/) 作为 AOP 编程的完全解决方案，提供了三种织入时机，分别为
+
+1. compile-time：**编译期织入**，在编译的时候一步到位，直接编译出包含织入代码的 .class 文件
+2. post-compile：**编译后织入**，增强已经编译出来的类，如我们要增强依赖的 jar 包中的某个类的某个方法
+3. load-time：**在 JVM 进行类加载的时候进行织入**
+
+**参考文章：**https://www.javadoop.com/post/aspectj

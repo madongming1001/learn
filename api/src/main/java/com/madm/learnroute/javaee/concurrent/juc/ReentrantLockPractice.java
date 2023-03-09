@@ -74,16 +74,16 @@ public class ReentrantLockPractice {
     public static void debugCondition() throws InterruptedException {
         ReentrantLock lock = new ReentrantLock();
         //创建新的条件变量
-        Condition condition = lock.newCondition();
+//        Condition condition = lock.newCondition();
         Thread thread0 = new Thread(() -> {
             lock.lock();
             try {
                 System.out.println("线程0获取锁");
                 // sleep不会释放锁
-                Thread.sleep(500);
+                Thread.sleep(50000000l);
                 //进入休息室等待
                 System.out.println("线程0释放锁，进入等待");
-                condition.await();
+//                condition.await();
                 System.out.println("线程0被唤醒了");
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -93,6 +93,9 @@ public class ReentrantLockPractice {
         });
         thread0.setName("thread-01");
         thread0.start();
+        log.info("thread0 未设置中断之前的中断状态为: {}",thread0.isInterrupted());
+        thread0.interrupt();
+        log.info("thread0 未设置中断之后的中断状态为: {}",thread0.isInterrupted());
         //叫醒
         Thread thread1 = new Thread(() -> {
             try {
@@ -104,7 +107,7 @@ public class ReentrantLockPractice {
             try {
                 System.out.println("线程1获取锁");
                 //唤醒
-                condition.signal();
+//                condition.signal();
                 System.out.println("线程1唤醒线程0");
             } finally {
                 lock.unlock();

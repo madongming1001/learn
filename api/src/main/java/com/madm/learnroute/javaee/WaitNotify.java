@@ -19,15 +19,23 @@ public class WaitNotify {
     }
 
     static class Wait implements Runnable {
+        private int index;
+
+        private int conCount;
+
         public void run() {
             synchronized (lock) {
+                System.out.println("waitThread 第 " + ++index + " 次获取锁");
                 while (flag) {
+                    System.out.println("waitThread 第 " + ++conCount + " 次进入循环");
                     System.out.println(String.format(Thread.currentThread() + " flag is true. wait @" + new SimpleDateFormat("HH:mm:ss").format(new Date())));
                     try {
                         lock.wait();
+                        System.out.println("lock notify");
                     } catch (InterruptedException e) {
                     }
                 }
+                System.out.println("waitThread 继续执行");
                 System.out.println(Thread.currentThread() + " flag is false. running@ " + new SimpleDateFormat("HH:mm:ss").format(new Date()));
             }
         }
@@ -39,7 +47,7 @@ public class WaitNotify {
             // 加锁，拥有lock的Monitor
             synchronized (lock) {
                 // 获取lock的锁，然后进行通知，通知时不会释放lock的锁，
-                // 知道当前线程释放了lock后，WaitThread才能从wait方法中返回
+                // 直到当前线程释放了lock后，WaitThread才能从wait方法中返回
                 System.out.println(Thread.currentThread() + " hold lock. notify @ " + new SimpleDateFormat("HH:mm:ss").format(new Date()));
                 lock.notifyAll();
                 flag = false;
