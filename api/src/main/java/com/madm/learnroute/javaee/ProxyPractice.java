@@ -21,16 +21,15 @@ import java.util.Properties;
  * Cglib代理对象的缺点：目标不能是final类
  * Created by YangTao
  * CallbackInfo 里面有很多回掉的类型
- *     private static final CallbackInfo[] CALLBACKS = {
- *         new CallbackInfo(NoOp.class, NoOpGenerator.INSTANCE),
- *         new CallbackInfo(MethodInterceptor.class, MethodInterceptorGenerator.INSTANCE),
- *         new CallbackInfo(InvocationHandler.class, InvocationHandlerGenerator.INSTANCE),
- *         new CallbackInfo(LazyLoader.class, LazyLoaderGenerator.INSTANCE),
- *         new CallbackInfo(Dispatcher.class, DispatcherGenerator.INSTANCE),
- *         new CallbackInfo(FixedValue.class, FixedValueGenerator.INSTANCE),
- *         new CallbackInfo(ProxyRefDispatcher.class, DispatcherGenerator.PROXY_REF_INSTANCE),
- *     };
- *
+ * private static final CallbackInfo[] CALLBACKS = {
+ * new CallbackInfo(NoOp.class, NoOpGenerator.INSTANCE),
+ * new CallbackInfo(MethodInterceptor.class, MethodInterceptorGenerator.INSTANCE),
+ * new CallbackInfo(InvocationHandler.class, InvocationHandlerGenerator.INSTANCE),
+ * new CallbackInfo(LazyLoader.class, LazyLoaderGenerator.INSTANCE),
+ * new CallbackInfo(Dispatcher.class, DispatcherGenerator.INSTANCE),
+ * new CallbackInfo(FixedValue.class, FixedValueGenerator.INSTANCE),
+ * new CallbackInfo(ProxyRefDispatcher.class, DispatcherGenerator.PROXY_REF_INSTANCE),
+ * };
  */
 interface Animal {
     void call();
@@ -70,7 +69,6 @@ class TargetInvoker implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         System.out.println("jdk 代理执行前");
-        System.out.println(proxy.getClass());
         Object result = method.invoke(target, args);
         System.out.println("jdk 代理执行后");
         return result;
@@ -118,7 +116,9 @@ public class ProxyPractice {
         System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");//jdk 1.8
 //        System.setProperty("jdk.proxy.ProxyGenerator.saveGeneratedFiles", "true");//jdk 1.8 after
         Cat cat = new Cat();
+        //动态代理就是，在程序运行期，创建目标对象的代理对象，并对目标对象中的方法进行功能性增强的一种技术。
         Animal proxy = (Animal) TargetInvoker.getProxy(cat);
+        //返回的是代理类
         proxy.call();
     }
 
@@ -136,12 +136,12 @@ public class ProxyPractice {
 
     public static void main(String[] args) throws Exception {
         //JDK代理生成 InvocationHandler invoke()
-//        jdkProxyGenerate();
+        jdkProxyGenerate();
 
         //CGLIB代理生成 MethodInterceptor intercept()
 //        cglibProxyGenerate();
 
-        testReflectMethod();
+//        testReflectMethod();
     }
 
     /**

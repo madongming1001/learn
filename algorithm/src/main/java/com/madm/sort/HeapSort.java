@@ -79,7 +79,7 @@ public class HeapSort {
         while (left < heapSize) {//如果有左孩子，有没有右孩子，可能有可能没有！
             int largest = (right = left + 1) < heapSize && arr[right] > arr[left] ? right : left;//把较大孩子的下标，给largest
             largest = arr[largest] > arr[index] ? largest : index;
-            if (largest == index) {
+            if (largest == index) {//左右两个孩子没有比他大的
                 break;
             }
             swap(arr, largest, index);//index和较大孩子，要互换

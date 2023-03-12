@@ -496,16 +496,16 @@ public Object postProcessAfterInitialization(@Nullable Object bean, String beanN
 ## 可以被代理的类执行流程
 
 ```java
-getAdvicesAndAdvisorsForBean -> findEligibleAdvisors -> {
-  //根据配置文件以及注解的方式找到所有声明aspectj的切面，然后生成对应的advisor，advisor主要作用是封装pointcut和advice
-	findCandidateAdvisors();
-  //根据当前类的所有方法找到所有符合的advisors
-  findAdvisorsThatCanApply();
-  //向advisors0号位置添加对象ExposeInvocationInterceptor，用于整个调用链的  //向advisors0号位置添加对象ExposeInvocationInterceptor，ExposeInvocationInterceptor 就是用来传递MethodInvocation的。在后续的任何下调用链环节，只需要用到当前的MethodInvocation就通过ExposeInvocationInterceptor.currentInvocation()静态方法获得
-  extendAdvisors(eligibleAdvisors);
-  //进行拓扑排序
-	sortAdvisors(eligibleAdvisors);
-}
+getAdvicesAndAdvisorsForBean()
+		findEligibleAdvisors()
+    		//根据配置文件以及注解的方式找到所有声明aspectj的切面，然后生成对应的advisor，advisor主要作用是						封装pointcut和advice
+				findCandidateAdvisors()
+			  //根据当前类的所有方法找到所有符合的advisors
+				findAdvisorsThatCanApply()
+			  //向advisors0号位置添加对象ExposeInvocationInterceptor，ExposeInvocationInterceptor 就是					 用来传递MethodInvocation的。在后续的任何下调用链环节，只需要用到当前的MethodInvocation就通过					 ExposeInvocationInterceptor.currentInvocation()静态方法获得
+				extendAdvisors()
+			  //进行拓扑排序
+				sortAdvisors()
 ```
 
 
@@ -2352,13 +2352,63 @@ Spring 为 Resource 接口提供了如下实现类：
 
 > Spring只是解决了单例模式下属性依赖的循环问题；Spring为了解决单例的循环依赖问题，使用了三级缓存。
 
-### 
+**Bean的完整生命周期经历了各种方法调用，这些方法可以划分为以下几类**：(结合上图，需要有如下顶层思维)
+
+- **Bean自身的方法**： 这个包括了Bean本身调用的方法和通过配置文件中`<bean>`的**init-method**和**destroy-method**指定的方法
+
+![image-20230310100053240](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230310100053240.png)
+
+- **Bean级生命周期接口方法**： 这个包括了**BeanNameAware**、**BeanFactoryAware**、**ApplicationContextAware**；当然也包括**InitializingBean**和**DiposableBean**这些接口的方法（可以被**@PostConstruct**和**@PreDestroy**注解替代)
+- **容器级生命周期接口方法**： 这个包括了**InstantiationAwareBeanPostProcessor** 和 **BeanPostProcessor** 这两个接口实现，一般称它们的实现类为“后处理器”。
+- **工厂后处理器接口方法**： 这个包括了**AspectJWeavingEnabler**, **ConfigurationClassPostProcessor**, **CustomAutowireConfigurer**等等非常有用的工厂后处理器接口的方法。工厂后处理器也是容器级的。在应用上下文装配配置文件之后立即调用。
+
+![img](https://pdai.tech/images/spring/springframework/spring-springframework-aop-3.png)
 
 
 
+**should()方法执行流程**
+
+```java
+//AspectJAwareAdvisorAutoProxyCreator#shouldSkip()
+//AnnotationAwareAspectJAutoProxyCreator#findCandidateAdvisors()
+//		BeanFactoryAdvisorRetrievalHelper#findAdvisorBeans()
+//
+	@Override
+	protected boolean shouldSkip(Class<?> beanClass, String beanName) {
+		// TODO: Consider optimization by caching the list of the aspect names
+		//考虑通过缓存切面名称列表进行优化
+		List<Advisor> candidateAdvisors = findCandidateAdvisors();
+		for (Advisor advisor : candidateAdvisors) {
+			//对于<aop:aspect/>中的<aop:before/>类似的生成的是AspectJPointcutAdvisor
+			//Advice就是AbstractAspectJAdvice的子类
+			if (advisor instanceof AspectJPointcutAdvisor &&
+					((AspectJPointcutAdvisor) advisor).getAspectName().equals(beanName)) {
+				return true;
+			}
+		}
+		return super.shouldSkip(beanClass, beanName);
+	}
+
+	@Override
+	protected List<Advisor> findCandidateAdvisors() {
+		// Add all the Spring advisors found according to superclass rules.
+    /**
+    * 找到所有 implements Advisor 接口的
+    * xml配置的 advice 最终都会转成 AspectJPointcutAdvisor
+    * BeanFactoryAdvisorRetrievalHelper#isEligibleBean() 钩子方法，默认为true
+    */ 
+		List<Advisor> advisors = super.findCandidateAdvisors();
+		// Build Advisors for all AspectJ aspects in the bean factory.
+		// 在从所有切面中解析得到Advisor对象 getAdvisor()
+		if (this.aspectJAdvisorsBuilder != null) {
+			//注解方式，找到系统中使用@Aspectj标注的Bean，并且找到该bean中使用@Before、@After等标注的方法，将这些方法封装成一个一个Advisor
+			advisors.addAll(this.aspectJAdvisorsBuilder.buildAspectJAdvisors());
+		}
+		return advisors;
+	}
 
 
-
+```
 
 # 揭秘Java热部署原理及JRebel(Hotcode)的实现原理
 

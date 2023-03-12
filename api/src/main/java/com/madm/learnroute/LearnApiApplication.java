@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  * @author madongming
  */
 
-@SpringBootApplication(exclude = AopAutoConfiguration.class)
+@SpringBootApplication
 @MapperScan(basePackages = "com.madm.learnroute.mapper")
 @EnableFeignClients
 @EnableJSONDoc

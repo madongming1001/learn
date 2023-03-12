@@ -5,9 +5,11 @@ import com.google.common.collect.Lists;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletionStage;
 
 /**
  * 泛型中 extends 和 super 的区别？
@@ -30,18 +32,26 @@ public class WildcardPractice {
         //所以，就算容器里装的东西之间有继承关系，但容器之间是没有继承关系的。所以我们不可以把Plate的引用传递给Plate。
 //        Plate<Fruit> p=new Plate<Apple>(new Apple());
 
-        Map<String, Fruit> map1 = new HashMap();
+        Map<Fruit, RedApple> map1 = new HashMap();
         mapPrint1(map1);
         Map<String, List<? extends Fruit>> map2 = new HashMap();
         //同样地，出于对类型安全的考虑，我们可以加入Apple对象或者其任何子类（如RedApple）对象，但由于编译器并不知道List的内容究竟是Apple的哪个超类，因此不允许加入特定的任何超类型。
-        List<? super Apple> plates = Lists.newArrayList();
-        plates.add(new Apple());
+//        List<? super Apple> plates = Lists.newArrayList();
+        ArrayList<? super Apple> apples = new ArrayList<>();
+        apples.add(new Apple());
+        apples.add(new RedApple());
+        apples.add(new BlueApple());
+
         mapPrint2(map2);
         WildcardPractice singleton = Singleton.get(WildcardPractice.class);
-
+//        public <U> CompletableFuture<U> thenCompose(
+//                Function<? super T, ? extends CompletionStage<U>> fn) {
+//            return uniComposeStage(null, fn);
+//        }
     }
 
-    public static void mapPrint1(Map<String, ? extends Fruit> map1) {
+
+    public static void mapPrint1(Map<? super Apple, ? extends RedApple> map1) {
         System.out.println(map1);
     }
 
@@ -56,6 +66,16 @@ class Fruit {
 
 @ToString
 class Apple extends Fruit {
+}
+
+@ToString
+class BlueApple extends Apple {
+
+}
+
+@ToString
+class RedApple extends Apple {
+
 }
 
 @NoArgsConstructor

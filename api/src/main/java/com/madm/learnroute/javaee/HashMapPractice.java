@@ -3,6 +3,7 @@ package com.madm.learnroute.javaee;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
 import com.mdm.pojo.AuthParam;
+import com.mdm.pojo.Student;
 import com.mdm.pojo.User;
 import com.mdm.utils.GsonObject;
 import org.apache.commons.collections4.map.MultiKeyMap;
@@ -11,10 +12,15 @@ import org.apache.curator.shaded.com.google.common.collect.Lists;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
+ * 学习 Collectors 用法
+ * 参考文章：https://www.jianshu.com/p/6ee7e4cd5314
+ *
  * @author madongming
  */
 public class HashMapPractice {
@@ -63,7 +69,7 @@ public class HashMapPractice {
 //        System.out.println(uniqueId);
 //        System.out.println("runner");
         List<User> lists = Arrays.asList(new User(1, "group 1"), new User(2, "group 2"), new User(3, "group 3"), new User(4, "group 4"));
-        Map<Integer, User> userMap = lists.stream().collect(Collectors.toConcurrentMap(x -> x.getId(), Function.identity(), (k1, k2) -> k1));
+        Map<Integer, User> userMap = lists.stream().collect(Collectors.toConcurrentMap(x -> x.getId(), Function.identity(), BinaryOperator.maxBy(Comparator.comparing(User::getName))));
         userMap.computeIfAbsent(1, key -> {
             System.out.println(key);
             return new User(1000, "group 1000");
@@ -109,10 +115,9 @@ public class HashMapPractice {
 //        userMap.get(1).setAuth(Arrays.asList(new AuthParam("1", "2")));
 //        System.out.println(GsonObject.createGson().toJson(userMap));
 //
-//        Collection<List<User>> values = lists.stream().collect(Collectors.groupingBy(s -> {
-//            return s.getName();
-//        })).values();
-//        values.stream().forEach(System.out::println);
+        Map<Object, List<User>> map2 = lists.stream().collect(Collectors.groupingBy(s -> s.getName()));
+        Collection<List<User>> values = map2.values();
+        values.stream().forEach(System.out::println);
 //        System.out.println(values.size());
 //
         ArrayList<Map<String, Long>> mapArrayList = new ArrayList();
@@ -156,6 +161,119 @@ public class HashMapPractice {
             Object key2 = map1.computeIfAbsent("key1", key -> new Object());
             System.out.println(map1);        //输出：{key1=java.lang.Object@708f5957, value=java.lang.Object@68999068}    }    /**
         }
+
+        Student studentA = new Student("20190001", "小明");
+        Student studentB = new Student("20190002", "小红");
+        Student studentC = new Student("20190003", "小丁");
+
+        //使用分隔符：201900012019000220190003
+        Stream.of(studentA, studentB, studentC).map(Student::getId).collect(Collectors.joining());
+
+        //使用^_^ 作为分隔符
+        //20190001^_^20190002^_^20190003
+        Stream.of(studentA, studentB, studentC).map(Student::getId).collect(Collectors.joining("^_^"));
+
+        //使用^_^ 作为分隔符
+        //[]作为前后缀
+        //[20190001^_^20190002^_^20190003]
+        Stream.of(studentA, studentB, studentC).map(Student::getId).collect(Collectors.joining("^_^", "[", "]"));
+
+        // Long 8
+        Stream.of(1, 0, -10, 9, 8, 100, 200, -80).collect(Collectors.counting());
+
+        //如果仅仅只是为了统计，那就没必要使用Collectors了，那样更消耗资源
+        // long 8
+        Stream.of(1, 0, -10, 9, 8, 100, 200, -80).count();
+
+        // maxBy 200
+        Stream.of(1, 0, -10, 9, 8, 100, 200, -80).collect(Collectors.maxBy(Integer::compareTo)).ifPresent(System.out::println);
+
+        // max 200
+        Stream.of(1, 0, -10, 9, 8, 100, 200, -80).max(Integer::compareTo).ifPresent(System.out::println);
+
+        // minBy -80
+        Stream.of(1, 0, -10, 9, 8, 100, 200, -80).collect(Collectors.minBy(Integer::compareTo)).ifPresent(System.out::println);
+
+        // min -80
+        Stream.of(1, 0, -10, 9, 8, 100, 200, -80).min(Integer::compareTo).ifPresent(System.out::println);
+
+
+        //IntSummaryStatistics{count=10, sum=55, min=1, average=5.500000, max=10}
+        Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).collect(Collectors.summarizingInt(Integer::valueOf));
+
+        //DoubleSummaryStatistics{count=10, sum=55.000000, min=1.000000, average=5.500000, max=10.000000}
+        Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).collect(Collectors.summarizingDouble(Double::valueOf));
+
+        //LongSummaryStatistics{count=10, sum=55, min=1, average=5.500000, max=10}
+        Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).collect(Collectors.summarizingLong(Long::valueOf));
+
+        // 55
+        Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).mapToInt(Integer::valueOf).sum();
+
+        // 55.0
+        Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).mapToDouble(Double::valueOf).sum();
+
+        // 55
+        Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).mapToLong(Long::valueOf).sum();
+
+        //Optional[6]
+        Stream.of(studentA, studentB, studentC).map(student -> student.getName().length()).collect(Collectors.reducing(Integer::sum));
+
+        //6
+        //或者这样，指定初始值，这样可以防止没有元素的情况下正常执行
+        Stream.of(studentA, studentB, studentC).map(student -> student.getName().length()).collect(Collectors.reducing(0, (i1, i2) -> i1 + i2));
+
+        //6
+        //更或者先不转换，规约的时候再转换
+        Stream.of(studentA, studentB, studentC).collect(Collectors.reducing(0, s -> s.getName().length(), Integer::sum));
+
+        //Map<String,List<Integer>>
+        Stream.of(-6, -7, -8, -9, 1, 2, 3, 4, 5, 6).collect(Collectors.groupingBy(integer -> {
+            if (integer < 0) {
+                return "小于";
+            } else if (integer == 0) {
+                return "等于";
+            } else {
+                return "大于";
+            }
+        }));
+
+        //Map<String,Set<Integer>>
+        //自定义下游收集器
+        Stream.of(-6, -7, -8, -9, 1, 2, 3, 4, 5, 6).collect(Collectors.groupingBy(integer -> {
+            if (integer < 0) {
+                return "小于";
+            } else if (integer == 0) {
+                return "等于";
+            } else {
+                return "大于";
+            }
+        }, Collectors.toSet()));
+
+        //Map<String,Set<Integer>>
+        //自定义map容器 和 下游收集器
+        Stream.of(-6, -7, -8, -9, 1, 2, 3, 4, 5, 6).collect(Collectors.groupingBy(integer -> {
+            if (integer < 0) {
+                return "小于";
+            } else if (integer == 0) {
+                return "等于";
+            } else {
+                return "大于";
+            }
+        }, LinkedHashMap::new, Collectors.toSet()));
+
+        //Map<Boolean,List<Integer>>
+        Stream.of(0, 1, 0, 1).collect(Collectors.partitioningBy(integer -> integer == 0));
+
+        //Map<Boolean,Set<Integer>>
+        //自定义下游收集器
+        Stream.of(0, 1, 0, 1).collect(Collectors.partitioningBy(integer -> integer == 0, Collectors.toSet()));
+
+        //List<String>
+        Stream.of(studentA, studentB, studentC).collect(Collectors.mapping(Student::getName, Collectors.toList()));
+
+        //listIterator
+        Stream.of(studentA, studentB, studentC).collect(Collectors.collectingAndThen(Collectors.toList(), List::listIterator));
     }
 
     private static void threadSafeQuestion() {

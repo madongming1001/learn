@@ -42,8 +42,8 @@ public class CompletableFuturePractice {
 
         //同时执行，组合结果，任务A 和任务B 同时执行，然后取它们的结果进行后续操作。这里强调的是任务之间的并行工作，没有先后执行顺序。
         //cfA.runAfterBoth(cfB, () -> {});
-        //cfA.thenAcceptBoth(cfB, (resultA, resultB) -> {}); 后续结果不需要返回值
-        //cfA.thenCombine(cfB, (resultA, resultB) -> "result A + B"); 后续结果需要返回值
+        //cfA.thenAcceptBoth(cfB, (resultA, resultB) -> {}); 没有返回值
+        //cfA.thenCombine(cfB, (resultA, resultB) -> "result A + B"); 有返回值
         //前面一个 CompletableFuture 实例的结果可以传递到下一个实例中，这就是 compose 和 combine 的主要区别。
 
         //取多个任务的结果
@@ -63,6 +63,44 @@ public class CompletableFuturePractice {
         //cfA.runAfterEitherAsync(cfB, () -> {});
         //cfA.runAfterEitherAsync(cfB, () -> {}, executorService);
 
+    }
+
+    private static void testCompose() {
+        CompletableFuture<String> cfA = CompletableFuture.supplyAsync(() -> {
+            System.out.println("processing a...");
+            return "hello";
+        });
+
+        CompletableFuture<String> cfB = CompletableFuture.supplyAsync(() -> {
+            System.out.println("processing b...");
+            return " world";
+        });
+
+        CompletableFuture<String> cfC = CompletableFuture.supplyAsync(() -> {
+            System.out.println("processing c...");
+            return ", I'm robot!";
+        });
+
+        cfA.thenCombine(cfB, (resultA, resultB) -> {
+            System.out.println(resultA + resultB);  // hello world
+            return resultA + resultB;
+        }).thenCombine(cfC, (resultAB, resultC) -> {
+            System.out.println(resultAB + resultC); // hello world, I'm robot!
+            return resultAB + resultC;
+        });
+
+        CompletableFuture<String> result = CompletableFuture.supplyAsync(() -> {
+            // 第一个实例的结果
+            return "hello";
+        }).thenCompose(resultA -> CompletableFuture.supplyAsync(() -> {
+            // 把上一个实例的结果传递到这里
+            return resultA + " world";
+        })).thenCompose(resultAB -> CompletableFuture.supplyAsync(() -> {
+            // 到这里大家应该很清楚了
+            return resultAB + ", I'm robot";
+        }));
+
+        System.out.println(result.join()); // hello world, I'm robot
     }
 
     private static void resultDelivery() {
