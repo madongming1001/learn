@@ -1316,3 +1316,12 @@ man命令可以查看系统参数详情 man pthread_create
 上面我们介绍了**MetaspaceSize**与**MaxMetaspaceSize**这两个参数，事实上，**这两个参数仅仅是用来控制Metaspace空间进行GC操作的**，并不是用来真正控制Metaspace的大小的，而真正控制Metaspace空间大小的参数，是CompressedClassSpaceSize、UseCompressedClassPointers、InitialBootClassLoaderMetaspaceSize。
 
 **参考文章：**https://blog.csdn.net/wtopps/article/details/106620292
+
+
+
+
+
+![image-20230314032039044](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230314032039044.png)
+
+![image-20230314032050636](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230314032050636.png)
+
