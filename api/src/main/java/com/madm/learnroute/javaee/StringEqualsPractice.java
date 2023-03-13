@@ -62,6 +62,8 @@ public class StringEqualsPractice {
 //        System.out.println(Integer.toBinaryString(65));//A
 //        System.out.println(Integer.toBinaryString(97));//a
 
+        System.out.println(Integer.valueOf(Integer.valueOf(".")));
+
     }
 
     /**

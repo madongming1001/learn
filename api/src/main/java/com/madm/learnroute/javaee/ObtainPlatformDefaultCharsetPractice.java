@@ -1,5 +1,9 @@
 package com.madm.learnroute.javaee;
 
+import cn.hutool.core.util.StrUtil;
+import com.github.pagehelper.util.StringUtil;
+import org.springframework.util.StringUtils;
+
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -42,5 +46,21 @@ public class ObtainPlatformDefaultCharsetPractice {
 
         String property = System.getProperty("sun.misc.ProxyGenerator.saveGeneratedFiles");
         System.out.println(property);
+
+        System.out.println(getProjectPath());
+    }
+
+    static String getProjectPath() {
+        String projectPath;
+        String localPath = ObtainPlatformDefaultCharsetPractice.class.getResource("").getPath();
+//        System.out.println("localPath = " + localPath);
+
+
+        //获取项目根目录
+        String rootPath = ObtainPlatformDefaultCharsetPractice.class.getResource("/").getPath();
+//        System.out.println("rootPath = " + rootPath);
+        projectPath = localPath.replace(rootPath, "").replace("/", ".");
+
+        return StringUtils.trimTrailingCharacter(projectPath, (char) 46);
     }
 }

@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
+import static cn.hutool.core.date.DatePattern.NORM_DATETIME_MS_PATTERN;
+import static cn.hutool.core.date.DatePattern.NORM_DATETIME_PATTERN;
+
 /**
  * 什么是GMT（Greenwich Mean Time）格林尼治标准时间（也称格林威治时间）
  * 传统的中文译法是「格林威治」，是「Greenwich」的形譯，與上述的英语读音有较大的出入，因此现代有改译「格林尼治」的趋势。
@@ -37,15 +40,19 @@ import java.util.TimeZone;
  * 从格林威治本初子午线起，经度每向东或者向西间隔15°，就划分一个时区，在这个区域内，大家使用同样的标准时间
  * <p>
  * 参考文章：https://www.cnblogs.com/theRhyme/p/9756154.html
- *
+ * <p>
  * T表示分隔符，Z表示的是UTC。 UTC：世界标准时间，在标准时间上加上8小时，即东八区时间，也就是北京时间。
  */
 @Slf4j
 public class java8DateTimePractice {
 
     static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(NORM_DATETIME_PATTERN);
+
+    static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(NORM_DATETIME_MS_PATTERN);
+    static DateTimeFormatter norm_pattern = DateTimeFormatter.ofPattern(NORM_DATETIME_PATTERN);
     private static String messageDelayLevel = "1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h";
-    private static Map<String, Long> timeUnitTable;
+    private final static Map<String, Long> timeUnitTable;
 
     static {
         timeUnitTable = new HashMap();
@@ -70,7 +77,7 @@ public class java8DateTimePractice {
 //        System.out.println(LocalTime.now());
 //        System.out.println(LocalDateTime.now());//中间T代表时间分割的字符
 //
-//        System.out.println(timeUnitTable.get("s"));
+        System.out.println(timeUnitTable.get("s"));
     }
 
     private static void testLocalDateAndTime() {
@@ -79,7 +86,6 @@ public class java8DateTimePractice {
         LocalDate lastWeek = now.minusWeeks(1);
         LocalDate nextWeek = now.plusWeeks(1);
         now.isAfter(nextWeek);
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         System.out.println(dateTimeFormatter.format(LocalDateTime.now()));
         System.out.println("==========================================");
         System.out.println(LocalDateTime.ofInstant(Instant.now(), ZoneId.of("UTC")));
@@ -96,16 +102,14 @@ public class java8DateTimePractice {
         //获取毫秒数
         Long milliSecond = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
         //时间转字符串格式化
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
         String dateTime = LocalDateTime.now(ZoneOffset.of("+8")).format(formatter);
         //字符串转时间
         String dateTimeStr = "2018-07-28 14:11:15";
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime localDateTime = LocalDateTime.parse(dateTimeStr, df);
+        LocalDateTime localDateTime = LocalDateTime.parse(dateTimeStr, norm_pattern);
 
         LocalDateTime time = LocalDateTime.now();
-        String localTime = df.format(time);
-        LocalDateTime ldt = LocalDateTime.parse("2017-09-28 17:07:05", df);
+        String localTime = norm_pattern.format(time);
+        LocalDateTime ldt = LocalDateTime.parse("2017-09-28 17:07:05", norm_pattern);
     }
 
     private static void testDuration() {
@@ -120,7 +124,7 @@ public class java8DateTimePractice {
 
     private static void testPeriod() {
         // 比较两个LocalDate相差多少年、月、天
-        LocalDate startDate = LocalDate.of(2022, 7, 1);
+        LocalDate startDate = LocalDate.of(1990, 7, 1);
         LocalDate endDate = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), LocalDate.now().getDayOfMonth());
         Period period = Period.between(startDate, endDate);
         log.info("Years:" + period.getYears() + " months:" + period.getMonths() + " days:" + period.getDays());

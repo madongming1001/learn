@@ -500,6 +500,10 @@ getAdvicesAndAdvisorsForBean()
 		findEligibleAdvisors()
     		//根据配置文件以及注解的方式找到所有声明aspectj的切面，然后生成对应的advisor，advisor主要作用是						封装pointcut和advice
 				findCandidateAdvisors()
+  					//找到所有 implements Advisor 接口的
+  					findAdvisorBeans()
+     				//注解方式，找到系统中使用@Aspectj标注的Bean，并且找到该bean中使用@Before、@After等标注的							方法，将这些方法封装成一个一个Advisor
+	 				  buildAspectJAdvisors()
 			  //根据当前类的所有方法找到所有符合的advisors
 				findAdvisorsThatCanApply()
 			  //向advisors0号位置添加对象ExposeInvocationInterceptor，ExposeInvocationInterceptor 就是					 用来传递MethodInvocation的。在后续的任何下调用链环节，只需要用到当前的MethodInvocation就通过					 ExposeInvocationInterceptor.currentInvocation()静态方法获得
@@ -1390,9 +1394,9 @@ public UserService userService() {
 }
 ```
 
-**⚠️注意**：就会出现myService使用的是自己new出来的，**走的正常方法调用**，正常想使用的是spring中的userService，所以就会导致用的不是同一个对象，比较的话可定是false。
+**⚠️注意**：就会出现myService使用的是自己new出来的，**走的正常方法调用**，正常想使用的是spring中的userService，所以就会导致用的不是同一个对象，比较的话肯定是false。
 
-@Bean修饰的方法走的是工厂方法方式创建对象（**createBeanInstance()&instantiateUsingFactoryMethod()**），之后会把当前工厂方法存入到一个isCurrentlyInvokedFactoryMethod() Threadlocal之中，再然后调用方法走到拦截器，拦截器里面判断isCurrentlyInvokedFactoryMethod()是否有值，如果有值说明是spring正常在创建对象，如果没值的话说明是方法里面自己调用的，当执行到userService的时候由于该配置类每个方法都有拦截器所以又回到了拦截器的逻辑，又因为在isCurrentlyInvokedFactoryMethod()中不是当前工厂方法，所以获取的对象从spring中获取，存入到一级缓存，正常获取对象的逻辑，完事之后回到myService方法继续执行。当spring加载配置类下一个userSerivice方法创建对象的时候，由于spring容器中已经有该对象，就不需要创建了。
+@Bean修饰的方法走的是工厂方法方式创建对象（**createBeanInstance()&instantiateUsingFactoryMethod()**），之后会把当前工厂方法存入到一个**isCurrentlyInvokedFactoryMethod()** Threadlocal之中，再然后调用方法走到拦截器，拦截器里面判断isCurrentlyInvokedFactoryMethod()是否有值，如果有值说明是spring正常在创建对象，如果没值的话说明是方法里面自己调用的，当执行到userService的时候由于该配置类每个方法都有拦截器所以又回到了拦截器的逻辑，又因为在**isCurrentlyInvokedFactoryMethod()**中不是当前工厂方法，所以获取的对象从spring中获取，存入到一级缓存，正常获取对象的逻辑，完事之后回到myService方法继续执行。当spring加载配置类下一个userSerivice方法创建对象的时候，由于spring容器中已经有该对象，就不需要创建了。
 
 参考文章：https://blog.csdn.net/weixin_37689658/article/details/125664876
 
@@ -2379,7 +2383,7 @@ Spring 为 Resource 接口提供了如下实现类：
 		//考虑通过缓存切面名称列表进行优化
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
 		for (Advisor advisor : candidateAdvisors) {
-			//对于<aop:aspect/>中的<aop:before/>类似的生成的是AspectJPointcutAdvisor
+			//对于<aop:aspect/>中的<aop:before/>类似的生成的是 AspectJPointcutAdvisor
 			//Advice就是AbstractAspectJAdvice的子类
 			if (advisor instanceof AspectJPointcutAdvisor &&
 					((AspectJPointcutAdvisor) advisor).getAspectName().equals(beanName)) {

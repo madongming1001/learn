@@ -6,7 +6,7 @@ package com.madm.sort;
  * @author dongming.ma
  * @date 2022/11/9 20:13
  */
-public class BubbleSortPractice {
+public class BubbleSort {
 
     public static void main(String[] args) {
         bubbleSort1();

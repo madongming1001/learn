@@ -16,7 +16,7 @@ public class HeapSort {
 
     public static void main(String[] args) {
         int[] arr = {7, 5, 15, 3, 17, 2, 20, 24, 1, 9, 12, 8};
-        System.out.println(findLargestNumberThanK(arr, 5));
+        findLargestNumberThanK(arr, 5);
         heapSort(arr);
         System.out.println(Arrays.toString(arr));
     }
@@ -38,7 +38,7 @@ public class HeapSort {
         // 从最后一个非叶子节点开始，依次下沉调整
         for (int i = (index - 2) / 2; i >= 0; i--) {
             downAdjust(arr, i, index);
-            System.out.println("第" + i + "次输出");
+//            System.out.println("第" + i + "次输出");
         }
     }
 
@@ -101,6 +101,7 @@ public class HeapSort {
         for (int i = arr.length - 1; i >= 0; i--) {
             heapify(arr, i, arr.length);
         }
+        //变成了堆结构
         int heapSize = arr.length;
         swap(arr, 0, --heapSize);
         //O(N*logN)

@@ -11,7 +11,7 @@ import java.util.Arrays;
  * 快速排序就是每一轮挑选一个基准元素，并让其他比它大的元素移动到数列一边，
  * 比它小的元素移动到数列的另一边，从而把数列拆解成两部分
  */
-public class QuickSortPractice {
+public class QuickSort {
     public static void main(String[] args) {
         int[] ints = {6, 1, 2, 7, 9};
 //        int[] ints = {3, 6, 5, 3, 1, 4, 5, 6, 7};

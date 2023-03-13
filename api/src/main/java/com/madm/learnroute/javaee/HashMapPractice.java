@@ -60,7 +60,6 @@ public class HashMapPractice {
         // new EntryIterator() extends HashIterator 构造方法就会设置 expectedModCount = modCount;
         Iterator<Map.Entry<String, Integer>> iterator = prices.entrySet().iterator();
 
-
 //        List<Integer> uniqueId = new ArrayList<>();
 //        int newId = 0;
 //        do {

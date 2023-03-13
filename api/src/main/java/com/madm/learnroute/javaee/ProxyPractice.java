@@ -13,6 +13,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.Properties;
 
+import static com.madm.learnroute.javaee.ObtainPlatformDefaultCharsetPractice.getProjectPath;
+
 /**
  * 代理模式是一种设计模式，提供了对目标对象额外的访问方式，
  * 即通过代理对象访问目标对象，这样可以在不修改原目标对象的前提下，
@@ -89,7 +91,7 @@ class TargetInvoker implements InvocationHandler {
 public class ProxyPractice {
 
     private static void cglibProxyGenerate() {
-        saveGeneratedCGlibProxyFile(System.getProperty("user.dir") + "/proxy");
+        saveGeneratedCGlibProxyFile(System.getProperty("user.dir"));
         //DebuggingClassWriter.traceEnabled 打印cdlib代理文件
         //通过cglib动态代理获取代理对象的过程，创建调用的对象，在后续创建过程中Enhancekey的对象，
         //所以在进行enhancer对象创建的时候需要把EnhancerKey（newInstance）对象准备好
@@ -136,10 +138,10 @@ public class ProxyPractice {
 
     public static void main(String[] args) throws Exception {
         //JDK代理生成 InvocationHandler invoke()
-        jdkProxyGenerate();
+//        jdkProxyGenerate();
 
         //CGLIB代理生成 MethodInterceptor intercept()
-//        cglibProxyGenerate();
+        cglibProxyGenerate();
 
 //        testReflectMethod();
     }
@@ -161,6 +163,5 @@ public class ProxyPractice {
             UserId a = method.getAnnotation(UserId.class);
             System.out.println(a.value());
         }
-
     }
 }
