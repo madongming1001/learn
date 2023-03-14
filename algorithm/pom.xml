@@ -18,11 +18,6 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>com.madm</groupId>
             <artifactId>learn-common</artifactId>
             <version>1.0-SNAPSHOT</version>

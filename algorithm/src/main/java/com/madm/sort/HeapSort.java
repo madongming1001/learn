@@ -63,6 +63,13 @@ public class HeapSort {
         arr[index] = temp;
     }
 
+    public static int[] buildBigTopPile(int[] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            initializeHeap(arr, i);
+        }
+        return arr;
+    }
+
     private static void initializeHeap(int[] arr, int index) {
         //新进来的数，现在停在了index位置，请依次往上移动，
         //移动到0位置，或者干不掉自己的父亲，停！
@@ -103,7 +110,7 @@ public class HeapSort {
         }
         //变成了堆结构
         int heapSize = arr.length;
-        swap(arr, 0, --heapSize);
+        swap(arr, 0, --heapSize);//0和最后位置交换
         //O(N*logN)
         while (heapSize > 0) {//O(N)
             heapify(arr, 0, heapSize);//O(logN)

@@ -1,6 +1,5 @@
 package com.madm.interview_guide;
 
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.madm.data_structure.TreeNode;
 
@@ -8,13 +7,15 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import static com.madm.sort.HeapSort.buildBigTopPile;
+
 /**
  * @author dongming.ma
  * @date 2023/3/14 01:28
  */
 public class TreeNodeShow {
     public static void main(String[] args) {
-        TreeNode root = TreeNodeUtil.arrayToTreeNode(Arrays.stream(RandomUtil.randomInts(35)).boxed().toArray(Integer[]::new));
+        TreeNode root = TreeNodeUtil.arrayToTreeNode(Arrays.stream(buildBigTopPile(RandomUtil.randomInts(15))).boxed().toArray(Integer[]::new));
         TreeNodeShow.show(root);
     }
 
@@ -34,6 +35,7 @@ public class TreeNodeShow {
         if (currLevel == treeDepth) return;
         // 计算当前行到下一行，每个元素之间的间隔（下一行的列索引与当前元素的列索引之间的间隔）
         int gap = treeDepth - currLevel - 1;
+//        int gap = 1;
 
         // 对左儿子进行判断，若有左儿子，则记录相应的"/"与左儿子的值
         if (currNode.left != null && currNode.left.val != null) {
@@ -56,14 +58,11 @@ public class TreeNodeShow {
         }
         // 得到树的深度
         int treeDepth = getTreeDepth(root);
-
         int arrayHeight = treeDepth * 2 - 1;
         // 最后一行的长度为2的（n - 1）次方乘3，再加1
         // 作为整个二维数组的长度
-
-
-        int arrayWidth = (2 << (treeDepth - 2)) * 3 + 1;
-//        int arrayWidth = (1 << (treeDepth - 1)) * treeDepth + 1;
+//        int arrayWidth = (2 << (treeDepth - 2)) * 3 + 1;
+        int arrayWidth = (1 << (treeDepth - 1)) * treeDepth + 1;
         // 用一个字符串数组来存储每个位置应显示的元素
         String[][] res = new String[arrayHeight][arrayWidth];
         // 对数组进行初始化，默认为一个空格
