@@ -73,7 +73,7 @@ public class SkipList {
      *
      * @param value 值
      */
-    public void insert2(int value) {
+    public void add(int value) {
         int level = head.forwards[0] == null ? 1 : randomLevel();
         // 每次只增加一层，如果条件满足
         if (level > levelCount) {
@@ -284,14 +284,14 @@ public class SkipList {
         // 优化后insert()
 
         SkipList list2 = new SkipList();
-        list2.insert2(1);
-        list2.insert2(2);
-        list2.insert2(6);
-        list2.insert2(7);
-        list2.insert2(8);
-        list2.insert2(3);
-        list2.insert2(4);
-        list2.insert2(5);
+        list2.add(1);
+        list2.add(2);
+        list2.add(6);
+        list2.add(7);
+        list2.add(8);
+        list2.add(3);
+        list2.add(4);
+        list2.add(5);
         System.out.println();
         list2.printAll_beautiful();
     }
