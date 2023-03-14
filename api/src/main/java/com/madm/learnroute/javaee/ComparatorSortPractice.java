@@ -1,13 +1,21 @@
 package com.madm.learnroute.javaee;
 
 import com.madm.learnroute.model.Employee;
+import com.mdm.pojo.Apple;
 import com.mdm.utils.GsonObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.madm.learnroute.javaee.ListStreamPractice.appleList;
+
 /**
+ * Comparable 翻译为中文是“比较”的意思，而 Comparator 是“比较器”的意思。
+ * Comparable 是以 -able 结尾的，表示它自身具备着某种能力，
+ * 而 Comparator 是以 -or 结尾，表示自身是比较的参与者，这是从字面含义先来理解二者的不同。
+ *
  * @author dongming.ma
  * @date 2022/7/3 11:07
  */
@@ -19,6 +27,9 @@ public class ComparatorSortPractice {
         Comparator<Employee> compareByName = Comparator.comparing(Employee::getName).thenComparing(Employee::getSalary);
 
         System.out.println(GsonObject.createGson().toJson(employees));
+        Collections.sort(appleList);
+        Collections.sort(appleList, Comparator.comparingInt(Apple::getNum));
+
     }
 
     private static ArrayList<Employee> getUnsortedEmployeeList() {

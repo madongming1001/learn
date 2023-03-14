@@ -24,13 +24,22 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ListStreamPractice {
+    static final List<Apple> appleList = new ArrayList<>();
 
-    public static void main(String[] args) throws Exception {
-
+    static {
         Apple apple1 = new Apple(1, "苹果1", new BigDecimal("3.25"), 10);
         Apple apple2 = new Apple(2, "苹果2", new BigDecimal("2.89"), 30);
         Apple apple3 = new Apple(3, "荔枝", new BigDecimal("9.99"), 40);
         Apple apple4 = new Apple(4, "香蕉", new BigDecimal("1.35"), 20);
+        appleList.addAll(Arrays.asList(apple1, apple2, apple3, apple4));
+    }
+
+    public static void main(String[] args) throws Exception {
+        Apple apple1 = appleList.get(0);
+        Apple apple2 = appleList.get(1);
+        Apple apple3 = appleList.get(2);
+        Apple apple4 = appleList.get(3);
+
         //验证对过滤后的集合修改会影响原集合的内容
         affectTheOriginalCollection(apple1, apple2, apple3, apple4);
 
@@ -93,13 +102,11 @@ public class ListStreamPractice {
         //存放apple对象集合
 
 
-
         List<Invitee> invitees = Lists.newArrayList(new Invitee(1l, "1", "1"), new Invitee(2l, "2", "2"));
         List<String> newInstance = Lists.newArrayList("1", "2", "3", "4", "5", "6", "1");
         List<String> oldInstance = Lists.newArrayList("3", "232", "35", "24", "5", "6", "1");
 
-        List<Invitee> inviteeCompression = Stream.of(invitees, Arrays.asList(new Invitee(3l, "2", "3"), new Invitee(36l, "36", "36")))
-                .flatMap(invitee -> invitee.stream()).collect(Collectors.toList());
+        List<Invitee> inviteeCompression = Stream.of(invitees, Arrays.asList(new Invitee(3l, "2", "3"), new Invitee(36l, "36", "36"))).flatMap(invitee -> invitee.stream()).collect(Collectors.toList());
 
 
         //add：加、subtract：减、multiply：乘、divide：除
