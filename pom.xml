@@ -23,6 +23,7 @@
         <module>discovery</module>
         <module>common</module>
         <module>algorithm</module>
+        <module>head-first</module>
     </modules>
     <properties>
         <spring-cloud.version>Hoxton.SR12</spring-cloud.version>
