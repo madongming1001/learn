@@ -589,14 +589,6 @@ HASH算法的基本要求
 
 ![img](https://static001.geekbang.org/resource/image/29/2c/299c615bc2e00dc32225f4d9e3490e2c.jpg)
 
-
-
-左旋（rotate left）、右旋（rotate right）。左旋全称其实是叫围绕某个节点的左旋，那右旋的全称估计你已经猜到了，就叫围绕某个节点的右旋。
-
-![img](https://static001.geekbang.org/resource/image/0e/1e/0e37e597737012593a93105ebbf4591e.jpg)
-
-
-
 # HashMap版本问题
 
 ## HashMap1.7问题
