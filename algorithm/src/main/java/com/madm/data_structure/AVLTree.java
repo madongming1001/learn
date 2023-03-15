@@ -16,7 +16,6 @@ public class AVLTree {
      */
     private int height(TreeNode node) {
         if (node != null) return node.height;
-
         return 0;
     }
 
@@ -36,15 +35,15 @@ public class AVLTree {
 
     //左左局面旋转
     private TreeNode leftLeftRotation(TreeNode node) {
-        //leftChildNode 对应示意图中的结点B
-        TreeNode leftChildNode = node.left;
-        node.left = leftChildNode.right;
-        leftChildNode.right = node;
+        //left 对应示意图中的结点B
+        TreeNode left = node.left;
+        node.left = left.right;
+        left.right = node;
         //刷新结点A和结点B的高度
         node.height = Math.max(height(node.left), height(node.right)) + 1;
-        leftChildNode.height = Math.max(height(leftChildNode.left), node.height) + 1;
+        left.height = Math.max(height(left.left), node.height) + 1;
         //返回旋转后的父结点
-        return leftChildNode;
+        return left;
     }
 
     //右右局面旋转
