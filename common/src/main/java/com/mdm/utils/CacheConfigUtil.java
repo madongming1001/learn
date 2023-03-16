@@ -1,6 +1,7 @@
 package com.mdm.utils;
 
 
+import cn.hutool.cache.CacheUtil;
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -27,7 +28,7 @@ import java.util.function.Function;
  * 在处理频率记录的方案中，你可能会想到用hashMap去存储，每一个key对应一个频率值。那如果数据量特别大的时候，
  * 是不是这个hashMap也会特别大呢。由此可以联想到 Bloom Filter，对于每个key，用n个byte每个存储一个标志用来判断key是否在集合中。原理就是使用k个hash函数来将key散列成一个整数。
  */
-public class CacheUtil {
+public class CacheConfigUtil {
 
     //    static Cache<String, String> myMap;
     static Cache<Object, Object> cache;
@@ -43,6 +44,12 @@ public class CacheUtil {
 //                .build();
 
         cache = Caffeine.newBuilder().maximumSize(10_000).expireAfterWrite(Duration.ofMinutes(5)).refreshAfterWrite(Duration.ofMinutes(1)).build();
+    }
+
+    public static void main(String[] args) {
+        //明铺夜盖
+        CacheConfigUtil cache = new CacheConfigUtil();
+
     }
 
     /**

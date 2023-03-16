@@ -1,6 +1,7 @@
 package com.madm.learnroute.javaee.concurrent.juc;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ArrayUtil;
 import io.netty.handler.codec.DateFormatter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,12 +30,10 @@ public class ScheduledThreadPoolExecutorTest {
 //          scheduledThreadPool.schedule(worker, 5, TimeUnit.SECONDS);
             // 周期性执行，每5秒执行一次
             scheduledThreadPool.scheduleAtFixedRate(worker, 0, 5, TimeUnit.SECONDS);
-//            scheduledThreadPool.scheduleWithFixedDelay(worker, 0, 5, TimeUnit.SECONDS);
+            scheduledThreadPool.scheduleWithFixedDelay(worker, 0, 5, TimeUnit.SECONDS);
         }
         scheduledThreadPool.setContinueExistingPeriodicTasksAfterShutdownPolicy(true);
         scheduledThreadPool.setExecuteExistingDelayedTasksAfterShutdownPolicy(true);
-
-
         Thread.sleep(10000);
 
         System.out.println("Shutting down executor...");
