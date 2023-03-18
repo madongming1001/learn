@@ -423,13 +423,7 @@ AtAfterThrowing -> AspectJAfterThrowingAdvice
 
 ![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/12b53fb8183c40c2a71b575d9a2d91da~tplv-k3u1fbpfcp-watermark.awebp)
 
-
-
-
-
 ![image-20211210134538464](noteImg/image-20211210134538464.png)
-
-
 
 ![image-20211210173929956](noteImg/image-20211210173929956.png)
 
@@ -2367,8 +2361,6 @@ Spring 为 Resource 接口提供了如下实现类：
 - **工厂后处理器接口方法**： 这个包括了**AspectJWeavingEnabler**, **ConfigurationClassPostProcessor**, **CustomAutowireConfigurer**等等非常有用的工厂后处理器接口的方法。工厂后处理器也是容器级的。在应用上下文装配配置文件之后立即调用。
 
 ![img](https://pdai.tech/images/spring/springframework/spring-springframework-aop-3.png)
-
-
 
 **should()方法执行流程**
 

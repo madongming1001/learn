@@ -1,4 +1,4 @@
-package com.woniu.design;
+package com.madm.design.strategy.springregister;
 
 import org.springframework.util.StringUtils;
 

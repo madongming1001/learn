@@ -47,6 +47,10 @@ public class WildcardPractice {
 //        public <U> CompletableFuture<U> thenCompose(
 //                Function<? super T, ? extends CompletionStage<U>> fn) {
 //            return uniComposeStage(null, fn);
+
+        System.out.println(Apple.class.isAssignableFrom(Apple.class));
+        System.out.println(Fruit.class.isAssignableFrom(Apple.class));
+
 //        }
     }
 

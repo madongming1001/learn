@@ -21,8 +21,8 @@ public class Employee {
     }
 
     public Employee(long mobile, String name) {
-        this.name = name;
         this.mobile = mobile;
+        this.name = name;
     }
 
     public String getName() {
@@ -57,7 +57,7 @@ public class Employee {
         this.mobile = mobile;
     }
 
-    public void print(){
+    public void print() {
         System.out.println("自定义方法");
     }
 

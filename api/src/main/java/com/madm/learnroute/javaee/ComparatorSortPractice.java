@@ -1,5 +1,6 @@
 package com.madm.learnroute.javaee;
 
+import cn.hutool.core.lang.func.Func1;
 import com.madm.learnroute.model.Employee;
 import com.mdm.pojo.Apple;
 import com.mdm.utils.GsonObject;
@@ -24,12 +25,12 @@ public class ComparatorSortPractice {
         List<Employee> employees = getUnsortedEmployeeList();
 //
 //        Compare by first name and then last name
-        Comparator<Employee> compareByName = Comparator.comparing(Employee::getName).thenComparing(Employee::getSalary);
+        Comparator<Employee> compare = Comparator.comparing(Employee::getName).reversed().thenComparing(Employee::getMobile).reversed();
 
-        System.out.println(GsonObject.createGson().toJson(employees));
-        Collections.sort(appleList);
-        Collections.sort(appleList, Comparator.comparingInt(Apple::getNum));
+        System.out.println(employees);
+        Collections.sort(employees, compare);
 
+        System.out.println(employees);
     }
 
     private static ArrayList<Employee> getUnsortedEmployeeList() {

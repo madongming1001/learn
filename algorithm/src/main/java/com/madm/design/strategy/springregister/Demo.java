@@ -1,4 +1,4 @@
-package com.woniu.design;
+package com.madm.design.strategy.springregister;
 
 /**
  * 用策略模式和工厂模式以及模板方法模式优化代码中的if else
