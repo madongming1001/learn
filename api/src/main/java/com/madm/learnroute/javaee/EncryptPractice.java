@@ -1,6 +1,7 @@
 package com.madm.learnroute.javaee;
 
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.digest.Digester;
 import cn.hutool.crypto.digest.MD5;
 import com.alibaba.nacos.common.utils.MD5Utils;
 import com.madm.learnroute.dto.UserDto;
@@ -21,15 +22,17 @@ public class EncryptPractice {
     @SneakyThrows
     public static void main(String[] args) {
         String source = "收拾收拾";
-        String encrypt = DigestUtils.md5Hex(source);
-        String expected1 = SecureUtil.md5(source);
-        String expected2 = MD5Utils.md5Hex(source.getBytes());
+        String expected1 = SecureUtil.md5().digestHex(source);
+        Digester digester = SecureUtil.sha1();
         //hutool提供的摘要加密算法 内部第一次初始化会加载很多第三方加密包 耗时过长
         String expected3 = MD5.create().digestHex16(source);
+        String expected2 = MD5Utils.md5Hex(source.getBytes());
+        String expected4 = DigestUtils.md5Hex(source);
         System.out.println(expected1.equals(expected3));
         System.out.println(expected3);
         System.out.println(expected2);
         System.out.println(expected1);
+        System.out.println(expected4);
     }
 
     /**
