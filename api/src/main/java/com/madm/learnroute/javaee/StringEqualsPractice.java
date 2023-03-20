@@ -57,11 +57,15 @@ public class StringEqualsPractice {
         System.out.println("14个1：" + Integer.valueOf("11111111111111", 2));//16383
         System.out.println("15个1：" + Integer.valueOf("111111111111111", 2));//32767
         System.out.println("16个1：" + Integer.valueOf("1111111111111111", 2));//65535
-        System.out.println("32个1：" + Integer.valueOf(String.valueOf(Integer.MAX_VALUE), 2));//2147483647
+        System.out.println("获取最高位1之前有多少个0："+ Integer.numberOfLeadingZeros(31));
+        System.out.println(Integer.bitCount(16));
+        //System.out.println("32个1：" + Integer.valueOf(String.valueOf(Integer.MAX_VALUE), 2));//2147483647
         System.out.println(Integer.toBinaryString(2147483647));//反码+补码 绝对值+1
         System.out.println(Integer.toBinaryString(Integer.MIN_VALUE));
 //        System.out.println(Integer.toBinaryString(65));//A
 //        System.out.println(Integer.toBinaryString(97));//a
+
+        System.out.println(Float.floatToIntBits(234));
     }
 
     /**
