@@ -1,7 +1,8 @@
 package com.madm.learnroute.javaee;
 
-import cn.hutool.core.date.StopWatch;
+
 import cn.hutool.core.date.SystemClock;
+import org.springframework.util.StopWatch;
 
 /**
  * 记录时间的另一个种方式
@@ -10,17 +11,17 @@ import cn.hutool.core.date.SystemClock;
  */
 public class RecordTimePractice {
     public static void main(String[] args) throws Exception {
-        StopWatch sw = new StopWatch();
-        sw.start("A");
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("A");
         Thread.sleep(500);
-        sw.stop();
-        sw.start("B");
+        stopWatch.stop();
+        stopWatch.start("B");
         Thread.sleep(300);
-        sw.stop();
-        sw.start("C");
+        stopWatch.stop();
+        stopWatch.start("C");
         Thread.sleep(200);
-        sw.stop();
-        System.out.println(sw.prettyPrint());
+        stopWatch.stop();
+        System.out.println(stopWatch.prettyPrint());
         System.out.println(SystemClock.now());
     }
 }

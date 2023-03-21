@@ -1319,9 +1319,6 @@ man命令可以查看系统参数详情 man pthread_create
 
 
 
-
-
 ![image-20230314032039044](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230314032039044.png)
 
 ![image-20230314032050636](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230314032050636.png)
-

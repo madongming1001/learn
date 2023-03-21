@@ -1358,3 +1358,10 @@ return result;
 ClassLoader.getSystemResources(fullName);
 loader.getResources(fullName);
 ```
+
+
+
+# InputStream结构
+
+![image-20230321022425838](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230321022425838.png)
+

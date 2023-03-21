@@ -1,5 +1,7 @@
 package com.madm.learnroute.technology.spring;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
@@ -7,7 +9,12 @@ import org.springframework.boot.SpringApplicationRunListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import static cn.hutool.core.date.DatePattern.NORM_DATETIME_MS_FORMATTER;
+import static cn.hutool.core.date.DatePattern.NORM_DATETIME_PATTERN;
 
 /**
  * @author dongming.ma
@@ -21,36 +28,36 @@ public class SpringBootStartupMonitor implements SpringApplicationRunListener {
 
     @Override
     public void starting() {
-        log.info("starting {}", LocalDateTime.now());
+        log.info("starting {}", NORM_DATETIME_MS_FORMATTER.format(LocalDateTime.now()));
     }
 
     @Override
     public void environmentPrepared(ConfigurableEnvironment environment) {
-        log.info("environmentPrepared {}", LocalDateTime.now());
+        log.info("environmentPrepared {}", NORM_DATETIME_MS_FORMATTER.format(LocalDateTime.now()));
     }
 
     @Override
     public void contextPrepared(ConfigurableApplicationContext context) {
-        log.info("contextPrepared {}", LocalDateTime.now());
+        log.info("contextPrepared {}", NORM_DATETIME_MS_FORMATTER.format(LocalDateTime.now()));
     }
 
     @Override
     public void contextLoaded(ConfigurableApplicationContext context) {
-        log.info("contextLoaded {}", LocalDateTime.now());
+        log.info("contextLoaded {}", NORM_DATETIME_MS_FORMATTER.format(LocalDateTime.now()));
     }
 
     @Override
     public void started(ConfigurableApplicationContext context) {
-        log.info("started {}", LocalDateTime.now());
+        log.info("started {}", NORM_DATETIME_MS_FORMATTER.format(LocalDateTime.now()));
     }
 
     @Override
     public void running(ConfigurableApplicationContext context) {
-        log.info("running {}", LocalDateTime.now());
+        log.info("running {}", NORM_DATETIME_MS_FORMATTER.format(LocalDateTime.now()));
     }
 
     @Override
     public void failed(ConfigurableApplicationContext context, Throwable exception) {
-        log.info("failed {}", LocalDateTime.now());
+        log.info("failed {}", NORM_DATETIME_MS_FORMATTER.format(LocalDateTime.now()));
     }
 }
