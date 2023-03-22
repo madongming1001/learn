@@ -98,13 +98,44 @@
 
 - 如果在其它分支上做了一个修改（比如修复了一个bug，这次修改有一个commitID），想要将这次修改应用到当前分支上，可以使用：`git cherry-pick commitID`，可以复制一个特定的提交到当前分支
 
+#### git reset --soft,--hard的区别
+
+git reset 命令可以将当前的`HEAD`重置到特定的状态。
+ 首先要搞清楚下面几个概念
+
+-  `HEAD`: `HEAD`就是指向当前分支当前版本的游标
+- Index: Index即为暂存区，当你修改了你的git仓库里的一个文件时，这些变化一开始是unstaged状态，为了提交这些修改，你需要使用`git add`把它加入到index，使它成为staged状态。当你提交一个commit时，index里面的修改被提交。
+- working tree: 即当前的工作目录。
+
+##### **--soft**
+
+使用`--soft`参数将会仅仅重置`HEAD`到制定的版本，不会修改index和working tree,而本地文件的内容并没有发生变化，**而index中仍然有最近一次提交的修改，这时执行git status会显示这些修改已经在暂存区中了**，无需再一次执行git add。
+
+##### --mixed
+
+使用`--mixed`参数与--soft的不同之处在于，--mixed修改了index，使其与第二个版本匹配。index中给定commit之后的修改被unstaged。如果现在执行git commit 将不会发生任何事，因为暂存区中没有修改，在提交之前需要再次执行git add。
+
+##### --hard
+
+使用`--hard`同时也会修改working tree，也就是当前的工作目录，如果我们执行`git reset --hard HEAD~`，那么最后一次提交的修改，包括本地文件的修改都会被清楚，彻底还原到上一次提交的状态且无法找回。所以在执行`reset --hard`之前一定要小心
+
+## git revert
+
+##### 使用`git revert`也能起到回退版本的作用，不同之处在于
+
+-  `git revert <commit>`会回退到<commit>之前的那次提交，比如`git revert HEAD~3`会回退到最近的第4个提交的状态，而不是第3个
+-  `git revert`会产生一个新的commit，将这次回退作为一次修改记录提交，这样的好处是不修改历史提交记录。
+
+**参考文章：**https://www.jianshu.com/p/c6927e80a01d
+
 ##Git每次clone都是同一项目问题
 https://blog.csdn.net/liuxiao723846/article/details/83113317
 因为git运行的时候会默认读取三个文件
-Git的三个重要配置文件分别是/etc/gitconfig，${HOME}/.gitconfig，.git/config。这三个配置文件都是Git运行时所需要读取的，但是它们分别作用于不同的范围。
-其中${HOME}/.gitconfig我默认设置了每次取得地址，所有每次读取都是同一个项目
+Git的三个重要配置文件分别是/etc/gitconfig，${home}/.gitconfig，.git/config。这三个配置文件都是Git运行时所需要读取的，但是它们分别作用于不同的范围。
+其中${home}/.gitconfig我默认设置了每次取得地址，所有每次读取都是同一个项目
+
 - /etc/gitconfig: 系统范围内的配置文件，适用于系统所有的用户； 使用 git config 时， 加 --system 选项，Git将读写这个文件。
-- ${HOME}/.gitconfig: 用户级的配置文件，只适用于当前用户； 使用 git config 时， 加 --global 选项，Git将读写这个文件。
+- ${home}/.gitconfig: 用户级的配置文件，只适用于当前用户； 使用 git config 时， 加 --global 选项，Git将读写这个文件。
 - .git/config: Git项目级的配置文件，位于当前Git工作目录下，只适用于当前Git项目； 使用 git config 时，不加选项（ --system 和 --global  ），Git将读写这个文件。
 
 

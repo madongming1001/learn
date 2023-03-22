@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 public class HashMapPractice {
 
     private static final AtomicInteger userNumber = new AtomicInteger();
-    static final HashMap<String, String> map = new HashMap<String, String>(2);
+    static final HashMap<String, String> map = new HashMap<>(2);
 
     public static void main(String[] args) {
         HashBasedTable<String, String, String> table = HashBasedTable.create();
@@ -44,11 +44,14 @@ public class HashMapPractice {
         }
         // 往HashMap中添加映射项
 
-//        prices.put("Shoes", 200);
-//        prices.put("Bag", 300);
-//        prices.put("Pant", 150);
-//        prices.put("111", 150);
+        prices.put("Shoes", 200);
+        prices.put("Bag", 300);
+        prices.put("Pant", 150);
+        prices.put("111", 150);
         prices.put("Shoes" + (int) (Math.random() * 80) + 1, 200);
+
+        System.out.println("默认值是：" + prices.getOrDefault("sfs", 1));
+
 //        System.out.println("HashMap: " + prices);
 //        prices.forEach((value, value) -> {
 //            System.out.println("value : " + value + "value :" + value);

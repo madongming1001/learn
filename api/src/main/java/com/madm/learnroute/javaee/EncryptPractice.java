@@ -6,6 +6,8 @@ import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
 import cn.hutool.crypto.digest.*;
+import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
+import cn.hutool.crypto.symmetric.SymmetricCrypto;
 import com.alibaba.nacos.common.utils.MD5Utils;
 import com.madm.learnroute.dto.UserDto;
 import com.mdm.pojo.AuthParam;
@@ -24,6 +26,11 @@ import java.util.Base64;
  * hutool加密第一次会加载很多加密包，导致第一次请求接口过慢，耗时长
  * 解决方案：使用google提供的加密方案
  * https://mp.weixin.qq.com/s/9Xa_ElBR3c8I29JY2k1RRg
+ * <p>
+ * 安全相关工具类 加密分为三种：
+ * 1、对称加密（symmetric），例如：AES、DES等
+ * 2、非对称加密（asymmetric），例如：RSA、DSA等
+ * 3、摘要加密（digest），例如：MD5、SHA-1、SHA-256、HMAC等
  *
  * @author dongming.ma
  * @date 2022/9/2 16:27
@@ -109,5 +116,25 @@ public class EncryptPractice {
             e.printStackTrace();
         }
         return new byte[20];
+    }
+
+    private static void symmetric() {
+        String content = "test中文";
+
+        //随机生成密钥
+        byte[] key = SecureUtil.generateKey(SymmetricAlgorithm.AES.getValue()).getEncoded();
+
+        //构建
+        SymmetricCrypto aes = new SymmetricCrypto(SymmetricAlgorithm.AES, key);
+
+        //加密
+        byte[] encrypt = aes.encrypt(content);
+        //解密
+        byte[] decrypt = aes.decrypt(encrypt);
+
+        //加密为16进制表示
+        String encryptHex = aes.encryptHex(content);
+        //解密为字符串
+        String decryptStr = aes.decryptStr(encryptHex, CharsetUtil.CHARSET_UTF_8);
     }
 }

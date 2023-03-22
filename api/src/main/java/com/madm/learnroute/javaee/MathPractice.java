@@ -10,5 +10,7 @@ public class MathPractice {
         System.out.println(Math.ceil(11.2));
         //返回最大小于给定数值的整数
         System.out.println(Math.floor(11.2));
+        //返回数字四舍五入的整数
+        System.out.println(Math.round(11.2));
     }
 }
