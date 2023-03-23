@@ -70,8 +70,10 @@ public class StringEqualsPractice {
 //        System.out.println(Integer.toBinaryString(65));//A
 //        System.out.println(Integer.toBinaryString(97));//a
 
-        System.out.println(Float.floatToIntBits(234));
+        //System.out.println(Float.floatToIntBits(234));
+        System.out.println(Long.MAX_VALUE);
     }
+
 
     /**
      * 判断一个数是不是2的幂
