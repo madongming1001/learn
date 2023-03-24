@@ -21,7 +21,6 @@ public class MQAdapter {
 
     public static RebateInfo filter(Map obj, Map<String, String> link) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         RebateInfo rebateInfo = new RebateInfo();
-        rebateInfo.setBizTime(new Date(1648965553165l));
         for (String key : link.keySet()) {
             Object val = obj.get(link.get(key));
             Class parameterTypes = String.class;

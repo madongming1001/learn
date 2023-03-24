@@ -20,7 +20,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
  * @author dongming.ma
  * @date 2022/6/6 21:47
  */
-@RestControllerAdvice
+//@RestControllerAdvice
 public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
     /**
      * For IllegalArgumentException, we are returning void with status code as 400, so our error-page will be used in
@@ -35,7 +35,7 @@ public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
 
     @ExceptionHandler(RuntimeException.class)
     public RestResponse handleRuntimeException(Exception e) {
-        return RestResponse.code(INTERNAL_SERVER_ERROR.value()).withBody(ExceptionUtil.getMessage(e)).withMsg(INTERNAL_SERVER_ERROR.getReasonPhrase()).build();
+        return RestResponse.code(INTERNAL_SERVER_ERROR.value()).withBody(e).withMsg(INTERNAL_SERVER_ERROR.getReasonPhrase()).build();
     }
 
     @ExceptionHandler(APIException.class)

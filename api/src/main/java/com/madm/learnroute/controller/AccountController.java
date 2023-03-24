@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Nullable;
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -22,10 +23,10 @@ import java.util.List;
 @RequestMapping("/account")
 public class AccountController {
 
-    @Autowired
+    @Resource
     AccountService accountService;
 
-    //    @Autowired
+    @Resource
     Redisson redisson;
 
     @GetMapping("/save")

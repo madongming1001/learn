@@ -1,6 +1,8 @@
 package com.madm.learnroute.javaee;
 
 
+import org.junit.Assert;
+
 /**
  * -server -Xcomp -XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly -XX:CompileCommand=compileonly
  */
@@ -33,6 +35,9 @@ public class StringEqualsPractice {
 
 //        System.out.println(abc1 == abc.intern());
 //        System.out.println(Long.parseLong("0x7fffffff"));
+        //assert (10 - 1) >> 1 == 21;
+        //Assert.equals((10 - 1) >> 1, 4);
+        Assert.assertEquals((10 - 1) >> 1, 4);
 
         // 这个就是那个音符字符，只不过由于当前的网页没支持这种编码，所以没显示。
         // 这个就是音符字符的UTF-16编码
