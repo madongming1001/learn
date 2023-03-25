@@ -11,6 +11,7 @@ public class StringIndexPractice {
 
         char[] chars = classOrder.toCharArray();
         char[] charsCopy = Arrays.copyOfRange(chars, 0, chars.length - 1);
+
         System.out.println(Arrays.toString(chars));
         System.out.println(Arrays.toString(charsCopy));
 
