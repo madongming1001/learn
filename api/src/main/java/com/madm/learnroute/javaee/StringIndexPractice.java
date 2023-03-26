@@ -18,8 +18,9 @@ public class StringIndexPractice {
         classOrder.replace("$", StringUtils.EMPTY);
         int s1 = classOrder.indexOf("国画");
         int s2 = classOrder.indexOf("书法");
-//        System.out.println(classOrder.indexOf("-", s1));
-//        System.out.println(classOrder.indexOf("-", s2));
+
+        System.out.println(classOrder.indexOf("-", s1));
+        System.out.println(classOrder.indexOf("-", s2));
 
         int first1 = classOrder.indexOf("-", s1);
         classOrder.substring(first1 + 1, classOrder.indexOf("-", first1 + 1));
