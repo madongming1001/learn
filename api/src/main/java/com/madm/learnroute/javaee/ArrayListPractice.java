@@ -1,11 +1,11 @@
 package com.madm.learnroute.javaee;
 
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * 线程不安全 扩容为1.5倍
- *
- *
+ * <p>
+ * <p>
  * Arraylist 与 LinkedList 区别?
  * 1、是否保证线程安全： ArrayList 和 LinkedList 都是不同步的，也就是不保证线程安全；
  * 2、底层数据结构： Arraylist 底层使用的是 Object 数组；LinkedList 底层使用的是 双向链表 数据结构（JDK1.6 之前为循环链表，JDK1.7 取消了循环。注意双向链表和双向循环链表的区别，下面有介绍到！）
@@ -22,12 +22,24 @@ public class ArrayListPractice {
 //        ArrayList<String> list = new ArrayList<>();
 //        list.add("11");
 //        System.out.println(list);
-
-        ensureCapacity();
+        ArrayListPractice ap = new ArrayListPractice();
+        ap.ensureCapacity();
     }
 
-    public static void ensureCapacity() {
-        ArrayList<Object> list = new ArrayList<Object>();
+    public void ensureCapacity() {
+        ArrayListHandler handler = new ArrayListHandler();
+        ArrayList<Object> list = new ArrayList();
+        list.add(UUID.randomUUID().toString());
+        list.add(UUID.randomUUID().toString());
+        list.add(UUID.randomUUID().toString());
+        list.add(UUID.randomUUID().toString());
+        list.add(UUID.randomUUID().toString());
+        list.add(UUID.randomUUID().toString());
+        list.add(UUID.randomUUID().toString());
+
+        list.forEach(handler::register);
+        System.out.println(Arrays.toString(handler.map.keySet().toArray()));
+
         final int N = 10000000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < N; i++) {
@@ -47,6 +59,17 @@ public class ArrayListPractice {
         long endTime1 = System.currentTimeMillis();
         System.out.println("使用ensureCapacity方法后：" + (endTime1 - startTime1));
 
+
+    }
+
+    private class ArrayListHandler {
+
+        private Map<String, Object> map = new HashMap();
+
+        private void register(Object obj) {
+            obj.toString().replaceAll("-", "");
+            map.put(obj.toString(), obj);
+        }
 
     }
 

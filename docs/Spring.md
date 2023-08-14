@@ -1436,12 +1436,14 @@ beanFactory.registerResolvableDependency(ApplicationContext.class, this);
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/JdLkEI9sZfdnf4LkFxFWiavibb3ia7qGHfIQ9e9RYIGU8J84A8cAjsPic9e54pCFS80RpkrZ1RlLBqWIvpKpO8RpZw/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
 
-- ApplicationStartingEvent：Application 启动**开始** 事件。
-- ApplicationEnvironmentPreparedEvent：Spring Environment 准备完成的事件。
-- ApplicationContextInitializedEvent：Spring Context 准备完成，但是 Bean Definition 未加载时的事件
-- ApplicationPreparedEvent：Spring Context 准备完成，但是未刷新时的事件。
-- ApplicationReadyEvent：Application 启动**成功** 事件。
-- ApplicationFailedEvent：Application 启动**失败** 事件。
+**EventPublishingRunListener** 类至关重要
+
+- ApplicationStartingEvent：Application 启动**开始** 事件。**starting（）**
+- ApplicationEnvironmentPreparedEvent：Spring Environment 准备完成的事件。**environmentPrepared（）**
+- ApplicationContextInitializedEvent：Spring Context 准备完成，但是 BeanDefinition 未加载时的事件**contextPrepared（）**
+- ApplicationPreparedEvent：Spring Context 准备完成，但是未刷新时的事件。**contextLoaded（）**
+- ApplicationReadyEvent：Application 启动**成功** 事件。**running（）**
+- ApplicationFailedEvent：Application 启动**失败** 事件。**failed（）**
 
 
 
@@ -1582,6 +1584,8 @@ springboot提供加载资源properties .yml
 PropertySourceLoader.java
 SpringApplication&run&prepareEnvironment去加载bootstrap.yml文件
 读取nacos配置文件是在SpringApplication&run&prepareContext方法&applyInitializers&PropertySourceBootstrapConfiguration&PropertySourceLocator.locateCollection&NacosPropertySourceLocator.locate
+
+
 
 ## 注册中心整合spring
 
@@ -2409,3 +2413,9 @@ Spring 为 Resource 接口提供了如下实现类：
 # 揭秘Java热部署原理及JRebel(Hotcode)的实现原理
 
 **参考文章：**https://blog.csdn.net/weixin_34221036/article/details/86264463
+
+
+
+# Spring版版本发展
+
+![image-20230814174306615](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230814174306615.png)

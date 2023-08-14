@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.*;
 
-//@Component
+@Component
 public class RedisTemplatePractice {
 
     @Autowired
@@ -30,6 +30,8 @@ public class RedisTemplatePractice {
         candidate.add(stringObjectHashMap1);
         candidate.add(stringObjectHashMap2);
         candidate.add(stringObjectHashMap3);
+
+        redisTemplate.delete("1");
 
         Long lastMachMasterId = Long.valueOf(String.valueOf(redisTemplate.opsForValue().get("444444")));
         lastMachMasterId = Objects.isNull(lastMachMasterId) ? 0L : lastMachMasterId;

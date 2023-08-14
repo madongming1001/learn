@@ -1,5 +1,7 @@
 package com.madm.learnroute;
 
+import com.madm.learnroute.service.OrderService;
+import com.madm.learnroute.technology.spring.MyDeferredImportSelector;
 import lombok.extern.slf4j.Slf4j;
 import org.jsondoc.spring.boot.starter.EnableJSONDoc;
 import org.mybatis.spring.annotation.MapperScan;
@@ -9,6 +11,7 @@ import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -29,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 //@EnableBinding(MySource.class)
 @Slf4j
 @EnableCaching
+@Import(MyDeferredImportSelector.class)
 public class LearnApiApplication {
 
     public static void main(String[] args) {

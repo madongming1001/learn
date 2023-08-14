@@ -15,7 +15,7 @@ public class WhitelistAspect {
     @Before("whitelistPointCut() && @annotation(whitelist)")
     public void checkAppkeyWhitelist(JoinPoint joinPoint, Whitelist whitelist) {
 //        checkWhitelist();
-        // 可使用 joinPoint.getArgs() 获取Controller方法的参数
+        // 可使用 joinPoint.getArgs() 获取Controller方法的参数vv
         // 可以使用 whitelist 变量获取注解参数
     }
 
