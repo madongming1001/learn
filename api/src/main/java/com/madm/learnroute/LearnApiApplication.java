@@ -11,9 +11,11 @@ import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,6 +35,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @EnableCaching
 @Import(MyDeferredImportSelector.class)
+@EnableTransactionManagement
+@EnableAspectJAutoProxy
 public class LearnApiApplication {
 
     public static void main(String[] args) {

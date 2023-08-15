@@ -1366,7 +1366,7 @@ ApplicationListenerDetector 在 prepareBeanFactory 注入的
 
 # ConfigurationClassPostProcessor
 
-​		首先，ConfigurationClassPostProcessor后置处理器的处理入口为`postProcessBeanDefinitionRegistry()`方法。其主要使用了`ConfigurationClassParser`配置类解析器解析`@Configuration`配置类上的诸如`@ComponentScan`、`@Import`、`@Bean`等注解，并尝试发现所有的配置类；还使用了`ConfigurationClassBeanDefinitionReader`注册所发现的所有配置类中的所有Bean定义；结束执行的条件是所有配置类都被发现和处理，相应的bean定义注册到容器。
+​		首先，ConfigurationClassPostProcessor后置处理器的处理入口为`postProcessBeanDefinitionRegistry()`方法。其主要使用了`ConfigurationClassParser`配置类解析器解析`@Configuration`配置类上的诸如`@Component`、`@ComponentScan`、`@Import`、`@Bean`等注解，并尝试发现所有的配置类；还使用了`ConfigurationClassBeanDefinitionReader`注册所发现的所有配置类中的所有Bean定义；结束执行的条件是所有配置类都被发现和处理，相应的bean定义注册到容器。
 
 **@Configuration的类为什么会生成代理?**
 
@@ -1390,11 +1390,11 @@ public UserService userService() {
 
 **⚠️注意**：就会出现myService使用的是自己new出来的，**走的正常方法调用**，正常想使用的是spring中的userService，所以就会导致用的不是同一个对象，比较的话肯定是false。
 
-@Bean修饰的方法走的是工厂方法方式创建对象（**createBeanInstance()&instantiateUsingFactoryMethod()**），之后会把当前工厂方法存入到一个**isCurrentlyInvokedFactoryMethod()** Threadlocal之中，再然后调用方法走到拦截器，拦截器里面判断isCurrentlyInvokedFactoryMethod()是否有值，如果有值说明是spring正常在创建对象，如果没值的话说明是方法里面自己调用的，当执行到userService的时候由于该配置类每个方法都有拦截器所以又回到了拦截器的逻辑，又因为在**isCurrentlyInvokedFactoryMethod()**中不是当前工厂方法，所以获取的对象从spring中获取，存入到一级缓存，正常获取对象的逻辑，完事之后回到myService方法继续执行。当spring加载配置类下一个userSerivice方法创建对象的时候，由于spring容器中已经有该对象，就不需要创建了。
+@Bean修饰的方法走的是工厂方法方式创建对象（**createBeanInstance()&instantiateUsingFactoryMethod()**），之后会把当前工厂方法存入到一个**isCurrentlyInvokedFactoryMethod()** Threadlocal之中，再然后调用方法走到拦截器，拦截器里面判断isCurrentlyInvokedFactoryMethod()是否有值，如果有值说明是spring正常在创建对象，如果没值的话说明是方法里面自己调用的，当执行到userService的时候由于该配置类每个方法都有拦截器所以又回到了拦截器的逻辑，又因为在**isCurrentlyInvokedFactoryMethod()**中不是当前工厂方法，所以获取的对象从spring中获取，存入到一级缓存，正常获取对象的逻辑，完事之后回到myService方法继续执行。当spring加载配置类下一个userSerivice方法创建对象的时候，由于spring容器中已经有该对象，就不需要创建了。，最终是为了保证两次调用用的都是同一个容器对象。
 
 参考文章：https://blog.csdn.net/weixin_37689658/article/details/125664876
 
-
+![image-20230815212334444](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230815212334444.png)
 
 # RefreshScope
 
@@ -2419,3 +2419,11 @@ Spring 为 Resource 接口提供了如下实现类：
 # Spring版版本发展
 
 ![image-20230814174306615](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230814174306615.png)
+
+
+
+# HikariCP为什么这么快
+
+- 它使用 `FastList` 替代 `ArrayList`，通过初始化的默认值，减少了越界检查的操作；
+- 优化并精简了字节码，通过使用 `Javassist`，减少了动态代理的性能损耗，比如使用 `invokestatic` 指令代替 `invokevirtual` 指令；
+- 实现了无锁的 `ConcurrentBag`，减少了并发场景下的锁竞争。

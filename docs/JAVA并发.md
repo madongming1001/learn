@@ -1365,3 +1365,6 @@ loader.getResources(fullName);
 
 ![image-20230321022425838](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230321022425838.png)
 
+
+
+线程负载的CPU使用率 = 线程增量CPU的运行时间/采样线程间隔时间 * 100%

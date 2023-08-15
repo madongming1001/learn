@@ -1778,7 +1778,7 @@ END;
 select mock_data();
 ```
 
-## OVER 函数
+## OVER 函数 OVER(PARTITION BY… ORDER BY…)
 
 ### ROW_NUMBER()
 
