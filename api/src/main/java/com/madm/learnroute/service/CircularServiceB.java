@@ -11,7 +11,7 @@ public class CircularServiceB {
 	private CircularServiceA circularServiceA;
 
 	public void methodB() {
-		AopProxy aopProxy = (AopProxy) AopContext.currentProxy();
-		System.out.println("方法 B 执行");
+//		AopProxy aopProxy = (AopProxy) AopContext.currentProxy();
+//		System.out.println("方法 B 执行");
 	}
 }

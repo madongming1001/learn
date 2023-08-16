@@ -500,10 +500,10 @@ getAdvicesAndAdvisorsForBean()
 	 				  buildAspectJAdvisors()
 			  //根据当前类的所有方法找到所有符合的advisors
 				findAdvisorsThatCanApply()
-			  //向advisors0号位置添加对象ExposeInvocationInterceptor，ExposeInvocationInterceptor 就是					 用来传递MethodInvocation的。在后续的任何下调用链环节，只需要用到当前的MethodInvocation就通过					 ExposeInvocationInterceptor.currentInvocation()静态方法获得
+			  //向advisors0号位置添加对象ExposeInvocationInterceptor，ExposeInvocationInterceptor 就是					 用来传递MethodInvocation的。在后续的任何下调用链环节，只需要用到当前的MethodInvocation就通过					 ExposeInvocationInterceptor.currentInvocation()静态方法获得 在一个threadlocal中
 				extendAdvisors()
-			  //进行拓扑排序
-				sortAdvisors()
+			  //按Order接口、@Order注解进行排序 拓扑排序
+				  ()
 ```
 
 
@@ -525,7 +525,7 @@ ProxyTransactionManagementConfiguration -> BeanFactoryTransactionAttributeSource
 
 **注意⚠️：如果内层方法出现了异常外层没有捕获，那会使得外层方法也会回滚，影响到了外层方法。 外层方法异常不会影响内层方法的异常。内层是nested的时候。**
 
-当项目中只有事务没有aop的时候链条里面是不会有**ExposeInvocationInterceptor**，因为InfrastructureAdvisorAutoProxyCreator和AnnotationAwareAspectJAutoProxyCreator的父类AspectJAwareAdvisorAutoProxyCreator是同级的，而往链条里面添加**ExposeInvocationInterceptor**的方法extendAdvisors()就是在父类里面。
+当项目中只有事务没有aop的时候链条里面是不会有**ExposeInvocationInterceptor**，因为InfrastructureAdvisor**AutoProxyCreator**和AnnotationAwareAspectJ**AutoProxyCreator**的父类AspectJAwareAdvisorAutoProxyCreator是同级的，而往链条里面添加**ExposeInvocationInterceptor**的方法extendAdvisors()就是在父类里面。
 
 **有两个地方会加载TransactionAttribute!!!**
 
@@ -825,7 +825,7 @@ if (status.hasSavepoint()) {
 
 为什么**PROPAGATION_REQUIRES_NEW**内层可以使用新事务？
 
-因为在**handleExistingTransaction()**方法里面走到**PROPAGATION_REQUIRES_NEW**分支的时候，**suspend(transaction);**会把当前线程事务状态清空，并返回一个清空前数据的封装对象**SuspendedResourcesHolder**，之后会重新调用**startTransaction()**常见新线程新事务，在business logic方法执行结束之后，如果有异常会执行**completeTransactionAfterThrowing()**、没有异常会执行**commitTransactionAfterReturning()**方法，都会执行**cleanupAfterCompletion()**，方法里面就会清空当前事务信息对象，如果有挂起的事务要恢复就走**resume()**方法。
+因为在**handleExistingTransaction()**方法里面走到**PROPAGATION_REQUIRES_NEW**分支的时候，**suspend(transaction);**会把当前线程事务状态清空，并返回一个清空前数据的封装对象**SuspendedResourcesHolder**，之后会重新调用**startTransaction()** 创建新线程新事务，在business logic方法执行结束之后，如果有异常会执行**completeTransactionAfterThrowing()**、没有异常会执行**commitTransactionAfterReturning()**方法，都会执行**cleanupAfterCompletion()**，方法里面就会清空当前事务信息对象，如果有挂起的事务要恢复就走**resume()**方法。
 
 ```java
 /**
@@ -2226,7 +2226,7 @@ private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<
 
 4、**适配器模式**
 
-AOP 的注解解析出来时Advice，部分是实现了MethodInterceptor接口，而在调用链中，必须得是MethodInterceptor类型，这个时候就需要适配器了，需要一个类的方法返回实现了MethodInterceptor的类并包含advice属性。
+AOP 的注解解析出来时Advice，部分是实现了MethodInterceptor接口，而在调用链中，必须得是MethodInterceptor类型，这个时候就需要适配器了，**需要一个类的方法返回实现了MethodInterceptor的类并包含advice属性。**
 
 ![image-20220701190744135](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20220701190744135.png)
 
@@ -2258,7 +2258,7 @@ BeanWrapper 相当于是Spring中的一个包装类，**对Bean 进行包装，�
 
 6、**代理模式**
 
-​	AOP底层，就是动态代理模式的实现。
+​	AOP底层，就是动态代理模式的实现。动态代理就是，在程序运行期，创建目标对象的代理对象，并对目标对象中的方法进行功能性增强的一种技术。
 
 7、**观察者模式**
 
@@ -2427,3 +2427,42 @@ Spring 为 Resource 接口提供了如下实现类：
 - 它使用 `FastList` 替代 `ArrayList`，通过初始化的默认值，减少了越界检查的操作；
 - 优化并精简了字节码，通过使用 `Javassist`，减少了动态代理的性能损耗，比如使用 `invokestatic` 指令代替 `invokevirtual` 指令；
 - 实现了无锁的 `ConcurrentBag`，减少了并发场景下的锁竞争。
+
+# @Autowired 和 @Resource 区别
+
+1. 来源不同：@Autowired 来自 Spring 框架，而 @Resource 来自于（Java）JSR-250；
+
+   **小知识：**JSR 是 Java Specification Requests 的缩写，意思是“Java 规范提案”。任何人都可以提交 JSR 给 Java 官方，但只有最终确定的 JSR，才会以 JSR-XXX 的格式发布，如 JSR-250，而被发布的 JSR 就可以看作是 Java 语言的规范或标准。
+
+2. 依赖查找的顺序不同：@Autowired 先根据类型再根据名称查询，而 @Resource 先根据名称再根据类型查询；
+
+3. 支持的参数不同：@Autowired 只支持设置 1 个参数，而 @Resource 支持设置 7 个参数；
+
+4. 依赖注入的用法支持不同：@Autowired 既支持构造方法注入，又支持属性注入和 Setter 注入，而 @Resource 只支持属性注入和 Setter 注入；
+
+5. 编译器 IDEA 的提示不同：当注入 Mapper 对象时，使用 @Autowired 注解编译器会提示错误，而使用 @Resource 注解则不会提示错误。
+
+# CURL是什么？
+
+**curl是一个非常实用的、用来与服务器之间传输数据的工具**；支持的协议包括 (DICT, FILE, FTP, FTPS, GOPHER, HTTP, HTTPS, IMAP, IMAPS, LDAP, LDAPS, POP3, POP3S, RTMP, RTSP, SCP, SFTP, SMTP, SMTPS, TELNET and TFTP)，curl设计为无用户交互下完成工作；curl提供了一大堆非常有用的功能，包括代理访问、用户认证、ftp上传下载、HTTP POST、SSL连接、cookie支持、断点续传...。
+
+
+
+# springAOP和AspectJ有关系吗？
+
+**AOP是通过“预编译方式”和“运行期间动态代理”实现程序功能的统一维护的一种技术。AOP是一个概念，其实现技术有AspectJ和springAOP**。
+
+### 1、AspectJ
+
+AspcetJ作为AOP的一种实现，是基于编译的方式实现的AOP，在程序运行期是不会做任何事情的，因为类和切面是直接编译在一起的。AspectJ 使用了三种不同类型的织入方式，**使用的是编译期和类加载时进行织入**
+
+1. Compile-time weaving：**编译期织入**。编译器将切面和应用的源代码编译在一个字节码文件中。
+2. Post-compile weaving：**编译后织入**。也称为二进制织入。将已有的字节码文件与切面编制在一起。
+3. Load-time weaving:**加载时织入**。与编译后织入一样，只是织入时间会推迟到类加载到jvm时。
+
+### 2、springAOP
+
+springAOP作为AOP的一种实现，基于动态代理的实现AOP，意味着实现目标对象的切面会创建一个代理类，代理类的实现有两种不同的模式，分为两种不同的代理，**Spring AOP利用的是运行时织入，在springAOP中连接点是方法的执行。**
+
+1. JDK动态代理；
+2. cglib动态代理；

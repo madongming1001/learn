@@ -1,6 +1,8 @@
 package com.madm.learnroute;
 
+import com.madm.learnroute.service.MyService;
 import com.madm.learnroute.service.OrderService;
+import com.madm.learnroute.technology.mybatis.service.UserService;
 import com.madm.learnroute.technology.spring.MyDeferredImportSelector;
 import lombok.extern.slf4j.Slf4j;
 import org.jsondoc.spring.boot.starter.EnableJSONDoc;
@@ -51,6 +53,12 @@ public class LearnApiApplication {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        /**
+         *         MyService myService = (MyService) applicationContext.getBean("myService");
+         *         System.out.println(myService.getUserService());
+         *         UserService userService = (UserService) applicationContext.getBean("userService");
+         *         System.out.println(userService);
+         */
 //        }
     }
 

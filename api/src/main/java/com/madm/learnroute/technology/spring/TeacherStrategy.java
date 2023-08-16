@@ -25,9 +25,9 @@ public class TeacherStrategy implements InitializingBean, ApplicationContextAwar
     @Override
     public void afterPropertiesSet() throws Exception {
         //全局 singletonObjects 里面只会放一个 myFactoryBean BeanFactoryUtils.isFactoryDereference(name)会判断传过来的是带不带&开头的带就是获取FactoryBean工具类 反之则是getObject()的对象
-//        MyFactoryBean externalBean = (MyFactoryBean) applicationContext.getBean("&myFactoryBean");
+//        MyFactoryBean externalBean = (MyFactoryBean) applicationContext.getBean("&myFactoryBean");工具类
         //getObject方法返回的bean
-        MyObject internalBean = (MyObject) applicationContext.getBean("myFactoryBean");
+        MyObject internalBean = (MyObject) applicationContext.getBean("myFactoryBean"); //getObject()对象
         //外层类的bean
         MyFactoryBean externalBean = (MyFactoryBean)applicationContext.getBean("&myFactoryBean");
         log.info("internalBean 获取 information is ：{}", internalBean);

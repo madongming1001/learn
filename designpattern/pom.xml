@@ -8,7 +8,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <groupId>com.mdm.headfirst</groupId>
-    <artifactId>head-first</artifactId>
+    <artifactId>designpattern</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>head-first</name>
     <description>head-first</description>

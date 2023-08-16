@@ -48,7 +48,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         Object sqlSessionFactory = SpringUtil.getBean("sqlSessionFactory");
         System.out.println(sqlSessionTemplate + "" + sqlSessionFactory);
         return accountMapper.insert(account);
-        //使用的还是DataSourceUtils.getConnection(obtainDataSource());
+//        使用的还是DataSourceUtils.getConnection(obtainDataSource());
 //        return jdbcTemplate.update("update account set " + account.getUserName() + " = left(" + account.getUserName() + ",9) where id = " + account.getId());
     }
 

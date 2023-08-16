@@ -18,7 +18,6 @@ import com.alipay.api.response.AlipayTradeFastpayRefundQueryResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.madm.learnroute.config.AlipayConfig;
-import com.madm.learnroute.service.impl.PayService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

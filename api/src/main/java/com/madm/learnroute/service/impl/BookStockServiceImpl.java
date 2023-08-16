@@ -19,8 +19,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class BookStockServiceImpl extends ServiceImpl<BookStockMapper, BookStock> implements BookStockService {
 
+    private JdbcTemplate jdbcTemplate;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
     @Autowired
-    JdbcTemplate jdbcTemplate;
-    @Autowired
-    NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    public BookStockServiceImpl(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+    }
 }

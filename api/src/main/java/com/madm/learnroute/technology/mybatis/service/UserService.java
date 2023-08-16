@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author 周瑜
  */
-@Component
+//@Component
 public class UserService {
 
 //	@Autowired

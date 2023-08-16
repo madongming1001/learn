@@ -98,7 +98,7 @@ public class ProxyPractice {
         //恰好这个对象也需要动态代理生成
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(Cat.class);
-        //obj是代理子类实例，method是父类方法，args是方法如入参，proxy是代理子类方法，用于委托基类中的原方法。
+        //obj是代理子类实例，method是父类方法，args是方法入参，proxy是代理子类方法，用于委托基类中的原方法。
         enhancer.setCallbacks(new Callback[]{(MethodInterceptor) (obj, method, args, proxy) -> {
             System.out.println("before");
             Object result = proxy.invokeSuper(obj, args);//不报错
