@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,9 +44,19 @@ import java.util.concurrent.TimeUnit;
 public class LearnApiApplication {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext applicationContext = SpringApplication.run(LearnApiApplication.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(LearnApiApplication.class, args);
 //        while (true) {
-        String configValue = applicationContext.getEnvironment().getProperty("config.info");
+        String configValue = context.getEnvironment().getProperty("config.info");
+
+        MessageSource messageSource = context.getBean(MessageSource.class);
+
+        String zhMessage = messageSource.getMessage("user.name", null, null, Locale.CHINA);
+        String enMessage = messageSource.getMessage("user.name", null, null, Locale.ENGLISH);
+
+        System.out.println("zhMessage = " + zhMessage);
+
+        System.out.println("enMessage = " + enMessage);
+
         try {
             log.info("启动完成！当前时间是：{}", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now()));
 //            log.info("config.info property value ：{}", configValue);
@@ -53,6 +65,8 @@ public class LearnApiApplication {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        context.close();
+        context.registerShutdownHook();
         /**
          *         MyService myService = (MyService) applicationContext.getBean("myService");
          *         System.out.println(myService.getUserService());

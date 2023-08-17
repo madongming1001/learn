@@ -19,7 +19,7 @@ public class InheritableThreadLocalPractice {
         Thread.currentThread().setName("mainThread");
         threadLocal.set("hello world");
         //在set值的时候createMap把 Thread 的 inheritableThreadLocals 设置有值了
-        inheritableThreadLocal.set("hello world");
+        inheritableThreadLocal.set("weyeyeyewryr");
         Thread inheritableThread = new Thread(() -> {
             System.out.println("线程内部主线程：" + threadLocal.get());
             System.out.println("子线程：" + inheritableThreadLocal.get());
@@ -41,7 +41,7 @@ public class InheritableThreadLocalPractice {
         Thread.sleep(5000 * 4);
         for (int i = 0; i < 50; ++i) {
             poolExecutor.execute(() -> {
-                localVariable.set(new LocalVariable());
+                localVariable.set(new LocalVariable());//这个时候才会把每个加入到线程的threadlocalmap中
                 System.out.println("use local varaible" + localVariable.get());
                 localVariable.remove();
             });

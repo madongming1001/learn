@@ -19,7 +19,7 @@
 | [`filtered`](https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_filtered) | `filtered`      | Percentage of rows filtered by table condition |
 | [`Extra`](https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_extra) | None            | Additional information                         |
 
-explain 通过执行计划可以模拟优化器执行sql语句，查询sql的课优化空间
+explain 通过执行计划可以模拟优化器执行的sql语句，查询sql的可优化空间
 
 set session optimizer_switch='derived_merge=off'; #关闭mysql5.7新特性对衍生表的合并优化
 set session optimizer_switch='derived_merge=on'; #关闭mysql5.7新特性对衍生表的合并优化

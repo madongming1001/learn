@@ -29,6 +29,12 @@ public class HashMapPractice {
     static final HashMap<String, String> map = new HashMap<>(2);
 
     public static void main(String[] args) {
+
+        Optional.of(new Object()).orElse(new AtomicInteger());
+        Optional.ofNullable(new Object()).ifPresent((obj) -> {
+
+        } );
+
         HashBasedTable<String, String, String> table = HashBasedTable.create();
         table.put("1", "2", "3");
 

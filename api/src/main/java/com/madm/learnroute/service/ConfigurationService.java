@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Configuration
 //@Component 使用他会导致两个userService的地址不是同一地址 使用不会编译错误 只会建议注入的方式
 public class ConfigurationService {
-    @Bean
+    @Bean(initMethod = "init", destroyMethod = "destroyForBeanWay")
     public MyService myService() {
         MyService myService = new MyService();
         myService.setUserService(userService());

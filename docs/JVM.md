@@ -1322,3 +1322,16 @@ man命令可以查看系统参数详情 man pthread_create
 ![image-20230314032039044](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230314032039044.png)
 
 ![image-20230314032050636](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230314032050636.png)
+
+# [GC调优]一次内存泄漏的经历分享
+
+```shell
+# 使用jps查看进程号,也就是pid
+$> jps
+# 使用jmap导出dump文件  
+$> jmap -dump:format=b,file=mydump.hprof pid  
+接着使用MemoryAnalyzer
+使用大名鼎鼎的"MAT"(Memory Analyzer Tool)可以很好的分析dump文件.
+```
+
+**参考文章：**https://www.jianshu.com/p/3ff14a884acf

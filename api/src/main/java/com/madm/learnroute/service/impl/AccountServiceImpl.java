@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,6 +53,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
 //        return jdbcTemplate.update("update account set " + account.getUserName() + " = left(" + account.getUserName() + ",9) where id = " + account.getId());
     }
 
+    @Transactional
     @Override
     public Account findAccountById(int id) {
         super.baseMapper.delete(Wrappers.<Account>lambdaQuery().eq(Account::getId, id));

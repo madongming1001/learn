@@ -4,16 +4,17 @@ package com.madm.learnroute.javaee;
 import com.madm.learnroute.annotation.UserId;
 import lombok.SneakyThrows;
 import net.sf.cglib.core.DebuggingClassWriter;
-import org.apache.commons.lang3.BooleanUtils;
-import org.springframework.cglib.proxy.*;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.cglib.proxy.Callback;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
+import org.springframework.cglib.proxy.NoOp;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Properties;
-
-import static com.madm.learnroute.javaee.ObtainPlatformDefaultCharsetPractice.getProjectPath;
 
 /**
  * 代理模式是一种设计模式，提供了对目标对象额外的访问方式，
@@ -38,6 +39,10 @@ interface Animal {
 
     void eat();
 }
+
+interface FactoryConfiguration extends BeanFactoryAware {
+}
+
 
 class Cat implements Animal {
     @UserId("sdfd")
@@ -98,6 +103,7 @@ public class ProxyPractice {
         //恰好这个对象也需要动态代理生成
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(Cat.class);
+//        enhancer.setInterfaces(new Class<?>[]{FactoryConfiguration.class});
         //obj是代理子类实例，method是父类方法，args是方法入参，proxy是代理子类方法，用于委托基类中的原方法。
         enhancer.setCallbacks(new Callback[]{(MethodInterceptor) (obj, method, args, proxy) -> {
             System.out.println("before");
@@ -107,6 +113,7 @@ public class ProxyPractice {
             System.out.println("after");
             return result;
         }, NoOp.INSTANCE});
+        //CallbackFilter的作用就是，当执行目标方法的时候会被accept方法拦截
         enhancer.setCallbackFilter(method -> 0);
 
 
@@ -138,7 +145,7 @@ public class ProxyPractice {
 
     public static void main(String[] args) throws Exception {
         //JDK代理生成 InvocationHandler invoke()
-//        jdkProxyGenerate();
+        jdkProxyGenerate();
 
         //CGLIB代理生成 MethodInterceptor intercept()
         cglibProxyGenerate();

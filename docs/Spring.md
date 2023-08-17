@@ -8,7 +8,7 @@
 
 ![7bcf852475b501c0dcd46c5be78e17a9.png](https://img-blog.csdnimg.cn/img_convert/7bcf852475b501c0dcd46c5be78e17a9.png)
 
-而多次调用 `singletonFactory.getObject()` 返回的代理对象是不同的，就会导致 B 和 C 依赖了不同的 A。那如果获取 B 到之后直接放到一级缓存，然后 C 再获取呢？
+而多次调用 `singletonFactory.getObject()` 返回的代理对象是不同的，就会导致 B 和 C 依赖了不同的 A。那如果获取 B 到之后直接放到一级缓存，然后 C 再获取呢？对于普通的bean没有影响，但对于AOP代理的bean会导致重复创建bean实例，违法了单例原则。
 
 
 
@@ -76,7 +76,7 @@ if (earlySingletonExposure) {
 
 ```java
 createBean()
-//遇到Aop的 BeanPostProcessor 的话就findCandidateAdvisors找到所有的advisor放到容器中，advisor指的是spring中封装pointcut和notify的对象，这里不会对具体需要代理的对象创建代理类，而是有一个插口（getCustomTargetSource）让我们可以做，但一般不会做。
+//遇到Aop的 BeanPostProcessor 的话就findCandidateAdvisors找到所有的advisor放到容器中，advisor指的是spring中封装pointcut和advisor的对象，这里不会对具体需要代理的对象创建代理类，而是有一个插口（getCustomTargetSource）让我们可以做，但一般不会做。
 标注@Aspectj的对象是在shouldSkip方法返回null，而普通的bean在方法结束返回null，因为没有自定义targetSource
 @Nullable
 protected Object resolveBeforeInstantiation(String beanName, RootBeanDefinition mbd) {
@@ -142,31 +142,36 @@ protected Object resolveBeforeInstantiation(String beanName, RootBeanDefinition 
 
 
 ```java
-* <p>Bean factory implementations should support the standard bean lifecycle interfaces
-* as far as possible. The full set of initialization methods and their standard order is:
-  Bean 工厂实现应尽可能支持标准的 bean 生命周期接口。全套初始化方法及其标准顺序为：
-* <ol>
-* <li>BeanNameAware's {@code setBeanName}
-* <li>BeanClassLoaderAware's {@code setBeanClassLoader}
-* <li>BeanFactoryAware's {@code setBeanFactory}
-* <li>EnvironmentAware's {@code setEnvironment}
-* <li>EmbeddedValueResolverAware's {@code setEmbeddedValueResolver}
-* <li>ResourceLoaderAware's {@code setResourceLoader}
-* (only applicable when running in an application context)
-* <li>ApplicationEventPublisherAware's {@code setApplicationEventPublisher}
-* (only applicable when running in an application context)
-* <li>MessageSourceAware's {@code setMessageSource}
-* (only applicable when running in an application context)
-* <li>ApplicationContextAware's {@code setApplicationContext}
-* (only applicable when running in an application context)
-* <li>ServletContextAware's {@code setServletContext}
-* (only applicable when running in a web application context)
-* <li>{@code postProcessBeforeInitialization} methods of BeanPostProcessors
-* <li>InitializingBean's {@code afterPropertiesSet}
-* <li>a custom init-method definition
-* <li>{@code postProcessAfterInitialization} methods of BeanPostProcessors
-* </ol>
-BeanFactory.java
+ <p>Bean factory implementations should support the standard bean lifecycle interfaces
+ * as far as possible. The full set of initialization methods and their standard order is:
+ * <ol>Bean工厂实现应该支持标准的Bean生命周期接口尽可能地。整套初始化方法及其标准顺序为：
+ * <li>BeanNameAware's {@code setBeanName}
+ * <li>BeanClassLoaderAware's {@code setBeanClassLoader}
+ * <li>BeanFactoryAware's {@code setBeanFactory}
+ * <li>EnvironmentAware's {@code setEnvironment}
+ * <li>EmbeddedValueResolverAware's {@code setEmbeddedValueResolver}
+ * <li>ResourceLoaderAware's {@code setResourceLoader}
+ * (only applicable when running in an application context)
+ * <li>ApplicationEventPublisherAware's {@code setApplicationEventPublisher}
+ * (only applicable when running in an application context)
+ * <li>MessageSourceAware's {@code setMessageSource}
+ * (only applicable when running in an application context)
+ * <li>ApplicationContextAware's {@code setApplicationContext}
+ * (only applicable when running in an application context)
+ * <li>ServletContextAware's {@code setServletContext}
+ * (only applicable when running in a web application context)
+ * <li>{@code postProcessBeforeInitialization} methods of BeanPostProcessors
+ * <li>InitializingBean's {@code afterPropertiesSet}
+ * <li>a custom init-method definition
+ * <li>{@code postProcessAfterInitialization} methods of BeanPostProcessors
+ * </ol>
+ *
+ * <p>On shutdown of a bean factory, the following lifecycle methods apply:
+ * <ol>
+ * <li>{@code postProcessBeforeDestruction} methods of DestructionAwareBeanPostProcessors
+ * <li>DisposableBean's {@code destroy}
+ * <li>a custom destroy-method definition
+ * </ol>
 ```
 
 ```java
@@ -914,6 +919,12 @@ AbstractPlatformTransactionManager$prepareForCommit()提交事务之前回掉方
 2、方法必须是public修饰符。否则注解不会生效，但是加了注解也没啥毛病，不会报错，只是没卵用而已。
 
 3、this.本方法的调用，被调用方法上注解是不生效的，因为无法再次进行切面增强
+
+**解决同类调用方式事务不生效的方法**
+
+- 方式一：通过在service里面自己注入自己 循环依赖
+- 方式二：把方法拆成两个类的方法
+- 方式三：SpringBoot上启动类上添加@EnableAspectJAutoProxy(exposeProxy = true)注解，同时设置exposeProxy=true，testA()中通过 (TransactionService) AopContext.currentProxy()获取代理类通过代理类调用testB()。
 
 ### 重要对象
 
