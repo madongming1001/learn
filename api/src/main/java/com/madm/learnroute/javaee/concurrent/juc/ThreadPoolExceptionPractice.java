@@ -7,8 +7,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * execute方法执行时，会抛出(打印)堆栈异常。
- * submit方法执行时，返回结果封装在future中，如果调用future.get()方法则必须进行异常捕获，从而可以抛出(打印)堆栈异常。
+ * execute 方法执行时，会抛出(打印)堆栈异常。
+ * submit 方法执行时，返回结果封装在future中，如果调用future.get()方法则必须进行异常捕获，从而可以抛出(打印)堆栈异常。
  *
  * @author dongming.ma
  * @date 2022/10/28 12:58

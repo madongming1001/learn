@@ -1,8 +1,6 @@
 package com.madm.learnroute.javaee.concurrent.juc;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,17 +31,17 @@ public class ThreadExecuteTest {
 //        runnable.run();
 
 
-//        FutureTask task = new FutureTask(new Callable() {
-//            @Override
-//            public Object call() throws Exception {
-//                log.debug("通过Callable方式执行任务");
-//                Thread.sleep(3000);
-//                return "返回任务结果";
-//            }
-//        });
-//
-//        new Thread(task).start();
-//        log.debug("结果：{}",task.get());
+        FutureTask task = new FutureTask(new Callable() {
+            @Override
+            public Object call() throws Exception {
+                log.debug("通过Callable方式执行任务");
+                Thread.sleep(3000);
+                return "返回任务结果";
+            }
+        });
+
+        new Thread(task).start();
+        log.debug("结果：{}",task.get());
 
 
         ExecutorService executor = Executors.newFixedThreadPool(2);

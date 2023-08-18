@@ -2002,6 +2002,24 @@ processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchExc
 
 # Condition注解原理
 
+在@SpringbootApplication内部@Enableautoconfiguration注册了一个**AutoConfigurationImportSelector**的类，他是实现了DeferredImportSelector接口，就会先走到getImportSelector方法，返回一个**AutoConfigurationGroup**的类，而**AutoConfigurationGroup**的类有两个方法先后会被执行，一个是process，另一个是selectimportor，至于DeferredImportSelector的selectimportor就不会被执行。
+
+在执行到process方法的时候会调用**AutoConfigurationImportSelector**的方法getAutoConfigurationEntry(),
+
+![image-20230818165803540](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230818165803540.png)
+
+![image-20230818165816925](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230818165816925.png)
+
+![image-20230818165848668](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230818165848668.png)
+
+找到spring.factories类中所有对应的value
+
+由两部分内容需要验证
+
+一、项目自定义的bean是否添加了@Conditional相关的注解及按条件匹配
+
+二、通过@EnableAutoConfiguration spring.factories文件自动扫描的类 按条件是否匹配注入
+
 **ConfigurationClassParser**构造方法会创建一个对象**ConditionEvaluator（用来验证@Conditional注解的）**，
 
 因为对于每个类来说可能包含内部类bean之类的，所以整个是递归调用的。**processConfigurationClass**主要用来判断是否符合**Conditional**条件。

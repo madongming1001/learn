@@ -30,7 +30,7 @@ public class MyDeferredImportSelector implements DeferredImportSelector {
 
         @Override
         public void process(AnnotationMetadata metadata, DeferredImportSelector selector) {
-            System.out.println("MyDeferredImportSelectorGroup.Group");
+            System.out.println("先执行 内部group类的 process方法");
         }
 
         @Override

@@ -4,6 +4,7 @@ import com.madm.learnroute.service.MyService;
 import com.madm.learnroute.service.OrderService;
 import com.madm.learnroute.technology.mybatis.service.UserService;
 import com.madm.learnroute.technology.spring.MyDeferredImportSelector;
+import io.lettuce.core.resource.Delay;
 import lombok.extern.slf4j.Slf4j;
 import org.jsondoc.spring.boot.starter.EnableJSONDoc;
 import org.mybatis.spring.annotation.MapperScan;
@@ -20,9 +21,12 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -65,8 +69,10 @@ public class LearnApiApplication {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        context.close();
-        context.registerShutdownHook();
+        ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
+        ses.schedule(() -> context.close(), 10, TimeUnit.SECONDS);
+
+//        context.registerShutdownHook();
         /**
          *         MyService myService = (MyService) applicationContext.getBean("myService");
          *         System.out.println(myService.getUserService());

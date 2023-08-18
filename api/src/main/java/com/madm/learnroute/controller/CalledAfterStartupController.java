@@ -38,6 +38,6 @@ public class CalledAfterStartupController implements DisposableBean {
 
     @Override
     public void destroy() throws Exception {
-        System.out.println("接口形式销毁 destroy 方法后执行");
+        System.out.println("接口形式销毁 destroy 方法后执行 for CalledAfterStartupController");
     }
 }

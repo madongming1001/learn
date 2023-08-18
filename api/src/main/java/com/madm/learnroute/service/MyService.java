@@ -21,11 +21,11 @@ public class MyService implements DisposableBean {
     }
 
     public void destroy() {
-        log.info("接口形式销毁 destroy 方法后执行");
+        log.info("接口形式销毁 destroy 方法后执行 for MyService");
     }
 
     public void destroyForBeanWay() {
-        log.info("接口形式销毁 destroy 方法后执行");
+        log.info("bean自定义形式形式销毁 destroy 方法后执行 for MyService");
     }
 
 }

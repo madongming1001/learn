@@ -477,7 +477,7 @@ LinkedBlockingDeque：一个由链表结构组成的双向阻塞队列
 
 #### 原子更新基本类型类
 
-```
+```shell
 AtomicBoolean
 
 AtomicInteger
@@ -489,7 +489,7 @@ AtomicLong
 
 #### 原子更新数组
 
-```
+```shell
 AtomicIntegerArray
 
 AtomicLongArray
@@ -503,7 +503,7 @@ AtomicIntegerArray
 
 #### 原子更新引用类型
 
-```
+```shell
 AtomicReference
 
 AtomicReferenceFieldUpdater
@@ -515,7 +515,7 @@ AtomicMarkableReference
 
 #### 原子更新字段类
 
-```
+```shell
 AtomicIntegerFieldUpdater
 
 AtomicLongFieldUpdater

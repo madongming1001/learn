@@ -4,10 +4,12 @@ import cn.hutool.core.util.ArrayUtil;
 import com.madm.learnroute.controller.param.AccountRequest;
 import com.madm.learnroute.model.Account;
 import com.madm.learnroute.service.AccountService;
+import com.madm.learnroute.validate.ClassNameCondition;
 import com.mdm.model.RestResponse;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +23,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/account")
+@Conditional(ClassNameCondition.class)
 public class AccountController {
 
     @Resource
