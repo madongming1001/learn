@@ -109,15 +109,15 @@ git reset 命令可以将当前的`HEAD`重置到特定的状态。
 
 ##### **--soft**
 
-使用`--soft`参数将会仅仅重置`HEAD`到制定的版本，不会修改index和working tree,而本地文件的内容并没有发生变化，**而index中仍然有最近一次提交的修改，这时执行git status会显示这些修改已经在暂存区中了**，无需再一次执行git add。
+使用`--soft`参数将会仅仅重置`HEAD`到制定的版本，不会修改index和working tree,而本地文件的内容并没有发生变化，**而index中仍然有最近一次提交的修改，这时执行git status会显示这些修改已经在暂存区中了**，无需再一次执行git add。修改已经在暂存区
 
 ##### --mixed
 
-使用`--mixed`参数与--soft的不同之处在于，--mixed修改了index，使其与第二个版本匹配。index中给定commit之后的修改被unstaged。如果现在执行git commit 将不会发生任何事，因为暂存区中没有修改，在提交之前需要再次执行git add。
+使用`--mixed`参数与--soft的不同之处在于，--mixed修改了index，使其与第二个版本匹配。index中给定commit之后的修改被unstaged。如果现在执行git commit 将不会发生任何事，因为暂存区中没有修改，在提交之前需要再次执行git add。修改不再暂存区
 
 ##### --hard
 
-使用`--hard`同时也会修改working tree，也就是当前的工作目录，如果我们执行`git reset --hard HEAD~`，那么最后一次提交的修改，包括本地文件的修改都会被清楚，彻底还原到上一次提交的状态且无法找回。所以在执行`reset --hard`之前一定要小心
+使用`--hard`同时也会修改working tree，也就是当前的工作目录，如果我们执行`git reset --hard HEAD~`，那么最后一次提交的修改，包括本地文件的修改都会被清除，彻底还原到上一次提交的状态且无法找回。所以在执行`reset --hard`之前一定要小心
 
 ## git revert
 

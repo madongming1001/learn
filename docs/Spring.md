@@ -890,17 +890,41 @@ AbstractPlatformTransactionManager$prepareForCommit()提交事务之前回掉方
 
 ### 事务失效几种方式
 
+**1、spring默认只会回滚非检查异常和error异常**
+
+​	解决方法：配置Transactional(rollbackfor=Exceptionclass)
+
+**2、spring事务只有捕获到了业务抛出去的异常，才能进行后续的处理，如果业务自己捕获了异常，则事务无法感知**
+
+​	解决方法：1、将异常原样抛出
+
+​						2、设置TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+**3、spring事务切面的优先级顺序最低，但如果自定义的切面优先级和他一样且自定义的切面没有正确处理异常，则会同业务自己捕获异常的那种场景一样。**
+
+​	解决方法：1、在切面中将异常原样抛出
+
+​						2、在切面中设置TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
+
+**4、spring是无默认生效的方法权限都必须为public**
+
+​	解决方法：1、将方法改为public
+
+​						2、修改TransactionAttributeSource.将publicMethodsOnly修改为false
+
+​						3、开启Aspectj代理模式
+
 1. 数据库引擎是否支持事务（Mysql 的 MyIsam引擎不支持事务）
 
 2. 注解所在的类是否被加载为 Bean（是否被Spring 管理）
 
-3. 注解所在的方法是否为 public 修饰的
+3. **注解所在的方法是否为 public 修饰的**
 
-4. 是否存在自身调用的问题
+4. **是否存在自身调用的问题**
 
 5. 所用数据源是否加载了事务管理器
 
-6. @Transactional的扩展配置propagation是否正确
+6. **@Transactional的扩展配置propagation是否正确**
 
 7. 异常没有被抛出, 或异常类型错误
 
@@ -924,7 +948,7 @@ AbstractPlatformTransactionManager$prepareForCommit()提交事务之前回掉方
 
 - 方式一：通过在service里面自己注入自己 循环依赖
 - 方式二：把方法拆成两个类的方法
-- 方式三：SpringBoot上启动类上添加@EnableAspectJAutoProxy(exposeProxy = true)注解，同时设置exposeProxy=true，testA()中通过 (TransactionService) AopContext.currentProxy()获取代理类通过代理类调用testB()。
+- 方式三：SpringBoot上启动类上添加@EnableAspectJAutoProxy(exposeProxy = true)注解，testA()中通过 (TransactionService) AopContext.currentProxy()获取代理类通过代理类调用testB()。
 
 ### 重要对象
 
