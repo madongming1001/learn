@@ -1,9 +1,9 @@
 # SQL语句内部执行过程
 
-  MySQL分为**Server层**和**存储引擎层**两部分。Server层包括**连接器**、**分析器**、**优化器**、**执行器**等等，而存储引擎层负责数据的存储和读取。
+  MySQL分为**Server层**和**存储引擎层**两部分。Server层包括**连接器、查询缓存（默认关闭 have_query_cache，在一个表上有更新的时候，跟这个表有关的查询缓存会失效）、分析器**、**优化器**、**执行器**等等，而存储引擎层负责数据的存储和读取。
   SQL执行时，会通过连接器**建立连接**、**获取权限**；连接器会**维持和管理连接**。
-  然后，MySQL会通过分析器对SQL语句进行**解析**，分析语句**各部分含义**，然后按照语法规则**判断SQL是否符合MySQL的语法**。
-  经过分析器分析后，MySQL会对SQL请求进行优化器的处理，优化器对**语句索引**、**连接顺序**等情况判断，决定使用哪种执行方案最合适。
+  然后，MySQL会通过分析器对SQL语句进行**词法分析**、语法分析，分析语句**各部分含义，语法分析器会根据语法规则，判断你输入的这个 SQL 语句是否满足 MySQL 语法。
+  经过分析器分析后，MySQL会对SQL请求进行优化器的处理，优化器对语句索引、连接顺序等情况判断，决定使用哪种执行方案最合适。
   最后，就到了执行器的阶段，执行器根据表的引擎定义，去调用引擎接口，执行SQL语句。
 
 **并且`FORMAT`新增`TREE`格式**。通过EXPLAIN展示的信息我们可以了解到**表查询的顺序**，**表连接的方式**等，并根据这些信息判断语句执行效率，决定是否添加索引或改写SQL语句优化表连接方式以提高执行效率。
@@ -148,7 +148,7 @@ timestamp：4个字节+秒精度字节 时间到2039年
   where子句的条件永远都不可能为真。
 
 - **Using join buffer** (Block Nested Loop), Using join buffer (Batched Key Access)
-  在表联接过程当中，将先前表的部分数据读取到join buffer缓冲区中，然后从缓冲区中读取数据与当前表进行连接。主要有两种算法：Block Nested Loop和Batched Key Access。
+  在表联接过程当中，将先前表的部分数据读取到join buffer缓冲区中，然后从缓冲区中读取数据与当前表进行连接。主要有两种算法：Block Nested Loop和Batched Key Access。8.0取消了BlockNested loop，只有Nested loop join和hash join
 
   ```sql
   SET PERSIST optimizer_switch='mrr=on,mrr_cost_based=off,block_nested_loop=on,batched_key_access=on/off';
@@ -325,17 +325,17 @@ Double Write 分为了两个组成部分：
 
 这个 innodb_old_blocks_time 的默认值是 1000，它的单位是毫秒，也就意味着对于从磁盘上被加载到 LRU 链表的 old 区域的某个页来说，如果第一次和最后一次访问该页面的时间间隔小于 1s（很明显在一次全表扫描的过程中，多次访问一个页面中的时间不会超过 1s），那么该页是不会被加入到 young 区域的，当然，像innodb_old_blocks_pct 一样，我们也可以在服务器启动或运行时设置innodb_old_blocks_time 的值，这里需要注意的是，如果我们把innodb_old_blocks_time 的值设置为 0，那么每次我们访问一个页面时就会把该页面放到 young 区域的头部。
 
-​		**当从磁盘读取数据页后，会先将数据页存放到 LRU 链表冷数据区的头部，**如果这些缓存页在 1 秒之后被访问，那么就将缓存页移动到热数据区的头部；如果是 1 秒之内被访问，则不会移动，缓存页仍然处于冷数据区中。1 秒这个数值，是由参数 innodb_old_blocks_time 控制。
+​		**当从磁盘读取数据页后，会先将数据页存放到 LRU 链表冷数据区的头部，**如果这些缓存页在 1 秒之后被访问，那么就将缓存页移动到热数据区的头部；如果是 1 秒之内被访问，则不会移动，缓存页仍然处于冷数据区中。1 秒这个数值，是由参数 **innodb_old_blocks_time** 控制。
 
 ​		当遇到全表扫描或者预读时，如果没有空闲缓存页来存放它们，那么将会淘汰一个数据页，**而此时淘汰地是冷数据区尾部的数据页**。冷数据区的数据就是不经常访问的，因此这解决了误将热点数据淘汰的问题。如果在 1 秒后，因全表扫描和预读机制额外加载进来的缓存页，仍然没有人访问，那么它们会一直待在冷数据区，当再需要淘汰数据时，首先淘汰地就是这一部分数据。
 
 至此，基于冷热分离优化后的 LRU 链表，完美解决了直接使用 LRU 链表带来的问题。
 
-​		综上所述，正是因为将 LRU 链表划分为 young 和 old 区域这两个部分，又添加了 **innodb_old_blocks_time** 这个系统变量，才使得预读机制和全表扫描造成的缓存命中率降低的问题得到了遏制，因为用不到的预读页面以及全表扫描的页面都只会被放到 old 区域，而不影响 young 区域中的缓存页。
+​		综上所述，正是因为将 LRU 链表划分为 young 和 old 区域这两个部分，又添加了 **innodb_old_blocks_time** 这个系统变量，才**使得预读机制和全表扫描造成的缓存命中率降低的问题得到了遏制**，因为用不到的预读页面以及全表扫描的页面都只会被放到 old 区域，而不影响 young 区域中的缓存页。
 
 **LRU 链表的极致优化**
 
-把young区域等分为4份，当处于前4分之1的时候不需要移动到young头部，后4分之三需要，优化目的在于减少对于同步所带来的开销损耗。
+把young区域等分为4份，当处于前4分之1的时候不需要移动到young头部，后4分之三需要，优化目的在于**减少对于同步所带来的开销损耗。**
 
 实际上，MySQL 在冷热分离的基础上还做了一层优化。
 
@@ -344,6 +344,22 @@ Double Write 分为了两个组成部分：
 从代码的角度来看，将链表中的数据移动到头部，实际上就是修改元素的指针指向，这个操作是非常快的。但是为了安全起见，在修改链表的时候，我们需要对链表加上锁，否则容易出现并发问题。
 
 当并发量大的时候，因为要加锁，会存在锁竞争，每次移动显然效率就会下降。因此 MySQL 针对这一点又做了优化，如果一个缓存页处于热数据区域，且在热数据区域的前 1/4 区域（注意是热数据区域的 1/4，不是整个链表的 1/4），那么当访问这个缓存页的时候，就不用把它移动到热数据区域的头部；如果缓存页处于热数据的后 3/4 区域，那么当访问这个缓存页的时候，会把它移动到热数据区域的头部。
+
+**生产上的 MySQL 调优**
+
+MySQL 的数据最终是存储在磁盘上的，每次查询数据时，我们先需要把数据加载进缓存，然后读取，如果每次查询的数据都已经存在于缓存了，那么就不用去磁盘读取，避免了一次磁盘 IO，这是我们最期望的。因此为了尽量在 LRU 链表中缓存更多的缓存页，我们**「可以根据服务器的配置，尽量调大 Buffer Pool 的大小」**。
+
+另外在实际应用中，在没有外部监控工具的情况下，我们该如何知道 MySQL 的一些状态信息呢？如：缓存命中率、缓存页的空闲数、脏页数量、LRU 链表中缓存页个数、冷热数据的比例、磁盘 IO 读取的数据页数量等信息。可以通过如下命令查看：
+
+```text
+show engine innodb status;
+```
+
+这个命令的查询结果是一个很长的字符串，可以复制出来，放在文本文件中查看分析，部分信息截图如下：
+
+![img](https://pic4.zhimg.com/80/v2-68e305fe88d5034c80de717c3a56ba87_720w.webp)
+
+如果看到 **「youngs/s」** 这个值较高，说明数据从冷数据区移到热数据的频率较大，因此可以适当调大热数据所占的比例，也就是减小**「innodb_old_blocks_pct」**参数的值，也可以调大**「innodb_old_blocks_time」**参数的值
 
 **参考文章：https://zhuanlan.zhihu.com/p/142087506**
 
@@ -369,7 +385,7 @@ Double Write 分为了两个组成部分：
 
 *线性预读*
 
-InnoDB 提供了一个系统变量 innodb_read_ahead_threshold，如果顺序访问了某个区（extent）的页面超过这个系统变量的值，**就会触发一次异步读取下一个区中全部的页面到 Buffer Pool 的请求**。这个 innodb_read_ahead_threshold 系统变量的值默认是 56，我们可以在服务器启动时通过启动参数或者服务器运行过程中直接调整该系统变量的值，取值范围是 0~64。
+InnoDB 提供了一个系统变量 **innodb_read_ahead_threshold**，如果顺序访问了某个区（extent）的页面超过这个系统变量的值，**就会触发一次异步读取下一个区中全部的页面到 Buffer Pool 的请求**。这个 innodb_read_ahead_threshold 系统变量的值默认是 56，我们可以在服务器启动时通过启动参数或者服务器运行过程中直接调整该系统变量的值，取值范围是 0~64。
 
 *随机预读*
 
@@ -862,7 +878,7 @@ select * from t1 join temp_t on (t1.b=temp_t.b);
 
 “按 name 排序”这个动作，可能在内存中完成，也可能需要使用外部排序，这取决于排序所需的内存和参数 sort_buffer_size。
 
-sort_buffer_size，就是 MySQL 为排序开辟的内存（sort_buffer）的大小。如果要排序的数据量小于 sort_buffer_size，排序就在内存中完成。但如果排序数据量太大，内存放不下，则不得不利用磁盘临时文件辅助排序。
+sort_buffer_size，就是 MySQL 为排序开辟的内存（sort_buffer）的大小。如果要排序的数据量小于 sort_buffer_size，排序就在内存中完成。但如果排序数据量太大，**内存放不下，则不得不利用磁盘临时文件辅助排序。**
 
 你可以用下面介绍的方法，来确定一个排序语句是否使用了临时文件。
 
@@ -888,19 +904,19 @@ select @b-@a;
 
 这个方法是通过查看 OPTIMIZER_TRACE 的结果来确认的，你可以从 number_of_tmp_files 中看到是否使用了临时文件。
 
-![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/89baf99cdeefe90a22370e1d6f5e6495.png)
+![image-20230820165541622](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230820165541622.png)
 
-图 4 全排序的 OPTIMIZER_TRACE 部分结果
+全排序的 **OPTIMIZER_TRACE** 部分结果
 
-number_of_tmp_files 表示的是，排序过程中使用的临时文件数。你一定奇怪，为什么需要 12 个文件？内存放不下时，就需要使用外部排序，外部排序一般使用归并排序算法。可以这么简单理解，**MySQL 将需要排序的数据分成 12 份，每一份单独排序后存在这些临时文件中。然后把这 12 个有序文件再合并成一个有序的大文件。**
+number_of_tmp_files 表示的是，排序过程中使用的临时文件数。你一定奇怪，为什么需要 12 个文件？内存放不下时，就需要使用外部排序，外部排序一般使用**归并排序算法**。可以这么简单理解，**MySQL 将需要排序的数据分成 12 份，每一份单独排序后存在这些临时文件中。然后把这 12 个有序文件再合并成一个有序的大文件。**
 
 如果 sort_buffer_size 超过了需要排序的数据量的大小，**number_of_tmp_files** 就是 0，表示排序可以直接在内存中完成。
 
 否则就需要放在临时文件中排序。sort_buffer_size 越小，需要分成的份数越多，number_of_tmp_files 的值就越大。
 
-`接下来，我再和你解释一下图 4 中其他两个值的意思。
+接下来，我再和你解释一下图 4 中其他两个值的意思。
 
-我们的示例表中有 4000 条满足 city='杭州’的记录，所以你可以看到 examined_rows=4000，表示参与排序的行数是 4000 行。
+我们的示例表中有 4000 条满足 city='/杭州’的记录，所以你可以看到 examined_rows=4000，表示参与排序的行数是 4000 行。
 
 sort_mode 里面的 packed_additional_fields 的意思是，排序过程对字符串做了“紧凑”处理。即使 name 字段的定义是 varchar(16)，在排序过程中还是要按照实际长度来分配空间的。
 
@@ -1262,7 +1278,7 @@ MVCC机制的实现就是通过read-view机制与undo版本链比对机制，使
 
 ### 间隙锁(Gap Lock)
 
-锁定一个范围，但不包括记录本身，是为了阻止多个事务将记录插入到同一个范围内。
+锁定一个范围，但不包括记录本身，是为了阻止多个事务将记录插入到同一个范围内。**前开后开区间**
 
 **关闭Gap Lock两种方式：**
 
@@ -1279,6 +1295,54 @@ Gap Lock+Record Lock，锁定一个范围，并且锁定记录本身，当查询
 数组的前闭后开、前闭后闭，**[ , ]中括号表示能取得这个数,称为“闭” ( , )小括号表示不能取到这个数，称为“开”。**
 
 InnoDB存储引擎默认的事务隔离级别是Repeatable Read，在该隔离级别下，其采用Next-Key Locking的方式来加锁。而在事务隔离级别Read Committed下，其仅采用Record Lock。
+
+## 加锁规则
+
+行级锁加锁规则比较复杂，不同的场景，加锁的形式是不同的。
+
+**加锁的对象是索引，加锁的基本单位是 next-key lock**，它是由记录锁和间隙锁组合而成的，**next-key lock 是前开后闭区间，而间隙锁是前开后开区间**。但是，next-key lock 在一些场景下会退化成记录锁或间隙锁。
+
+### 唯一索引等值查询
+
+当我们用唯一索引进行等值查询的时候，查询的记录存不存在，加锁的规则也会不同：
+
+- 当查询的记录是「存在」的，在索引树上定位到这一条记录后，将该记录的索引中的 next-key lock 会**退化成「记录锁」**。
+- 当查询的记录是「不存在」的，则会在索引树找到**第一条大于该查询记录的记录**，然后将该记录的索引中的 next-key lock 会**退化成「间隙锁」**
+
+### 唯一索引范围查询
+
+范围查询和等值查询的加锁规则是不同的。
+
+当唯一索引进行范围查询时，会对每一个扫描到的索引加 next-key 锁，然后如果遇到下面这些情况，会退化成记录锁或者间隙锁：
+
+- 情况一：针对「大于等于」的范围查询，因为存在等值查询的条件，那么如果等值查询的记录是存在于表中，那么该记录的索引中的 next-key 锁会**退化成记录锁**。
+- 情况二：针对「小于或者小于等于」的范围查询，要看条件值的记录是否存在于表中：
+  1. **当条件值的记录不在表中**，那么不管是「小于」还是「小于等于」条件的范围查询，扫描到终止范围查询的记录时，该记录的索引的 next-key 锁会**退化成间隙锁**，其他扫描到的记录，都是在这些记录的索引上加 **next-key 锁**。
+  2. **当条件值的记录在表中**，如果是**「小于」**条件的范围查询，扫描到终止范围查询的记录时，该记录的索引的 next-key 锁会**退化成间隙锁**，其他扫描到的记录，都是在这些记录的索引上加**next-key 锁**。
+  3. **当条件值的记录在表中**，如果**「小于等于**」条件的范围查询，扫描到终止范围查询的记录时，该记录的索引 next-key 锁**不会退化成间隙锁**。其他扫描到的记录，都是在这些记录的索引上加 **next-key 锁**。
+
+### 非唯一索引等值查询
+
+当我们用非唯一索引进行等值查询的时候，**因为存在两个索引，一个是主键索引，一个是非唯一索引（二级索引），所以在加锁时，同时会对这两个索引都加锁，但是对主键索引加锁的时候，只有满足查询条件的记录才会对它们的主键索引加锁**。
+
+针对非唯一索引等值查询时，查询的记录存不存在，加锁的规则也会不同：
+
+- 当查询的记录「存在」时，由于不是唯一索引，所以肯定存在索引值相同的记录，于是**非唯一索引等值查询的过程是一个扫描的过程，直到扫描到第一个不符合条件的二级索引记录就停止扫描，然后在扫描的过程中，对扫描到的二级索引记录加的是 next-key 锁，而对于第一个不符合条件的二级索引记录，该二级索引的 next-key 锁会退化成间隙锁。同时，在符合查询条件的记录的主键索引上加记录锁**。
+- 当查询的记录「不存在」时，**扫描到第一条不符合条件的二级索引记录，该二级索引的 next-key 锁会退化成间隙锁。因为不存在满足查询条件的记录，所以不会对主键索引加锁**。
+
+### 非唯一索引范围查询
+
+非唯一索引和主键索引的范围查询的加锁也有所不同，不同之处在于**非唯一索引范围查询，索引的 next-key lock 不会有退化为间隙锁和记录锁的情况**，也就是非唯一索引进行范围查询时，对二级索引记录加锁都是加 next-key 锁。
+
+因此在使用过程中尽可能使用主键索引和唯一索引进行处理，避免大面积的锁定造成性能的一个影响。
+
+### 没有加索引的查询
+
+**如果锁定读查询语句，没有使用索引列作为查询条件，或者查询语句没有走索引查询，导致扫描是全表扫描。那么，每一条记录的索引上都会加 next-key 锁，这样就相当于锁住的全表，这时如果其他事务对该表进行增、删、改操作的时候，都会被阻塞**。
+
+不只是锁定读查询语句不加索引才会导致这种情况，update 和 delete 语句如果查询条件不加索引，那么由于扫描的方式是全表扫描，于是就会对每一条记录的索引上都会加 next-key 锁，这样就相当于锁住的全表。
+
+**参考文章：**https://www.toutiao.com/article/7240633218465088037/?source=aweme_search
 
 # sql执行流程
 
@@ -1297,6 +1361,8 @@ InnoDB存储引擎默认的事务隔离级别是Repeatable Read，在该隔离�
 3. 引擎将这行新数据更新到内存中，同时将这个更新操作记录到 redo log 里面，此时 redo log 处于 prepare 状态。然后告知执行器执行完成了，随时可以提交事务。
 4. 执行器生成这个操作的 binlog，并把 binlog 写入磁盘。
 5. 执行器调用引擎的提交事务接口，引擎把刚刚写入的 redo log 改成提交（commit）状态，更新完成。
+
+![image-20230820151008261](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230820151008261.png)
 
 # 两阶段提交
 
@@ -1387,7 +1453,7 @@ checkpoint有两种方式，**sharp checkpoint**和**fuzzy checkpoint**。
 2. **fuzzy checkpoint：**模糊检查点，主要有以下四种情况：
 
 - master thread checkpoint：以每秒或者每十秒的速度从缓冲池的脏页列表中刷新一定比例的脏页回磁盘，这个过程是异步的，不会阻塞用户线程。
-- flush_lru_list checkpoint：通过参数 innodb_lru_scan_depth 控制LRU列表中可用页的数量，发生了这个checkpoint时，说明脏页写入速度过慢。
+- flush_lru_list checkpoint：通过参数 **innodb_lru_scan_depth** 控制LRU列表中可用页的数量，发生了这个checkpoint时，说明脏页写入速度过慢。
 - async/sync flush checkpoint：指的是重做日志不可用的情况。当重做日志不可用时， 如果不能被覆盖的脏页数量（2-3）达到 75%时，触发异步checkpoint。 不能被覆盖的脏页数量（2-3）达到90%时，同步并且阻塞用户线程，然后根据 flush 列表最早脏的顺序刷脏页。 当这个事件中的任何一个发生的时候，都会记录到errlog 中，一旦errlog出现这种日志提示，一定需要加大logfile的组数。
 - dirty page too much checkpoint：脏页太多时，也会发生强制写日志，会阻塞用户线程，由innodb_max_dirty_pages_pct参数（默认75%）控制。 
 
@@ -1403,8 +1469,6 @@ checkpoint有两种方式，**sharp checkpoint**和**fuzzy checkpoint**。
 需要特别注意的是，上述信息仅在每个log group的第一个redo log file 中进行存储。log group中的其余redo log file仅保留这些空间，但不保存上述信息。正因为保存了这些信息，就意味着对redo log file的写入并不是完全顺序的。因为其除了log block的写入操作，还需要更新前2kb部分的信息，这些信息对于InnoDB存储引擎的回复操作来说非常关键和重要。
 
 例如，页P1的LSN为10000，而数据库启动时，InnoDB检测到写入重做日志中的LSN为13000，并且该事务已经提交，那么数据库需要进行恢复操作，将重做日志应用到P1页中，同样的，对于重做日志中LSN小于P1页的LSN，不需要进行重做，因为P1页中的LSn表示页已经被刷新到该位置。
-
-
 
 **控制重做日志刷新到磁盘的策略**
 
@@ -1427,9 +1491,14 @@ innodb_flush_log_at_trx_commit
 
 **redolog**
 
-同样，在 MySQL 里也有这个问题，如果每一次的更新操作都需要写进磁盘，然后磁盘也要找到对应的那条记录，然后再更新，整个过程 IO 成本、查找成本都很高。为了解决这个问题，MySQL 的设计者就用了类似酒店掌柜粉板的思路来提升更新效率。
+同样，在 MySQL 里也有这个问题，**如果每一次的更新操作都需要写进磁盘，然后磁盘也要找到对应的那条记录，然后再更新，整个过程 IO 成本、查找成本都很高。**为了解决这个问题，MySQL 的设计者就用了类似酒店掌柜粉板的思路来提升更新效率。
 
 而粉板和账本配合的整个过程，其实就是 MySQL 里经常说到的 WAL 技术，WAL 的全称是 **Write-Ahead Logging**，它的关键点就是先写日志，再写磁盘，也就是先写粉板，等不忙的时候再写账本。
+
+**现在你就能理解了，WAL 机制主要得益于两个方面：**
+
+1. redo log 和 binlog 都是顺序写，磁盘的顺序写比随机写速度要快；
+2. 组提交机制，可以大幅度降低磁盘的 IOPS 消耗。
 
 具体来说，当有一条记录需要更新的时候，InnoDB 引擎就会先把记录写到 redo log（粉板）里面，并更新内存，这个时候更新就算完成了。同时，InnoDB 引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做，这就像打烊以后掌柜做的事。
 
@@ -1445,7 +1514,81 @@ write pos 和 checkpoint 之间的是“粉板”上还空着的部分，可以�
 
 **参考文章：**http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/02%20%20%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%80%E6%9D%A1SQL%E6%9B%B4%E6%96%B0%E8%AF%AD%E5%8F%A5%E6%98%AF%E5%A6%82%E4%BD%95%E6%89%A7%E8%A1%8C%E7%9A%84%EF%BC%9F.md
 
-### bin-log
+**redo log 的写入机制**
+
+事务在执行过程中，生成的 redo log 是要先写到 redo log buffer 的。
+
+**redolog的三种状态分别是：**
+
+1. 存在 redo log buffer 中，物理上是在 MySQL 进程内存中，就是图中的红色部分；
+2. 写到磁盘 (write)，但是没有持久化（fsync)，物理上是在文件系统的 page cache 里面，也就是图中的黄色部分；
+3. 持久化到磁盘，对应的是 hard disk，也就是图中的绿色部分。
+
+**为了控制 redo log 的写入策略，InnoDB 提供了 innodb_flush_log_at_trx_commit 参数，它有三种可能取值：**
+
+1. 设置为 0 的时候，表示每次事务提交时都只是把 redo log **留在 redo log buffer 中** ;
+2. 设置为 1 的时候，表示每次事务提交时都将 **redo log 直接持久化到磁盘**；
+3. 设置为 2 的时候，表示每次事务提交时都只是把 **redo log 写到 page cache**。
+
+InnoDB 有一个后台线程，**每隔 1 秒**，就会把 redo log buffer 中的日志，调用 write 写到文件系统的 page cache，然后调用 fsync 持久化到磁盘。
+
+实际上，除了后台线程每秒一次的轮询操作外，**还有两种场景会让一个没有提交的事务的 redo log 写入到磁盘中。**
+
+1. **一种是，redo log buffer 占用的空间即将达到 innodb_log_buffer_size 一半的时候，后台线程会主动写盘。**注意，由于这个事务并没有提交，所以这个写盘动作只是 write，而没有调用 fsync，也就是只留在了文件系统的 page cache。
+2. **另一种是，并行的事务提交的时候，顺带将这个事务的 redo log buffer 持久化到磁盘。**假设一个事务 A 执行到一半，已经写了一些 redo log 到 buffer 中，这时候有另外一个线程的事务 B 提交，如果 innodb_flush_log_at_trx_commit 设置的是 1，那么按照这个参数的逻辑，事务 B 要把 redo log buffer 里的日志全部持久化到磁盘。这时候，就会带上事务 A 在 redo log buffer 里的日志一起持久化到磁盘。
+
+每秒一次后台轮询刷盘，再加上崩溃恢复这个逻辑，InnoDB 就认为 **redo log 在 commit** 的时候就不需要 fsync 了，只会 write 到文件系统的 page cache 中就够了。
+
+**mysql每执行一条DML语句都先写入 redo log buffer。**
+
+**IOPS**
+
+OPS（Input/Output Operations Per Second）是一个用于计算机存储设备（如硬盘（HDD）、固态硬盘（SSD）或存储区域网络（SAN））性能测试的量测方式，可以视为是每秒的读写次数。
+
+**1、在两阶段提交的不同时刻，MySQL 异常重启会出现什么现象？**
+
+**如果在写入 redo log 处于 prepare 阶段之后、写 binlog 之前，发生了崩溃（crash）**，由于此时 binlog 还没写，redo log 也还没提交，**所以崩溃恢复的时候，这个事务会回滚**。这时候，binlog 还没写，所以也不会传到备库。到这里，大家都可以理解。
+
+**2、如果binlog 写完，redo log 还没 commit 前发生 crash，那崩溃恢复的时候 MySQL 会怎么处理？**
+
+我们先来看一下崩溃恢复时的判断规则。
+
+1. 如果 redo log 里面的事务是完整的，也就是已经有了 commit 标识，则直接提交；
+2. 如果 redo log 里面的事务只有完整的 prepare，**则判断对应的事务 binlog 是否存在并完整**： a. 如果是，则提交事务； b. 否则，回滚事务。
+
+**3、MySQL 怎么知道 binlog 是完整的?**
+
+回答：一个事务的 binlog 是有完整格式的：
+
+- statement 格式的 binlog，最后会有 COMMIT；
+- row 格式的 binlog，最后会有一个 XID event。
+
+另外，在 MySQL 5.6.2 版本以后，还引入了 binlog-checksum 参数，用来验证 binlog 内容的正确性。对于 binlog 日志由于磁盘原因，可能会在日志中间出错的情况，MySQL 可以通过校验 checksum 的结果来发现。所以，MySQL 还是有办法验证事务 binlog 的完整性的。
+
+**4、redo log 和 binlog 是怎么关联起来的?**
+
+回答：**它们有一个共同的数据字段，叫 XID**。崩溃恢复的时候，会按顺序扫描 redo log：
+
+- 如果碰到既有 prepare、又有 commit 的 redo log，就直接提交；
+- 如果碰到只有 parepare、而没有 commit 的 redo log，就拿着 XID 去 binlog 找对应的事务。
+
+**5、处于 prepare 阶段的 redo log 加上完整 binlog，重启就能恢复，MySQL 为什么要这么设计?**
+
+回答：**其实，这个问题还是跟我们在反证法中说到的数据与备份的一致性有关**。在时刻 B，也就是 binlog 写完以后 MySQL 发生崩溃，这时候 binlog 已经写入了，之后就会被从库（或者用这个 binlog 恢复出来的库）使用。
+
+所以，在主库上也要提交这个事务。采用这个策略，主库和备库的数据就保证了一致性。
+
+**6、不引入两个日志，也就没有两阶段提交的必要了。只用 binlog 来支持崩溃恢复，又能支持归档，不就可以了？**
+
+如果说**历史原因**的话，那就是 InnoDB 并不是 MySQL 的原生存储引擎。M**ySQL 的原生引擎是 MyISAM，设计之初就有没有支持崩溃恢复。**
+
+**InnoDB 在作为 MySQL 的插件加入 MySQL 引擎家族之前，就已经是一个提供了崩溃恢复和事务支持的引擎了。**
+
+InnoDB 接入了 MySQL 后，**发现既然 binlog 没有崩溃恢复的能力，那就用 InnoDB 原有的 redo log 好了**。
+
+对于binlog来说如果要恢复的事务处于数据页的最下方，之前已经提交成功的事务是恢复不了的，属于数据页级的丢失。但是，InnoDB 引擎使用的是 WAL 技术，执行事务的时候，写完内存和日志，事务就算完成了。如果之后崩溃，要依赖于日志来恢复数据页。
+
+### Bin-log
 
 binlog是Server层实现的二进制日志,他会记录我们的cud操作。Binlog有以下几个特点： 
 
@@ -1462,16 +1605,33 @@ show variables like '%log_bin%';
 
 binlog三种格式：
 
-- **statement**：**当binlog=statement时，binlog记录的是SQL本身的语句，语句中可能有函数，比如uuid每次获取都是不一样的，这样同步slave的时候就会出现数据不一致问题
+- **statement**：当binlog=statement时，binlog记录的是SQL本身的语句，语句中可能有函数，比如uuid每次获取都是不一样的，这样同步slave的时候就会出现数据不一致问题
   1. LOAD_FILE()
   2. UUID()
   3. USER()
   4. FOUND_ROWS()
   5. SYSDATE() (除非启动时启用了 --sysdate-is-now 选项)）
-- **row：**会记录比如删除delete from table where id < 100,会记录100条删除每条id的语句，内容占用空间大
-- **mixed：**分析sql，然后决定使用哪种记录方式
+- **row：**会记录比如删除delete from table where id < 100,会记录100条被删除每条id的语句，内容占用空间大，当处理随机函数的时候记录的是本次生成的值。
+- **mixed：**分析sql，然后决定使用哪种记录方式。
 
-statement格式记录sql原句，**可能会导致主备不一致**，所以出现了row格式但是row格式也有一个缺点，就是很占空间，比如你delete语句删除1万行记录，statement格式会记录一个sql删除1万行就没了；但是使用row格式会把这1万要删除的记录都写到binlog中，这样会导致binlog占用了大量空间同时写binlog也要耗费大量IO，影响mysql的整体速度。所以MySQL出了个mixed格式，它是前面两种格式的混合。意思是MySQL自己会判断这条SQL语句是否会引起主备不一致，是的话就会使用row，否则就用statement格式也就是说上面delete语句加上了limit1，MySQL认为会引起主备不一致，它就会使用row格式记录到binlog；如果delete 1万行记录，MySQL认为不会引起主备不一致，它就会使用statement格式记录到binlog。
+statement格式记录sql原句，**可能会导致主备不一致**，所以出现了row格式但是row格式也有一个缺点，就是很占空间，比如你delete语句删除1万行记录，statement格式会记录一个sql删除1万行就没了；但是使用row格式会把这1万要删除的记录都写到binlog中，**这样会导致binlog占用了大量空间同时写binlog也要耗费大量IO**，影响mysql的整体速度。所以MySQL出了个mixed格式，它是前面两种格式的混合。**意思是MySQL自己会判断这条SQL语句是否会引起主备不一致，是的话就会使用row，否则就用statement格式也就是说上面delete语句加上了limit1**，MySQL认为会引起主备不一致，它就会使用row格式记录到binlog；如果delete 1万行记录，MySQL认为不会引起主备不一致，它就会使用statement格式记录到binlog。
+
+**binlog的写入时机**
+
+事务执行过程中，先把日志写到 binlog cache，事务提交的时候，再把 binlog cache 写到 binlog 文件中。一个事务的 binlog 是不能被拆开的，因此不论这个事务多大，也要确保一次性写入。这就涉及到了 binlog cache 的保存问题。**系统给 binlog cache 分配了一片内存，每个线程一个**，参数 binlog_cache_size 用于控制单个线程内 binlog cache 所占内存的大小。如果超过了这个参数规定的大小，就要暂存到磁盘。事务提交的时候，执行器把 binlog cache 里的完整事务写入到 binlog 中，并清空 binlog cache
+
+![image-20230820152551606](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230820152551606.png)
+
+可以看到，每个线程有自己 binlog cache，但是共用同一份 binlog 文件。
+
+- 图中的 write，指的就是指把日志写入到**文件系统的 page cache**，并没有把数据持久化到磁盘，所以速度比较快。
+- 图中的 fsync，才是将数据持久化到磁盘的操作。一般情况下，我们认为 fsync 才占磁盘的 IOPS。
+
+write 和 fsync 的时机，是由参数 sync_binlog 控制的：
+
+1. sync_binlog=0 的时候，表示每次提交事务都只 write，不 fsync；
+2. sync_binlog=1 的时候，表示每次提交事务都会执行 fsync；
+3. sync_binlog=N(N>1) 的时候，表示每次提交事务都 write，但累积 N 个事务后才 fsync。
 
 **binlong常用命令**
 
@@ -1480,8 +1640,6 @@ flush logs; #会多一个最新的bin‐log日志
 show master status; #查看最后一个bin‐log日志的相关信息 
 reset master; #清空所有的bin‐log日志 
 ```
-
-
 
 redo日志文件：如果事务提交成功，buffer pool里的数据还没来得及写入磁盘，此时系统宕机了，可以用redo日志里的数据恢复buffer pool里的缓存数据
 
@@ -1500,6 +1658,38 @@ redo日志文件：如果事务提交成功，buffer pool里的数据还没来�
 7.写入commit标记到redo日志文件里，提交事务完成，该标记为了保证事务提交后redo于binlog数据一致
 
 8.随机写入磁盘，以page为单位写入，这步做完磁盘里的数据就是最新的了
+
+**查看bin log**
+
+两种方式**mysqlbinlog命令**和**show binlog events 命令** 
+
+mysqlbinlog binlog文件地址
+
+![image-20230820173956428](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230820173956428.png)
+
+```less
+show binlog events [IN 'log_name'] [FROM pos] [LIMIT [offset,] row_count];
+```
+
+这个表示以事件的方式来查看 binlog，这里涉及到几个参数：
+
+log_name：可以指定要查看的 binlog 日志文件名，如果不指定的话，表示查看最早的 binlog 文件。
+
+pos：从哪个 pos 点开始查看，凡是 binlog 记录下来的操作都有一个 pos 点，这个其实就是相当于我们可以指定从哪个操作开始查看日志，如果不指定的话，就是从该 binlog 的开头开始查看。
+
+offset：这是是偏移量，不指定默认就是 0。
+
+row_count：查看多少行记录，不指定就是查看所有。
+
+我们来看一个简单的例子：
+
+```sql
+show binlog events in 'javaboy_logbin.000001';
+```
+
+![img](https://img-blog.csdnimg.cn/img_convert/65edbcf1100e4442d8a4735bc00ca462.png)
+
+
 
 ### general log
 
@@ -1648,13 +1838,14 @@ ALTER INDEX idx_name INVISIBLE/VISIBLE;
 
 **死锁是指两个或两个以上的事务在执行过程中，因争夺锁资源而造成的一种互相等待的现象。** 
 
-如果需要解除死锁，有一种最简单粗暴的方式，那就是找到进程id之后，直接干掉。
+解决死锁问题最简单的方法是超时，即当两个事务互相等待时，当一个等待时间超过设置的某一个阈值时，其中一个事务进行回滚，另一个等待的事务就能继续进行。
+
+第二种方式是wait-for graph（等待图）的方式来进行死锁检测。较为主动的死锁检测方式。InnoDB存储引擎就是采用的这种方式。在每个事务请求锁并发生等待时都会判断是否存在回路，若存在则有死锁，通常来说InnoDB存储引擎选择回滚undo量最小的事务。
 
 查看当前正在进行中的进程
 
 ```sql
 show processlist
-
 // 也可以使用
 SELECT * FROM information_schema.INNODB_TRX;
 // 查看正在锁的事务
@@ -1667,6 +1858,8 @@ show open tables where In_use > 0;
 show engine innodb status;
 //配置将有关所有死锁的信息打印到mysqld错误日志中。每个死锁的信息，不仅仅是最新的死锁，都记录在mysql错误日志中，完成调试后禁用此选项。
 innodb_print_all_deadlocks;
+#设置事务等待超时时间
+show variables  like  '%innodb_lock_wait_timeout%';
 ```
 
 ![img](https://segmentfault.com/img/remote/1460000038352608)
@@ -1704,13 +1897,13 @@ show variables  like  '%max_execution_time%';
 
 
 
-## MySQL 批量操作，一次插入多少行数据效率最高？
+## 12.MySQL 批量操作，一次插入多少行数据效率最高？
 
 **参考文章：**https://mp.weixin.qq.com/s/RhilSmmfmqwt_mkQUkQiGQ
 
 
 
-## Count(1)和Count(*)和Count(列)哪个快？
+## 13.Count(1)和Count(*)和Count(列)哪个快？
 
 count(星)计算所有数据中包含null值的行数
 
@@ -1728,11 +1921,11 @@ myisam的存储了表的总行数，使用count(*)不走统计，直接读取，
 
 count(列名)因为只统计不为null的，所以要遍历整个表，性能下降。
 
-## MySQL 上亿大表，如何深度优化？
+## 14.MySQL 上亿大表，如何深度优化？
 
 **参考文章：**https://mp.weixin.qq.com/s/TZSyhI1WwrtBX1W86duxuQ
 
-## 线上怎么修改列的数据类型的？
+## 15.线上怎么修改列的数据类型的？
 
 方式一:使用mysql5.6 提供的在线修改功能。
 
@@ -1740,7 +1933,7 @@ ALTER TABLE table_name change old_field_name new_field_name field_type;
 
 那么，在mysql5.5这个版本之前，这是通过临时表拷贝的方式实现的。执行ALTER语句后，会**新建**一个带有新结构的**临时表**，将原表数据全部拷贝到临时表，然后Rename，完成创建操作。这个方式过程中，原表是可读的，不可写。
 
-## 表自增id用完了怎么办
+## 16.表自增id用完了怎么办
 
 1. 正常自己设置的ID如果满了，在分配的话就会出现主键冲突错误
 
@@ -1769,7 +1962,7 @@ ALTER TABLE table_name change old_field_name new_field_name field_type;
 
 **参考文章：**http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/45%20%20%E8%87%AA%E5%A2%9Eid%E7%94%A8%E5%AE%8C%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F.md
 
-## 查找连续id的sql
+## 17.查找连续id的sql
 
 **连续的数字id-row-number()的值是相同的**
 
@@ -1799,7 +1992,7 @@ SELECT *,
 
 ```
 
-## MySQL与redis缓存的同步方案
+## 18.MySQL与redis缓存的同步方案
 
 参考文章：https://blog.csdn.net/androidstarjack/article/details/115191588
 方案1：通过MySQL自动同步刷新Redis，MySQL触发器+UDF函数实现
@@ -1813,7 +2006,7 @@ SELECT *,
 方案2：解析MySQL的binlog实现，将数据库中的数据同步到Redis
 canal是阿里巴巴旗下的一款开源项目，纯Java开发。基于数据库增量日志解析提供增量数据订阅&消费，目前主要支持了MySQL（也支持mariaDB）
 
-## **Mysql分页**
+## **19.Mysql分页**
 
 总页数公式：totalRecord是总记录数；pageSize是一页分多少条记录
 
@@ -1825,6 +2018,12 @@ limit分页公式：（curPage - 1）* pageSize，pageSize
 
 ```java
 limit (curPage - 1) * pageSize, pageSize
+```
+
+## 20.有什么命令可以分析加了什么锁？
+
+```sql
+我们可以通过 select * from performance_schema.data_locks\G; 这条语句，查看事务执行 SQL 过程中加了什么锁。
 ```
 
 

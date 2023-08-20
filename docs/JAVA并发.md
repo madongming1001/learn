@@ -1368,3 +1368,7 @@ loader.getResources(fullName);
 
 
 线程负载的CPU使用率 = 线程增量CPU的运行时间/采样线程间隔时间 * 100%
+
+# CompletableFuture
+
+参考文章：https://www.toutiao.com/article/7255939768826184229/?log_from=4a83d0f87fa51_1692508870262

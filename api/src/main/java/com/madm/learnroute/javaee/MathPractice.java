@@ -6,11 +6,13 @@ package com.madm.learnroute.javaee;
  */
 public class MathPractice {
     public static void main(String[] args) {
-        //返回最小大于给定数值的整数
+        //返回最小大于给定数值的整数 向上取整
         System.out.println(Math.ceil(11.2));
-        //返回最大小于给定数值的整数
+        //返回最大小于给定数值的整数 向下取整
         System.out.println(Math.floor(11.2));
         //返回数字四舍五入的整数
         System.out.println(Math.round(11.2));
+        //用来求 x 的 y 次幂（次方），其原型为：
+        System.out.println(Math.pow(2, 5));
     }
 }

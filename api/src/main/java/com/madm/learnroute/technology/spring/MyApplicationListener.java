@@ -1,6 +1,5 @@
 package com.madm.learnroute.technology.spring;
 
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
