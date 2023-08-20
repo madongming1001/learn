@@ -2479,7 +2479,7 @@ Spring 为 Resource 接口提供了如下实现类：
 
 # springAOP和AspectJ有关系吗？
 
-**AOP是通过“预编译方式”和“运行期间动态代理”实现程序功能的统一维护的一种技术。AOP是一个概念，其实现技术有AspectJ和springAOP**。
+**AOP是通过“预编译方式”和“运行期间动态代理”实现程序功能的	统一维护的一种技术。AOP是一个概念，其实现技术有AspectJ和springAOP**。
 
 ### 1、AspectJ
 

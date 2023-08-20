@@ -6,7 +6,12 @@
   经过分析器分析后，MySQL会对SQL请求进行优化器的处理，优化器对**语句索引**、**连接顺序**等情况判断，决定使用哪种执行方案最合适。
   最后，就到了执行器的阶段，执行器根据表的引擎定义，去调用引擎接口，执行SQL语句。
 
+**并且`FORMAT`新增`TREE`格式**。通过EXPLAIN展示的信息我们可以了解到**表查询的顺序**，**表连接的方式**等，并根据这些信息判断语句执行效率，决定是否添加索引或改写SQL语句优化表连接方式以提高执行效率。
+EXPLAIN语法如下：
 
+```sql
+explain format='TREE' sql语句
+```
 
 ## Explain（执行计划）
 
@@ -35,11 +40,11 @@ set session optimizer_switch='derived_merge=on'; #关闭mysql5.7新特性对衍�
 1. **explain**：会在 explain 的基础上额外提供一些查询优化的信息。紧随其后通过 show warnings 命令可 以得到优化后的查询语句，从而看出优化器优化了什么。额外还有 filtered 列，是一个半分比的值，rows filtered/100 可以**估算**出将要和 explain 中前一个表进行连接的行数（前一个表指 explain 中的id值比当前表id值小的 表）
 2. **explain partitions**：相比 explain 多了个 partitions 字段，如果查询是基于分区表的话，会显示查询将访问的分 区。
 
-#### **ID列**
+### **ID列**
 
 Id列越大执行优先级越高，id相同则从上往下执行，id为NULL最后执行。
 
-#### **Select_type列**
+### **Select_type列**
 
 | select_type值        | 含义                                                 |
 | :------------------- | :--------------------------------------------------- |
@@ -55,15 +60,15 @@ Id列越大执行优先级越高，id相同则从上往下执行，id为NULL最�
 | UNCACHEABLE SUBQUERY | 结果集无法缓存的子查询，必须重新评估外部查询的每一行 |
 | UNCACHEABLE UNION    | UNION中第二个或之后的SELECT，属于无法缓存的子查询    |
 
-#### **table列**
+### **table列**
 
 显示explain正在执行哪一张表
 
-#### partitions
+### partitions
 
 该列显示的为分区表命中的分区情况。非分区表该字段为空（null）。
 
-#### type列
+### type列
 
 常见的
 
@@ -73,25 +78,25 @@ Id列越大执行优先级越高，id相同则从上往下执行，id为NULL最�
 2. system,const：**表中只有一行数据或者是空表**，这是const类型的一个特例。且只能用于myisam和memory表。**如果是Innodb引擎表，type列在这个情况通常都是all或者index**。
 2. const :最多只有一行记录匹配。当联合主键或唯一索引的所有字段跟常量值比较时，join类型为const。其他数据库也叫做唯一索引扫描。
 3. eq_ref：primary key 或 unique key 索引的所有部分被连接使用 ，最多只会返回一条符合条件的记录。这可能是在 const 之外最好的联接类型了，简单的 select 查询不会出现这种 type。
-4. ref：对于来自前面表的每一行，在此表的索引中可以匹配到多行。相比 eq_ref，不使用唯一索引，而是使用普通索引或者唯一性索引的部分前缀，索引要和某个值相比较，可能会找到多个符合条件的行。
+4. ref：对于来自前面表的每一行，在此表的索引中可以匹配到多行。相比 eq_ref，不使用唯一索引，而是使用普通索引或者唯一性索引的部分前缀，索引要和某个值相比较，可能会找到多个符合条件的行。辅助索引
 5. range：范围扫描通常出现在 in(), between ,> ,<, >= 等操作中。使用一个索引来检索给定范围的行。
 6. index：扫描全索引就能拿到结果，一般是扫描某个二级索引，这种扫描不会从索引树根节点开始快速查找，而是直接对二级索引的叶子节点遍历和扫描，速度还是比较慢的，这种查询一般为使用**覆盖索引**，二级索引一般比较小，所以这种通常比ALL快一些。
 7. ALL：即全表扫描，扫描你的聚簇索引的所有叶子节点。通常情况下这需要增加索引来进行优化了。
 
-#### possible_keys列
+### possible_keys列
 
 显示了MySQL在查找当前表中数据的时候可能使用到的索引，实际意义不大。
 
-#### key列
+### key列
 
 实际使用的索引，如果为NULL，则没有使用索引。如果想强制mysql使用或忽视possible_keys列中的索引，在查询中使用 **force index**、**ignore index**。 
 
-#### key_len列
+### key_len列
 
 这一列显示了mysql在索引里使用的字节数，通过这个值可以算出具体使用了索引中的哪些列。
 
 显示了MySQL实际使用索引的大小，单位字节。可以通过key_len的大小判断评估复合索引使用了哪些部分。
-几种常见字段类型索引长度大小如下，假设字符编码为utf8mb4：如果字段允许为NULL，则需要额外增加一个字节；
+几种常见字段类型索引长度大小如下，假设字符编码为utf8mb4：**如果字段允许为NULL，则需要额外增加一个字节**；
 字符型：
 char(n)：4n个字节（中文四字节，英文一个字节）
 varchar(n)：4n+2个字节（中文四字节，英文一个字节）
@@ -110,19 +115,19 @@ timestamp：4个字节+秒精度字节 时间到2039年
 
 索引最大长度是768字节，当字符串过长时，mysql会做一个类似左前缀索引的处理，将前半部分的字符提取出来做索引。
 
-#### ref列
+### ref列
 
 这一列显示了在key列记录的索引中，**表查找值所用到的列或常量**，常见的有：const（常量），字段名（例：film.id） 
 
-#### rows列
+### rows列
 
 这是mysql估算的需要扫描的行数（不是精确值）。这个值非常直观显示 SQL的效率好坏, 原则上rows越少越好。
 
-#### filtered
+### filtered
 
 这个字段表示存储引擎返回的数据在server层过滤后，**剩下多少满足查询的记录数量的比例**，注意是百分比，不是具体记录数。
 
-#### Extra列
+### Extra列
 
 这一列展示的是额外信息。常见的重要值如下： 
 
@@ -159,6 +164,10 @@ timestamp：4个字节+秒精度字节 时间到2039年
   MySQL需要对获取的数据进行额外的一次排序操作，无法通过索引的排序完成。通常发生在有ORDER BY子句的语句当中。
 
 **mysql8.0执行计划 参考文章：**https://developer.aliyun.com/article/712421
+
+
+
+
 
 
 
@@ -344,7 +353,7 @@ Double Write 分为了两个组成部分：
 
 ​		InnoDB存储引擎除了我们前面所说的各种索引，还有一种自适应哈希索引，我们知道B+树的查找次数,取决于B+树的高度,在生产环境中,B+树的高度一般为3~4层,故 需要3~4次的IO查询。 
 
-​		**InnoDB存储引擎会监控对表上各索引页的查询**。如果观察到建立哈希索引可以带来速度提升，则建立哈希索引，称之为自适应哈希索引（Adaptive Hash Index，AHI）。AHI是通过缓冲池的B+树页构造而来，因此几哪里的速度很快，而且不需要对整张表构建哈希索引。**InnoDB存储引擎会自动根据访问的频率和模式来自动地为某些热点页建立哈希索引。**	
+​		**InnoDB存储引擎会监控对表上各索引页的查询**。如果观察到建立哈希索引可以带来速度提升，则建立哈希索引，称之为自适应哈希索引（Adaptive Hash Index，AHI）。AHI是通过缓冲池的B+树页构造而来，因此建立的速度很快，而且不需要对整张表构建哈希索引。**InnoDB存储引擎会自动根据访问的频率和模式来自动地为某些热点页建立哈希索引。**	
 
 ​		AHI有一个要求，即对这个页的连续访问模式必须是一样的。例如对于（a，b）这样的联合索引页，其访问模式可以是以下的情况：
 
@@ -526,7 +535,7 @@ ERROR 1142 (42000): SELECT command denied to user 'b'@'localhost' for table 'T'
 2. 调用引擎接口取“下一行”，重复相同的判断逻辑，直到取到这个表的最后一行。
    1. 执行器将上述遍历过程中所有满足条件的行组成的记录集作为结果集返回给客户端。
 
-#### 索引使用情况（mysql5.6引入索引下推）
+**索引使用情况（mysql5.6引入索引下推）**
 
 1、联合索引第一个字段用范围不会走索引
 
@@ -582,7 +591,7 @@ by的优化如果不需要排序的可以加上**order by null禁止排序**。�
 
 
 
-#### 索引原则
+**索引原则**
 
 1、代码先行，索引后上
 
@@ -598,7 +607,7 @@ by的优化如果不需要排序的可以加上**order by null禁止排序**。�
 
 
 
-#### sql 慢查询
+### sql 慢查询
 
 MySQL的慢查询，全名是**慢查询日志**，是MySQL提供的一种日志记录，用来记录在MySQL中**响应时间超过阀值**的语句。
 
@@ -632,11 +641,13 @@ MySQL提供了日志分析工具`mysqldumpslow`
 
 
 
-# **Mysql常见的几种算法**
+# **join算法**
 
-参考文章：http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/35%20%20join%E8%AF%AD%E5%8F%A5%E6%80%8E%E4%B9%88%E4%BC%98%E5%8C%96%EF%BC%9F.md
+**参考文章：**http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/35%20%20join%E8%AF%AD%E5%8F%A5%E6%80%8E%E4%B9%88%E4%BC%98%E5%8C%96%EF%BC%9F.md
 
-##  Index Nested-Loop Join 算法
+**参考文章：**https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%98%E5%AE%9D%E5%85%B8/12%20%20JOIN%20%E8%BF%9E%E6%8E%A5%EF%BC%9A%E5%88%B0%E5%BA%95%E8%83%BD%E4%B8%8D%E8%83%BD%E5%86%99%20JOIN%EF%BC%9F.md
+
+##  Nested Loop Join 算法
 
 **拿驱动表的条件索引去被驱动表根据索引找就叫做Index Nested-Loop Join**
 
@@ -648,13 +659,7 @@ select * from t1 straight_join t2 on (t1.a=t2.a);
 
 如果直接使用 join 语句，MySQL 优化器可能会选择表 t1 或 t2 作为驱动表，这样会影响我们分析 SQL 语句的执行过程。所以，为了便于分析执行过程中的性能问题，我改用 straight_join 让 MySQL 使用固定的连接方式执行查询，这样优化器只会按照我们指定的方式去 join。在这个语句里，t1 是驱动表，t2 是被驱动表。
 
-现在，我们来看一下这条语句的 explain 结果。
-
-![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/4b9cb0e0b83618e01c9bfde44a0ea990.png)
-
-图 1 使用索引字段 join 的 explain 结果
-
-可以看到，在这条语句里，被驱动表 t2 的字段 a 上有索引，join 过程用上了这个索引，因此这个语句的执行流程是这样的：
+在这条语句里，被驱动表 t2 的字段 a 上有索引，join 过程用上了这个索引，因此这个语句的执行流程是这样的：
 
 1. 从表 t1 中读入一行数据 R；
 2. 从数据行 R 中，取出 a 字段到表 t2 里去查找；
@@ -663,13 +668,7 @@ select * from t1 straight_join t2 on (t1.a=t2.a);
 
 这个过程是先遍历表 t1，然后根据从表 t1 中取出的每行数据中的 a 值，去表 t2 中查找满足条件的记录。在形式上，这个过程就跟我们写程序时的嵌套查询类似，并且可以用上被驱动表的索引，所以我们称之为“Index Nested-Loop Join”，简称 NLJ。
 
-## Simple Nested-Loop Join
-
-**驱动表索引去驱动表用不上索引的情况。**
-
-每一次别驱动表都需要做全表扫描，负担太大没有使用
-
-## Block Nested-Loop Join
+## Block Nested Loop Join
 
 被驱动表上没有可用的索引，算法的流程是这样的：
 
@@ -680,7 +679,7 @@ select * from t1 straight_join t2 on (t1.a=t2.a);
 
 可以看到，在这个过程中，对表 t1 和 t2 都做了一次全表扫描，因此总的扫描行数是 1100。由于 join_buffer 是以无序数组的方式组织的，因此对表 t2 中的每一行，都要做 100 次判断，总共需要在内存中做的判断次数是：100*1000=10 万次。
 
-然后，你可能马上就会问了，这个例子里表 t1 才 100 行，要是表 t1 是一个大表，join_buffer 放不下怎么办呢？join_buffer 的大小是由参数 join_buffer_size 设定的，默认值是 256k。如果放不下表 t1 的所有数据话，策略很简单，就是分段放。我把 join_buffer_size 改成 1200，再执行：
+然后，你可能马上就会问了，这个例子里表 t1 才 100 行，要是表 t1 是一个大表，join_buffer 放不下怎么办呢？join_buffer 的大小是由参数 join_buffer_size 设定的，默认值是 256k。**如果放不下表 t1 的所有数据话，策略很简单，就是分段放**。我把 join_buffer_size 改成 1200，再执行：
 
 ```sql
 select * from t1 straight_join t2 on (t1.a=t2.b);
@@ -713,7 +712,7 @@ select * from t1 straight_join t2 on (t1.a=t2.b);
 
 ## Multi-Range Read 优化 (MRR)
 
-**在二级索引进行回表查询的时候，这个优化的主要目的是尽量使用顺序读盘。**
+**这个优化的主要目的是尽量使用顺序读盘。如果数据已经加载在bufferpool中，那么MRR主要是为了减少这个回表的次数，如果数据在bufferpool中不存在，那么不仅仅减少了回表的次数，同时也减少了随机IO，减少磁盘的交互数**
 
 ```sql
 create table t1(id int primary key, a int, b int, index(a));
@@ -732,33 +731,21 @@ select** * **from** t1 **where** a>=1 **and** a<=100;
 show variables like '%read_rnd_buffer_size%';
 ```
 
-**另外需要说明的是，如果你想要稳定地使用 MRR 优化的话，需要设置`set optimizer_switch="mrr_cost_based=off"`。（官方文档的说法，是现在的优化器策略，判断消耗的时候，会更倾向于不使用 MRR，把 mrr_cost_based 设置为 off，就是固定使用 MRR 了。）**
+**另外需要说明的是，如果你想要稳定地使用 MRR 优化的话，需要设置`set optimizer_switch="mrr_cost_based=off"`。（官方文档的说法，是现在的优化器策略，判断消耗的时候，会更倾向于不使用 MRR，把 mrr_cost_based 设置为 off，就是固定使用 MRR 了。）**8.0的时候默认开启
 
 **MRR 能够提升性能的核心**在于，这条查询语句在索引 a 上做的是一个范围查询（也就是说，这是一个多值查询），可以得到足够多的主键 id。这样通过排序以后，再去主键索引查数据，才能体现出“顺序性”的优势。
 
-## Batched Key Access
+## Batched Key Access （8.0禁用）
 
 理解了 MRR 性能提升的原理，我们就能理解 MySQL 在 5.6 版本后开始引入的 Batched Key Access(BKA) 算法了。这个 BKA 算法，其实就是对 NLJ 算法的优化。
-
-我们再来看看上一篇文章中用到的 NLJ 算法的流程图：
-
-![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/10e14e8b9691ac6337d457172b641a3d.jpg)
-
-图 4 Index Nested-Loop Join 流程图
 
 NLJ 算法执行的逻辑是：从驱动表 t1，一行行地取出 a 的值，再到被驱动表 t2 去做 join。也就是说，对于表 t2 来说，每次都是匹配一个值。这时，MRR 的优势就用不上了。
 
 那怎么才能一次性地多传些值给表 t2 呢？方法就是，从表 t1 里一次性地多拿些行出来，一起传给表 t2。
 
-既然如此，我们就把表 t1 的数据取出来一部分，先放到一个临时内存。这个临时内存不是别人，就是 join_buffer。
+既然如此，我们就把表 t1 的数据取出来一部分，先放到一个临时内存。这个临时内存不是别人，就是 **join_buffer**。
 
 通过上一篇文章，我们知道 join_buffer 在 BNL 算法里的作用，是暂存驱动表的数据。但是在 NLJ 算法里并没有用。那么，我们刚好就可以复用 join_buffer 到 BKA 算法中。
-
-如图 5 所示，是上面的 NLJ 算法优化后的 BKA 算法的流程。
-
-![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/31d85666542b9cb0b47a447a8593a47e.jpg)
-
-图 5 Batched Key Access 流程
 
 图中，我在 join_buffer 中放入的数据是 P1~P100，表示的是只会取查询需要的字段。当然，如果 join buffer 放不下 P1~P100 的所有数据，就会把这 100 行数据分成多段执行上图的流程。
 
@@ -770,19 +757,21 @@ NLJ 算法执行的逻辑是：从驱动表 t1，一行行地取出 a 的值，�
 set optimizer_switch='mrr=on,mrr_cost_based=off,batched_key_access=on';
 ```
 
-其中，前两个参数的作用是要启用 MRR。这么做的原因是，BKA 算法的优化要依赖于 MRR。理解了 MRR 性能提升的原理，我们就能理解 MySQL 在 **5.6 版本后**开始引入的 Batched Key Access(BKA) 算法了。这个 BKA 算法，其实就是对 NLJ 算法的优化。
+其中，前两个参数的作用是要启用 MRR。这么做的原因是，BKA 算法的优化要依赖于 MRR。理解了 MRR 性能提升的原理，我们就能理解 MySQL 在 **5.6 版本后**开始引入的 Batched Key Access(BKA) 算法了。这个 BKA 算法，其实就是对 NLJ 算法的优化。 8.0默认关闭
+
+```sql
+show variables like '%optimizer_switch%';
+```
 
 **问题：查询虚拟列会导致sql显示不了**
 
 **参考文章：**https://blog.csdn.net/bczzm/article/details/100577819
 
-## BNL 算法的性能问题
+## Block Nested Loop 算法的性能问题
 
-说完了 NLJ 算法的优化，我们再来看 BNL 算法的优化。
+使用 Block Nested-Loop Join(BNL) 算法时，可能会对被驱动表做多次扫描。如果这个被驱动表是一个大的冷数据表，除了会导致 IO 压力大以外，还会对系统有什么影响呢？
 
-我在上一篇文章末尾，给你留下的思考题是，使用 Block Nested-Loop Join(BNL) 算法时，可能会对被驱动表做多次扫描。如果这个被驱动表是一个大的冷数据表，除了会导致 IO 压力大以外，还会对系统有什么影响呢？
-
-在[第 33 篇文章]中，我们说到 InnoDB 的 LRU 算法的时候提到，由于 InnoDB 对 Bufffer Pool 的 LRU 算法做了优化，即：第一次从磁盘读入内存的数据页，会先放在 old 区域。如果 1 秒之后这个数据页不再被访问了，就不会被移动到 LRU 链表头部，这样对 Buffer Pool 的命中率影响就不大。
+我们说到 InnoDB 的 LRU 算法的时候提到，由于 InnoDB 对 Bufffer Pool 的 LRU 算法做了优化，即：第一次从磁盘读入内存的数据页，会先放在 old 区域。如果 1 秒之后这个数据页不再被访问了，就不会被移动到 LRU 链表头部，这样对 Buffer Pool 的命中率影响就不大。
 
 但是，如果一个使用 BNL 算法的 join 语句，多次扫描一个冷表，而且这个语句执行时间超过 1 秒，就会在再次扫描冷表的时候，把冷表的数据页移到 LRU 链表头部。
 
@@ -791,13 +780,13 @@ set optimizer_switch='mrr=on,mrr_cost_based=off,batched_key_access=on';
 1. 如果冷表数据能完全融入Buffer Pool old区的话，由于多次扫描冷表导致sql执行时间超过1秒，就会把冷表的数据页移到LRU链表头部。
 2. 如果这个冷表很大，就会出现另外一种情况：业务正常访问的数据页，没有机会进入 young 区域。
 
-由于优化机制的存在，一个正常访问的数据页，要进入 young 区域，需要隔 1 秒后再次被访问到。但是，由于我们的 join 语句在循环读磁盘和淘汰内存页，进入 old 区域的数据页，很可能在 1 秒之内就被淘汰了。这样，就会导致这个 MySQL 实例的 Buffer Pool 在这段时间内，young 区域的数据页没有被合理地淘汰。
+由于优化机制的存在，一个正常访问的数据页，要进入 young 区域，需要隔 1 秒后再次被访问到。但是，由于我们的 join 语句在**循环读磁盘和淘汰内存页**，进入 old 区域的数据页，很可能在 1 秒之内就被淘汰了。这样，就会导致这个 MySQL 实例的 Buffer Pool 在这段时间内，young 区域的数据页没有被合理地淘汰。
 
 也就是说，这两种情况都会影响 Buffer Pool 的正常运作。
 
 **大表 join 操作虽然对 IO 有影响，但是在语句执行结束后，对 IO 的影响也就结束了。但是，对 Buffer Pool 的影响就是持续性的，需要依靠后续的查询请求慢慢恢复内存命中率。**
 
-为了减少这种影响，你可以考虑增大 join_buffer_size 的值，减少对被驱动表的扫描次数。
+为了减少这种影响，你可以考虑**增大 join_buffer_size 的值**，减少对被驱动表的扫描次数。或者调整进入热表的时间 调整为5秒什么的
 
 也就是说，BNL 算法对系统的影响主要包括三个方面：
 
@@ -807,7 +796,7 @@ set optimizer_switch='mrr=on,mrr_cost_based=off,batched_key_access=on';
 
 我们执行语句之前，需要通过理论分析和查看 explain 结果的方式，确认是否要使用 BNL 算法。如果确认优化器会使用 BNL 算法，就需要做优化。优化的常见做法是，给被驱动表的 join 字段加上索引，把 BNL 算法转成 BKA 算法。
 
-## BNL 转 BKA 
+## Block Nested Loop 转 Batched Key Access 
 
 一些情况下，我们可以直接在被驱动表上建索引，这时就可以直接转成 BKA 算法了。
 
@@ -828,14 +817,6 @@ select * from t1 join t2 on (t1.b=t2.b) where t2.b>=1 and t2.b<=2000;
 
 我在上一篇文章中说过，对于表 t2 的每一行，判断 join 是否满足的时候，都需要遍历 join_buffer 中的所有行。因此判断等值条件的次数是 1000*100 万 =10 亿次，这个判断的工作量很大。
 
-![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/92fbdbfc35da3040396401250cb33f60.png)
-
-图 6 explain 结果
-
-![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/d862bc3e88305688df2c354a4b26809c.png)
-
-图 7 语句执行时间
-
 可以看到，explain 结果里 Extra 字段显示使用了 BNL 算法。在我的测试环境里，这条语句需要执行 1 分 11 秒。
 
 在表 t2 的字段 b 上创建索引会浪费资源，但是不创建索引的话这个语句的等值条件要判断 10 亿次，想想也是浪费。那么，有没有两全其美的办法呢？
@@ -843,7 +824,7 @@ select * from t1 join t2 on (t1.b=t2.b) where t2.b>=1 and t2.b<=2000;
 这时候，我们可以考虑使用临时表。使用临时表的大致思路是：
 
 1. 把表 t2 中满足条件的数据放在临时表 tmp_t 中；
-2. 为了让 join 使用 BKA 算法，给临时表 tmp_t 的字段 b 加上索引；
+2. 为了让 join 使用 Batched Key Access  算法，给临时表 tmp_t 的字段 b 加上索引；
 3. 让表 t1 和 tmp_t 做 join 操作。
 
 此时，对应的 SQL 语句的写法如下：
@@ -854,34 +835,14 @@ insert into temp_t select * from t2 where b>=1 and b<=2000;
 select * from t1 join temp_t on (t1.b=temp_t.b);
 ```
 
-图 8 就是这个语句序列的执行效果。
-
-![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/a80cdffe8173fa0fd8969ed976ac6ac7.png)
-
-图 8 使用临时表的执行效果
-
 可以看到，整个过程 3 个语句执行时间的总和还不到 1 秒，相比于前面的 1 分 11 秒，性能得到了大幅提升。接下来，我们一起看一下这个过程的消耗：
 
 1. 执行 insert 语句构造 temp_t 表并插入数据的过程中，对表 t2 做了全表扫描，这里扫描行数是 100 万。
 2. 之后的 join 语句，扫描表 t1，这里的扫描行数是 1000；join 比较过程中，做了 1000 次带索引的查询。相比于优化前的 join 语句需要做 10 亿次条件判断来说，这个优化效果还是很明显的。
 
-总体来看，不论是在原表上加索引，还是用有索引的临时表，我们的思路都是让 join 语句能够用上被驱动表上的索引，来触发 BKA 算法，提升查询性能。
+总体来看，**不论是在原表上加索引**，**还是用有索引的临时表**，我们的思路都是让 join 语句能够用上被驱动表上的索引，来触发 BKA 算法，提升查询性能。
 
-## 扩展 -hash join
-
-看到这里你可能发现了，其实上面计算 10 亿次那个操作，看上去有点儿傻。如果 join_buffer 里面维护的不是一个无序数组，而是一个哈希表的话，那么就不是 10 亿次判断，而是 100 万次 hash 查找。这样的话，整条语句的执行速度就快多了吧？
-
-确实如此。
-
-这，也正是 MySQL 的优化器和执行器一直被诟病的一个原因：不支持哈希 join。并且，MySQL 官方的 roadmap，也是迟迟没有把这个优化排上议程。
-
-实际上，这个优化思路，我们可以自己实现在业务端。实现流程大致如下：
-
-1. `select * from t1;`取得表 t1 的全部 1000 行数据，在业务端存入一个 hash 结构，比如 C++ 里的 set、PHP 的数组这样的数据结构。
-2. `select * from t2 where b>=1 and b<=2000;` 获取表 t2 中满足条件的 2000 行数据。
-3. 把这 2000 行数据，一行一行地取到业务端，到 hash 结构的数据表中寻找匹配的数据。满足匹配的条件的这行数据，就作为结果集的一行。
-
-
+# order原理
 
 ## 全字段排序
 
@@ -961,8 +922,9 @@ sort_mode 里面的 packed_additional_fields 的意思是，排序过程对字�
 
 接下来，我来修改一个参数，让 MySQL 采用另外一种算法。
 
-```java
-SET max_length_for_sort_data = 16;
+```sql
+#默认 4096
+SET max_length_for_sort_data = 16; 
 ```
 
 **max_length_for_sort_data，是 MySQL 中专门控制用于排序的行数据的长度的一个参数。它的意思是，如果单行的长度超过这个值，MySQL 就认为单行太大，要换一个算法。**
@@ -1018,7 +980,7 @@ city、name、age 这三个字段的定义总长度是 36，我把 max_length_fo
 
 这也就体现了 MySQL 的一个设计思想：**如果内存够，就要多利用内存，尽量减少磁盘访问。**
 
-对于 InnoDB 表来说，rowid 排序会要求回表多造成磁盘读，因此不会被优先选择。
+对于 InnoDB 表来说，**rowid 排序会要求回表多造成磁盘读**，因此不会被优先选择。
 
 这个结论看上去有点废话的感觉，但是你要记住它，下一篇文章我们就会用到。
 
@@ -1037,8 +999,6 @@ alter table t add index city_user(city, name);
 ```
 
 作为与 city 索引的对比，我们来看看这个索引的示意图。
-
-![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/f980201372b676893647fb17fac4e2bf.png)
 
 图 7 city 和 name 联合索引示意图
 
@@ -1163,6 +1123,8 @@ count(**) 是例外，mysql并不会把全部字段取出来，而是专门做�
 
   　　**快照视图读取的数据不足以支撑接下来的业务操作。**快照读视图里面发现没有要插入的数据，然后进行insert的时候发现提示数据已存在，这种情况下就叫幻读。**明明按照第一次快照视图里面没有该数据，自己插入确失败了，以为自己看错了刚才的视图数据，这就是所谓的幻读。**
 
+  **当同一个查询在不同的时间产生不同的行集时，事务中就会出现所谓的幻影问题。**例如，如果SELECT执行了两次，但第二次返回的行不是第一次返回的，那么该行就是“幻影”行。
+
   **参考文章：**https://segmentfault.com/a/1190000016566788
 
   一句话就是事务A添加以为没有的数据其实事务B已经添加完成了，所以出现了错误。
@@ -1191,7 +1153,7 @@ count(**) 是例外，mysql并不会把全部字段取出来，而是专门做�
 
   锁是计算机协调多个进程货线程并发访问某一资源的机制。
 
-  ##### **锁分类*
+  ##### *锁分类*
 
   - 从性能上分为乐观锁(用版本对比来实现)和悲观锁
 
@@ -1202,7 +1164,7 @@ count(**) 是例外，mysql并不会把全部字段取出来，而是专门做�
     写锁（排它锁，X锁(Exclusive)）：当前写操作没有完成前，它会阻断其他写锁和读锁
 
   - 从对数据操作的粒度分，分为表锁和行锁
-
+  
   
   
   **表锁**
@@ -1233,11 +1195,17 @@ unlock tables
 
 ## MVCC多版本并发控制机制
 
+**MVCC 是一种并发控制机制，用于在多个并发事务同时读写数据库时保持数据的一致性和隔离性。它是通过在每个数据行上维护多个版本的数据来实现的。**
+
 **Mysql在可重复读隔离级别下如何保证事务较高的隔离性，同样的sql查询语句在一个事务里多次执行查询结果相同，就算其它事务对数据有修改也不会影响当前事务sql语句的查询结果。**
 
-这个隔离性就是靠MVCC(**Multi-Version Concurrency Control**)机制来保证的，对一行数据的读和写两个操作默认是不会通过加锁互斥来保证隔离性，避免了频繁加锁互斥，而在串行化隔离级别为了保证较高的隔离性是通过将所有操作加锁互斥来实现的。
+**为了防止数据库中的版本无限增长，MVCC 会定期进行版本的回收。回收机制会删除已经不再需要的旧版本数据，从而释放空间。purge线程**
+
+这个隔离性就是靠MVCC(**Multi-Version Concurrency Control**)机制来保证的，对一行数据的读和写两个操作默认是不会通过加锁互斥来保证隔离性，避免了频繁加锁互斥，**而在串行化隔离级别为了保证较高的隔离性是通过将所有操作加锁互斥来实现的。**
 
 InnoDB 的行数据有多个版本，每个数据版本有自己的 row trx_id，每个事务或者语句有自己的一致性视图。普通查询语句是一致性读，一致性读会根据 row trx_id 和一致性视图确定数据版本的可见性。
+
+[幻读（Phantom Reads）](#幻读（Phantom Reads）)
 
 **Mysql在读已提交和可重复读隔离级别下都实现了MVCC机制。**
 
@@ -1245,9 +1213,11 @@ InnoDB 的行数据有多个版本，每个数据版本有自己的 row trx_id�
 
 **Read View生成的时间**
 
-第一种启动方式，一致性视图是在第执行第一个快照读语句时创建的；
+第一种begin /start transation启动方式，一致性视图是在执行第一个快照读语句时创建的；
 
-第二种启动方式，一致性视图是在执行 start transaction with consistent snapshot 时创建的。
+第二种启动方式，一致性视图是在执行start transaction with consistent snapshot 时创建的。
+
+**begin/start transaction 命令并不是一个事务的起点，在执行到它们之后的第一个操作 InnoDB 表的语句，事务才真正启动。如果你想要马上启动一个事务，可以使用 start transaction with consistent snapshot 这个命令。**
 
 **undo日志版本链与read view机制详解**
 
@@ -1271,13 +1241,11 @@ undo日志版本链是指一行数据被多个事务依次修改过后，在每�
 
   b. 若 row 的 trx_id 不在视图数组中，表示这个版本是已经提交了的事务生成的，可见。
 
-对于删除的情况可以认为是update的特殊情况，会将版本链上最新的数据复制一份，然后将trx_id修改成删除操作的trx_id，同时在该条记录的头信息（record header）里的（deleted_flag）标记位写上true，来表示当前记录已经被删除，在查询时按照上面的规则查到对应的记录如果delete_flag标记位为true，意味着记录已被删除，则不返回数据。
+对于删除的情况可以认为是update的特殊情况，会将版本链上最新的数据复制一份，然后将trx_id修改成删除操作的trx_id，同时在该条记录的头信息（record header）里的（deleted_flag）标记位写上true，来表示当前记录已经被删除，在查询时按照上面的规则查到对应的记录如果delete_flag标记位为true，**意味着记录已被删除，则不返回数据。**
 
 **注意：**begin/start transaction 命令并不是一个事务的起点，在执行到它们之后的第一个修改操作InnoDB表的语句，事务才真正启动，才会向mysql申请事务id，mysql内部是严格按照事务的启动顺序来分配事务id的。
 
-**当前读和快照读**
-
-正常情况下是快照读，但是使用lock in share mode 或 for update就会变成当前读，在使用select进行查询，之后同一事务进行update的时候，insert、update、delete是快照读，原则是**更新数据都是先读后写的，而这个读，只能读当前的值，称为“当前读”（current read），如果当前的记录的行锁被其他事务占用的话，就需要进入锁等待。**
+**事务查询查询之后再更新数据就不能是在历史版本上更新了，更新数据都是先读后写的，而这个读，只能读当前的值，称为“当前读”（current read）。而事务更新数据的时候，只能用当前读。如果当前的记录的行锁被其他事务占用的话，就需要进入锁等待。**
 
 **而读提交的逻辑和可重复读的逻辑类似，它们最主要的区别是：**
 
@@ -1288,23 +1256,31 @@ undo日志版本链是指一行数据被多个事务依次修改过后，在每�
 
 MVCC机制的实现就是通过read-view机制与undo版本链比对机制，使得不同的事务会根据数据版本链对比规则读取同一条数据在版本链上的不同版本数据。
 
-#### 行锁(Record Lock)
+### 行锁(Record Lock)
 
 锁定单个行记录上的锁，如果没有设置任何索引会使用隐式的主键进行锁定。
 
-#### 间隙锁(Gap Lock)
+### 间隙锁(Gap Lock)
 
 锁定一个范围，但不包括记录本身，是为了阻止多个事务将记录插入到同一个范围内。
 
-#### 临键锁(Next-key Locks)
+**关闭Gap Lock两种方式：**
 
-Gap Lock+Record Lock，锁定一个范围，并且锁定记录本身，当查询的索引含有**唯一属性**时，会对next-key lock进行优化，将其降级为Record Lock锁。
+1、将事务的隔离级别设置为**READ COMMITTED**
 
-**当查询的索引是辅助索引时，记录本身既拥有聚集索引也拥有辅助索引，Next-key lock会对主键索引加上Record lock锁，然后对于辅助索引加上左闭右闭Gap Lock**
+2、将参数**log_statements_unsafe_for_binlog**设置为off 默认开启
+
+### 临键锁(Next-key Locks)
+
+Gap Lock+Record Lock，锁定一个范围，并且锁定记录本身，当查询的索引含有**唯一属性**时，会对next-key lock进行优化，将其降级为Record Lock锁。不能是联合索引，如果是还是会用next-key lock锁定。
+
+**当查询的索引是辅助索引时，记录本身既拥有聚集索引也拥有辅助索引，Next-key lock会对主键索引加上Record lock锁，然后对于辅助索引加上前闭后闭Gap Lock，并同时还会对辅助索引下一个键值对加上gap lock**
+
+数组的前闭后开、前闭后闭，**[ , ]中括号表示能取得这个数,称为“闭” ( , )小括号表示不能取到这个数，称为“开”。**
 
 InnoDB存储引擎默认的事务隔离级别是Repeatable Read，在该隔离级别下，其采用Next-Key Locking的方式来加锁。而在事务隔离级别Read Committed下，其仅采用Record Lock。
 
-#### BufferPool
+# sql执行流程
 
 ​    ![0](https://note.youdao.com/yws/public/resource/b36b975188fadf7bfbfd75c0d2d6b834/xmlnote/9C296B9BBF3C4C0389F470357FC55FE9/99001)
 
@@ -1356,13 +1332,13 @@ redo log 用于保证 crash-safe 能力。**innodb_flush_log_at_trx_commit** 这
 
 **sync_binlog** 这个参数设置成 1 的时候，表示每次事务的 binlog 都持久化到磁盘。这个参数我也建议你设置成 1，这样可以保证 MySQL 异常重启之后 binlog 不丢失。
 
-#### 日志文件
+## 日志文件
 
-##### Undo log
+### Undo log
 
 回滚行记录到某个特定版本
 
-##### Redo log
+### Redo log
 
 恢复事务提交修改的页操作，两部分组成：
 
@@ -1469,7 +1445,7 @@ write pos 和 checkpoint 之间的是“粉板”上还空着的部分，可以�
 
 **参考文章：**http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/02%20%20%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%80%E6%9D%A1SQL%E6%9B%B4%E6%96%B0%E8%AF%AD%E5%8F%A5%E6%98%AF%E5%A6%82%E4%BD%95%E6%89%A7%E8%A1%8C%E7%9A%84%EF%BC%9F.md
 
-##### Bin-log
+### bin-log
 
 binlog是Server层实现的二进制日志,他会记录我们的cud操作。Binlog有以下几个特点： 
 
@@ -1525,36 +1501,59 @@ redo日志文件：如果事务提交成功，buffer pool里的数据还没来�
 
 8.随机写入磁盘，以page为单位写入，这步做完磁盘里的数据就是最新的了
 
+### general log
 
+在默认情况下，MySQL是不会打开general log的，这个log里面会记录MySQL所有的SQL语句，不管是查询语句，还是DML语句，还是DDL语句，还是DCL语句，这些语句统统都会被记录在general log文件中。就连我们连接和断开MySQL数据库的这些语句。
 
-mysql主从
+MySQL会把它收到的所有SQL语句按照接收的顺序依次记录在general log中。我们需要注意的是，这里接受的SQL语句的顺序，并不等于SQL语句就是按照这个接受的顺序来执行，因为有的时候，一些SQL可能需要等待其他锁被释放后才会被真正的执行，SQL语句的执行顺序是和binlog中的顺序是相匹配的。
 
-1.数据安全
+假如我们执行一个select查询语句，在binlog中不会记录这样的SQL语句，但是在general log中就会记录这个select查询语句。
 
-2.读写分离 缓解压力
+General log默认不开启的原因有两个：
 
-3.高可用 故障转移
+日志将会非常大，对磁盘是一个很大的压力。因为所有的操作都会被记录下来。
+对MySQL数据的性能有一定的影响。
 
+开启方式两种，配置文件（永久），命令修改（实例临时）
 
+```sql
+mysql> show variables like 'general_log'; -- 查看日志是否开启
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| general_log   | OFF   |
++---------------+-------+
+1 row in set (0.02 sec)
+
+mysql>
+mysql> show variables like 'general_log_file'; -- 看看日志文件保存位置
++------------------+-------------------------+
+| Variable_name    | Value                   |
++------------------+-------------------------+
+| general_log_file | /var/lib/mysql/test.log |
++------------------+-------------------------+
+1 row in set (0.02 sec)
+
+mysql>
+mysql> show variables like 'log_output'; -- 看看日志输出类型 table或file
++---------------+------------+
+| Variable_name | Value      |
++---------------+------------+
+| log_output    | FILE,TABLE |
++---------------+------------+
+1 row in set (0.01 sec)
+
+```
 
 # 面试题
 
-## Mysql 查看死锁和解除死锁? 
-
-**死锁是指两个或两个以上的事务在执行过程中，因争夺锁资源而造成的一种互相等待的现象。**
-
-```sql
-死锁检查，默认开启
-show variables like '%innodb_deadlock_detect%';
-```
-
-#### 1. 查看正在进行中的事务
+## 1. 查看正在进行中的事务
 
 ```sql
 SELECT * FROM information_schema.INNODB_TRX
 ```
 
-#### 2. 查看正在锁的事务
+## 2. 查看正在锁的事务
 
 ```sql
 #mysql 8.0 版本之前
@@ -1563,7 +1562,7 @@ SELECT * FROM information_schema.INNODB_LOCKS;
 select * from performance_schema.data_locks;
 ```
 
-#### 3. 查看等待锁的事务
+## 3. 查看等待锁的事务
 
 ```sql
 #mysql 8.0 版本之前
@@ -1572,19 +1571,19 @@ SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS;
 select * from performance_schema.data_lock_waits;
 ```
 
-#### 4. 查询是否锁表
+## 4. 查询是否锁表
 
 ```sql
 SHOW OPEN TABLES where In_use > 0;
 ```
 
-#### 5. 查看最近死锁的日志
+## 5. 查看最近死锁的日志
 
 ```sql
 show engine innodb status
 ```
 
-#### 6.查看表中索引
+## 6.查看表中索引
 
 ```sql
 show index from department;
@@ -1594,7 +1593,60 @@ show KEYS  from department;
 drop index idx_n_a on department;删除索引
 ```
 
-### 解除死锁
+## 7.**如何获得 MySQL 数据库中最近5分钟更新过的表**？
+
+```sql
+SELECT * FROM information_schema.TABLES
+WHERE (update_time > DATE_SUB(NOW(), INTERVAL 5 MINUTES)
+    AND update_time =< NOW())
+```
+
+## 8.查询索引情况
+
+可以通过查询表 mysql.innodb_index_stats 查看每个索引的大致情况
+
+```sql
+SELECT 
+
+table_name,index_name,stat_name,
+
+stat_value,stat_description 
+
+FROM innodb_index_stats 
+
+WHERE table_name = 'orders' and index_name = 'PRIMARY';
+
++----------+------------+-----------+------------+------------------+
+
+|table_name| index_name | stat_name | stat_value |stat_description  |
+
++----------+-------------------+------------+------------+----------+
+
+| orders | PRIMARY|n_diff_pfx01|5778522     | O_ORDERKEY            |
+
+| orders | PRIMARY|n_leaf_pages|48867 | Number of leaf pages        |
+
+| orders | PRIMARY|size        |49024 | Number of pages in the index|
+
++--------+--------+------------+------+-----------------------------+
+
+3 rows in set (0.00 sec)
+```
+
+## 9.B+树查询未被使用过的索引
+
+```sql
+SELECT * FROM sys.schema_unused_indexes WHERE object_schema != 'performance_schema';
+而 MySQL 8.0 版本推出了索引不可见（Invisible）功能。在删除废弃索引前，用户可以将索引设置为对优化器不可见，然后观察业务是否有影响。若无，DBA 可以更安心地删除这些索引：
+
+ALTER TABLE t1 
+
+ALTER INDEX idx_name INVISIBLE/VISIBLE;
+```
+
+## 10.mysql 查看死锁和解除死锁?
+
+**死锁是指两个或两个以上的事务在执行过程中，因争夺锁资源而造成的一种互相等待的现象。** 
 
 如果需要解除死锁，有一种最简单粗暴的方式，那就是找到进程id之后，直接干掉。
 
@@ -1605,7 +1657,19 @@ show processlist
 
 // 也可以使用
 SELECT * FROM information_schema.INNODB_TRX;
+// 查看正在锁的事务
+SELECT * FROM information_schema.innodb_locks;
+// 查看等待锁的事务
+SELECT * FROM information_schema.innodb_lock_waits;
+// 查询是否锁表
+show open tables where In_use > 0;
+//查看最近死锁的日志
+show engine innodb status;
+//配置将有关所有死锁的信息打印到mysqld错误日志中。每个死锁的信息，不仅仅是最新的死锁，都记录在mysql错误日志中，完成调试后禁用此选项。
+innodb_print_all_deadlocks;
 ```
+
+![img](https://segmentfault.com/img/remote/1460000038352608)
 
 这两个命令找出来的进程id 是同一个。
 
@@ -1621,15 +1685,32 @@ kill id
 SHOW OPEN TABLES where In_use > 0;
 ```
 
-
+```sql
+死锁检查，默认开启
+show variables like '%innodb_deadlock_detect%';
+```
 
 **参考文章：**https://segmentfault.com/a/1190000038352601
+
+## 11.查询长事务？
+
+你可以在 information_schema 库的 innodb_trx 这个表中查询长事务，比如下面这个语句，用于查找持续时间超过 60s 的事务。
+
+```csharp
+select * from information_schema.innodb_trx where TIME_TO_SEC(timediff(now(),trx_started))>60
+//max_execution_time 是MySQL服务器中的一个用于控制单条语句最大允许执行时间的变量。超过这个时间，MySQL将会终止这条语句的执行，并返回一个错误信息。  
+show variables  like  '%max_execution_time%';
+```
+
+
 
 ## MySQL 批量操作，一次插入多少行数据效率最高？
 
 **参考文章：**https://mp.weixin.qq.com/s/RhilSmmfmqwt_mkQUkQiGQ
 
-## Count(1)和Count(星)和Count(列名)哪个快？
+
+
+## Count(1)和Count(*)和Count(列)哪个快？
 
 count(星)计算所有数据中包含null值的行数
 
@@ -1658,20 +1739,6 @@ count(列名)因为只统计不为null的，所以要遍历整个表，性能下
 ALTER TABLE table_name change old_field_name new_field_name field_type;
 
 那么，在mysql5.5这个版本之前，这是通过临时表拷贝的方式实现的。执行ALTER语句后，会**新建**一个带有新结构的**临时表**，将原表数据全部拷贝到临时表，然后Rename，完成创建操作。这个方式过程中，原表是可读的，不可写。
-
-## 索引失效
-
-**参考文章：**https://www.51cto.com/article/702691.html
-
-1. 联合索引的场景下，查询条件不满足最左匹配原则。
-2. 两边索引列进行比较的时候 a > b
-3. Like '%abc'
-4. 对索引列进行函数式计算的时候 left(d,5) == 'abcd'
-5. 索引字符串类型比较强转 a（字符串）== 1
-6. 使用or进行连接的时候，**包含不是索引列的**
-7. 查询条件使用不等<>进行比较时
-8. 查询条件使用is null时正常走索引，**使用is not null时，不走索引。**
-9. 当查询条件为大于等于、in等范围查询时，根据查询结果占全表数据比例的不同，优化器有可能会放弃索引，进行全表扫描。
 
 ## 表自增id用完了怎么办
 
@@ -2104,9 +2171,39 @@ slow_query_log,ON
 slow_query_log_file,/usr/local/mysql/mysql-slow.log
 ```
 
-# 优化SQL
+# SQL优化
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/JdLkEI9sZfdv9IRLWRd3WRGKO1lFtlcib38ezD5NtzjFeuUbfJPQ1icZ3ZjyS0woTXtUBzEic64xSkM7aZsmjcrDw/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
+1. 避免使用select *。
+2. 使用union all 代替 union。
+3. 小表驱动大表  select in 先处理**子查询** 后处理**外部查询** select exists 先处理**外部查询** 在根据查询结果**跟子查询比较匹配**。in适用于用于左边大表，右边小表：exists适用于右边大表，左边小表
+4. 批量操作。
+5. 多用limit，在删除修改数据时，为了误操作数据，也可以使用limit。
+6. in中值太多 多线程分批次查询
+7. 增量查询，按id和时间升序，每次保存id和时间，分批次查询
+8. 高效的分页 id>指定数 between 分页 要在唯一索引上 子查询使用二级索引
+9. 用连接查询代替子查询 （子查询需要额外创建临时表 用完还得删除）
+10. join的表不宜过多 选择索引困难  多表数据成几何比较 可以考虑冗余多余字段 不多的情况下
+11. join时要注意 inner join可以自动选择小表驱动大表 left join 左表会显示查询的所有表数据，右表会显示符合条件的，如果不符合条件使用null表示
+12. 控制索引的数量 需要额外存储空间，维护 阿里巴巴手册规定单表索引和联合索引字段均不超过5个 高并发系统使用联合索引，删除单个索引，把部分查询功能放到其他数据库中 elasticsearch hbase
+13. 选择合理的字段类型 char定长 varchar变长 小的数据类型 bit存布尔值 tinyint 存储枚举值 金额字段用decimal 避免精度丢失
+14. 提升group by的效率 去重和分组 having  做耗时操作尽可能缩小数据范围提升sql整体的性能
+15. 索引优化
+
+参考视频：https://www.bilibili.com/video/BV1CX4y1Y7rm/?buvid=Z94C2D9EF9DE95124865B3F389C20E6ED774&is_story_h5=false&mid=QxFBuPR633wfOeXFe5jPvA%3D%3D&p=1&plat_id=114&share_from=ugc&share_medium=iphone&share_plat=ios&share_session_id=CCFC39CC-CEBD-4EBF-9EDC-240B3A4630DE&share_source=WEIXIN&share_tag=s_i&timestamp=1692411664&unique_k=ooqXHBp&up_id=1852997180&vd_source=6cb291f20a9b62c2a719b89ee73c2f6f
+
+## 索引失效
+
+**参考文章：**https://www.51cto.com/article/702691.html
+
+1. 联合索引的场景下，查询条件不满足**最左匹配原则。**
+2. 使用了select *
+3. like查询左边有**%**
+4. 索引列使用的**函数计算** left(d,5) == 'abcd' **根据返回值决定是否走索引**
+5. 索引列上**有计算** explain select b from t2 where a - 1= 30; **根据返回值决定是否走索引**
+6. 字符串类型**没加引号**
+7. 当查询条件为大于等于、in等范围查询时，根据查询结果占全表数据比例的不同，优化器有可能会放弃索引，进行全表扫描。
+
+
 
 # 如果插入数据的值就是sql语句的最大值真的好吗？
 
