@@ -31,13 +31,10 @@ public class ThreadExecuteTest {
 //        runnable.run();
 
 
-        FutureTask task = new FutureTask(new Callable() {
-            @Override
-            public Object call() throws Exception {
-                log.debug("通过Callable方式执行任务");
-                Thread.sleep(3000);
-                return "返回任务结果";
-            }
+        FutureTask task = new FutureTask(() -> {
+            log.debug("通过Callable方式执行任务");
+            Thread.sleep(3000);
+            return "返回任务结果";
         });
 
         new Thread(task).start();

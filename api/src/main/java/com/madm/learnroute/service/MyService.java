@@ -3,7 +3,9 @@ package com.madm.learnroute.service;
 import com.madm.learnroute.technology.mybatis.service.UserService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
 
 import javax.annotation.PreDestroy;
 
@@ -13,7 +15,7 @@ import javax.annotation.PreDestroy;
  */
 @Data
 @Slf4j
-public class MyService implements DisposableBean {
+public class MyService implements DisposableBean, DestructionAwareBeanPostProcessor {
     private UserService userService;
 
     public void init() {
@@ -28,4 +30,8 @@ public class MyService implements DisposableBean {
         log.info("bean自定义形式形式销毁 destroy 方法后执行 for MyService");
     }
 
+    @Override
+    public void postProcessBeforeDestruction(Object bean, String beanName) throws BeansException {
+        log.info("DestructionAwareBeanPostProcessor 形式销毁bean ");
+    }
 }

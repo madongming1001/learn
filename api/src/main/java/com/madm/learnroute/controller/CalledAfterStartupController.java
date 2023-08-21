@@ -15,7 +15,6 @@ import javax.annotation.PreDestroy;
 @Component
 @AllArgsConstructor
 @Slf4j
-
 public class CalledAfterStartupController implements DisposableBean {
 
     AccountController accountController;

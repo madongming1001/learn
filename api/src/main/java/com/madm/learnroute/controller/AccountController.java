@@ -17,6 +17,8 @@ import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static com.madm.learnroute.model.Account.create;
+
 /**
  * @author dongming.ma
  * @date 2022/11/9 22:34
@@ -33,9 +35,9 @@ public class AccountController {
     Redisson redisson;
 
     @GetMapping("/save")
-    public RestResponse save(@RequestBody Account... account) {
-        accountService.saveForJdbc(ArrayUtil.isNotEmpty(account) ? account[0] : Account.create());
-        accountService.save(ArrayUtil.isNotEmpty(account) ? account[0] : Account.create());
+    public RestResponse     save(@RequestBody Account... account) {
+        accountService.saveForJdbc(ArrayUtil.isNotEmpty(account) ? account[0] : create());
+        accountService.save(ArrayUtil.isNotEmpty(account) ? account[0] : create());
         return RestResponse.OK();
     }
 

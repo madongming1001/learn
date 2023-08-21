@@ -9,20 +9,28 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.madm.learnroute.mapper.AccountMapper;
 import com.madm.learnroute.model.Account;
 import com.madm.learnroute.service.AccountService;
+import com.madm.learnroute.technology.spring.MyApplicationEvent;
 import com.mdm.utils.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.shaded.com.google.common.collect.Lists;
 import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import static cn.hutool.core.date.DatePattern.NORM_DATETIME_PATTERN;
+import static com.madm.learnroute.model.Account.create;
+import static java.time.format.DateTimeFormatter.ofPattern;
 
 /**
  * @author dongming.ma
@@ -30,7 +38,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> implements AccountService {
+public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> implements AccountService, SmartInitializingSingleton {
 
 
     @Autowired
@@ -39,11 +47,15 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     @Autowired
     AccountMapper accountMapper;
-
+    @Autowired
+    ApplicationEventPublisher applicationEventPublisher;
     @Autowired
     SqlSessionFactory sqlSessionFactory;
+    @Autowired
+    AccountService accountService;
 
     @Override
+    @Transactional
     public int saveForJdbc(Account account) {
         Object sqlSessionTemplate = SpringUtil.getBean("sqlSessionTemplate");
         Object sqlSessionFactory = SpringUtil.getBean("sqlSessionFactory");
@@ -99,5 +111,12 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         } catch (Exception e) {
             log.error("updateAllUserName method execution exception :{}", ExceptionUtil.getMessage(e));
         }
+    }
+
+    @Override
+    @Transactional
+    public void afterSingletonsInstantiated() {
+        accountService.saveForJdbc(create());
+        applicationEventPublisher.publishEvent(new MyApplicationEvent(ofPattern(NORM_DATETIME_PATTERN).format(LocalDateTime.now())));
     }
 }

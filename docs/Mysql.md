@@ -237,15 +237,21 @@ InnoDB 规定一页至少存储两条记录，如果页中只能存放下一条�
 
 ![image-20220208190217690](noteImg/image-20220208190217690.png)
 
+**Mysql 8.0 memory structures**
+
 ![MySQL8.0官方文档学习_MySQL8.0](https://s2.51cto.com/images/blog/202104/25/87eb9cd0e6e435fe9015fafcdb2961be.png?x-oss-process=image/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_30,g_se,x_10,y_10,shadow_20,type_ZmFuZ3poZW5naGVpdGk=/format,webp/resize,m_fixed,w_1184)
 
 **区（**extent**）**
 
-​		表空间中的页可以达到 2^32个页，实在是太多了，为了更好的管理这些页面，InnoDB 中还有一个区（英文名：extent）的概念。对于 16KB 的页来说，连续的64 个页就是一个区，也就是说一个区默认占用 1MB 空间大小。不论是系统表空间还是独立表空间，都可以看成是由若干个区组。
+​		表空间中的页可以达到 2^32个页，实在是太多了，为了更好的管理这些页面，InnoDB 中还有一个区（英文名：extent）的概念。对于 16KB 的页来说，连续的64 个页就是一个区，也就是说一个区默认占用 1MB 空间大小。通常会按照区来申请连续的磁盘空间
 
 **组**（group）
 
-​		每 256个区又被划分成一个**组**
+​		为了管理大量的区每 256个区又被划分成一个**区组**
+
+**段**（segment）
+
+**逻辑上的概念，本质上是由若干个零散页面和若干个完整的区组成的。**主要管理索引树中的叶子、非叶子结点
 
 
 
@@ -1239,7 +1245,7 @@ InnoDB 的行数据有多个版本，每个数据版本有自己的 row trx_id�
 
 undo日志版本链是指一行数据被多个事务依次修改过后，在每个事务修改完后，Mysql会保留修改前的数据undo回滚日志，并且用两个隐藏字段trx_id和roll_pointer把这些undo日志串联起来形成一个历史记录版本链(见下图，需参考视频里的例子理解)
 
-​    ![0](https://note.youdao.com/yws/public/resource/b36b975188fadf7bfbfd75c0d2d6b834/xmlnote/8C9D98D4BB9B49BEB2822BCE98A37DDE/99285)
+![0](https://note.youdao.com/yws/public/resource/b36b975188fadf7bfbfd75c0d2d6b834/xmlnote/8C9D98D4BB9B49BEB2822BCE98A37DDE/99285)
 
 
 
@@ -1271,6 +1277,16 @@ undo日志版本链是指一行数据被多个事务依次修改过后，在每�
 **总结：**
 
 MVCC机制的实现就是通过read-view机制与undo版本链比对机制，使得不同的事务会根据数据版本链对比规则读取同一条数据在版本链上的不同版本数据。
+
+**可重复读的情况下还是会发生幻读问题。**
+
+![img](https://img-blog.csdnimg.cn/img_convert/d21f7c93d96874d62085ee234ade116e.png)
+
+在可重复读隔离级别下，事务 A 第一次执行普通的 select 语句时生成了一个 ReadView，之后事务 B 向表中新插入了一条 id = 5的记录并提交。接着，事务 A 对 id = 5 这条记录进行了更新操作，在这个时刻，这条新纪录的 trx_id 隐藏列的值就变成了事务 A 的事务 id，之后事务 A 再使用普通 select 语句去查询这条记录时就可以看到这条记录了，于是就发生了幻读。
+
+因为这种特殊场景的存在，在首次查询之后，进行了修改操作使用了当前读，然后再进行查询，得到了当前读的内容，**所以我们认为 MySQL Innodb 中的 MVCC 并不能完全避免幻读现象**。
+
+解决方法就是一开始上来就使用当前读 加上for update 就会上锁。next key log （前开后闭）有可能退变成为行锁和间隙锁（前开后开）
 
 ### 行锁(Record Lock)
 
@@ -1346,7 +1362,7 @@ InnoDB存储引擎默认的事务隔离级别是Repeatable Read，在该隔离�
 
 # sql执行流程
 
-​    ![0](https://note.youdao.com/yws/public/resource/b36b975188fadf7bfbfd75c0d2d6b834/xmlnote/9C296B9BBF3C4C0389F470357FC55FE9/99001)
+![0](https://note.youdao.com/yws/public/resource/b36b975188fadf7bfbfd75c0d2d6b834/xmlnote/9C296B9BBF3C4C0389F470357FC55FE9/99001)
 
 **为什么Mysql不能直接更新磁盘上的数据而且设置这么一套复杂的机制来执行SQL了？**
 
@@ -1400,11 +1416,254 @@ redo log 用于保证 crash-safe 能力。**innodb_flush_log_at_trx_commit** 这
 
 ## 日志文件
 
-### Undo log
+### undo log
 
-回滚行记录到某个特定版本
+回滚行记录到某个特定版本，**undo log时逻辑日志，因此只是将数据库逻辑地恢复到原来的样子。所有修改都被逻辑的取消了，但是数据结构和页本身在回滚之后可能大不相同。由于并发事务，所以不能将一个页回滚到事务开始的样子。**
 
-### Redo log
+**注意：undo log会产生redo log，也就是undo log的产生会随着redo log的产生，这是因为undo log也需要持久性的保护。**
+
+在InnoDB存储引擎中，undo log分为：
+
+insert undo log
+
+update undo log
+
+insert undo log 指的是在insert操作中产生的undo log。对事务本身可见，对其他事务不可见。故该undo log可以在事务提交后直接删除。不需要进行purge操作。
+
+。我们前面介绍`InnoDB`的数据字典时说过，每个表都会被分配一个唯一的`table id`，我们可以通过系统数据库`information_schema`中的`innodb_sys_tables`表来查看某个表对应的`table id`是什么。
+
+```sql
+mysql> SELECT * FROM information_schema.INNODB_TABLES WHERE name = 't1';
+```
+
+![image-20230821183957823](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230821183957823.png)
+
+一条日志有不同的类型 记录的内容也不尽相同
+
+有对应insert的delete update的
+
+对于insert来说只需要记录对应的插入主键id就可以了 删除的时候时候，对于插入到索引页的数据来说，伴随着每行记录会指向插入到undo页的地址，每行都有隐藏指针roll_pointer 7字节 事务6字节 隐藏id6字节。
+
+**INSERT操作对应的undo日志**
+
+![image-20230821194458700](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230821194458700.png)
+
+![image-20230821194511968](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230821194511968.png)
+
+**DELETE操作对应的undo日志**
+
+我们知道插入到页面中的记录会根据记录头信息中的`next_record`属性组成一个单向链表，我们把这个链表称之为`正常记录链表`；我们在前面介绍数据页结构的时候说过，被删除的记录其实也会根据记录头信息中的`next_record`属性组成一个链表，只不过这个链表中的记录占用的存储空间可以被重新利用，所以也称这个链表为`垃圾链表`。`Page Header`部分有一个称之为`PAGE_FREE`的属性，它指向由被删除记录组成的垃圾链表中的头节点。
+
+![img](https://relph1119.github.io/mysql-learning-notes/images/22-06.png)
+
+从图中可以看出，`正常记录链表`中包含了3条正常记录，`垃圾链表`里包含了2条已删除记录，在`垃圾链表`中的这些记录占用的存储空间可以被重新利用。页面的`Page Header`部分的`PAGE_FREE`属性的值代表指向`垃圾链表`头节点的指针。假设现在我们准备使用`DELETE`语句把`正常记录链表`中的最后一条记录给删除掉，其实这个删除的过程需要经历两个阶段：
+
+- 阶段一：仅仅将记录的`delete_mask`标识位设置为`1`，其他的不做修改（其实会修改记录的`trx_id`、`roll_pointer`这些隐藏列的值）。设计`InnoDB`的大佬把这个阶段称之为`delete mark`。
+
+![img](https://relph1119.github.io/mysql-learning-notes/images/22-07.png)
+
+可以看到，`正常记录链表`中的最后一条记录的`delete_mask`值被设置为`1`，但是并没有被加入到`垃圾链表`。也就是此时记录处于一个`中间状态`，跟猪八戒照镜子——里外不是人似的。在删除语句所在的事务提交之前，被删除的记录一直都处于这种所谓的`中间状态`。
+
+```txt
+小贴士：为什么会有这种奇怪的中间状态呢？其实主要是为了实现一个称之为MVCC的功能，稍后再介绍。
+```
+
+阶段二：当该删除语句所在的事务提交之后，会有专门的线程后来真正的把记录删除掉。所谓真正的删除就是把该记录从`正常记录链表`中移除，并且加入到`垃圾链表`中，然后还要调整一些页面的其他信息，比如页面中的用户记录数量`PAGE_N_RECS`、上次插入记录的位置`PAGE_LAST_INSERT`、垃圾链表头节点的指针`PAGE_FREE`、页面中可重用的字节数量`PAGE_GARBAGE`、还有页目录的一些信息等等。设计`InnoDB`的大佬把这个阶段称之为`purge`。
+
+  把`阶段二`执行完了，这条记录就算是真正的被删除掉了。这条已删除记录占用的存储空间也可以被重新利用了。画下来就是这样：
+
+![img](https://relph1119.github.io/mysql-learning-notes/images/22-08.png)
+
+> 页面的Page Header部分有一个**PAGE_GARBAGE**属性，该属性记录着当前页面中可重用存储空间占用的总字节数。每当有已删除记录被加入到垃圾链表后，都会把这个PAGE_GARBAGE属性的值加上该已删除记录占用的存储空间大小。**PAGE_FREE**指向垃圾链表的头节点，之后每当新插入记录时，首先判断PAGE_FREE指向的头节点代表的已删除记录占用的存储空间是否足够容纳这条新插入的记录，如果不可以容纳，就直接向页面中申请新的空间来存储这条记录（是的，你没看错，并不会尝试遍历整个垃圾链表，找到一个可以容纳新记录的节点）。如果可以容纳，那么直接重用这条已删除记录的存储空间，并且把PAGE_FREE指向垃圾链表中的下一条已删除记录。但是这里有一个问题，如果新插入的那条记录占用的存储空间大小小于垃圾链表的头节点占用的存储空间大小，那就意味头节点对应的记录占用的存储空间里有一部分空间用不到，这部分空间就被称之为碎片空间。那这些碎片空间岂不是永远都用不到了么？其实也不是，这些碎片空间占用的存储空间大小会被统计到PAGE_GARBAGE属性中，这些碎片空间在整个页面快使用完前并不会被重新利用，不过当页面快满时，如果再插入一条记录，此时页面中并不能分配一条完整记录的空间，这时候会首先看一看PAGE_GARBAGE的空间和剩余可利用的空间加起来是不是可以容纳下这条记录，如果可以的话，InnoDB会尝试重新组织页内的记录，重新组织的过程就是先开辟一个临时页面，把页面内的记录依次插入一遍，因为依次插入时并不会产生碎片，之后再把临时页面的内容复制到本页面，这样就可以把那些碎片空间都解放出来（很显然重新组织页面内的记录比较耗费性能）。
+
+![img](https://relph1119.github.io/mysql-learning-notes/images/22-09.png)
+
+UPDATE操作对应的undo日志
+
+  在执行`UPDATE`语句时，`InnoDB`对更新主键和不更新主键这两种情况有截然不同的处理方案。
+
+**不更新主键**
+
+  在不更新主键的情况下，又可以细分为被更新的列占用的**存储空间不发生变化**和**发生变化**的情况。
+
+​		**就地更新（in-place update）**
+
+​	**更新记录时，对于被更新的每个列来说，如果更新后的列和更新前的列占用的存储空间都一样大，那么就可以进行`就地更新`，也就是直接在原记录的基础上修改对应列的值。**
+
+​		**先删除掉旧记录，再插入新记录**
+
+​		在不更新主键的情况下，如果有任何一个被更新的列更新前和更新后占用的存储空间大小不一致，那么就需要先把这条旧的记录从聚簇索引页面中删除掉，然后再根据更新后列的值创建一条新的记录插入到页面中。
+
+  **请注意一下，我们这里所说的`删除`并不是`delete mark`操作，而是真正的删除掉，也就是把这条记录从`正常记录链表`中移除并加入到`垃圾链表`中**，并且修改页面中相应的统计信息（比如`PAGE_FREE`、`PAGE_GARBAGE`等这些信息）。不过这里做真正删除操作的线程并不是在介绍`DELETE`语句中做`purge`操作时使用的另外专门的线程，而是由用户线程同步执行真正的删除操作，真正删除之后紧接着就要根据各个列更新后的值创建的新记录插入。
+
+![img](https://relph1119.github.io/mysql-learning-notes/images/22-15.png)
+
+**更新主键的情况**
+
+将旧记录进行`delete mark`操作
+
+根据更新后各列的值创建一条新记录，并将其插入到聚簇索引中（需重新定位插入的位置）。
+
+针对`UPDATE`语句更新记录主键值的这种情况，在对该记录进行`delete mark`操作前，会记录一条类型为`TRX_UNDO_DEL_MARK_REC`的`undo日志`；之后插入新记录时，会记录一条类型为`TRX_UNDO_INSERT_REC`的`undo日志`，也就是说每对一条记录的主键值做改动时，会记录2条`undo日志`。
+
+ 在一个事务执行过程中，可能混着执行`INSERT`、`DELETE`、`UPDATE`语句，也就意味着会产生不同类型的`undo日志`。但是我们前面又强调过，同一个`Undo页面`要么只存储`TRX_UNDO_INSERT`大类的`undo日志`，要么只存储`TRX_UNDO_UPDATE`大类的`undo日志`，反正不能混着存，所以在一个事务执行过程中就可能需要2个`Undo页面`的链表，一个称之为`insert undo链表`，另一个称之为`update undo链表`，画个示意图就是这样：
+
+![img](https://relph1119.github.io/mysql-learning-notes/images/23-08.png)
+
+ 另外，设计`InnoDB`的大佬规定对普通表和临时表的记录改动时产生的`undo日志`要分别记录（我们稍后阐释为什么这么做），所以在一个事务中最多有4个以`Undo页面`为节点组成的链表：
+
+![img](https://relph1119.github.io/mysql-learning-notes/images/23-09.png)
+
+![img](https://relph1119.github.io/mysql-learning-notes/images/23-22.png)
+
+在修改针对普通表的回滚段中的Undo页面时，需要记录对应的redo日志，而修改针对临时表的回滚段中的Undo页面时，不需要记录对应的redo日志。
+
+**如果没有可分配更多的undo页面链表**
+
+```txt
+Too many active concurrent transactions
+活动并发事务过多
+```
+
+**Undo页面链表**
+
+**单个事务中的Undo页面链表**
+
+  因为一个事务可能包含多个语句，而且一个语句可能对若干条记录进行改动，而对每条记录进行改动前，都需要记录1条或2条的`undo日志`，所以在一个事务执行过程中可能产生很多`undo日志`，这些日志可能一个页面放不下，需要放到多个页面中，这些页面就通过我们上面介绍的`TRX_UNDO_PAGE_NODE`属性连成了链表。
+
+在一个事务执行过程中，可能混着执行`INSERT`、`DELETE`、`UPDATE`语句，也就意味着会产生不同类型的`undo日志`。但是我们前面又强调过，同一个`Undo页面`要么只存储`TRX_UNDO_INSERT`大类的`undo日志`，要么只存储`TRX_UNDO_UPDATE`大类的`undo日志`，反正不能混着存，所以在一个事务执行过程中就可能需要2个`Undo页面`的链表，一个称之为`insert undo链表`，另一个称之为`update undo链表`。
+
+**另外，设计`InnoDB`的大佬规定对普通表和临时表的记录改动时产生的`undo日志`要分别记录（我们稍后阐释为什么这么做），所以在一个事务中最多有4个以`Undo页面`为节点组成的链表。按需分配，什么时候需要什么时候再分配，不需要就不分配。**
+
+**多个事务中的Undo页面链表**
+
+为了尽可能提高`undo日志`的写入效率，不同事务执行过程中产生的undo日志需要被写入到不同的Undo页面链表中。
+
+**Undo log segment**
+
+每一个`Undo页面`链表都对应着一个`段`，称之为`Undo Log Segment`。也就是说链表中的页面都是从这个段里边申请的，所以他们在`Undo页面`链表的第一个页面，也就是上面提到的`first undo page`中设计了一个称之为`Undo Log Segment Header`的部分，这个部分中包含了该链表对应的段的`segment header`信息以及其他的一些关于这个段的信息，所以`Undo`页面链表的第一个页面其实长这样：
+
+![image-20230821205727283](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230821205727283.png)
+
+`TRX_UNDO_STATE`：本`Undo页面`链表处在什么状态。
+
+一个`Undo Log Segment`可能处在的状态包括：
+
+- `TRX_UNDO_ACTIVE`：活跃状态，也就是一个活跃的事务正在往这个段里边写入`undo日志`。
+- `TRX_UNDO_CACHED`：被缓存的状态。处在该状态的`Undo页面`链表等待着之后被其他事务重用。
+- `TRX_UNDO_TO_FREE`：对于`insert undo`链表来说，如果在它对应的事务提交之后，该链表不能被重用，那么就会处于这种状态。
+- `TRX_UNDO_TO_PURGE`：对于`update undo`链表来说，如果在它对应的事务提交之后，该链表不能被重用，那么就会处于这种状态。
+- `TRX_UNDO_PREPARED`：包含处于`PREPARE`阶段的事务产生的`undo日志`。
+
+- `TRX_UNDO_LAST_LOG`：本`Undo页面`链表中最后一个`Undo Log Header`的位置。
+- `TRX_UNDO_FSEG_HEADER`：本`Undo页面`链表对应的段的`Segment Header`信息（就是我们上一节介绍的那个10字节结构，通过这个信息可以找到该段对应的`INODE Entry`）。
+- `TRX_UNDO_PAGE_LIST`：`Undo页面`链表的基节点。
+
+**重用Undo页面**
+
+一个`Undo页面`链表是否可以被重用的条件很简单：
+
+- 该链表中只包含一个`Undo页面`。
+- 该`Undo页面`已经使用的空间小于整个页面空间的3/4。
+
+**insert undo链表**
+
+提交后记录没用了，直接覆盖
+
+**update undo链表**
+
+继续添加undo log
+
+**回滚段**
+
+**Rollback Segment下面可以管理多个undo log segment**
+
+一个Rollback segment只有1024个undo slot 也就是1024个 undo链表，通过参数查看有128个 也就是可以有
+
+128 * 1024 = 131072
+
+```sql
+show variables like '%segment%';
+```
+
+我们现在知道一个事务在执行过程中最多可以分配4个`Undo页面`链表，在同一时刻不同事务拥有的`Undo页面`链表是不一样的，所以在同一时刻系统里其实可以有许许多多个`Undo页面`链表存在。为了更好的管理这些链表，设计`InnoDB`的大佬又设计了一个称之为`Rollback Segment Header`的页面，在这个页面中存放了各个`Undo页面`链表的`frist undo page`的`页号`，他们把这些`页号`称之为`undo slot`。我们可以这样理解，每个`Undo页面`链表都相当于是一个班，这个链表的`first undo page`就相当于这个班的班长，找到了这个班的班长，就可以找到班里的其他同学（其他同学相当于`normal undo page`）。有时候学校需要向这些班级传达一下精神，就需要把班长都召集在会议室，这个`Rollback Segment Header`就相当于是一个会议室。
+
+**purge**
+
+purge用于最终完成delete和update操作。这样的设计是因为InnoDB存储引擎支持MVCC，所以记录不能在事务提交时立即处理。这时其他事务可能正在引用这行，故InnoDB存储引擎需要保存记录之前的版本。而是否可以删除该记录通过purge来进行判断。
+
+InnoDB存储引擎有一个history链表，**它根据事务提交的顺序**，将undo log进行链接。先提交的事务在尾端。因为可以重用，所以多个事务的undolog可以在一个undo page中。
+
+在执行puge的过程中，InnoDB存储引擎首先从history list中找到第一个需要被清理的记录，这里是trx1，清理之后InnoDB存储引擎会在trx1的undo log所在的页中继续寻找是否存在可以被清理的记录，这里会找到事务trx3，接着找到trx5，但是发现trx5被其他事物所引用而不能清理，故去再次去history list中查找，发现这时最尾端的记录为trx2，记者找到trx2所在的页，然后依次再把事务trx6、trx4的记录进行清理。由于undo page的所有页都被清理了，因此该undo page可以被重用。
+
+InnoDB引擎这种先从history list中找到undo log，然后再从undo page中找undo log的设计模式是为了避免大量的随机读取操作，从而提高purge的效率。
+
+全局动态参数 **innodb_purge_batch_size**用来设置每次purge操作需要清理的undo page数量。
+
+
+
+**purge删除的是什么？**
+
+1、把数据页行消息改到垃圾连表中，free garbage。
+
+2，清除undo log
+
+如何判断需不需要删除因为innodb有一个history链表存储的是按照事务提交的顺序将undo log进行链接，先提交的在尾部，然后先根据第一个undo log然后再看page中其他是否需要清理的undo log。
+
+删除的是update undo log是对 **delete 和 update 操作产生的 undo log**。该 undo log 可能需要提供 MVCC 机制，因此不能在事务提交时就进行删除。提交时放入 undo log 链表，等待 purge 线程进行最后的删除。
+
+事务提交后，InnoDB做2件事：
+
+- 将undo log放入链表中，以供之后的 purge 操作
+- 判断 undo log 所在的页是否可以重用，若可以分配给下个事务使用
+
+
+
+**事务回滚undolog是如何进行数据恢复的？**
+
+事务回滚是通过Undo Log来进行数据恢复的。Undo Log记录了事务对数据所做的修改操作，包括旧值和新值。
+
+当需要回滚一个事务时，数据库会根据Undo Log中的信息，按照相反的操作进行数据恢复。具体的过程如下：
+
+1. 事务开始：当一个事务开始时，系统会为该事务分配一个唯一的事务ID，并为该事务创建一个Undo段用于存储Undo Log。
+
+2. 记录Undo操作：在事务执行期间，对数据进行修改操作时，系统将修改前的旧值记录到Undo Log中。这样，在回滚操作时可以使用Undo Log中的旧值将数据还原到修改之前的状态。
+
+3. 回滚操作：当需要回滚一个事务时，系统会根据Undo Log中的信息，按照相反的操作进行数据恢复。例如，对于一个insert操作，回滚操作就是删除插入的数据行；对于一个update操作，回滚操作就是将数据行恢复到修改前的状态。
+
+4. 事务结束：当事务回滚完成后，系统会释放Undo Log所占用的空间。
+
+需要注意的是，Undo Log中的数据只对当前事务可见，其他事务无法访问。这保证了事务的隔离性。
+
+通过使用Undo Log进行事务回滚，数据库可以将数据恢复到事务开始之前的状态，从而保持数据的一致性和完整性。
+
+**innodb的undo log有持久化功能吗？**
+
+**是的，InnoDB引擎的Undo Log具有持久化功能**。Undo Log用于记录事务的回滚操作，以便在事务回滚或崩溃恢复时可以撤销对数据库的更改。
+
+Undo Log的持久化是通过将其写入磁盘上的Undo Log文件来实现的。**当事务进行提交或数据库发生崩溃时，InnoDB会将Undo Log中的数据刷新到磁盘上的日志文件中，以确保数据的持久性和一致性。**
+
+通过持久化Undo Log，InnoDB可以在数据库故障后进行崩溃恢复。它可以使用Undo Log文件中的信息来撤销未提交的事务所做的更改，并还原已提交的事务所做的更改。
+
+**需要注意的是，Undo Log的持久化是在事务提交之前进行的**，因此如果事务未提交，则对应的Undo Log可能不会持久化到磁盘上。
+
+**innodb的undolog 事务如何和redo log的事务进行关联通过 xid吗？**
+
+InnoDB的Undo Log和Redo Log是用于不同的目的，它们在事务处理中扮演不同的角色。
+
+Undo Log记录了事务对数据的修改操作，用于事务的回滚。当事务执行修改操作时，将会生成对应的Undo Log记录，用于在事务回滚或系统崩溃恢复时撤销对数据的修改。每个事务都有自己的Undo Log，Undo Log中的信息与事务相关联。
+
+Redo Log记录了事务对数据的修改操作，用于事务的持久化。当事务执行修改操作时，将会生成对应的Redo Log记录，用于在系统崩溃后进行重做操作，以确保数据的持久性和一致性。Redo Log中的信息与事务无直接关联，而是以物理日志记录的形式存在。
+
+在InnoDB中，事务的相关信息并不是通过xid（事务ID）来关联Undo Log和Redo Log的，而是通过LSN（Log Sequence Number）来进行关联。LSN是一个递增的数字，表示日志记录在日志文件中的位置。Undo Log和Redo Log都包含了LSN的信息，通过LSN可以实现两者的关联。
+
+总结来说，Undo Log记录事务的回滚操作，与事务相关联；而Redo Log记录事务的修改操作，与事务没有直接关联，而是通过LSN来关联。这种设计可以提高并发性和恢复性，保证数据的一致性和持久性。
+
+**checkpoint和lsn的关系 数据崩溃恢复的整体流程？**
+
+Checkpoint和LSN（Log Sequence Number）是InnoDB引擎中用于数据崩溃恢复的重要概念。 Checkpoint是一个触发点，用于控制数据在内存中和磁盘中的同步。当发生Checkpoint时，InnoDB会将内存中被修改的数据页刷新到磁盘上的数据文件中，并将Checkpoint位置的LSN记录下来。这样做的目的是为了减少数据库崩溃后的恢复时间，因为只需要从Checkpoint位置开始进行日志重做即可。 **LSN是一个递增的日志序列号，它标识了日志文件中日志记录的顺序。每个事务的操作都会生成一个对应的LSN**。LSN与数据文件和日志文件中的位置相关联。 数据崩溃恢复的整体流程如下： 1. 数据库崩溃：发生系统故障或非正常停机，导致数据库无法正常工作。 2. 启动数据库：当数据库重新启动时，InnoDB引擎会检查日志文件中的最后一个Checkpoint位置的LSN，并将其标记为恢复起点。 3. 日志重做：从恢复起点开始，依次读取日志文件中的日志记录，并根据LSN顺序进行重做操作，将未完成的事务操作应用到数据文件上。这个过程称为日志重做（Redo Log）。 4. 数据恢复：在日志重做期间，InnoDB会通过Undo Log来撤销未提交的事务操作，以保持数据的一致性。Undo Log中记录了事务的回滚操作，用于回滚未提交的事务。 5. 数据一致性：当所有日志记录都经过重做和回滚操作后，数据库的数据将恢复到崩溃之前的一致状态。 总结来说，Checkpoint是控制数据同步的触发点，LSN用于标识日志记录的顺序。数据崩溃恢复的流程包括日志重做和回滚操作，以保证数据的一致性和完整性。
+
+### redo log
 
 恢复事务提交修改的页操作，两部分组成：
 
@@ -1455,7 +1714,7 @@ checkpoint有两种方式，**sharp checkpoint**和**fuzzy checkpoint**。
 - master thread checkpoint：以每秒或者每十秒的速度从缓冲池的脏页列表中刷新一定比例的脏页回磁盘，这个过程是异步的，不会阻塞用户线程。
 - flush_lru_list checkpoint：通过参数 **innodb_lru_scan_depth** 控制LRU列表中可用页的数量，发生了这个checkpoint时，说明脏页写入速度过慢。
 - async/sync flush checkpoint：指的是重做日志不可用的情况。当重做日志不可用时， 如果不能被覆盖的脏页数量（2-3）达到 75%时，触发异步checkpoint。 不能被覆盖的脏页数量（2-3）达到90%时，同步并且阻塞用户线程，然后根据 flush 列表最早脏的顺序刷脏页。 当这个事件中的任何一个发生的时候，都会记录到errlog 中，一旦errlog出现这种日志提示，一定需要加大logfile的组数。
-- dirty page too much checkpoint：脏页太多时，也会发生强制写日志，会阻塞用户线程，由innodb_max_dirty_pages_pct参数（默认75%）控制。 
+- dirty page too much checkpoint：脏页太多时，也会发生强制写日志，会阻塞用户线程，由innodb_max_dirty_pages_pct参数（默认90.000000%）控制。 8.0默认90
 
 虽然log block总是在redo log file的最后部分进行写入，有的读者可能以为对redo log file的写入都是顺序的。其实不然，因为redo log file除了保存log buffer刷新到磁盘的log block，还保存了一些其他信息，这些信息一共占用2kb大小，**即每个redo log file的前2kb的部分不保存log block的信息**。对于log group 中的第一个redo log file其前2kb的部分保存4个512字节大小的块，其中存放的内容如表所示。
 
@@ -1500,7 +1759,7 @@ innodb_flush_log_at_trx_commit
 1. redo log 和 binlog 都是顺序写，磁盘的顺序写比随机写速度要快；
 2. 组提交机制，可以大幅度降低磁盘的 IOPS 消耗。
 
-具体来说，当有一条记录需要更新的时候，InnoDB 引擎就会先把记录写到 redo log（粉板）里面，并更新内存，这个时候更新就算完成了。同时，InnoDB 引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做，这就像打烊以后掌柜做的事。
+具体来说，当有一条记录需要更新的时候，InnoDB 引擎就会先把记录写到 redo log（粉板）里面，**并更新内存，这个时候更新就算完成了**。同时，InnoDB 引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做，这就像打烊以后掌柜做的事。
 
 如果今天赊账的不多，掌柜可以等打烊后再整理。但如果某天赊账的特别多，粉板写满了，又怎么办呢？这个时候掌柜只好放下手中的活儿，把粉板中的一部分赊账记录更新到账本中，然后把这些记录从粉板上擦掉，为记新账腾出空间。
 
@@ -1514,9 +1773,83 @@ write pos 和 checkpoint 之间的是“粉板”上还空着的部分，可以�
 
 **参考文章：**http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/02%20%20%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%80%E6%9D%A1SQL%E6%9B%B4%E6%96%B0%E8%AF%AD%E5%8F%A5%E6%98%AF%E5%A6%82%E4%BD%95%E6%89%A7%E8%A1%8C%E7%9A%84%EF%BC%9F.md
 
+**组提交机制**
+
+为了提高磁盘fsync的效率，当前数据都提供了group commit的功能，即一次fsync可以刷新确保多个事务日志被写入文件。
+
+这里，我需要先和你介绍日志逻辑序列号（log sequence number，LSN）的概念。LSN 是单调递增的，用来对应 redo log 的一个个写入点。每次写入长度为 length 的 redo log， LSN 的值就会加上 length。
+
+LSN 也会写到 InnoDB 的数据页中，来确保数据页不会被多次执行重复的 redo log。关于 LSN 和 redo log、checkpoint 的关系，我会在后面的文章中详细展开。
+
+如图 3 所示，是三个并发事务 (trx1, trx2, trx3) 在 prepare 阶段，都写完 redo log buffer，持久化到磁盘的过程，对应的 LSN 分别是 50、120 和 160。
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/933fdc052c6339de2aa3bf3f65b188cc.png)
+
+图 3 redo log 组提交
+
+从图中可以看到，
+
+1. trx1 是第一个到达的，会被选为这组的 leader；
+2. 等 trx1 要开始写盘的时候，这个组里面已经有了三个事务，这时候 LSN 也变成了 160；
+3. trx1 去写盘的时候，带的就是 LSN=160，因此等 trx1 返回时，所有 LSN 小于等于 160 的 redo log，都已经被持久化到磁盘；
+4. 这时候 trx2 和 trx3 就可以直接返回了。
+
+所以，一次组提交里面，组员越多，节约磁盘 IOPS 的效果越好。但如果只有单线程压测，那就只能老老实实地一个事务对应一次持久化操作了。
+
+在并发更新场景下，第一个事务写完 redo log buffer 以后，接下来这个 fsync 越晚调用，组员可能越多，节约 IOPS 的效果就越好。
+
+为了让一次 fsync 带的组员更多，MySQL 有一个很有趣的优化：拖时间。在介绍两阶段提交的时候，我曾经给你画了一个图，现在我把它截过来。
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/98b3b4ff7b36d6d72e38029b86870551.png)
+
+图 4 两阶段提交
+
+图中，我把“写 binlog”当成一个动作。但实际上，写 binlog 是分成两步的：
+
+1. 先把 binlog 从 binlog cache 中写到磁盘上的 binlog 文件；
+2. 调用 fsync 持久化。
+
+MySQL 为了让组提交的效果更好，把 redo log 做 fsync 的时间拖到了步骤 1 之后。也就是说，上面的图变成了这样：
+
+![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/5ae7d074c34bc5bd55c82781de670c28.png)
+
+图 5 两阶段提交细化
+
+这么一来，binlog 也可以组提交了。在执行图 5 中第 4 步把 binlog fsync 到磁盘时，如果有多个事务的 binlog 已经写完了，也是一起持久化的，这样也可以减少 IOPS 的消耗。
+
+不过通常情况下第 3 步执行得会很快，所以 binlog 的 write 和 fsync 间的间隔时间短，导致能集合到一起持久化的 binlog 比较少，因此 binlog 的组提交的效果通常不如 redo log 的效果那么好。
+
+如果你想提升 binlog 组提交的效果，可以通过设置 binlog_group_commit_sync_delay 和 binlog_group_commit_sync_no_delay_count 来实现。
+
+1. binlog_group_commit_sync_delay 参数，表示延迟多少微秒后才调用 fsync;
+2. binlog_group_commit_sync_no_delay_count 参数，表示累积多少次以后才调用 fsync。
+
+这两个条件是或的关系，也就是说只要有一个满足条件就会调用 fsync。
+
+所以，当 binlog_group_commit_sync_delay 设置为 0 的时候，binlog_group_commit_sync_no_delay_count 也无效了。
+
+之前有同学在评论区问到，WAL 机制是减少磁盘写，可是每次提交事务都要写 redo log 和 binlog，这磁盘读写次数也没变少呀？
+
+现在你就能理解了，WAL 机制主要得益于两个方面：
+
+1. redo log 和 binlog 都是顺序写，磁盘的顺序写比随机写速度要快；
+2. 组提交机制，可以大幅度降低磁盘的 IOPS 消耗。
+
+分析到这里，我们再来回答这个问题：**如果你的 MySQL 现在出现了性能瓶颈，而且瓶颈在 IO 上，可以通过哪些方法来提升性能呢？**
+
+针对这个问题，可以考虑以下三种方法：
+
+1. 设置 binlog_group_commit_sync_delay 和 binlog_group_commit_sync_no_delay_count 参数，减少 binlog 的写盘次数。这个方法是基于“额外的故意等待”来实现的，因此可能会增加语句的响应时间，但没有丢失数据的风险。
+2. 将 sync_binlog 设置为大于 1 的值（比较常见是 100~1000）。这样做的风险是，主机掉电时会丢 binlog 日志。
+3. 将 innodb_flush_log_at_trx_commit 设置为 2。这样做的风险是，主机掉电的时候会丢数据。
+
+我不建议你把 innodb_flush_log_at_trx_commit 设置成 0。因为把这个参数设置成 0，表示 redo log 只保存在内存中，这样的话 MySQL 本身异常重启也会丢数据，风险太大。而 redo log 写到文件系统的 page cache 的速度也是很快的，所以将这个参数设置成 2 跟设置成 0 其实性能差不多，但这样做 MySQL 异常重启时就不会丢数据了，相比之下风险会更小。
+
 **redo log 的写入机制**
 
 事务在执行过程中，生成的 redo log 是要先写到 redo log buffer 的。
+
+![image-20230821121501697](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230821121501697.png)
 
 **redolog的三种状态分别是：**
 
@@ -1537,13 +1870,13 @@ InnoDB 有一个后台线程，**每隔 1 秒**，就会把 redo log buffer 中�
 1. **一种是，redo log buffer 占用的空间即将达到 innodb_log_buffer_size 一半的时候，后台线程会主动写盘。**注意，由于这个事务并没有提交，所以这个写盘动作只是 write，而没有调用 fsync，也就是只留在了文件系统的 page cache。
 2. **另一种是，并行的事务提交的时候，顺带将这个事务的 redo log buffer 持久化到磁盘。**假设一个事务 A 执行到一半，已经写了一些 redo log 到 buffer 中，这时候有另外一个线程的事务 B 提交，如果 innodb_flush_log_at_trx_commit 设置的是 1，那么按照这个参数的逻辑，事务 B 要把 redo log buffer 里的日志全部持久化到磁盘。这时候，就会带上事务 A 在 redo log buffer 里的日志一起持久化到磁盘。
 
-每秒一次后台轮询刷盘，再加上崩溃恢复这个逻辑，InnoDB 就认为 **redo log 在 commit** 的时候就不需要 fsync 了，只会 write 到文件系统的 page cache 中就够了。
+每秒一次后台轮询刷盘，再加上崩溃恢复这个逻辑，InnoDB 就认为 **redo log 在 commit** 的时候就不需要 fsync 了，只会 write 到文件系统的 page cache 中就够了。**innodb_flush_log_at_trx_commit = 1设置的是在prepare阶段redo log就已经落盘。**
 
 **mysql每执行一条DML语句都先写入 redo log buffer。**
 
 **IOPS**
 
-OPS（Input/Output Operations Per Second）是一个用于计算机存储设备（如硬盘（HDD）、固态硬盘（SSD）或存储区域网络（SAN））性能测试的量测方式，可以视为是每秒的读写次数。
+OPS（Input/Output Operations Per Second）是一个用于计算机存储设备（如硬盘（HDD）、固态硬盘（SSD）或存储区域网络（SAN））性能测试的量测方式，**可以视为是每秒的读写次数**。
 
 **1、在两阶段提交的不同时刻，MySQL 异常重启会出现什么现象？**
 
@@ -1588,7 +1921,7 @@ InnoDB 接入了 MySQL 后，**发现既然 binlog 没有崩溃恢复的能力�
 
 对于binlog来说如果要恢复的事务处于数据页的最下方，之前已经提交成功的事务是恢复不了的，属于数据页级的丢失。但是，InnoDB 引擎使用的是 WAL 技术，执行事务的时候，写完内存和日志，事务就算完成了。如果之后崩溃，要依赖于日志来恢复数据页。
 
-### Bin-log
+### bin-log
 
 binlog是Server层实现的二进制日志,他会记录我们的cud操作。Binlog有以下几个特点： 
 

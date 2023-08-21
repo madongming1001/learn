@@ -1573,13 +1573,15 @@ new SpringApplication()
 执行run方法（）主要步骤
 1、获取 SpringApplicationRunListener相关的类
 2、prepareEnvironment 发布事件 ApplicationEnvironmentPreparedEvent(BootstrapApplicationListener) 去加载 bootstrap.yml 文件
-3、createApplicationContext，根据 webApplicationType 类型不同创建 ConfigurableApplicationContext，这个时候就会通过其创建对象的构造方法，创建两个对象，一个是 AnnotatedBeanDefinitionReader，
-一个是ClassPathBeanDefinitionScanner对象，其中
+3、createApplicationContext，根据 webApplicationType 类型不同创建 (ConfigurableApplicationContext)AnnotationConfigApplicationContext，这个时候就会通过其创建对象的构造方法，创建两个对象，一个是 
+AnnotatedBeanDefinitionReader，
+ClassPathBeanDefinitionScanner对象，其中
 //AnnotationConfigUtils.java
 AnnotatedBeanDefinitionReader 在new对象的时候就是往容器里面注册几个beandefinition，其中比较重要的是，
 	1. AutowiredAnnotationBeanPostProcessor.java
 	2. CommonAnnotationBeanPostProcessor.java
 	3. ConfigurationClassPostProcessor.java
+	4、EventListenerMethodProcessor.java
 ClassPathBeanDefinitionScanner是一个扫描器对象
 4、准备上下文 
 	nacos config 整合 springboot 位置
@@ -2503,7 +2505,7 @@ Spring 为 Resource 接口提供了如下实现类：
 
 # springAOP和AspectJ有关系吗？
 
-**AOP是通过“预编译方式”和“运行期间动态代理”实现程序功能的	统一维护的一种技术。AOP是一个概念，其实现技术有AspectJ和springAOP**。
+**AOP是通过“预编译方式”和“运行期间动态代理”实现程序功能的统一维护的一种技术。AOP是一个概念，其实现技术有AspectJ和springAOP**。
 
 ### 1、AspectJ
 
@@ -2519,3 +2521,63 @@ springAOP作为AOP的一种实现，基于动态代理的实现AOP，意味着�
 
 1. JDK动态代理；
 2. cglib动态代理；
+
+
+
+## RT响应时间
+
+响应时间是指系统对请求作出响应的时间。
+
+
+
+# @TransactionalEventListener
+
+事务完成后处理，
+
+1、工作方法：使用@**TransactionalEventListener**在方法上，监听对应的事件，**TransactionalEventListenerFactory**就会在匹配的方法里面创建一个监听器**ApplicationListenerMethodTransactionalAdapter**
+
+![image-20230821113050566](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230821113050566.png)
+
+2、在对应事务方法中发布事件，这个类就会注册事务方法并设置到当前事务线程中
+
+![image-20230821113219701](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230821113219701.png)
+
+![image-20230821113136945](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230821113136945.png)
+
+3、当事务结束之后
+
+**completeTransactionAfterThrowing**嵌套方法异常抛出调用
+**triggerBeforeCompletion**
+
+triggerAfterCompletion
+
+cleanupAfterCompletion
+
+**commitTransactionAfterReturning**
+
+​		processRollback
+
+​				triggerBeforeCompletion
+
+​				triggerAfterCompletion
+
+​				cleanupAfterCompletion
+
+​		processCommit
+
+​				triggerBeforeCommit(status);
+
+​		        triggerBeforeCompletion(status);
+
+​				triggerAfterCompletion
+
+​				triggerAfterCommit
+
+​				cleanupAfterCompletion
+
+@EnableTransactionManagement（TransactionManagementConfigurationSelector）会注入两个类，一个是AutoProxyRegistrar，另一个是**ProxyTransactionManagementConfiguration**，其中ProxyTransactionManagementConfiguration父类会注入一个**TransactionalEventListenerFactory**的bean,在所有bean注册完成之后会查找所有实现了SmartInitializingSingleton接口的调用其afterSingletonsInstantiated方法，其中调用TransactionalEventListenerFactory的就是**EventListenerMethodProcessor**类。
+
+[EventListenerMethodProcessor创建方式](#Spring默认启动的时候就会创建几个BeanDefinition) 
+
+![image-20230821114312050](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230821114312050.png)
+
