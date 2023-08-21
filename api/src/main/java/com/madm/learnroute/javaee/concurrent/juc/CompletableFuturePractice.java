@@ -4,9 +4,7 @@ import com.madm.learnroute.javaee.Discount;
 import lombok.Data;
 import lombok.SneakyThrows;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,6 +27,14 @@ public class CompletableFuturePractice {
         CompletableFuture.allOf(voidCompletableFuture, objectCompletableFuture).get();
         //无异常类型 CancellationException CompletionException 未经检查异常 不强制抛出
         CompletableFuture.allOf(voidCompletableFuture, objectCompletableFuture).join();
+
+        List<CompletableFuture> futures = new ArrayList<>();
+        futures.add(CompletableFuture.runAsync(() -> System.out.println(1001)));
+        futures.add(CompletableFuture.runAsync(() -> System.out.println(1001)));
+        CompletableFuture<List<Object>> listCompletableFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(v -> futures.stream()
+                .map(CompletableFuture::join)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList()));
 
         //执行后运行，需不需要上一个返回值
         //thenRun(Runnable runnable)，任务 A 执行完执行 B，并且 B 不需要 A 的结果。

@@ -22,7 +22,7 @@ public class PatternPractice {
         Matcher matcher = pattern.matcher(content);
 //        Matcher matcher = compile.matcher("TA-1509801876382683111");
         System.out.println(matcher.find());
-
+        content.substring(0, 0);//性能问题
     }
 }
 
