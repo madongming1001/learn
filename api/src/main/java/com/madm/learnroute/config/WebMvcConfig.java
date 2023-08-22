@@ -5,7 +5,6 @@ import com.madm.learnroute.technology.spring.interceptor.AuthInterceptor;
 import com.madm.learnroute.technology.spring.interceptor.TraceLogInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -17,7 +16,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 //继承 WebMvcConfigurationSupport
 @Configuration
-public class WebMvcConfiguration implements WebMvcConfigurer {
+public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

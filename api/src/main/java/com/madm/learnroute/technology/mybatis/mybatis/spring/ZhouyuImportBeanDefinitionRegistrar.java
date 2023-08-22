@@ -28,12 +28,7 @@ public class ZhouyuImportBeanDefinitionRegistrar implements ImportBeanDefinition
 
 		ZhouyuBeanDefinitionScanner scanner = new ZhouyuBeanDefinitionScanner(registry);
 
-		scanner.addIncludeFilter(new TypeFilter() {
-			@Override
-			public boolean match(@NotNull MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) throws IOException {
-				return true;
-			}
-		});
+		scanner.addIncludeFilter((metadataReader, metadataReaderFactory) -> true);
 
 		scanner.scan(path);
 	}

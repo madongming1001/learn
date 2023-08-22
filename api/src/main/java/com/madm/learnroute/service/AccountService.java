@@ -9,7 +9,7 @@ import java.util.List;
  * @author dongming.ma
  * @date 2022/11/9 22:07
  */
-public interface AccountService extends IService<Account> {
+public interface AccountService {
 
     int saveForJdbc(Account account);
 

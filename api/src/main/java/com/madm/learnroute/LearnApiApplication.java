@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @SpringBootApplication
-@MapperScan(basePackages = "com.madm.learnroute.mapper")
+//@MapperScan(basePackages = "com.madm.learnroute.mapper")
 @EnableFeignClients
 @EnableJSONDoc
 @EnableScheduling

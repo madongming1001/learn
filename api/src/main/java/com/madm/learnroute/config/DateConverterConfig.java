@@ -54,27 +54,39 @@ public class DateConverterConfig {
      * 再添加自己的`converter`就不会注册到`FormattingConversionService`中
      */
     @Bean
-    @ConditionalOnBean(name = "requestMappingHandlerAdapter")
     public Converter<String, LocalDate> localDateConverter() {
-        return source -> LocalDate.parse(source, DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT));
-    }
-
-    /**
-     * LocalDateTime转换器，用于转换RequestParam和PathVariable参数
-     */
-    @Bean
-    @ConditionalOnBean(name = "requestMappingHandlerAdapter")
-    public Converter<String, LocalDateTime> localDateTimeConverter() {
-        return source -> LocalDateTime.parse(source, DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT));
+        return new Converter<String, LocalDate>() {
+            @Override
+            public LocalDate convert(String source) {
+                return LocalDate.parse(source, DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT));
+            }
+        };
     }
 
     /**
      * LocalTime转换器，用于转换RequestParam和PathVariable参数
      */
     @Bean
-    @ConditionalOnBean(name = "requestMappingHandlerAdapter")
     public Converter<String, LocalTime> localTimeConverter() {
-        return source -> LocalTime.parse(source, DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT));
+        return new Converter<String, LocalTime>() {
+            @Override
+            public LocalTime convert(String source) {
+                return LocalTime.parse(source, DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT));
+            }
+        };
+    }
+
+    /**
+     * LocalDateTime转换器，用于转换RequestParam和PathVariable参数
+     */
+    @Bean
+    public Converter<String, LocalDateTime> localDateTimeConverter() {
+        return new Converter<String, LocalDateTime>() {
+            @Override
+            public LocalDateTime convert(String source) {
+                return LocalDateTime.parse(source, DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT));
+            }
+        };
     }
 
     /**
@@ -83,7 +95,12 @@ public class DateConverterConfig {
      */
     @Bean
     public Converter<String, Date> dateConverter() {
-        return source -> DateUtil.parse(source.trim());
+        return new Converter<String, Date>() {
+            @Override
+            public Date convert(String source) {
+                return DateUtil.parse(source.trim());
+            }
+        };
     }
 
     /**

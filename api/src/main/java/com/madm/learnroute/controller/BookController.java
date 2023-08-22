@@ -3,6 +3,7 @@ package com.madm.learnroute.controller;
 import cn.hutool.core.util.ArrayUtil;
 import com.madm.learnroute.model.Book;
 import com.madm.learnroute.service.BookService;
+import com.madm.learnroute.service.impl.BookServiceImpl;
 import com.mdm.model.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,7 @@ import java.util.Objects;
 @RequestMapping("/book")
 public class BookController {
     @Autowired
-    BookService bookService;
+    BookServiceImpl bookService;
 
     @RequestMapping("/save")
     public RestResponse save(@RequestBody @Nullable Book... book) {

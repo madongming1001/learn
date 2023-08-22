@@ -39,8 +39,6 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @Service
 @Slf4j
 public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> implements AccountService, SmartInitializingSingleton {
-
-
     @Autowired
     JdbcTemplate jdbcTemplate;
     @Autowired

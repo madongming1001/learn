@@ -1357,6 +1357,7 @@ public void await() {
 - ```java
   EventListenerMethodProcessor
   判断是否需要处理TransactionEventListener
+  ```
 ```
   
 - **ApplicationListener**
@@ -1380,7 +1381,7 @@ public void await() {
 
 **@Async默认使用的是spring的通用线程池 ThreadPoolTaskExecutor**
 
-```java
+​```java
 //自动注入类
 TaskExecutionAutoConfiguration  
 /**

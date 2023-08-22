@@ -17,8 +17,8 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 
-@ComponentScan("com.zhouyu")
-@ZhoyuMapperScan("com.zhouyu.mapper")
+//@ComponentScan("com.zhouyu")
+//@ZhoyuMapperScan("com.zhouyu.mapper")
 public class AppConfig {
 
     @Bean
@@ -54,12 +54,12 @@ public class AppConfig {
     }
 
 
-    @Bean
-    public MapperScannerConfigurer configurer() {
-        MapperScannerConfigurer configurer = new MapperScannerConfigurer();
-        configurer.setBasePackage("com.zhouyu.mapper");
-        return configurer;
-    }
+//    @Bean
+//    public MapperScannerConfigurer configurer() {
+//        MapperScannerConfigurer configurer = new MapperScannerConfigurer();
+//        configurer.setBasePackage("com.zhouyu.mapper");
+//        return configurer;
+//    }
 
 
 }

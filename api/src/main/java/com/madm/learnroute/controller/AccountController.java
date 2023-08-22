@@ -4,6 +4,7 @@ import cn.hutool.core.util.ArrayUtil;
 import com.madm.learnroute.controller.param.AccountRequest;
 import com.madm.learnroute.model.Account;
 import com.madm.learnroute.service.AccountService;
+import com.madm.learnroute.service.impl.AccountServiceImpl;
 import com.madm.learnroute.validate.ClassNameCondition;
 import com.mdm.model.RestResponse;
 import org.redisson.Redisson;
@@ -29,7 +30,7 @@ import static com.madm.learnroute.model.Account.create;
 public class AccountController {
 
     @Resource
-    AccountService accountService;
+    AccountServiceImpl accountService;
 
     @Resource
     Redisson redisson;
