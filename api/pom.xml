@@ -184,6 +184,7 @@
 
 
         <!-- mybatisplus relational -->
+        <!--动态数据源-->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
@@ -193,7 +194,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.5.1</version>
+            <version>${mybatis-plus-boot-starter.version}</version>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -212,6 +213,7 @@
             <artifactId>freemarker</artifactId>
             <version>2.3.31</version>
         </dependency>
+        <!--        翻页插件-->
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper</artifactId>

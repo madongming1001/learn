@@ -1355,9 +1355,10 @@ public void await() {
 - **SmartInitializingSingleton (获取完所有单例bean之后，afterSingletonsInstantiated)**
 
 - ```java
-  ConfigurationPropertiesRebinderAutoConfiguration
-  ```
-
+  EventListenerMethodProcessor
+  判断是否需要处理TransactionEventListener
+```
+  
 - **ApplicationListener**
 
 - **Lifecycle （finishRefresh）**
@@ -1370,6 +1371,10 @@ public void await() {
 - **MethodInterceptor （mvc）**
 
 
+
+**spring中的HandlerInterceptor和MethodInterceptor的区别？？**
+
+在Spring框架中，HandlerInterceptor和MethodInterceptor都是拦截器，用于对请求进行拦截和处理。 1. HandlerInterceptor是Spring MVC框架中的一个接口，用于拦截处理程序（也就是Controller）的执行。它可以在请求到达Controller之前、之后以及视图渲染之前对请求进行拦截，并可以修改请求或响应。HandlerInterceptor主要用于处理与请求处理程序相关的任务，例如日志记录、权限验证、异常处理等。 2. MethodInterceptor是Spring AOP框架中的一个接口，用于拦截被代理对象的方法调用。它可以在目标方法执行前后添加额外的逻辑，例如性能监控、事务管理等。MethodInterceptor主要用于处理与方法调用相关的任务，而不限于特定的请求处理过程。 区别： - HandlerInterceptor是Spring MVC框架的一部分，用于拦截和处理HTTP请求。而MethodInterceptor是Spring AOP框架的一部分，用于拦截和处理被代理对象的方法调用。 - HandlerInterceptor主要关注请求处理过程中的操作，例如请求的预处理、后处理以及视图渲染前的拦截。而MethodInterceptor主要关注方法调用过程中的操作，例如方法执行前后的逻辑增强。 - HandlerInterceptor可以获取和修改请求和响应对象，同时也可以访问和修改处理程序的上下文信息。而MethodInterceptor只能获取和修改方法参数和返回值，无法直接访问请求和响应对象。 - HandlerInterceptor可以同时拦截多个请求处理程序，对于每个请求都会创建一个新的实例。而MethodInterceptor通常对单个被代理对象进行拦截，并且可以在整个应用程序中共享同一个拦截器实例。 总之，HandlerInterceptor和MethodInterceptor都是Spring框架中用于拦截和处理不同层次操作的拦截器接口。它们在不同的模块中起到不同的作用，并满足了不同的功能需求。
 
 # Spring注解
 
@@ -1638,9 +1643,9 @@ nacos divcovery是通过事件发布的方式注册的
 
 ![Spring Cloud集成Nacos服务发现源码解析?翻了三套源码,保质保鲜-开源基础软件社区](https://dl-harmonyos.51cto.com/images/202208/27ecf1915beee9dbedf34436233880453a1cdf.jpg)
 
-# SpringBoot整合Mybatis
+# SpringBoot整合Mybatisplus
 
-## mybatis使用spring事务创建的数据库连接
+## mybatisplus使用spring事务创建的数据库连接
 
 **mybatis的datasource是创建MybatisSqlSessionFactoryBean的时候必须传的所以在后面调用他的getObject()方法的时候可以拿到。**
 
@@ -2482,6 +2487,8 @@ Spring 为 Resource 接口提供了如下实现类：
 - 它使用 `FastList` 替代 `ArrayList`，通过初始化的默认值，减少了越界检查的操作；
 - 优化并精简了字节码，通过使用 `Javassist`，减少了动态代理的性能损耗，比如使用 `invokestatic` 指令代替 `invokevirtual` 指令；
 - 实现了无锁的 `ConcurrentBag`，减少了并发场景下的锁竞争。
+
+注：Javassist是一个开源的分析、编辑和创建Java字节码的类库，可以直接编辑和生成Java生成的字节码。相对于bcel, asm等这些工具，开发者不需要了解虚拟机指令，就能动态改变类的结构，或者动态生成类。javassist简单易用， 快速。
 
 # @Autowired 和 @Resource 区别
 

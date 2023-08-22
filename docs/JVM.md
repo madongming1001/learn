@@ -1258,9 +1258,15 @@ man命令可以查看系统参数详情 man pthread_create
 
 # JVM 新生代为何需要两个 Survivor 空间？
 
-为什么不是0个 Survivor 空间？
+**为什么不是0个 Survivor 空间？**
 
-为什么不是1个 Survivor 空间？
+不能够很好的识别出长久对象。
+
+**为什么不是1个 Survivor 空间？**
+
+**因为会造成更快的Minorgc**，前提就是新生代一般都采用复制算法进行垃圾收集。原始的复制算法是把一块内存一分为二， gc 时把存活的对象从一块空间（From space）复制到另外一块空间（To space），再把原先的那块内存（From space）清理干净，最后调换 From space 和 To space 的逻辑角色（这样下一次 gc 的时候还可以按这样的方式进行）。一个survivor的情况会导致第一次清楚之后，当 Survivor 空间作为对象“出生地”的时候，很容易触发 Minor GC ，这时候8:1就很影响性能了，就算把Eden和survivor改为1:1也不行，因为这样只是平衡了gc间隔时间了，如果有两块区域就不一样了，eden始终保持可以分配对象，并且分配对象空间可以是一个eden和survivor区域了。总体来说就是分配内存的空间加大了，使用两个survivor区域。
+
+因为如果一个的话首先是8:1的问题，一般新生
 
 **参考文章：**https://cloud.tencent.com/developer/article/1787086
 
