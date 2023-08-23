@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Singleton;
 import com.google.common.collect.Lists;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.beans.factory.BeanFactoryAware;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +51,12 @@ public class WildcardPractice {
 
         System.out.println(Apple.class.isAssignableFrom(Apple.class));
         System.out.println(Fruit.class.isAssignableFrom(Apple.class));
+        System.out.println(Apple.class.isAssignableFrom(Fruit.class));
 
+
+        System.out.println(AssignableFactoryBean.class.isAssignableFrom(AssignableFactoryBean.class));
+        System.out.println(BeanFactoryAware.class.isAssignableFrom(AssignableFactoryBean.class));
+        System.out.println(AssignableFactoryBean.class.isAssignableFrom(BeanFactoryAware.class));
 //        }
     }
 
@@ -63,6 +69,9 @@ public class WildcardPractice {
         System.out.println(map2);
     }
 
+}
+
+interface AssignableFactoryBean extends BeanFactoryAware {
 }
 
 class Fruit {

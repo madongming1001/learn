@@ -2,6 +2,7 @@ package com.mdm.pojo;
 
 import lombok.*;
 import lombok.experimental.Accessors;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Accessors(chain = true)
+@Component
 public class User implements Serializable {
     private Integer id;
     @NonNull

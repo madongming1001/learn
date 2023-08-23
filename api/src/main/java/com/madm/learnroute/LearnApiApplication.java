@@ -4,6 +4,7 @@ import com.madm.learnroute.service.MyService;
 import com.madm.learnroute.service.OrderService;
 import com.madm.learnroute.technology.mybatis.service.UserService;
 import com.madm.learnroute.technology.spring.MyDeferredImportSelector;
+import com.mdm.pojo.User;
 import io.lettuce.core.resource.Delay;
 import lombok.extern.slf4j.Slf4j;
 import org.jsondoc.spring.boot.starter.EnableJSONDoc;
@@ -33,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * @author madongming
  */
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.madm.learnroute", "com.mdm.pojo"})
 //@MapperScan(basePackages = "com.madm.learnroute.mapper")
 @EnableFeignClients
 @EnableJSONDoc
@@ -71,6 +72,9 @@ public class LearnApiApplication {
         }
         ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
         ses.schedule(() -> context.close(), 10, TimeUnit.SECONDS);
+
+        User user = (User) context.getBean("user");
+        System.out.println(user.getName());
 
 //        context.registerShutdownHook();
         /**

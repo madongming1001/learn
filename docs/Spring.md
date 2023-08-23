@@ -1693,6 +1693,8 @@ private void openConnection() throws SQLException {
 
 **MapperScannerConfigurer 它 将 会 查 找 类 路 径 下 的 映 射 器 并 自 动 将 它 们 创 建 成 MapperFactoryBean。**
 
+**ClassPathMapperScanner会先调用父类的doscan方法扫描所有的类，但是重写了isCandidateCompenment方法，就会让所有的接口也可以别扫描到。**
+
 ![image-20221110152120016](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20221110152120016.png)
 
 1. 实现BeanDefinitionRegistryPostProcessor接口中的**postProcessBeanDefinitionRegistry**方法，扫描 basePackage 路径下的类，并注册到 Spring 容器中。
@@ -1754,7 +1756,15 @@ public class MapperScannerConfigurer
 
 ```
 
-**参考文章：**https://qiuyadongsite.github.io/2019/01/15/mybatis-sources-code-6/
+**参考文章：**https://qiuyadongsite.github.io/2019/01/15/mybatis-sources-code-6/ 
+
+**sqlsession数据不安全问题？**
+
+![image-20230823195743954](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230823195743954.png)
+
+
+
+
 
 # springboot2.0默认创建什么代理？
 
