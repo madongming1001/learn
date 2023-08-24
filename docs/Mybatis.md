@@ -95,6 +95,26 @@ SqlSession**（线程独有）**它是应用程序与持久层之间交互操作
 
 **SqlSessionFactory是打开SqlSession会话的工厂，是一个接口，可以根据需求自己实现，它的默认实现类DefaultSqlSessionFactory使用了数据库连接池技术。**
 
+#### SqlSessionFactoryBuilder
+
+这个类可以被实例化、使用和丢弃，一旦创建了 SqlSessionFactory，就不再需要它了。 因此 SqlSessionFactoryBuilder
+实例的最佳作用域是方法作用域（也就是局部方法变量）。 你可以重用 SqlSessionFactoryBuilder 来创建多个 SqlSessionFactory
+实例，但最好还是不要一直保留着它，以保证所有的 XML 解析资源可以被释放给更重要的事情。
+
+#### SqlSessionFactory
+
+SqlSessionFactory 一旦被创建就应该在应用的运行期间一直存在，没有任何理由丢弃它或重新创建另一个实例。 使用
+SqlSessionFactory 的最佳实践是在应用运行期间不要重复创建多次，多次重建 SqlSessionFactory 被视为一种代码“坏习惯”。因此
+SqlSessionFactory 的最佳作用域是应用作用域。 有很多方法可以做到，最简单的就是使用单例模式或者静态单例模式。
+
+#### SqlSession
+
+每个线程都应该有它自己的 SqlSession 实例。SqlSession 的实例不是线程安全的，因此是不能被共享的，所以它的最佳的作用域是请求或方法作用域。
+绝对不能将 SqlSession 实例的引用放在一个类的静态域，甚至一个类的实例变量也不行。 也绝不能将 SqlSession
+实例的引用放在任何类型的托管作用域中，比如 Servlet 框架中的 HttpSession。 如果你现在正在使用一种 Web 框架，考虑将
+SqlSession 放在一个和 HTTP 请求相似的作用域中。 换句话说，每次收到 HTTP 请求，就可以打开一个 SqlSession，返回一个响应后，就关闭它。
+这个关闭操作很重要，为了确保每次都能执行关闭操作，你应该把这个关闭操作放到 finally 块中。
+
 **参考文章：**https://segmentfault.com/a/1190000021523973
 
 # 面试官：Mybatis中 Dao接口和XML文件的SQL如何建立关联？
@@ -108,6 +128,24 @@ SqlSession**（线程独有）**它是应用程序与持久层之间交互操作
 参考文章：https://mp.weixin.qq.com/s/acddVQSo2exXd0yij8wFiQ
 
 # mybatis的一级缓存失效 
+
+根据一级缓存的特性，在使用的过程中，我认为应该注意：
+
+- 对于数据变化频率很大，并且需要高时效准确性的数据要求，我们使用SqlSession查询的时候，要控制好SqlSession的生存时间，
+  SqlSession的生存时间越长，它其中缓存的数据有可能就越旧，从而造成和真实数据库的误差；同时对于这种情况，用户也可以手动地适时清空SqlSession中的缓存；
+- 对于只执行、并且频繁执行大范围的select操作的SqlSession对象，SqlSession对象的生存时间不应过长。
+
+------
+
+### 一级缓存的生命周期有多长？
+
+MyBatis在开启一个数据库会话时，会创建一个新的SqlSession对象，SqlSession对象中会有一个新的Executor对象，Executor对象中持有一个新的PerpetualCache对象；当会话结束时，SqlSession对象及其内部的Executor对象还有PerpetualCache对象也一并释放掉。
+
+- 如果SqlSession调用了close()方法，**会释放掉一级缓存PerpetualCache对象，一级缓存将不可用**；
+- 如果SqlSession调用了clearCache()，**会清空PerpetualCache对象中的数据**，但是该对象仍可使用；
+- SqlSession中执行了任何一个update操作(update()、delete()、insert()) ，**都会清空PerpetualCache对象的数据**，但是该对象可以继续使用；
+
+------
 
 **会现在自己的threadlocal里面找sqlsession 如果没有创建一个新的 创建完成之后在设置到threadloca变量里面，如果没有开启事务就会一级缓存失效。**
 
@@ -165,7 +203,7 @@ Spring JPA和MyBatis是两种不同的持久化框架，它们在实现上有很
 
  **5. 维护成本**：Spring JPA可以通过继承**JpaRepository**等接口来实现常见的CRUD操作，减少了编码工作量，但灵活性较差。而MyBatis需要开发者手动编写SQL语句，维护成本相对较高，但可以更加灵活地控制SQL语句的执行。 总体来说，如果你希望简化开发流程，减少编码量，同时对性能要求不是很高，可以选择Spring JPA；如果你需要更高的性能和灵活性，愿意花费一些时间编写和维护SQL语句，可以选择MyBatis。选择哪种框架取决于你的项目需求和个人偏好。
 
-#### MyBatis-Plus
+# MyBatis-Plus
 
 为了更高的效率，出现了MyBatis-Plus这类工具，对MyBatis进行增强。
 

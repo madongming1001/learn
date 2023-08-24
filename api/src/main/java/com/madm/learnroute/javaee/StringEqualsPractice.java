@@ -1,6 +1,7 @@
 package com.madm.learnroute.javaee;
 
 
+import cn.hutool.core.util.IdUtil;
 import org.junit.Assert;
 
 /**
@@ -69,7 +70,6 @@ public class StringEqualsPractice {
         System.out.println(Integer.bitCount(16));
         //System.out.println("32个1：" + Integer.valueOf(String.valueOf(Integer.MAX_VALUE), 2));//2147483647
         System.out.println(Integer.toBinaryString(2147483647));//反码+补码 绝对值+1
-        System.out.println(Integer.toBinaryString(Integer.MIN_VALUE));
         System.out.println(Integer.toBinaryString(Integer.MAX_VALUE));
         System.out.println(Integer.MAX_VALUE);
 //        System.out.println(Integer.toBinaryString(65));//A
@@ -77,6 +77,8 @@ public class StringEqualsPractice {
 
         //System.out.println(Float.floatToIntBits(234));
         System.out.println(Long.MAX_VALUE);
+        System.out.println(IdUtil.fastUUID());
+        System.out.println(IdUtil.fastSimpleUUID());
     }
 
 

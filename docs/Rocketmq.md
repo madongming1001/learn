@@ -1109,3 +1109,9 @@ private void doCommit() {
 7. 业务方发送回查结果消息
 
 1-4 是同步调用，5-7是异步调用。RocketMQ事务消息使用了2PC+事后补偿机制保证了最终一致性。
+
+# 主流mq
+
+![image-20230824101638179](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230824101638179.png)
+
+![image-20230824101755029](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230824101755029.png)

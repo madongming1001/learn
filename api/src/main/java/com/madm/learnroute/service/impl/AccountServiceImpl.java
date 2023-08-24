@@ -16,6 +16,7 @@ import org.apache.curator.shaded.com.google.common.collect.Lists;
 import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -55,8 +56,8 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     @Override
     @Transactional
     public int saveForJdbc(Account account) {
-        Object sqlSessionTemplate = SpringUtil.getBean("sqlSessionTemplate");
-        Object sqlSessionFactory = SpringUtil.getBean("sqlSessionFactory");
+        SqlSessionTemplate sqlSessionTemplate = SpringUtil.getBean("sqlSessionTemplate");
+        SqlSessionFactory SqlSessionFactory = SpringUtil.getBean("sqlSessionFactory");
         log.info("sqlSessionTemplate :{}, sqlSessionFactory : {}", sqlSessionTemplate, sqlSessionFactory);
         return baseMapper.insert(createAccount());
 //        使用的还是DataSourceUtils.getConnection(obtainDataSource());

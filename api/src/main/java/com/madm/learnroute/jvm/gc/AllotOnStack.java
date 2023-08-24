@@ -17,6 +17,7 @@ import com.mdm.pojo.User;
 public class AllotOnStack {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
+        System.out.println(start);
         for (int i = 0; i < 100000000; i++) {
             alloc();
         }
