@@ -31,7 +31,7 @@ public class Account {
     @ApiModelProperty(value = "性别")
     private GenderEnum gender;
 
-    public static Account create() {
+    public static Account createAccount() {
         return new Account().setBalance(BigDecimal.valueOf((int) Math.random() * 88 + 1)).
                                 setUserName(RandomUtils.nextInt(0, 1000000000) + StringPool.UNDERSCORE + "auto").
                                 setGender(getRandomGender());

@@ -3,22 +3,19 @@ package com.madm.learnroute.controller;
 import cn.hutool.core.util.ArrayUtil;
 import com.madm.learnroute.controller.param.AccountRequest;
 import com.madm.learnroute.model.Account;
-import com.madm.learnroute.service.AccountService;
 import com.madm.learnroute.service.impl.AccountServiceImpl;
 import com.madm.learnroute.validate.ClassNameCondition;
 import com.mdm.model.RestResponse;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.util.List;
 
-import static com.madm.learnroute.model.Account.create;
+import static com.madm.learnroute.model.Account.createAccount;
 
 /**
  * @author dongming.ma
@@ -36,9 +33,9 @@ public class AccountController {
     Redisson redisson;
 
     @GetMapping("/save")
-    public RestResponse     save(@RequestBody Account... account) {
-        accountService.saveForJdbc(ArrayUtil.isNotEmpty(account) ? account[0] : create());
-        accountService.save(ArrayUtil.isNotEmpty(account) ? account[0] : create());
+    public RestResponse  save(@RequestBody Account... account) {
+        accountService.saveForJdbc(ArrayUtil.isNotEmpty(account) ? account[0] : createAccount());
+        accountService.save(ArrayUtil.isNotEmpty(account) ? account[0] : createAccount());
         return RestResponse.OK();
     }
 

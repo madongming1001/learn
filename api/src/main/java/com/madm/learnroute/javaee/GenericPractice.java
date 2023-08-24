@@ -72,6 +72,8 @@ public class GenericPractice<T> extends TestClass<String> implements TestInterfa
 
     @SneakyThrows
     public static void main(String[] args) {
+        System.out.println(TestInterface1.class);
+
         OutputInterface oi =  new GenericPractice<String>() {
             public String innerMethod() {
                 return "1";

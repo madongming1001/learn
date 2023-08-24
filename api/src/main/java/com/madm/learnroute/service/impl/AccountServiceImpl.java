@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.hutool.core.date.DatePattern.NORM_DATETIME_PATTERN;
-import static com.madm.learnroute.model.Account.create;
+import static com.madm.learnroute.model.Account.createAccount;
 import static java.time.format.DateTimeFormatter.ofPattern;
 
 /**
@@ -58,7 +58,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         Object sqlSessionTemplate = SpringUtil.getBean("sqlSessionTemplate");
         Object sqlSessionFactory = SpringUtil.getBean("sqlSessionFactory");
         log.info("sqlSessionTemplate :{}, sqlSessionFactory : {}", sqlSessionTemplate, sqlSessionFactory);
-        return accountMapper.insert(account);
+        return baseMapper.insert(createAccount());
 //        使用的还是DataSourceUtils.getConnection(obtainDataSource());
 //        return jdbcTemplate.update("update account set " + account.getUserName() + " = left(" + account.getUserName() + ",9) where id = " + account.getId());
     }
@@ -112,9 +112,9 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     }
 
     @Override
-    @Transactional
+//    @Transactional
     public void afterSingletonsInstantiated() {
-        accountService.saveForJdbc(create());
+//        accountService.saveForJdbc(createAccount());
         applicationEventPublisher.publishEvent(new MyApplicationEvent(ofPattern(NORM_DATETIME_PATTERN).format(LocalDateTime.now())));
     }
 }

@@ -906,11 +906,20 @@ AbstractPlatformTransactionManager$prepareForCommit()提交事务之前回掉方
 
 ​						2、在切面中设置TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
 
+​						3、使用@Order注解提高切面优先级，order值越小，优先级越高
+
 **4、spring是无默认生效的方法权限都必须为public**
 
 ​	解决方法：1、将方法改为public
 
 ​						2、修改TransactionAttributeSource.将publicMethodsOnly修改为false
+
+```java
+@Bean
+public TransactionAttributeSource transactionAttributeSource(){
+    return new AnnotationTansactionAttributeSource(publicMethodsOnly:false);
+}
+```
 
 ​						3、开启Aspectj代理模式
 
@@ -1716,6 +1725,24 @@ private void openConnection() throws SQLException {
 
 **参考文章：**https://blog.csdn.net/Wu_Shang001/article/details/125356883
 
+MapperScannerConfigurer 实现了 BeanDefinitionRegistryPostProcessor这个类 所以在 refresh()调用invokeBeanFactoryPostProcessor方法的时候就会去调用这个类的postProcessBeanDefinitionRegistry方法，这个方法会初始化一个ClassPathMapperScanner对象，他继承自 ClassPathBeanDefinitionScanner,ConfigurationClassPostProcessor中用来实现@ComenmentScan注解扫描bean的，正常它通过方法设置不回去扫描接口或者实现类，但是在ClassPathMapperScanner中覆盖了这个方法isCandidateComponent让他可以扫描接口，回到postProcessBeanDefinitionRegistry方法中，注册完ClassPathMapperScanner方法之后有设置了一系列的值，最后调用它的scan方法，先调用父类的doscan方法扫描出所有的beandefinition（是接口的），就是对应我们创建的mapper，父类doscan调用完成之后会回到自己的方法中继续处理这些个接口，因为接口不能实例话，所以在后来把它beandefinition的beanclass变为了MapperFactoryBean,这样后来就可以实例话了。在docreatebean -> initializeBean中会调用afterpropertiesset方法，里面就会把当前的bean包装成一个**MybatisMapperProxyFactory**类型。然后放入到configuration的一个map类型的缓存中，key=mapper名字，value就是MybatisMapperProxyFactory对象。
+
+然后谁需要mapper类型的bean的话就需要注入，而因为它是一个mapperfactorybean类型的就会调用到getObject()方法,而最终就回去之前的map里面去找，找到取出来的时候在进行下面的newInstance也就是jdk代理的生成，变为代理类。调用其方法的时候就会走到 **MybatisMapperProxy**的invoke方法 最终会调用到sqlsession的4大类方法中，因为sqlsession是sqlsessiontemplate类型，会走到对应的方法，而因为内部会走代理类，sqlSessionProxy（SqlSessionInterceptor）的invoke方法，就会先获取sqlsession（defaultsqlsession），因为是每一个数据库方法一个，是在方法区域的，所以是线程安全的，他会先去当前事务中查看有没有绑定资源 
+
+SpringManagedTransactionFactory。
+
+![image-20230823232212130](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230823232212130.png)
+
+![image-20230823232037484](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230823232037484.png)
+
+![image-20230823225346789](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230823225346789.png)
+
+![image-20230823225141048](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230823225141048.png)
+
+![image-20230823231005007](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230823231005007.png)
+
+
+
 ### **入口**
 
 **@MapperScan("com.madm.learnroute.mapper") -> @Import(MapperScannerRegistrar.class)**
@@ -1761,6 +1788,12 @@ public class MapperScannerConfigurer
 **sqlsession数据不安全问题？**
 
 ![image-20230823195743954](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230823195743954.png)
+
+**FactoryBean通过getObject方法获取对象的源码调用地址？**
+
+```
+doGetBean#getObjectForBeanInstance(sharedInstance, name, beanName, mbd)#getObjectFromFactoryBean#doGetObjectFromFactoryBean(factory, beanName);
+```
 
 
 

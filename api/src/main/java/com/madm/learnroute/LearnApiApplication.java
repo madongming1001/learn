@@ -49,6 +49,7 @@ import java.util.concurrent.TimeUnit;
 public class LearnApiApplication {
 
     public static void main(String[] args) {
+//        System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");//jdk 1.8
         ConfigurableApplicationContext context = SpringApplication.run(LearnApiApplication.class, args);
 //        while (true) {
         String configValue = context.getEnvironment().getProperty("config.info");
