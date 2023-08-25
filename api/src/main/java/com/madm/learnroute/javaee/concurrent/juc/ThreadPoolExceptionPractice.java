@@ -5,7 +5,6 @@ import jodd.exception.ExceptionUtil;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * execute 方法执行时，会抛出(打印)堆栈异常。

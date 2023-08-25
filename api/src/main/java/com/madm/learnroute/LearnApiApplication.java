@@ -1,17 +1,12 @@
 package com.madm.learnroute;
 
-import com.madm.learnroute.service.MyService;
-import com.madm.learnroute.service.OrderService;
-import com.madm.learnroute.technology.mybatis.service.UserService;
 import com.madm.learnroute.technology.spring.MyDeferredImportSelector;
 import com.mdm.pojo.User;
-import io.lettuce.core.resource.Delay;
 import lombok.extern.slf4j.Slf4j;
 import org.jsondoc.spring.boot.starter.EnableJSONDoc;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -22,7 +17,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -35,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @SpringBootApplication(scanBasePackages = {"com.madm.learnroute", "com.mdm.pojo"})
-//@MapperScan(basePackages = "com.madm.learnroute.mapper")
+@MapperScan(basePackages = "com.madm.learnroute.mapper")
 @EnableFeignClients
 @EnableJSONDoc
 @EnableScheduling

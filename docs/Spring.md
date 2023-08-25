@@ -1672,7 +1672,13 @@ MybatisPlusAutoConfiguration.java
 
 ```
 
-通过Configuration的方式创建的DefaultSqlSessionFactory()。**里面有一个很重要的参数决定了mybatis是否使用spring的事务连接(transactionFactory)**，Mybatis在创建**SqlSession**时，需要为其**添加一个Executor执行器**，**构建Executor执行器时需要的Transaction对象就是通过TransactionFactory的newTransaction方法创建的**，后续Executor执行sql命令时会**通过Transaction的getConnection方法获取数据库连接。**而这里面获取连接靠的也是DataSourceUtils.getConnection(this.dataSource)的连接。也就是事务的连接。从**TransactionSynchronizationManager.getResource(dataSource);**获取ConnectionHolder。
+通过Configuration的方式创建的DefaultSqlSessionFactory()。**里面有一个很重要的参数决定了mybatis是否使用spring的事务连接(
+transactionFactory)**，Mybatis在创建**SqlSession**时，需要为其**添加一个Executor执行器**，*
+*构建Executor执行器时需要的Transaction对象就是通过TransactionFactory(SpringManagedTransactionFactory)的newTransaction()
+方法创建的**
+，后续prepareStatement的时候会通过TransactionFactory的newTransaction获取数据库连接，而这里面获取连接靠的也是DataSourceUtils.getConnection(
+this.dataSource)的连接。事务有连接就用事务的，没有就自己创建。从**TransactionSynchronizationManager.getResource(
+dataSource);**获取ConnectionHolder。
 
 ```java
 @Override
@@ -1700,7 +1706,7 @@ private void openConnection() throws SQLException {
 }
 ```
 
-**MapperScannerConfigurer 它 将 会 查 找 类 路 径 下 的 映 射 器 并 自 动 将 它 们 创 建 成 MapperFactoryBean。**
+**MapperScannerConfigurer 它 将 会 查 找 类 路 径 下 的 mapper接口并 自 动 将 它 们 创 建 成 MapperFactoryBean。**
 
 **ClassPathMapperScanner会先调用父类的doscan方法扫描所有的类，但是重写了isCandidateCompenment方法，就会让所有的接口也可以别扫描到。**
 
@@ -1725,9 +1731,22 @@ private void openConnection() throws SQLException {
 
 **参考文章：**https://blog.csdn.net/Wu_Shang001/article/details/125356883
 
-MapperScannerConfigurer 实现了 BeanDefinitionRegistryPostProcessor这个类 所以在 refresh()调用invokeBeanFactoryPostProcessor方法的时候就会去调用这个类的postProcessBeanDefinitionRegistry方法，这个方法会初始化一个ClassPathMapperScanner对象，他继承自 ClassPathBeanDefinitionScanner,ConfigurationClassPostProcessor中用来实现@ComenmentScan注解扫描bean的，正常它通过方法设置不回去扫描接口或者实现类，但是在ClassPathMapperScanner中覆盖了这个方法isCandidateComponent让他可以扫描接口，回到postProcessBeanDefinitionRegistry方法中，注册完ClassPathMapperScanner方法之后有设置了一系列的值，最后调用它的scan方法，先调用父类的doscan方法扫描出所有的beandefinition（是接口的），就是对应我们创建的mapper，父类doscan调用完成之后会回到自己的方法中继续处理这些个接口，因为接口不能实例话，所以在后来把它beandefinition的beanclass变为了MapperFactoryBean,这样后来就可以实例话了。在docreatebean -> initializeBean中会调用afterpropertiesset方法，里面就会把当前的bean包装成一个**MybatisMapperProxyFactory**类型。然后放入到configuration的一个map类型的缓存中，key=mapper名字，value就是MybatisMapperProxyFactory对象。
+**MapperScannerConfigurer** 实现了 **BeanDefinitionRegistryPostProcessor**这个类 所以在 refresh()
+调用invokeBeanFactoryPostProcessor方法的时候就会去调用这个类的postProcessBeanDefinitionRegistry方法，这个方法会初始化一个
+**ClassPathMapperScanner**对象，他继承自 **ClassPathBeanDefinitionScanner**,**ConfigurationClassPostProcessor**
+中用来实现**@ComenmentScan**注解扫描bean的，正常它通过方法设置不会去扫描接口或者实现类，但是在**ClassPathMapperScanner*
+*中覆盖了这个方法**isCandidateComponent**让他可以扫描接口，回到**postProcessBeanDefinitionRegistry**方法中，注册完**
+ClassPathMapperScanner**方法之后有设置了一系列的值，最后调用它的**scan**方法，先调用父类的**doscan*
+*方法扫描出所有的beandefinition（是接口的），就是对应我们创建的mapper，父类**doscan*
+*调用完成之后会回到自己的方法中继续处理这些个接口，因为接口不能实例话，所以在后来把它beandefinition的beanclass变为了**
+MapperFactoryBean**,这样后来就可以实例话了。在docreatebean -> initializeBean中会调用afterpropertiesset方法，里面就会把当前的bean包装成一个
+**MybatisMapperProxyFactory**类型。然后放入到configuration的一个map类型的缓存中，key=mapper名字，value就是MybatisMapperProxyFactory对象。
 
-然后谁需要mapper类型的bean的话就需要注入，而因为它是一个mapperfactorybean类型的就会调用到getObject()方法,而最终就回去之前的map里面去找，找到取出来的时候在进行下面的newInstance也就是jdk代理的生成，变为代理类。调用其方法的时候就会走到 **MybatisMapperProxy**的invoke方法 最终会调用到sqlsession的4大类方法中，因为sqlsession是sqlsessiontemplate类型，会走到对应的方法，而因为内部会走代理类，sqlSessionProxy（SqlSessionInterceptor）的invoke方法，就会先获取sqlsession（defaultsqlsession），因为是每一个数据库方法一个，是在方法区域的，所以是线程安全的，他会先去当前事务中查看有没有绑定资源 
+然后谁需要mapper类型的bean的话就需要注入，而因为它是一个**MapperFactoryBean**类型的就会调用到**getObject**()
+方法,而最终就回去之前的map里面去找，找到取出来的时候在进行下面的**newInstance**也就是jdk代理的生成，变为代理类。调用其方法的时候就会走到
+**MybatisMapperProxy**的**invoke**方法 最终会调用到**SqlSessionInterceptor**
+的invoke中。因为sqlsession是sqlsessiontemplate类型，会走到对应的方法，而因为内部会走代理类，sqlSessionProxy（SqlSessionInterceptor）的invoke方法，就会先获取sqlsession（defaultsqlsession），因为是每一个数据库方法一个，是在方法区域的，所以是线程安全的，他会先去当前事务中查看有没有绑定资源
+。没有就自己创建一个return new DefaultSqlSession(configuration, executor, autoCommit);
 
 SpringManagedTransactionFactory。
 
