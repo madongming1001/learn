@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.madm.learnroute.mapper.AccountMapper;
 import com.madm.learnroute.model.Account;
 import com.madm.learnroute.service.AccountService;
+import com.madm.learnroute.technology.spring.AccountRegisterEvent;
 import com.madm.learnroute.technology.spring.MyApplicationEvent;
 import com.mdm.utils.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -113,9 +114,10 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     }
 
     @Override
-//    @Transactional
+    @Transactional
     public void afterSingletonsInstantiated() {
-//        accountService.saveForJdbc(createAccount());
+        accountService.saveForJdbc(createAccount());
         applicationEventPublisher.publishEvent(new MyApplicationEvent(ofPattern(NORM_DATETIME_PATTERN).format(LocalDateTime.now())));
+        applicationEventPublisher.publishEvent(new AccountRegisterEvent(ofPattern(NORM_DATETIME_PATTERN).format(LocalDateTime.now())));
     }
 }

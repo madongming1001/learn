@@ -450,6 +450,8 @@ AtAfterThrowing -> AspectJAfterThrowingAdvice
 
 ## 1.调用被代理的方法
 
+Cglib无法代理final修饰的方法和类还有私有方法。
+
 2.找到cglib文件
 
 3.根据var00000找到DynamicAdvisedInterceptor#intercept方法ExposeInvocationInterceptor中间的调用循环结构

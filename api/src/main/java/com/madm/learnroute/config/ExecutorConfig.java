@@ -28,7 +28,7 @@ public class ExecutorConfig {
         executor.setQueueCapacity(1000);
         executor.setKeepAliveSeconds(30);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        executor.getThreadPoolExecutor().setThreadFactory(new ThreadFactoryDecorator(executor));
+        executor.setThreadFactory(new ThreadFactoryDecorator(executor));
         executor.initialize();
         return executor;
     }
