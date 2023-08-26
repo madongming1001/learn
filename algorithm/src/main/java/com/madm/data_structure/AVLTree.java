@@ -11,6 +11,58 @@ import java.util.Queue;
 public class AVLTree {
     private TreeNode root;
 
+    //中序遍历
+    public static void inOrderTraversal(TreeNode node) {
+        if (node != null) {
+            inOrderTraversal(node.left);
+            System.out.print(node.data + " ");
+            inOrderTraversal(node.right);
+        }
+    }
+
+    //层序遍历
+    public static void levelOrderTraversal(TreeNode root) {
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            System.out.print(node.data + " ");
+            if (node.left != null) {
+                queue.offer(node.left);
+            }
+            if (node.right != null) {
+                queue.offer(node.right);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        AVLTree tree = new AVLTree();
+        int input[] = {5, 3, 7, 2, 4, 6, 9, 1};
+        for (int i = 0; i < input.length; i++) {
+            tree.insert(input[i]);
+        }
+        System.out.println("中序遍历: ");
+        inOrderTraversal(tree.root);
+        System.out.println();
+        System.out.println("层序遍历: ");
+        levelOrderTraversal(tree.root);
+        System.out.println();
+        System.out.printf("高度: %d\n", tree.height());
+        int deletedData = 3;
+
+        System.out.printf("删除根节点: %d\n", deletedData);
+        tree.remove(deletedData);
+
+        System.out.println("中序遍历: ");
+        inOrderTraversal(tree.root);
+        System.out.println();
+        System.out.println("层序遍历: ");
+        levelOrderTraversal(tree.root);
+        System.out.println();
+        System.out.printf("高度: %d\n", tree.height());
+    }
+
     /*
      * 获取树的高度
      */
@@ -180,31 +232,6 @@ public class AVLTree {
         return node;
     }
 
-    //中序遍历
-    public static void inOrderTraversal(TreeNode node) {
-        if (node != null) {
-            inOrderTraversal(node.left);
-            System.out.print(node.data + " ");
-            inOrderTraversal(node.right);
-        }
-    }
-
-    //层序遍历
-    public static void levelOrderTraversal(TreeNode root) {
-        Queue<TreeNode> queue = new LinkedList<>();
-        queue.offer(root);
-        while (!queue.isEmpty()) {
-            TreeNode node = queue.poll();
-            System.out.print(node.data + " ");
-            if (node.left != null) {
-                queue.offer(node.left);
-            }
-            if (node.right != null) {
-                queue.offer(node.right);
-            }
-        }
-    }
-
     class TreeNode {
         int data;
         int height;
@@ -222,32 +249,5 @@ public class AVLTree {
             int right = (this.right == null ? 0 : this.right.height);
             return left - right;
         }
-    }
-
-    public static void main(String[] args) {
-        AVLTree tree = new AVLTree();
-        int input[] = {5, 3, 7, 2, 4, 6, 9, 1};
-        for (int i = 0; i < input.length; i++) {
-            tree.insert(input[i]);
-        }
-        System.out.println("中序遍历: ");
-        inOrderTraversal(tree.root);
-        System.out.println();
-        System.out.println("层序遍历: ");
-        levelOrderTraversal(tree.root);
-        System.out.println();
-        System.out.printf("高度: %d\n", tree.height());
-        int deletedData = 3;
-
-        System.out.printf("删除根节点: %d\n", deletedData);
-        tree.remove(deletedData);
-
-        System.out.println("中序遍历: ");
-        inOrderTraversal(tree.root);
-        System.out.println();
-        System.out.println("层序遍历: ");
-        levelOrderTraversal(tree.root);
-        System.out.println();
-        System.out.printf("高度: %d\n", tree.height());
     }
 }

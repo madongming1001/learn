@@ -10,19 +10,8 @@ public class ThreadLocalHolder {
 
     private Long currentTime;
 
-    /**
-     * 不同业务设置不同的业务场景，如：业务A设置值为1，业务B设置值为2...
-     */
-    private static class InnerClass {
-        private static final ThreadLocal<String> sceneThreadLocal = new ThreadLocal<>();
-    }
-
     public ThreadLocalHolder() {
         initProperties();
-    }
-
-    private void initProperties() {
-        this.currentTime = System.currentTimeMillis();
     }
 
     public static String getScene() {
@@ -35,6 +24,25 @@ public class ThreadLocalHolder {
 
     public static void clearScene() {
         initScene(null);
+    }
+
+    private void initProperties() {
+        this.currentTime = System.currentTimeMillis();
+    }
+
+    public enum SingletonEnum {
+        INSTANCE;
+
+        public void execute() {
+            System.out.println("begin execute");
+        }
+    }
+
+    /**
+     * 不同业务设置不同的业务场景，如：业务A设置值为1，业务B设置值为2...
+     */
+    private static class InnerClass {
+        private static final ThreadLocal<String> sceneThreadLocal = new ThreadLocal<>();
     }
 
     static class Singleton {
@@ -62,13 +70,6 @@ public class ThreadLocalHolder {
             System.out.println(instance);
             System.out.println(refInstance);
             System.out.println(instance == refInstance);
-        }
-    }
-
-    public enum SingletonEnum {
-        INSTANCE;
-        public void execute() {
-            System.out.println("begin execute");
         }
     }
 }

@@ -3,7 +3,6 @@ package com.madm.learnroute.javaee.concurrent.synchronize;
 import org.openjdk.jol.info.ClassLayout;
 
 /**
- *
  * @author ：杨过
  * @date ：Created in 2020/6/28
  * @version: V1.0
@@ -20,7 +19,7 @@ public class Juc_PrintMarkWord {
         T t = new T();
         //未出现任何获取锁的时候(匿名偏向)
         System.out.println(ClassLayout.parseInstance(t).toPrintable());
-        synchronized (t){
+        synchronized (t) {
             // 获取一次锁之后
             System.out.println(ClassLayout.parseInstance(t).toPrintable());
         }
@@ -28,7 +27,7 @@ public class Juc_PrintMarkWord {
         System.out.println(t.hashCode());
         // 计算了hashcode之后，将导致锁的升级（无锁）
         System.out.println(ClassLayout.parseInstance(t).toPrintable());
-        synchronized (t){
+        synchronized (t) {
             // 再次获取锁（轻量级锁）
             System.out.println(ClassLayout.parseInstance(t).toPrintable());
         }
@@ -36,6 +35,6 @@ public class Juc_PrintMarkWord {
     }
 }
 
-class T{
+class T {
     int i = 0;
 }

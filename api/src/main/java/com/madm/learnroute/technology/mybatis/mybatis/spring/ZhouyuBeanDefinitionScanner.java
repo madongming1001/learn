@@ -13,26 +13,26 @@ import java.util.Set;
  */
 public class ZhouyuBeanDefinitionScanner extends ClassPathBeanDefinitionScanner {
 
-	public ZhouyuBeanDefinitionScanner(BeanDefinitionRegistry registry) {
-		super(registry);
-	}
+    public ZhouyuBeanDefinitionScanner(BeanDefinitionRegistry registry) {
+        super(registry);
+    }
 
-	@Override
-	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
-		Set<BeanDefinitionHolder> beanDefinitionHolders = super.doScan(basePackages);
+    @Override
+    protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
+        Set<BeanDefinitionHolder> beanDefinitionHolders = super.doScan(basePackages);
 
-		for (BeanDefinitionHolder beanDefinitionHolder : beanDefinitionHolders) {
-			BeanDefinition beanDefinition = beanDefinitionHolder.getBeanDefinition();
+        for (BeanDefinitionHolder beanDefinitionHolder : beanDefinitionHolders) {
+            BeanDefinition beanDefinition = beanDefinitionHolder.getBeanDefinition();
 
-			beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(beanDefinition.getBeanClassName());
-			beanDefinition.setBeanClassName(ZhouyuFactoryBean.class.getName());
-		}
+            beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(beanDefinition.getBeanClassName());
+            beanDefinition.setBeanClassName(ZhouyuFactoryBean.class.getName());
+        }
 
-		return beanDefinitionHolders;
-	}
+        return beanDefinitionHolders;
+    }
 
-	@Override
-	protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
-		return beanDefinition.getMetadata().isInterface();
-	}
+    @Override
+    protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
+        return beanDefinition.getMetadata().isInterface();
+    }
 }

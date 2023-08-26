@@ -1,6 +1,6 @@
 package com.mdm.function;
 
-public class Animal extends TemplateMethodeHandler{
+public class Animal extends TemplateMethodeHandler {
 
     @Override
     void nameClassify(String name) {

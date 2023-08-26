@@ -1,16 +1,11 @@
 package com.madm.learnroute.javaee;
 
-import cn.hutool.core.lang.func.Func1;
 import com.madm.learnroute.model.Employee;
-import com.mdm.pojo.Apple;
-import com.mdm.utils.GsonObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import static com.madm.learnroute.javaee.ListStreamPractice.appleList;
 
 /**
  * Comparable 翻译为中文是“比较”的意思，而 Comparator 是“比较器”的意思。

@@ -6,7 +6,7 @@ package com.madm.learnroute.javaee;
  */
 public class SymbolPractice {
     public static void main(String[] args) {
-        if(2==3 | 1==1){
+        if (2 == 3 | 1 == 1) {
             System.out.println("sssss");
         }
         System.out.println("bbbbbb");

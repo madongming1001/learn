@@ -13,7 +13,7 @@ public class ArthasPractice {
         //模拟CPU过高
         // 模拟线程死锁
         //无异常类型 CancellationException CompletionException 未经检查异常 不强制抛出
-        CompletableFuture.allOf(CompletableFuture.runAsync(() -> cpuHigh()),CompletableFuture.runAsync(() -> deadThread())).join();
+        CompletableFuture.allOf(CompletableFuture.runAsync(() -> cpuHigh()), CompletableFuture.runAsync(() -> deadThread())).join();
         // 不断的向 hashSet 集合增加数据
 //        addHashSetThread();
         while (viability) {

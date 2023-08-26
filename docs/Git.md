@@ -16,20 +16,18 @@
 - commit之后又改了一个小bug，但是又不想增加一个commit，可以用：`git commit --amend --no-edit`，直接将改动添加到上一次的commit中
 - `git push`
 - `git pull`
-- `touch .gitignore` 
--  git commit -m '补交Oct18' --date "Mon Nov 29 18:18:18 2022 +0800"
+- `touch .gitignore`
+- git commit -m '补交Oct18' --date "Mon Nov 29 18:18:18 2022 +0800"
 
 ####修改分支名称
 
-1. 执行命令git checkout br_rename_old   //切换到br_rename_old分支 （如果已经在这个分支下，可以不执行此步骤）
-2. 执行命令git pull origin br_rename_old  //将代码更新到和远程仓库一致
-3. 执行命令git branch -m br_rename_old br_rename_new  //将本地仓库的br_rename_old的名称修改为br_rename_new
-4. 执行命令git push origin --delete br_rename_old  //将远程分支br_rename_old删除
-5. 执行命令git push --set-upstream origin br_rename_new   //将本地分支push到远程仓库
+1. 执行命令git checkout br_rename_old //切换到br_rename_old分支 （如果已经在这个分支下，可以不执行此步骤）
+2. 执行命令git pull origin br_rename_old //将代码更新到和远程仓库一致
+3. 执行命令git branch -m br_rename_old br_rename_new //将本地仓库的br_rename_old的名称修改为br_rename_new
+4. 执行命令git push origin --delete br_rename_old //将远程分支br_rename_old删除
+5. 执行命令git push --set-upstream origin br_rename_new //将本地分支push到远程仓库
 6. git remote rename pb paul 重命名远程分支
 7. git remote rm paul 删除远程分支
-
-
 
 #### Git 标签管理
 
@@ -69,7 +67,8 @@
   了，想撤销这次的修改：
 
   - `git revert commitID`. 其实，`git revert`可以用来撤销任意一次的修改，不一定要是最近一次
-  - `git reset --hard commitID`/`git reset --hard HEAD^`（HEAD表示当前版本，几个^表示倒数第几个版本，倒数第100个版本可以用HEAD~100）；参数`--hard`：强制将暂存区和工作区都同步到指定的版本
+  - `git reset --hard commitID`/`git reset --hard HEAD^`
+    （HEAD表示当前版本，几个^表示倒数第几个版本，倒数第100个版本可以用HEAD~100）；参数`--hard`：强制将暂存区和工作区都同步到指定的版本
   - `git reset`和`git revert`的区别是：reset是用来回滚的，将HEAD的指针指向了想要回滚的版本，作为最新的版本，而后面的版本也都没有了；而revert只是用来撤销某一次更改，对之后的更改并没有影响
   - 然后再用`git push -f`提交到远程仓库
 
@@ -96,35 +95,44 @@
   - 可以使用`git stash apply <stash number>`恢复之前储藏的工作现场，再使用`git stash drop <stash number>`删除掉储藏的内容
   - 也可以直接用`git stash pop`恢复并删除内容
 
-- 如果在其它分支上做了一个修改（比如修复了一个bug，这次修改有一个commitID），想要将这次修改应用到当前分支上，可以使用：`git cherry-pick commitID`，可以复制一个特定的提交到当前分支
+-
+
+如果在其它分支上做了一个修改（比如修复了一个bug，这次修改有一个commitID），想要将这次修改应用到当前分支上，可以使用：`git cherry-pick commitID`
+，可以复制一个特定的提交到当前分支
 
 #### git reset --soft,--hard的区别
 
 git reset 命令可以将当前的`HEAD`重置到特定的状态。
- 首先要搞清楚下面几个概念
+首先要搞清楚下面几个概念
 
--  `HEAD`: `HEAD`就是指向当前分支当前版本的游标
-- Index: Index即为暂存区，当你修改了你的git仓库里的一个文件时，这些变化一开始是unstaged状态，为了提交这些修改，你需要使用`git add`把它加入到index，使它成为staged状态。当你提交一个commit时，index里面的修改被提交。
+- `HEAD`: `HEAD`就是指向当前分支当前版本的游标
+- Index:
+  Index即为暂存区，当你修改了你的git仓库里的一个文件时，这些变化一开始是unstaged状态，为了提交这些修改，你需要使用`git add`
+  把它加入到index，使它成为staged状态。当你提交一个commit时，index里面的修改被提交。
 - working tree: 即当前的工作目录。
 
 ##### **--soft**
 
-使用`--soft`参数将会仅仅重置`HEAD`到制定的版本，不会修改index和working tree,而本地文件的内容并没有发生变化，**而index中仍然有最近一次提交的修改，这时执行git status会显示这些修改已经在暂存区中了**，无需再一次执行git add。修改已经在暂存区
+使用`--soft`参数将会仅仅重置`HEAD`到制定的版本，不会修改index和working tree,而本地文件的内容并没有发生变化，*
+*而index中仍然有最近一次提交的修改，这时执行git status会显示这些修改已经在暂存区中了**，无需再一次执行git add。修改已经在暂存区
 
 ##### --mixed
 
-使用`--mixed`参数与--soft的不同之处在于，--mixed修改了index，使其与第二个版本匹配。index中给定commit之后的修改被unstaged。如果现在执行git commit 将不会发生任何事，因为暂存区中没有修改，在提交之前需要再次执行git add。修改不再暂存区
+使用`--mixed`参数与--soft的不同之处在于，--mixed修改了index，使其与第二个版本匹配。index中给定commit之后的修改被unstaged。如果现在执行git
+commit 将不会发生任何事，因为暂存区中没有修改，在提交之前需要再次执行git add。修改不再暂存区
 
 ##### --hard
 
-使用`--hard`同时也会修改working tree，也就是当前的工作目录，如果我们执行`git reset --hard HEAD~`，那么最后一次提交的修改，包括本地文件的修改都会被清除，彻底还原到上一次提交的状态且无法找回。所以在执行`reset --hard`之前一定要小心
+使用`--hard`同时也会修改working tree，也就是当前的工作目录，如果我们执行`git reset --hard HEAD~`
+，那么最后一次提交的修改，包括本地文件的修改都会被清除，彻底还原到上一次提交的状态且无法找回。所以在执行`reset --hard`
+之前一定要小心
 
 ## git revert
 
 ##### 使用`git revert`也能起到回退版本的作用，不同之处在于
 
--  `git revert <commit>`会回退到<commit>之前的那次提交，比如`git revert HEAD~3`会回退到最近的第4个提交的状态，而不是第3个
--  `git revert`会产生一个新的commit，将这次回退作为一次修改记录提交，这样的好处是不修改历史提交记录。
+- `git revert <commit>`会回退到<commit>之前的那次提交，比如`git revert HEAD~3`会回退到最近的第4个提交的状态，而不是第3个
+- `git revert`会产生一个新的commit，将这次回退作为一次修改记录提交，这样的好处是不修改历史提交记录。
 
 **参考文章：**https://www.jianshu.com/p/c6927e80a01d
 
@@ -136,23 +144,21 @@ Git的三个重要配置文件分别是/etc/gitconfig，${home}/.gitconfig，.gi
 
 - /etc/gitconfig: 系统范围内的配置文件，适用于系统所有的用户； 使用 git config 时， 加 --system 选项，Git将读写这个文件。
 - ${home}/.gitconfig: 用户级的配置文件，只适用于当前用户； 使用 git config 时， 加 --global 选项，Git将读写这个文件。
-- .git/config: Git项目级的配置文件，位于当前Git工作目录下，只适用于当前Git项目； 使用 git config 时，不加选项（ --system 和 --global  ），Git将读写这个文件。
-
+- .git/config: Git项目级的配置文件，位于当前Git工作目录下，只适用于当前Git项目； 使用 git config 时，不加选项（ --system 和
+  --global ），Git将读写这个文件。
 
 ####设置别名
-git config --global alias.logp "log  --pretty=oneline --abbrev-commit"
-
+git config --global alias.logp "log --pretty=oneline --abbrev-commit"
 
 ##隐藏敏感文件
 在.gitignore文件添加想要隐藏的文件 然后git rm -r --cached 相对路径 然后 add commit push 远程就可以隐藏敏感文件了
 
 ##删除github历史敏感提交数据
-git filter-branch -f  --index-filter 'git rm -rf --cached --ignore-unmatch 文件相对路径' HEAD
+git filter-branch -f --index-filter 'git rm -rf --cached --ignore-unmatch 文件相对路径' HEAD
 git push origin --force --all`
 
 ####maven下载依赖源码
 mvn dependency:resolve -Dclassifier=sources
-
 
 ###本地文件修改不追踪
 git update-index --assume-unchanged ${文件路径}

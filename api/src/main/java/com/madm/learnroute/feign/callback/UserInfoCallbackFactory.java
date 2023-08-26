@@ -1,7 +1,7 @@
 package com.madm.learnroute.feign.callback;
 
-import com.mdm.model.Response;
 import com.madm.learnroute.feign.UserInfoFeignClient;
+import com.mdm.model.Response;
 import com.mdm.pojo.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;

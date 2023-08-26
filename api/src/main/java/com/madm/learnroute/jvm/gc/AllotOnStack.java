@@ -7,7 +7,7 @@ import com.mdm.pojo.User;
  * 代码调用了1亿次alloc()，如果是分配到堆上，大概需要1GB以上堆空间，如果堆空间小于该值，必然会触发GC。
  * -XX:+EliminateAllocations 标量替换
  * -XX:+DoEscapeAnalysis 逃逸分析
- *
+ * <p>
  * 使用如下参数不会发生GC
  * -Xmx15m -Xms15m -XX:+DoEscapeAnalysis -XX:+PrintGC -XX:+EliminateAllocations
  * 使用如下参数都会发生大量GC

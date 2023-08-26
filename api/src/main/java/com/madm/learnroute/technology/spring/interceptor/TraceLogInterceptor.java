@@ -18,6 +18,10 @@ import static com.madm.learnroute.constant.TraceLogEnum.TRACE_LOG_ID;
  */
 public class TraceLogInterceptor implements HandlerInterceptor {
 
+    public static String getTraceId() {
+        return RandomUtil.randomString(32);
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //如果有上层调用就用上层的ID
@@ -38,10 +42,6 @@ public class TraceLogInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         MDC.remove(TRACE_LOG_ID.getValue());
-    }
-
-    public static String getTraceId() {
-        return RandomUtil.randomString(32);
     }
 
 }

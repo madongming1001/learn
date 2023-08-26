@@ -17,10 +17,18 @@ import java.util.concurrent.ThreadLocalRandom;
  * 其中，HyperLogLog 的表现是惊人的，上面我们简单计算过用 bitmap 存储 1 个亿 统计数据大概需要
  * 12 M 内存，而在 HyperLoglog 中，只需要不到 1 K 内存就能够做到！在 Redis 中实现的
  * HyperLoglog 也只需要 12 K 内存，在 标准误差 0.81% 的前提下，能够统计 264 个数据！
- *
+ * <p>
  * 会发现 K 和 N 的对数之间存在显著的线性相关性：N 约等于 2k
  */
 public class PfTest {
+    public static void main(String[] args) {
+        for (int i = 1000; i < 100000; i += 100) {
+            Experiment exp = new Experiment(i);
+            exp.work();
+            exp.debug();
+        }
+    }
+
     static class BitKeeper {
         private int maxbit;
 
@@ -60,14 +68,6 @@ public class PfTest {
 
         public void debug() {
             System.out.printf("%d %.2f %d\n", this.n, Math.log(this.n) / Math.log(2), this.keeper.maxbit);
-        }
-    }
-
-    public static void main(String[] args) {
-        for (int i = 1000; i < 100000; i += 100) {
-            Experiment exp = new Experiment(i);
-            exp.work();
-            exp.debug();
         }
     }
 }

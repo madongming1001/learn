@@ -1,15 +1,17 @@
 package com.mdm.headfirst.command.party;
 
 public class LivingroomLightOffCommand implements Command {
-	Light light;
+    Light light;
 
-	public LivingroomLightOffCommand(Light light) {
-		this.light = light;
-	}
-	public void execute() {
-		light.off();
-	}
-	public void undo() {
-		light.on();
-	}
+    public LivingroomLightOffCommand(Light light) {
+        this.light = light;
+    }
+
+    public void execute() {
+        light.off();
+    }
+
+    public void undo() {
+        light.on();
+    }
 }

@@ -1,7 +1,6 @@
 package com.madm.learnroute.javaee;
 
 import cn.hutool.core.lang.Singleton;
-import com.google.common.collect.Lists;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -10,7 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletionStage;
+
+interface AssignableFactoryBean extends BeanFactoryAware {
+}
 
 /**
  * 泛型中 extends 和 super 的区别？
@@ -69,9 +70,6 @@ public class WildcardPractice {
         System.out.println(map2);
     }
 
-}
-
-interface AssignableFactoryBean extends BeanFactoryAware {
 }
 
 class Fruit {

@@ -1,7 +1,5 @@
 package com.madm.learnroute.service;
 
-import org.springframework.aop.framework.AopContext;
-import org.springframework.aop.framework.AopProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

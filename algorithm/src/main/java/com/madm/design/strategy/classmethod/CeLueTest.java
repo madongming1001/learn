@@ -3,10 +3,10 @@ package com.madm.design.strategy.classmethod;
 /**
  * 还在用策略模式解决 if-else？
  * Map + 函数式接口来帮你搞定！
- *
+ * <p>
  * 根据优惠券类型resourceType -> 确定查询哪个数据表
  * 根据编码resourceId -> 到对应的数据表里边查询优惠券的派发方式
- *
+ * <p>
  * 优惠券有多种类型，分别对应了不同的数据库表：
  * 红包 —— 红包发放规则表
  * 购物券 —— 购物券表

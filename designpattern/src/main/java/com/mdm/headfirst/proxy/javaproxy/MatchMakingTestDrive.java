@@ -6,13 +6,13 @@ import java.util.HashMap;
 public class MatchMakingTestDrive {
     HashMap<String, Person> datingDB = new HashMap<String, Person>();
 
+    public MatchMakingTestDrive() {
+        initializeDatabase();
+    }
+
     public static void main(String[] args) {
         MatchMakingTestDrive test = new MatchMakingTestDrive();
         test.drive();
-    }
-
-    public MatchMakingTestDrive() {
-        initializeDatabase();
     }
 
     public void drive() {

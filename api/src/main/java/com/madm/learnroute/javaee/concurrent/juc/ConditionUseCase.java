@@ -11,6 +11,16 @@ public class ConditionUseCase {
     Lock lock = new ReentrantLock();
     Condition condition = lock.newCondition();
 
+    public static void main(String[] args) {
+        ConditionUseCase c = new ConditionUseCase();
+        try {
+            c.conditionSignal();
+            c.conditionWait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void conditionWait() throws InterruptedException {
         lock.lock();
         try {
@@ -28,16 +38,6 @@ public class ConditionUseCase {
             condition.signal();
         } finally {
             lock.unlock();
-        }
-    }
-
-    public static void main(String[] args) {
-        ConditionUseCase c = new ConditionUseCase();
-        try {
-            c.conditionSignal();
-            c.conditionWait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 }

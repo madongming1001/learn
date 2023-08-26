@@ -1,14 +1,8 @@
 package com.madm.learnroute.javaee;
 
-import cn.hutool.core.util.StrUtil;
-import com.github.pagehelper.util.StringUtil;
 import org.springframework.util.StringUtils;
 
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Properties;
 
 /**
  * @author dongming.ma

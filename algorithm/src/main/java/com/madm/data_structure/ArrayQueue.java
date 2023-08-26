@@ -1,8 +1,5 @@
 package com.madm.data_structure;
 
-import io.netty.util.internal.StringUtil;
-import org.springframework.util.StringUtils;
-
 // 用数组实现的队列
 public class ArrayQueue {
     // 数组：items，数组大小：n

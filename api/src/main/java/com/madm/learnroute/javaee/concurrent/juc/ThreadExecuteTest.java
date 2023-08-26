@@ -1,8 +1,11 @@
 package com.madm.learnroute.javaee.concurrent.juc;
 
-import java.util.concurrent.*;
-
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 
 /**
  * @author Fox
@@ -38,7 +41,7 @@ public class ThreadExecuteTest {
         });
 
         new Thread(task).start();
-        log.debug("结果：{}",task.get());
+        log.debug("结果：{}", task.get());
 
 
         ExecutorService executor = Executors.newFixedThreadPool(2);

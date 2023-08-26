@@ -9,7 +9,10 @@ import com.mdm.model.RestResponse;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.springframework.context.annotation.Conditional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
@@ -33,7 +36,7 @@ public class AccountController {
     Redisson redisson;
 
     @GetMapping("/save")
-    public RestResponse  save(@RequestBody Account... account) {
+    public RestResponse save(@RequestBody Account... account) {
         accountService.saveForJdbc(ArrayUtil.isNotEmpty(account) ? account[0] : createAccount());
         accountService.save(ArrayUtil.isNotEmpty(account) ? account[0] : createAccount());
         return RestResponse.OK();

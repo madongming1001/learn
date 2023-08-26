@@ -2,7 +2,7 @@ package com.madm.data_structure;
 
 /**
  * 数组实现单向链表
- *
+ * <p>
  * 参考文章：https://blog.csdn.net/h_xiao_x/article/details/109151299
  */
 public class ArrayLinkedList {
@@ -147,7 +147,6 @@ public class ArrayLinkedList {
 
         } while (curr >= 0);
     }
-
 
 
 }

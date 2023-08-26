@@ -6,6 +6,11 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 
 public class GraspMethod {
+    public static void main(String[] args) throws Throwable {
+        new Son().thinking();
+        System.out.println(GraspMethod.class.getClassLoader().loadClass("com.madm.learnroute.socket.NioSelectorServer"));
+    }
+
     static class GrandFather {
         void thinking() throws Throwable {
             System.out.println("i am grandfather");
@@ -35,10 +40,5 @@ public class GraspMethod {
                 e.printStackTrace();
             }
         }
-    }
-
-    public static void main(String[] args) throws Throwable {
-        new Son().thinking();
-        System.out.println(GraspMethod.class.getClassLoader().loadClass("com.madm.learnroute.socket.NioSelectorServer"));
     }
 }

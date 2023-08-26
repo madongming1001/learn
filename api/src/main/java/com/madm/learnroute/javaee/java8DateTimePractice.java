@@ -46,13 +46,12 @@ import static cn.hutool.core.date.DatePattern.NORM_DATETIME_PATTERN;
 @Slf4j
 public class java8DateTimePractice {
 
+    private final static Map<String, Long> timeUnitTable;
     static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(NORM_DATETIME_PATTERN);
-
     static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(NORM_DATETIME_MS_PATTERN);
     static DateTimeFormatter norm_pattern = DateTimeFormatter.ofPattern(NORM_DATETIME_PATTERN);
     private static String messageDelayLevel = "1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h";
-    private final static Map<String, Long> timeUnitTable;
 
     static {
         timeUnitTable = new HashMap();

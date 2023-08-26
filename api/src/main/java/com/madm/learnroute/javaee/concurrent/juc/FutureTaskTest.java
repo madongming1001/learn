@@ -6,6 +6,9 @@ public class FutureTaskTest {
 
     private static final ConcurrentMap<Object, Future<String>> taskCache = new ConcurrentHashMap<Object, Future<String>>();
 
+    public static void main(String[] args) {
+    }
+
     private String executionTask(final String taskName) throws ExecutionException, InterruptedException {
         while (true) {
             Future<String> future = taskCache.get(taskName); // 1.1,2.1
@@ -25,8 +28,5 @@ public class FutureTaskTest {
                 taskCache.remove(taskName, future);
             }
         }
-    }
-
-    public static void main(String[] args) {
     }
 }

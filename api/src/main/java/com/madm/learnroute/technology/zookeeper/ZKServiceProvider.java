@@ -2,7 +2,6 @@ package com.madm.learnroute.technology.zookeeper;
 
 import lombok.Data;
 import org.apache.curator.RetryPolicy;
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.*;
@@ -25,6 +24,13 @@ public class ZKServiceProvider implements Watcher {
         Thread.sleep(Integer.MAX_VALUE);
     }
 
+    public static void build() {
+        CuratorFrameworkFactory.builder().connectString("0.0.0.0:8081").sessionTimeoutMs(5000)  // 会话超时时间
+                .connectionTimeoutMs(5000) // 连接超时时间
+                .retryPolicy(retryPolicy).namespace("base") // 包含隔离名称
+                .build().start();
+    }
+
     @Override
     public void process(WatchedEvent event) {
         if (Event.KeeperState.SyncConnected == event.getState()) {
@@ -33,12 +39,5 @@ public class ZKServiceProvider implements Watcher {
                 connectedSempahore.countDown();
             }
         }
-    }
-
-    public static void build() {
-        CuratorFrameworkFactory.builder().connectString("0.0.0.0:8081").sessionTimeoutMs(5000)  // 会话超时时间
-                .connectionTimeoutMs(5000) // 连接超时时间
-                .retryPolicy(retryPolicy).namespace("base") // 包含隔离名称
-                .build().start();
     }
 }

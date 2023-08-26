@@ -60,7 +60,6 @@ public class ArrayListPractice {
         System.out.println("使用ensureCapacity方法后：" + (endTime1 - startTime1));
 
 
-
     }
 
     private class ArrayListHandler {

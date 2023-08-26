@@ -14,22 +14,26 @@ import java.util.AbstractList;
 // between the specified fromIndex, inclusive, and toIndex, exclusive.
 
 public class MyStringList extends AbstractList<String> {
-	private String[] myList;
-	MyStringList(String[] strings) {
-		myList = strings;
-	}
-	@Override
-	public String get(int index) {
-		return myList[index];
-	}
-	@Override
-	public String set(int index, String item) {
-		String oldString = myList[index];
-		myList[index] = item;
-		return oldString;
-	}
-	@Override
-	public int size() {
-		return myList.length;
-	}
+    private String[] myList;
+
+    MyStringList(String[] strings) {
+        myList = strings;
+    }
+
+    @Override
+    public String get(int index) {
+        return myList[index];
+    }
+
+    @Override
+    public String set(int index, String item) {
+        String oldString = myList[index];
+        myList[index] = item;
+        return oldString;
+    }
+
+    @Override
+    public int size() {
+        return myList.length;
+    }
 }

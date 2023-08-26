@@ -1,7 +1,5 @@
 package com.madm.learnroute.technology.mybatis.service;
 
-import org.springframework.stereotype.Component;
-
 /**
  * @author 周瑜
  */

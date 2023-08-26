@@ -1,7 +1,6 @@
 package com.madm.interview_guide;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -10,13 +9,13 @@ import java.util.Objects;
 public class GetMaxOccurChar {
 
     public static void main(String[] args) {
-        System.out.println(Objects.equals(new Long(1),new Long(2)));
+        System.out.println(Objects.equals(new Long(1), new Long(2)));
 //        char result = getMaxOccurChar("hello world, every body!");
 //        System.out.println(result);
         char result = getMaxOccurChar02("aaabbbbcccc");
         System.out.println(result);
         LinkedHashMap lh = new LinkedHashMap();
-        lh.put("1",1);
+        lh.put("1", 1);
 
 
     }
@@ -25,10 +24,10 @@ public class GetMaxOccurChar {
         int maxCount = 1;
         char result = str.charAt(0);
         LinkedHashMap<Character, Integer> map = new LinkedHashMap<>();
-        for(int i = str.length() - 1;i >= 0;i--){
+        for (int i = str.length() - 1; i >= 0; i--) {
             Integer count = map.getOrDefault(str.charAt(i), 0);
-            map.put(str.charAt(i),count + 1);
-            if(count >= maxCount){
+            map.put(str.charAt(i), count + 1);
+            if (count >= maxCount) {
                 maxCount = count;
                 result = str.charAt(i);
             }

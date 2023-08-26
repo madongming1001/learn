@@ -9,7 +9,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public class CompletableFuturePractice {
@@ -227,6 +226,19 @@ public class CompletableFuturePractice {
             this.name = name;
         }
 
+        public static void delay() {
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private static Double calculatePrice(String product) {
+            delay();
+            return new Random().nextDouble() * product.charAt(0) + product.charAt(1);
+        }
+
         public String getPrice(String product) {
             double price = calculatePrice(product);
             Discount.Code code = Discount.Code.values()[new Random().nextInt(Discount.Code.values().length)];
@@ -245,19 +257,6 @@ public class CompletableFuturePractice {
 //            });
 //            return futurePrice;
             return CompletableFuture.supplyAsync(() -> calculatePrice(product));
-        }
-
-        public static void delay() {
-            try {
-                Thread.sleep(1000L);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        private static Double calculatePrice(String product) {
-            delay();
-            return new Random().nextDouble() * product.charAt(0) + product.charAt(1);
         }
 
         public List<String> findPrices(String product) {

@@ -5,10 +5,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class ThreadLocalPractice {
-    static class LocalVariable {
-        private Long[] a = new Long[1024 * 1024];
-    }
-
     // (1)
     final static ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(5, 5, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
     // (2)
@@ -28,5 +24,9 @@ public class ThreadLocalPractice {
         }
         // (6)
         System.out.println("pool execute over");
+    }
+
+    static class LocalVariable {
+        private Long[] a = new Long[1024 * 1024];
     }
 }

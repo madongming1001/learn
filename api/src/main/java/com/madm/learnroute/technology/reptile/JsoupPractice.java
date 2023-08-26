@@ -120,7 +120,7 @@ public class JsoupPractice {
      * @date 2019/11/4 19:26
      */
     public static void parseExamAnswers(String url) throws IOException {
-        Document doc = Jsoup.connect(url).userAgent("Mozilla/5.0").header("Origin","strict-origin-when-cross-origin").get();
+        Document doc = Jsoup.connect(url).userAgent("Mozilla/5.0").header("Origin", "strict-origin-when-cross-origin").get();
         Elements elements = doc.getElementsByTag("tbody");
         Element element = elements.get(4);
         Elements childrens = element.children();

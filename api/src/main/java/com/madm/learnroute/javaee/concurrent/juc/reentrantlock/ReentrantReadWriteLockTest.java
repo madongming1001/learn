@@ -36,9 +36,9 @@ public class ReentrantReadWriteLockTest {
 
 @Slf4j
 class CachedData {
+    final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     Object data;
     volatile boolean cacheValid;
-    final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     ReentrantReadWriteLock.ReadLock readLock = readWriteLock.readLock();
     ReentrantReadWriteLock.WriteLock writeLock = readWriteLock.writeLock();
 

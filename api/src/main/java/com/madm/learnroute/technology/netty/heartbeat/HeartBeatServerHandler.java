@@ -39,7 +39,6 @@ public class HeartBeatServerHandler extends SimpleChannelInboundHandler<String> 
         }
 
 
-
         System.out.println(ctx.channel().remoteAddress() + "超时事件：" + eventType);
         if (readIdleTimes > 3) {
             System.out.println(" [server]读空闲超过3次，关闭连接，释放更多资源");

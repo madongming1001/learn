@@ -5,7 +5,6 @@ import org.springframework.core.type.AnnotationMetadata;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.jar.JarFile;
 
 /**
  * @author dongming.ma

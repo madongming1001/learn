@@ -6,6 +6,7 @@ import java.util.Hashtable;
 
 /**
  * 不允许插入空值
+ *
  * @author dongming.ma
  * @date 2022/11/16 21:16
  */

@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 /**
  * 用java 8的函数式接口和泛型 优化策略模式（简化写法）
  * 进而优化if else逻辑
+ *
  * @className: FunctionStrategy
  * @author: woniu
  * @date: 2023/2/11

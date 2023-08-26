@@ -1,7 +1,6 @@
 package com.mdm.utils;
 
 
-import cn.hutool.cache.CacheUtil;
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -50,6 +49,9 @@ public class CacheConfigUtil {
         //明铺夜盖
         CacheConfigUtil cache = new CacheConfigUtil();
 
+    }
+
+    private static void writeToPeripheral() {
     }
 
     /**
@@ -112,8 +114,6 @@ public class CacheConfigUtil {
         return CompletableFuture.supplyAsync(() -> {
             return key + "value";
         });
-    }
-    private static void writeToPeripheral(){
     }
 
 

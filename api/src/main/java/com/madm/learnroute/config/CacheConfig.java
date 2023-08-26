@@ -37,7 +37,7 @@ public class CacheConfig {
         for (CacheBean cacheBean : list) {
             caches.add(new CaffeineCache(cacheBean.getKey(),
                     Caffeine.newBuilder().recordStats().
-                            expireAfterWrite(cacheBean.getTtl(),TimeUnit.SECONDS).
+                            expireAfterWrite(cacheBean.getTtl(), TimeUnit.SECONDS).
                             maximumSize(cacheBean.getMaximumSize()).
                             build()));
         }

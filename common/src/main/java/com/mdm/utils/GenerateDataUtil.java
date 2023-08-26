@@ -16,9 +16,8 @@ import java.util.Random;
 @NoArgsConstructor
 public class GenerateDataUtil {
 
-    private String filePath = StringUtils.EMPTY;
-
     private static Random random = new Random();
+    private String filePath = StringUtils.EMPTY;
 
     public GenerateDataUtil(String filePath) {
         this.filePath = filePath;

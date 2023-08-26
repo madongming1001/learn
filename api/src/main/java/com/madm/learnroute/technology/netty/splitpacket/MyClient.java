@@ -11,7 +11,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 public class MyClient {
-    public static void main(String[] args)  throws  Exception{
+    public static void main(String[] args) throws Exception {
 
         EventLoopGroup group = new NioEventLoopGroup();
 
@@ -30,7 +30,7 @@ public class MyClient {
             System.out.println("netty client start。。");
             ChannelFuture channelFuture = bootstrap.connect("127.0.0.1", 9000).sync();
             channelFuture.channel().closeFuture().sync();
-        }finally {
+        } finally {
             group.shutdownGracefully();
         }
     }

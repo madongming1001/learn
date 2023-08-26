@@ -1,14 +1,10 @@
 package com.madm.learnroute.javaee.concurrent.juc;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.ArrayUtil;
-import io.netty.handler.codec.DateFormatter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 

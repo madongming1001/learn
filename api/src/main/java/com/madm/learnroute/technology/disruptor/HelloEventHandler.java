@@ -1,7 +1,7 @@
 package com.madm.learnroute.technology.disruptor;
 
-import lombok.extern.slf4j.Slf4j;
 import com.lmax.disruptor.EventHandler;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author dongming.ma
@@ -16,7 +16,7 @@ public class HelloEventHandler implements EventHandler<MessageModel> {
             Thread.sleep(1000);
             log.info("消费者处理消息开始");
             if (event != null) {
-                log.info("消费者消费的信息是：{}",event);
+                log.info("消费者消费的信息是：{}", event);
             }
         } catch (Exception e) {
             log.info("消费者处理消息失败");

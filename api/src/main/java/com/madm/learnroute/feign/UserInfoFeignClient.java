@@ -1,7 +1,7 @@
 package com.madm.learnroute.feign;
 
-import com.mdm.model.Response;
 import com.madm.learnroute.feign.callback.UserInfoCallbackFactory;
+import com.mdm.model.Response;
 import com.mdm.pojo.User;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.openfeign.FeignClient;

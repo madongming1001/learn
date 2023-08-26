@@ -3,21 +3,21 @@ package com.madm.learnroute.javaee.concurrent.synchronize;
 import org.openjdk.jol.info.ClassLayout;
 
 /**
- *                  ,;,,;
- *                ,;;'(    社
- *      __      ,;;' ' \   会
- *   /'  '\'~~'~' \ /'\.)  主
+ * ,;,,;
+ * ,;;'(    社
+ * __      ,;;' ' \   会
+ * /'  '\'~~'~' \ /'\.)  主
  * ,;(      )    /  |.     义
- *,;' \    /-.,,(   ) \    码
- *     ) /       ) / )|    农
- *     ||        ||  \)     
- *     (_\       (_\
+ * ,;' \    /-.,,(   ) \    码
+ * ) /       ) / )|    农
+ * ||        ||  \)
+ * (_\       (_\
+ *
  * @author ：杨过
  * @date ：Created in 2020/4/28 17:15
  * @version: V1.0
  * @slogan: 天下风云出我辈，一入代码岁月催
- * @description:
- * -XX:BiasedLockingStartupDelay=0 关闭偏向锁延迟
+ * @description: -XX:BiasedLockingStartupDelay=0 关闭偏向锁延迟
  * -XX:-UseCompressedOops 对象头指针压缩
  * -XX:-UseCompressedClassPointers klass pointer指针压缩
  **/

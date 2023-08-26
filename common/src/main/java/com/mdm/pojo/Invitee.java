@@ -4,16 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.relational.core.sql.In;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Invitee implements Comparable<Invitee> {
-    private Long userId;
     public String nickName;
     public String avatarUrl;
     public AuthParam authParam;
+    private Long userId;
 
     public Invitee(Long userId, String nickName, String avatarUrl) {
         this.userId = userId;

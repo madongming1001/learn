@@ -4,7 +4,6 @@ import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import java.math.BigInteger;
 import java.util.UUID;
 
 public class UniqueIDGenerationPractice {

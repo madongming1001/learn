@@ -3,11 +3,12 @@ package com.mdm.utils.memorysafe;
 import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+
 /**
  * @author dongming.ma
  * @date 2022/6/11 11:41
  */
-public class MemorySafeLinkedBlockingQueue <E> extends LinkedBlockingQueue<E> {
+public class MemorySafeLinkedBlockingQueue<E> extends LinkedBlockingQueue<E> {
 
     private static final long serialVersionUID = 8032578371739960142L;
 
@@ -31,21 +32,21 @@ public class MemorySafeLinkedBlockingQueue <E> extends LinkedBlockingQueue<E> {
     }
 
     /**
-     * set the max free memory.
-     *
-     * @param maxFreeMemory the max free memory
-     */
-    public void setMaxFreeMemory(final int maxFreeMemory) {
-        this.maxFreeMemory = maxFreeMemory;
-    }
-
-    /**
      * get the max free memory.
      *
      * @return the max free memory limit
      */
     public int getMaxFreeMemory() {
         return maxFreeMemory;
+    }
+
+    /**
+     * set the max free memory.
+     *
+     * @param maxFreeMemory the max free memory
+     */
+    public void setMaxFreeMemory(final int maxFreeMemory) {
+        this.maxFreeMemory = maxFreeMemory;
     }
 
     /**

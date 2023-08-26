@@ -22,25 +22,24 @@ import java.util.concurrent.RecursiveTask;
 @Data
 public class ForkJoinPoolPractice extends RecursiveTask<Integer> {
 
-    public static void main(String[] args) {
-        ForkJoinPoolPractice task = new ForkJoinPoolPractice(0, 999, RandomUtil.randomInts(1000));
-        long startTime = System.nanoTime();
-        ForkJoinTask<Integer> submit = ForkJoinPool.commonPool().submit(task);
-        long endTime = System.nanoTime();
-        System.out.println("Forkjoin compare: " + submit.join() + " in " + (endTime - startTime) / 1000 / 1000 + " ms.");
-    }
-
     private static int[] dou;
     private int first;
     private int last;
     private int threadShould = 10;
-
     public ForkJoinPoolPractice(int first, int last, @Nullable int[] dou) {
         this.first = first;
         this.last = last;
         if (Objects.nonNull(dou)) {
             this.dou = dou;
         }
+    }
+
+    public static void main(String[] args) {
+        ForkJoinPoolPractice task = new ForkJoinPoolPractice(0, 999, RandomUtil.randomInts(1000));
+        long startTime = System.nanoTime();
+        ForkJoinTask<Integer> submit = ForkJoinPool.commonPool().submit(task);
+        long endTime = System.nanoTime();
+        System.out.println("Forkjoin compare: " + submit.join() + " in " + (endTime - startTime) / 1000 / 1000 + " ms.");
     }
 
     @Override

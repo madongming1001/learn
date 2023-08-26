@@ -73,14 +73,6 @@ class TargetInvoker implements InvocationHandler {
         this.target = target;
     }
 
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        System.out.println("jdk 代理执行前");
-        Object result = method.invoke(target, args);
-        System.out.println("jdk 代理执行后");
-        return result;
-    }
-
     public static Object getProxy(Object target) throws Exception {
         Object proxy = Proxy.newProxyInstance(
                 // 指定目标类的类加载
@@ -90,6 +82,14 @@ class TargetInvoker implements InvocationHandler {
                 // 代理对象处理器
                 new TargetInvoker(target));
         return proxy;
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        System.out.println("jdk 代理执行前");
+        Object result = method.invoke(target, args);
+        System.out.println("jdk 代理执行后");
+        return result;
     }
 }
 

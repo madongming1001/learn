@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>learn</artifactId>
@@ -21,12 +21,12 @@
     </properties>
 
     <dependencies>
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/mysql/mysql-connector-java &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>mysql</groupId>-->
-<!--            <artifactId>mysql-connector-java</artifactId>-->
-<!--            <version>8.0.28</version>-->
-<!--        </dependency>-->
+        <!--        &lt;!&ndash; https://mvnrepository.com/artifact/mysql/mysql-connector-java &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>mysql</groupId>-->
+        <!--            <artifactId>mysql-connector-java</artifactId>-->
+        <!--            <version>8.0.28</version>-->
+        <!--        </dependency>-->
 
         <!-- https://mvnrepository.com/artifact/org.redisson/redisson -->
         <dependency>
@@ -153,7 +153,7 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-<!--            <version>2.2.7.RELEASE</version>-->
+            <!--            <version>2.2.7.RELEASE</version>-->
         </dependency>
         <!-- https://mvnrepository.com/artifact/io.github.openfeign/feign-httpclient -->
         <dependency>
@@ -252,11 +252,11 @@
             <version>3.4.4</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->
-<!--        <dependency>-->
-<!--            <groupId>org.mapstruct</groupId>-->
-<!--            <artifactId>mapstruct</artifactId>-->
-<!--            <version>${org.mapstruct.version}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.mapstruct</groupId>-->
+        <!--            <artifactId>mapstruct</artifactId>-->
+        <!--            <version>${org.mapstruct.version}</version>-->
+        <!--        </dependency>-->
         <!--JSON数据转换支持-->
         <!-- 引入相关依赖 -->
         <dependency>

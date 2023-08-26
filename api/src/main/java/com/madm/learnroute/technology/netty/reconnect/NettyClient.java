@@ -21,15 +21,15 @@ public class NettyClient {
     private Bootstrap bootstrap;
     private EventLoopGroup group;
 
-    public static void main(String[] args) throws Exception {
-        NettyClient nettyClient = new NettyClient("localhost", 9000);
-        nettyClient.connect();
-    }
-
     public NettyClient(String host, int port) {
         this.host = host;
         this.port = port;
         init();
+    }
+
+    public static void main(String[] args) throws Exception {
+        NettyClient nettyClient = new NettyClient("localhost", 9000);
+        nettyClient.connect();
     }
 
     private void init() {

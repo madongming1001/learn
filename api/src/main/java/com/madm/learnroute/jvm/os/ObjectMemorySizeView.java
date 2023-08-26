@@ -1,8 +1,5 @@
 package com.madm.learnroute.jvm.os;
 
-import org.apache.lucene.util.RamUsageEstimator;
-import org.openjdk.jol.info.ClassLayout;
-
 /**
  * @author madongming
  */

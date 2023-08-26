@@ -11,11 +11,6 @@ package com.madm.learnroute.jvm.oom;
 public class JavaVMStackSOF {
     private int stackLength = 1;
 
-    public void stackLeak() {
-        stackLength++;
-        stackLeak();
-    }
-
     public static void main(String[] args) {
         JavaVMStackSOF sof = new JavaVMStackSOF();
         try {
@@ -24,6 +19,11 @@ public class JavaVMStackSOF {
             System.out.println("stack length: " + sof.stackLength);
             e.printStackTrace();
         }
+    }
+
+    public void stackLeak() {
+        stackLength++;
+        stackLeak();
     }
 
 }

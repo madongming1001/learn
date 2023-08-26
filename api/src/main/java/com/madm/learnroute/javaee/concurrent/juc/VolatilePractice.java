@@ -2,8 +2,8 @@ package com.madm.learnroute.javaee.concurrent.juc;
 
 public class VolatilePractice {
 
-    public static volatile int i = 0;
     private static final int THREADS_COUNT = 20;
+    public static volatile int i = 0;
 
     public static void increase() {
         i++;
@@ -19,7 +19,7 @@ public class VolatilePractice {
             });
             threads[j].start();
         }
-        System.out.println("i == "+i);
+        System.out.println("i == " + i);
 
     }
 }

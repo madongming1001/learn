@@ -3,7 +3,7 @@ package com.madm.design.strategy.springregister;
 import org.springframework.stereotype.Component;
 
 @Component
-public class WoNiuHandler extends AbstractHandler{
+public class WoNiuHandler extends AbstractHandler {
 
     @Override
     public void AA(String nikeName) {
@@ -13,6 +13,6 @@ public class WoNiuHandler extends AbstractHandler{
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Factory2.register("蜗牛",this);
+        Factory2.register("蜗牛", this);
     }
 }

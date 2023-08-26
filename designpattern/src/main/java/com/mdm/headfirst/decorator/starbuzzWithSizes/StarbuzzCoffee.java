@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 public class StarbuzzCoffee {
 
     public static final String USER_INFO_STRING = "userInfo:uid_%s";
+    private static final String BASE_KEY = "mallchat:";
 
     public static void main(String args[]) {
         List<String> uids = Lists.newArrayList("1", "2", "3", "4", "5", "6");
@@ -33,8 +34,6 @@ public class StarbuzzCoffee {
         beverage3 = new Whip(beverage3);
         System.out.println(beverage3.getDescription() + " $" + String.format("%.2f", beverage3.cost()));
     }
-
-    private static final String BASE_KEY = "mallchat:";
 
     public static String getKey(String key, Object... objects) {
         return BASE_KEY + String.format(key, objects);

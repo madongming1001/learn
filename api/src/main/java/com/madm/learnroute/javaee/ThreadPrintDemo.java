@@ -3,7 +3,6 @@ package com.madm.learnroute.javaee;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- *
  * 交叉打印
  */
 public class ThreadPrintDemo {
@@ -29,7 +28,7 @@ public class ThreadPrintDemo {
                     flag = true;
                 }
             }
-        },"thread 1");
+        }, "thread 1");
     }
 
     private static Thread printNumber2() {
@@ -44,7 +43,7 @@ public class ThreadPrintDemo {
                     flag = false;
                 }
             }
-        },"thread 2");
+        }, "thread 2");
     }
 
 

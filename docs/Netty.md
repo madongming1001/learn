@@ -17,8 +17,6 @@
 - 灵活的TCP参数配置能力
 - 并发优化
 
-
-
 ![https://note.youdao.com/yws/public/resource/bbc5cfef81b2951d769807ed748343b9/xmlnote/C48453E100EB42049B7349168EA17EC1/85277](https://note.youdao.com/yws/public/resource/bbc5cfef81b2951d769807ed748343b9/xmlnote/C48453E100EB42049B7349168EA17EC1/85277)
 
 **模型解释：**
@@ -31,25 +29,21 @@
 
 4) 每个NioEventLoop都有一个selector , 用于监听注册在其上的socketChannel的网络通讯
 
-5) 每个Boss  NioEventLoop线程内部循环执行的步骤有 3 步
+5) 每个Boss NioEventLoop线程内部循环执行的步骤有 3 步
 
-- 处理accept事件 , 与client 建立连接 , 生成 NioSocketChannel 
-- 将NioSocketChannel注册到某个worker  NIOEventLoop上的selector
+- 处理accept事件 , 与client 建立连接 , 生成 NioSocketChannel
+- 将NioSocketChannel注册到某个worker NIOEventLoop上的selector
 - 处理任务队列的任务 ， 即runAllTasks
 
-6) 每个worker  NIOEventLoop线程循环执行的步骤
+6) 每个worker NIOEventLoop线程循环执行的步骤
 
 - 轮询注册到自己selector上的所有NioSocketChannel 的read, write事件
 - 处理 I/O 事件， 即read , write 事件， 在对应NioSocketChannel 处理业务
-- runAllTasks处理任务队列TaskQueue的任务 ，一些耗时的业务处理一般可以放入TaskQueue中慢慢处理，这样不影响数据在 pipeline 中的流动处理
+- runAllTasks处理任务队列TaskQueue的任务 ，一些耗时的业务处理一般可以放入TaskQueue中慢慢处理，这样不影响数据在 pipeline
+  中的流动处理
 
-7) 每个worker NIOEventLoop处理NioSocketChannel业务时，会使用 pipeline (管道)，管道中维护了很多 handler 处理器用来处理 channel 中的数据
-
-
-
-
-
-
+7) 每个worker NIOEventLoop处理NioSocketChannel业务时，会使用 pipeline (管道)，管道中维护了很多 handler 处理器用来处理
+   channel 中的数据
 
 ![https://note.youdao.com/yws/public/resource/ab45dc97644411c44fbd27ee95d8244e/xmlnote/9C889DD8449F4254A3E2881690435DA6/106808](https://note.youdao.com/yws/public/resource/ab45dc97644411c44fbd27ee95d8244e/xmlnote/9C889DD8449F4254A3E2881690435DA6/106808)
 
@@ -64,23 +58,9 @@
 - 灵活的TCP参数配置能力
 - 并发优化
 
-
-
 **Netty学习之旅------第4篇---ByteBuf的扩容、缩容和类继承关系https://blog.csdn.net/qq157538651/article/details/93537187**
 
-
-
-
-
-
-
-
-
 ![https://note.youdao.com/yws/public/resource/916f44987d1fe0e35ec935bf5391d762/xmlnote/E7B425DD0F1142E28C7174E865FF0A05/106573](https://note.youdao.com/yws/public/resource/916f44987d1fe0e35ec935bf5391d762/xmlnote/E7B425DD0F1142E28C7174E865FF0A05/106573)
-
-
-
-
 
 ```java
 EPollSelectorImpl.java
@@ -149,8 +129,6 @@ int poll(long timeout) throws IOException {
     }
 ```
 
-
-
 ```java
 EPollArrayWrapper.java
 // maximum size of updatesLow
@@ -191,16 +169,19 @@ private void setUpdateEvents(int fd, byte events, boolean force) {
 }
 ```
 
-**I/O多路复用底层主要用的Linux 内核·函数（select，poll，epoll）来实现，windows不支持epoll实现，windows底层是基于winsock2的select函数实现的(不开源)，**
+**I/O多路复用底层主要用的Linux
+内核·函数（select，poll，epoll）来实现，windows不支持epoll实现，windows底层是基于winsock2的select函数实现的(不开源)，**
 
-|              | **select**                               | **poll**                                 | **epoll(jdk 1.5及以上)**                                     |
-| ------------ | ---------------------------------------- | ---------------------------------------- | ------------------------------------------------------------ |
-| **操作方式** | 遍历                                     | 遍历                                     | 回调                                                         |
-| **底层实现** | 数组                                     | 链表                                     | 哈希表                                                       |
-| **IO效率**   | 每次调用都进行线性遍历，时间复杂度为O(n) | 每次调用都进行线性遍历，时间复杂度为O(n) | 事件通知方式，每当有IO事件就绪，系统注册的回调函数就会被调用，时间复杂度O(1) |
-| **最大连接** | 有上限                                   | 无上限                                   | 无上限                                                       |
+|          | **select**             | **poll**               | **epoll(jdk 1.5及以上)**                     |
+|----------|------------------------|------------------------|-------------------------------------------|
+| **操作方式** | 遍历                     | 遍历                     | 回调                                        |
+| **底层实现** | 数组                     | 链表                     | 哈希表                                       |
+| **IO效率** | 每次调用都进行线性遍历，时间复杂度为O(n) | 每次调用都进行线性遍历，时间复杂度为O(n) | 事件通知方式，每当有IO事件就绪，系统注册的回调函数就会被调用，时间复杂度O(1) |
+| **最大连接** | 有上限                    | 无上限                    | 无上限                                       |
 
-**NIO底层在JDK1.4版本是用linux的内核函数select()或poll()来实现，跟上面的NioServer代码类似，selector每次都会轮询所有的sockchannel看下哪个channel有读写事件，有的话就处理，没有就继续遍历，JDK1.5开始引入了epoll基于事件响应机制来优化NIO。**
+**NIO底层在JDK1.4版本是用linux的内核函数select()或poll()
+来实现，跟上面的NioServer代码类似，selector每次都会轮询所有的sockchannel看下哪个channel有读写事件，有的话就处理，没有就继续遍历，JDK1.5开始引入了epoll基于事件响应机制来优化NIO。
+**
 
 ### BIO、NIO、AIO对比
 
@@ -208,16 +189,16 @@ private void setUpdateEvents(int fd, byte events, boolean force) {
 
 **为什么Netty使用NIO而不是AIO？**
 
-在Linux系统上，**AIO的底层实现仍使用Epoll**，没有很好实现AIO，因此在性能上没有明显的优势，而且被JDK封装了一层不容易深度优化，Linux上AIO还不够成熟。Netty是**异步非阻塞**框架，Netty在NIO上做了很多异步的封装。
+在Linux系统上，**AIO的底层实现仍使用Epoll**，没有很好实现AIO，因此在性能上没有明显的优势，而且被JDK封装了一层不容易深度优化，Linux上AIO还不够成熟。Netty是
+**异步非阻塞**框架，Netty在NIO上做了很多异步的封装。
 
 **为什么BIO不结合1:1线程来使用？**
 
 1. **线程的创建和销毁成本很高**，在Linux这样的操作系统中，线程本质上就是一个进程。创建和销毁都是重量级的系统函数。
-2. **线程本身占用较大内存**，像Java的线程栈，一般至少分配512K～1M的空间，如果系统中的线程数过千，恐怕整个JVM的内存都会被吃掉一半。 
-3. **线程的切换成本是很高的。**操作系统发生线程切换的时候，需要保留线程的上下文，然后执行系统调用。如果线程数过高，可能执行线程切换的时间甚至会大于线程执行的时间，这时候带来的表现往往是系统load偏高、CPU sy使用率特别高（超过20%以上)，导致系统几乎陷入不可用的状态。
+2. **线程本身占用较大内存**，像Java的线程栈，一般至少分配512K～1M的空间，如果系统中的线程数过千，恐怕整个JVM的内存都会被吃掉一半。
+3. **线程的切换成本是很高的。**操作系统发生线程切换的时候，需要保留线程的上下文，然后执行系统调用。如果线程数过高，可能执行线程切换的时间甚至会大于线程执行的时间，这时候带来的表现往往是系统load偏高、CPU
+   sy使用率特别高（超过20%以上)，导致系统几乎陷入不可用的状态。
 4. **容易造成锯齿状的系统负载。**因为系统负载是用活动线程数或CPU核心数，一旦线程数量高但外部网络环境不是很稳定，就很容易造成大量请求的结果同时返回，激活大量阻塞线程从而使系统负载压力过大。
-
-
 
 ### Netty 核心组件了解吗？分别有什么作用？
 
@@ -249,8 +230,6 @@ ChannelHandler针对IO数据的处理器，数据接收后，通过指定的Hand
 
 ChannelHandlerContext用来保存ChannelHandler的上下文信息
 
-
-
 **EventExecutor NioEventLoop**
 
 ```java
@@ -270,16 +249,12 @@ private static boolean isPowerOfTwo(int val) {
 }
 ```
 
-
-
 ```java
 public static final int OP_READ = 1 << 0;
 public static final int OP_WRITE = 1 << 2;
 public static final int OP_CONNECT = 1 << 3;
 public static final int OP_ACCEPT = 1 << 4;
 ```
-
-
 
 ## **解决粘包半包**
 
@@ -297,7 +272,8 @@ public static final int OP_ACCEPT = 1 << 4;
 3. 时间：编解码速度
 4. 是否追求可读性
 
-**参考文章：**（**几种Java常用序列化框架的选型与对比**）https://developer.aliyun.com/article/783611?spm=5176.21213303.J_6704733920.7.34fe53c9BlcfJj&scm=20140722.S_community%40%40%E6%96%87%E7%AB%A0%40%40783611._.ID_community%40%40%E6%96%87%E7%AB%A0%40%40783611-RL_%E5%87%A0%E7%A7%8Djava%E5%B8%B8%E7%94%A8%E5%BA%8F%E5%88%97%E5%8C%96%E6%A1%86%E6%9E%B6%E7%9A%84%E9%80%89%E5%9E%8B%E4%B8%8E%E5%AF%B9%E6%AF%94-LOC_main-OR_ser-V_2-P0_0
+**参考文章：**（**几种Java常用序列化框架的选型与对比
+**）https://developer.aliyun.com/article/783611?spm=5176.21213303.J_6704733920.7.34fe53c9BlcfJj&scm=20140722.S_community%40%40%E6%96%87%E7%AB%A0%40%40783611._.ID_community%40%40%E6%96%87%E7%AB%A0%40%40783611-RL_%E5%87%A0%E7%A7%8Djava%E5%B8%B8%E7%94%A8%E5%BA%8F%E5%88%97%E5%8C%96%E6%A1%86%E6%9E%B6%E7%9A%84%E9%80%89%E5%9E%8B%E4%B8%8E%E5%AF%B9%E6%AF%94-LOC_main-OR_ser-V_2-P0_0
 
 ## SSL和TLS
 
@@ -325,7 +301,9 @@ SSLEngine
 
 ## 零拷贝
 
-**零拷贝是指计算机执行IO操作时，CPU不需要将数据从一个存储区域复制到另一个存储区域，从而可以减少上下文切换以及CPU的拷贝时间。它是一种`I/O`操作优化技术。**
+*
+*零拷贝是指计算机执行IO操作时，CPU不需要将数据从一个存储区域复制到另一个存储区域，从而可以减少上下文切换以及CPU的拷贝时间。它是一种`I/O`
+操作优化技术。**
 
 #### 传统IO的执行流程
 
@@ -355,31 +333,28 @@ while ((n = read(diskfd, buf, BUF_SIZE)) > 0)
 
 - DMA控制器把数据从socket缓冲区，拷贝到网卡设备，**上下文从内核态切换回用户态（切换4）**，write函数返回
 
-  
-
-**内核空间是操作系统内核访问的区域，是受保护的内存空间，而用户空间是用户应用程序访问的内存区域。** 以32位操作系统为例，它会为每一个进程都分配了**4G**(2的32次方)的内存空间。
+**内核空间是操作系统内核访问的区域，是受保护的内存空间，而用户空间是用户应用程序访问的内存区域。** 以32位操作系统为例，它会为每一个进程都分配了
+**4G**(2的32次方)的内存空间。
 
 - 内核空间：主要提供进程调度、内存分配、连接硬件资源等功能
 
 - 用户空间：提供给各个程序进程的空间，它不具有访问内核空间资源的权限，如果应用程序需要使用到内核空间的资源，则需要通过系统调用来完成。进程从用户空间切换到内核空间，完成相关操作后，再从内核空间切换回用户空间。
 
-  
-
 ### 3.3 什么是上下文切换
 
 - 什么是CPU上下文？
 
-> CPU 寄存器，是CPU内置的容量小、但速度极快的内存。而程序计数器，则是用来存储 CPU 正在执行的指令位置、或者即将执行的下一条指令位置。它们都是 CPU 在运行任何任务前，必须的依赖环境，因此叫做CPU上下文。
+> CPU 寄存器，是CPU内置的容量小、但速度极快的内存。而程序计数器，则是用来存储 CPU 正在执行的指令位置、或者即将执行的下一条指令位置。它们都是
+> CPU 在运行任何任务前，必须的依赖环境，因此叫做CPU上下文。
 
 - 什么是**CPU上下文切换**？
 
 > 它是指，先把前一个任务的CPU上下文（也就是CPU寄存器和程序计数器）保存起来，然后加载新任务的上下文到这些寄存器和程序计数器，最后再跳转到程序计数器所指的新位置，运行新任务。
 
-一般我们说的**上下文切换**，就是指内核（操作系统的核心）在CPU上对进程或者线程进行切换。进程从用户态到内核态的转变，需要通过**系统调用**来完成。系统调用的过程，会发生**CPU上下文的切换**。
+一般我们说的**上下文切换**，就是指内核（操作系统的核心）在CPU上对进程或者线程进行切换。进程从用户态到内核态的转变，需要通过*
+*系统调用**来完成。系统调用的过程，会发生**CPU上下文的切换**。
 
 > CPU 寄存器里原来用户态的指令位置，需要先保存起来。接着，为了执行内核态代码，CPU 寄存器需要更新为内核态指令的新位置。最后才是跳转到内核态运行内核任务。
-
-
 
 ### 3.4 虚拟内存
 
@@ -392,11 +367,10 @@ while ((n = read(diskfd, buf, BUF_SIZE)) > 0)
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/PoF8jo1Pmpz58G4cfxZPyw8z2FARXj6oiaVKVOFNK24ZS4R8dicVTGcdVLS9086PKwF7n7RhabLIeia39GpaaeoFA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-
-
 ### 3.5 DMA技术
 
-DMA，英文全称是**Direct Memory Access**，即直接内存访问。**DMA**本质上是一块主板上独立的芯片，允许外设设备和内存存储器之间直接进行IO数据传输，其过程**不需要CPU的参与**。
+DMA，英文全称是**Direct Memory Access**，即直接内存访问。**DMA**本质上是一块主板上独立的芯片，允许外设设备和内存存储器之间直接进行IO数据传输，其过程
+**不需要CPU的参与**。
 
 我们一起来看下IO流程，DMA帮忙做了什么事情.
 
@@ -412,9 +386,8 @@ DMA，英文全称是**Direct Memory Access**，即直接内存访问。**DMA**�
 
 可以发现，DMA做的事情很清晰啦，它主要就是**帮忙CPU转发一下IO请求，以及拷贝数据**。为什么需要它的？
 
-> 主要就是效率，它帮忙CPU做事情，这时候，CPU就可以闲下来去做别的事情，提高了CPU的利用效率。大白话解释就是，CPU老哥太忙太累啦，所以他找了个小弟（名叫DMA） ，替他完成一部分的拷贝工作，这样CPU老哥就能着手去做其他事情。
-
-
+> 主要就是效率，它帮忙CPU做事情，这时候，CPU就可以闲下来去做别的事情，提高了CPU的利用效率。大白话解释就是，CPU老哥太忙太累啦，所以他找了个小弟（名叫DMA）
+> ，替他完成一部分的拷贝工作，这样CPU老哥就能着手去做其他事情。
 
 ## 4. 零拷贝实现的几种方式
 
@@ -439,7 +412,8 @@ void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
 - fd:进行映射的文件句柄
 - offset:文件偏移量
 
-前面一小节，零拷贝相关的知识点回顾，我们介绍了**虚拟内存，可以把内核空间和用户空间的虚拟地址映射到同一个物理地址，从而减少数据拷贝次数**！mmap就是用了虚拟内存这个特点，它将内核中的读缓冲区与用户空间的缓冲区进行映射，所有的IO都在内核中完成。
+前面一小节，零拷贝相关的知识点回顾，我们介绍了**虚拟内存，可以把内核空间和用户空间的虚拟地址映射到同一个物理地址，从而减少数据拷贝次数
+**！mmap就是用了虚拟内存这个特点，它将内核中的读缓冲区与用户空间的缓冲区进行映射，所有的IO都在内核中完成。
 
 `mmap+write`实现的零拷贝流程如下：
 
@@ -452,9 +426,11 @@ void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
 - CPU将内核缓冲区的数据拷贝到的socket缓冲区。
 - CPU利用DMA控制器，把数据从socket缓冲区拷贝到网卡，**上下文从内核态切换回用户态**，write调用返回。
 
-可以发现，`mmap+write`实现的零拷贝，I/O发生了**4**次用户空间与内核空间的上下文切换，以及3次数据拷贝。其中3次数据拷贝中，包括了**2次DMA拷贝和1次CPU拷贝**。
+可以发现，`mmap+write`实现的零拷贝，I/O发生了**4**次用户空间与内核空间的上下文切换，以及3次数据拷贝。其中3次数据拷贝中，包括了
+**2次DMA拷贝和1次CPU拷贝**。
 
-`mmap`是将读缓冲区的地址和用户缓冲区的地址进行映射，内核缓冲区和应用缓冲区共享，所以节省了一次CPU拷贝‘’并且用户进程内存是**虚拟的**，只是**映射**到内核的读缓冲区，可以节省一半的内存空间。
+`mmap`是将读缓冲区的地址和用户缓冲区的地址进行映射，内核缓冲区和应用缓冲区共享，所以节省了一次CPU拷贝‘’并且用户进程内存是*
+*虚拟的**，只是**映射**到内核的读缓冲区，可以节省一半的内存空间。
 
 ### 4.2 sendfile实现的零拷贝
 
@@ -469,11 +445,13 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 - offset：指定从读入文件的哪个位置开始读，如果为NULL，表示文件的默认起始位置。
 - count：指定在fdout和fdin之间传输的字节数。
 
-sendfile表示在两个文件描述符之间传输数据，它是在**操作系统内核**中操作的，**避免了数据从内核缓冲区和用户缓冲区之间的拷贝操作**，因此可以使用它来实现零拷贝。
+sendfile表示在两个文件描述符之间传输数据，它是在**操作系统内核**中操作的，**避免了数据从内核缓冲区和用户缓冲区之间的拷贝操作
+**，因此可以使用它来实现零拷贝。
 
 sendfile实现的零拷贝流程如下：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/PoF8jo1Pmpz58G4cfxZPyw8z2FARXj6oXYND4BKk0MrXdbgay85wGVI2kwEiaYzd4HEKFjedoJUVE9nk8fvMd9w/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)sendfile实现的零拷贝
+![图片](https://mmbiz.qpic.cn/mmbiz_png/PoF8jo1Pmpz58G4cfxZPyw8z2FARXj6oXYND4BKk0MrXdbgay85wGVI2kwEiaYzd4HEKFjedoJUVE9nk8fvMd9w/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+sendfile实现的零拷贝
 
 1. 用户进程发起sendfile系统调用，**上下文（切换1）从用户态转向内核态**
 2. DMA控制器，把数据从硬盘中拷贝到内核缓冲区。
@@ -481,11 +459,13 @@ sendfile实现的零拷贝流程如下：
 4. DMA控制器，异步把数据从socket缓冲区拷贝到网卡，
 5. **上下文（切换2）从内核态切换回用户态**，sendfile调用返回。
 
-可以发现，`sendfile`实现的零拷贝，I/O发生了**2**次用户空间与内核空间的上下文切换，以及3次数据拷贝。其中3次数据拷贝中，包括了**2次DMA拷贝和1次CPU拷贝**。那能不能把CPU拷贝的次数减少到0次呢？有的，即`带有DMA收集拷贝功能的sendfile`！
+可以发现，`sendfile`实现的零拷贝，I/O发生了**2**次用户空间与内核空间的上下文切换，以及3次数据拷贝。其中3次数据拷贝中，包括了*
+*2次DMA拷贝和1次CPU拷贝**。那能不能把CPU拷贝的次数减少到0次呢？有的，即`带有DMA收集拷贝功能的sendfile`！
 
 ### 4.3 sendfile+DMA scatter/gather实现的零拷贝
 
-linux 2.4版本之后，对`sendfile`做了优化升级，引入SG-DMA技术，其实就是对DMA拷贝加入了`scatter/gather`操作，它可以直接从内核空间缓冲区中将数据读取到网卡。使用这个特点搞零拷贝，即还可以多省去**一次CPU拷贝**。
+linux 2.4版本之后，对`sendfile`做了优化升级，引入SG-DMA技术，其实就是对DMA拷贝加入了`scatter/gather`
+操作，它可以直接从内核空间缓冲区中将数据读取到网卡。使用这个特点搞零拷贝，即还可以多省去**一次CPU拷贝**。
 
 sendfile+DMA scatter/gather实现的零拷贝流程如下：
 
@@ -497,7 +477,8 @@ sendfile+DMA scatter/gather实现的零拷贝流程如下：
 4. DMA控制器根据文件描述符信息，直接把数据从内核缓冲区拷贝到网卡
 5. **上下文（切换2）从内核态切换回用户态**，sendfile调用返回。
 
-可以发现，`sendfile+DMA scatter/gather`实现的零拷贝，I/O发生了**2**次用户空间与内核空间的上下文切换，以及2次数据拷贝。其中2次数据拷贝都是包**DMA拷贝**。这就是真正的 **零拷贝（Zero-copy)** 技术，全程都没有通过CPU来搬运数据，所有的数据都是通过DMA来进行传输的。
+可以发现，`sendfile+DMA scatter/gather`实现的零拷贝，I/O发生了**2**次用户空间与内核空间的上下文切换，以及2次数据拷贝。其中2次数据拷贝都是包
+**DMA拷贝**。这就是真正的 **零拷贝（Zero-copy)** 技术，全程都没有通过CPU来搬运数据，所有的数据都是通过DMA来进行传输的。
 
 ## 5. java提供的零拷贝方式
 
@@ -531,7 +512,8 @@ public class MmapTest {
 
 ### 5.2 Java NIO对sendfile的支持
 
-FileChannel的`transferTo()/transferFrom()`，底层就是sendfile() 系统调用函数。Kafka 这个开源项目就用到它，平时面试的时候，回答面试官为什么这么快，就可以提到零拷贝`sendfile`这个点。
+FileChannel的`transferTo()/transferFrom()`，底层就是sendfile() 系统调用函数。Kafka
+这个开源项目就用到它，平时面试的时候，回答面试官为什么这么快，就可以提到零拷贝`sendfile`这个点。
 
 ```java
 @Override
@@ -582,8 +564,6 @@ zookeeper一开始leader选举有三种状态
 
 nio通过多路复用的方式可以同事处理多请求 并且经过多reactor模型的形式可以做到接受请求和处理请求通过不同的线程组，来减少请求压力，提高吞吐量
 
-
-
 ### Select、poll、epoll的比较
 
 1、支持的最大连接数的区别
@@ -591,8 +571,6 @@ nio通过多路复用的方式可以同事处理多请求 并且经过多reactor
 2、连接的效率问题
 
 3、消息传递的方式问题
-
-
 
 epoll_ctl添加或删除所要监听的socket
 
@@ -614,10 +592,6 @@ epoll_create会创建一个eventpoll实例
 
 分布式协调器： Zookeeper
 
-
-
-
-
 ### Netty核心组件初步了解
 
 Bootstrap、EventLoop（Group）、Channel
@@ -625,8 +599,6 @@ Bootstrap、EventLoop（Group）、Channel
 事件和ChannelHandler、ChannelPipeline
 
 ChannelFuture
-
-
 
 # 传统接受发送数据几次上下文切换
 
@@ -664,8 +636,6 @@ poll 以链表形式保存的文件描述符
 
 一个进程能够同时打开的文件描述符是1024个
 
-
-
 # javaNIO
 
 ## **NIO三大核心组件**
@@ -686,7 +656,8 @@ channels读取数据需要通过buffer，buffer缓冲区，buffer可以读写切
 
 ## Reactor模型类型
 
-**Reactor模式称为反应器模式或应答者模式，是基于事件驱动的设计模式，拥有一个或多个并发输入源，有一个服务处理器和多个请求处理器，服务处理器会同步的将输入的请求事件以多路复用的方式分发给相应的请求处理器。**
+**Reactor模式称为反应器模式或应答者模式，是基于事件驱动的设计模式，拥有一个或多个并发输入源，有一个服务处理器和多个请求处理器，服务处理器会同步的将输入的请求事件以多路复用的方式分发给相应的请求处理器。
+**
 
 Reactor设计模式是一种为处理并发服务请求，并将请求提交到一个或多个服务处理程序的事件设计模式。当客户端请求抵达后，服务处理程序使用多路分配策略，由一个非阻塞的线程来接收所有请求，然后将请求派发到相关的工作线程并进行处理的过程。
 
@@ -694,17 +665,23 @@ Reactor设计模式是一种为处理并发服务请求，并将请求提交到�
 
 ### **单线程Reactor模式流程**
 
-​		服务器端的Reactor是一个线程对象，该线程会启动时间循环，并使用Selector（选择器）来实现IO的多路复用。注册一个Acceptor事件处理器到Reactor中，Acceptor事件处理器所关注的时间是ACCEPT事件，这样Reactor会监听客户端向服务端发起的连接请求事件（ACCEPT）
+​
+服务器端的Reactor是一个线程对象，该线程会启动时间循环，并使用Selector（选择器）来实现IO的多路复用。注册一个Acceptor事件处理器到Reactor中，Acceptor事件处理器所关注的时间是ACCEPT事件，这样Reactor会监听客户端向服务端发起的连接请求事件（ACCEPT）
 
-​	 客户端向服务器端发起一个连接请求，Reactor监听到了该ACCEPT事件的发生并将该ACCEPT事件派发给相应的Acceptor处理器来进行处理。Acceptor处理器通过accept()方法得到与这个客户端对应的连接(SocketChannel)，然后将该连接所关注的READ事件以及对应的READ事件处理器注册到Reactor中，这样一来Reactor就会监听该连接的READ事件了。
+​
+客户端向服务器端发起一个连接请求，Reactor监听到了该ACCEPT事件的发生并将该ACCEPT事件派发给相应的Acceptor处理器来进行处理。Acceptor处理器通过accept()
+方法得到与这个客户端对应的连接(SocketChannel)，然后将该连接所关注的READ事件以及对应的READ事件处理器注册到Reactor中，这样一来Reactor就会监听该连接的READ事件了。
 
-​	 当Reactor监听到有读或者写事件发生时，将相关的事件派发给对应的处理器进行处理。比如，读处理器会通过SocketChannel的read()方法读取数据，此时read()操作可以直接读取到数据，而不会堵塞与等待可读的数据到来。
+​ 当Reactor监听到有读或者写事件发生时，将相关的事件派发给对应的处理器进行处理。比如，读处理器会通过SocketChannel的read()
+方法读取数据，此时read()操作可以直接读取到数据，而不会堵塞与等待可读的数据到来。
 
-​	 每当处理完所有就绪的感兴趣的I/O事件后，Reactor线程会再次执行select()阻塞等待新的事件就绪并将其分派给对应处理器进行处理。
+​ 每当处理完所有就绪的感兴趣的I/O事件后，Reactor线程会再次执行select()阻塞等待新的事件就绪并将其分派给对应处理器进行处理。
 
-注意，Reactor的单线程模式的单线程主要是针对于I/O操作而言，也就是所有的I/O的accept()、read()、write()以及connect()操作都在一个线程上完成的。
+注意，Reactor的单线程模式的单线程主要是针对于I/O操作而言，也就是所有的I/O的accept()、read()、write()以及connect()
+操作都在一个线程上完成的。
 
-但在目前的单线程Reactor模式中，不仅I/O操作在该Reactor线程上，**连非I/O的业务操作也在该线程上进行处理了**，这可能会大大延迟I/O请求的响应。所以我们应该将非I/O的业务逻辑操作从Reactor线程上卸载，以此来加速Reactor线程对I/O请求的响应。
+但在目前的单线程Reactor模式中，不仅I/O操作在该Reactor线程上，**连非I/O的业务操作也在该线程上进行处理了**
+，这可能会大大延迟I/O请求的响应。所以我们应该将非I/O的业务逻辑操作从Reactor线程上卸载，以此来加速Reactor线程对I/O请求的响应。
 
 ![https://note.youdao.com/yws/public/resource/8ef33654f746921ad769ad9fe91a4c8f/xmlnote/OFFICED5F6435B59444264B2E0B3F4A9FE3468/10075](https://note.youdao.com/yws/public/resource/8ef33654f746921ad769ad9fe91a4c8f/xmlnote/OFFICED5F6435B59444264B2E0B3F4A9FE3468/10075)
 
@@ -724,11 +701,14 @@ Reactor设计模式是一种为处理并发服务请求，并将请求提交到�
 
 ## IO 多路复用
 
-**IO 多路复用是一种同步IO模型，实现一个线程可以监视多个文件句柄； 一旦某个文件句柄就绪，就能够通知应用程序进行相应的读写操作； 没有文件句柄就绪就会阻塞应用程序，交出CPU。**
+**IO 多路复用是一种同步IO模型，实现一个线程可以监视多个文件句柄； 一旦某个文件句柄就绪，就能够通知应用程序进行相应的读写操作；
+没有文件句柄就绪就会阻塞应用程序，交出CPU。**
 
 ### 文件描述符
 
-文件描述符（File descriptor）是计算机科学中的一个术语，**是一个用于表述指向文件引用的抽象化概念。 文件描述符在形式上是一个非负整数。**实际上，它是一个索引值，指向内核为每一个进程所维护的该进程打开文件的记录表。当程序打开一个现有文件或者创建一个新文件时，内核向进程返回一个文件描述符。在程序设计中，一些涉及底层的程序编写往往会围绕着文件描述符展开。但是文件描述符这一概念往往只适用于UNIX、Linux这样的操作系统。
+文件描述符（File descriptor）是计算机科学中的一个术语，**是一个用于表述指向文件引用的抽象化概念。
+文件描述符在形式上是一个非负整数。**
+实际上，它是一个索引值，指向内核为每一个进程所维护的该进程打开文件的记录表。当程序打开一个现有文件或者创建一个新文件时，内核向进程返回一个文件描述符。在程序设计中，一些涉及底层的程序编写往往会围绕着文件描述符展开。但是文件描述符这一概念往往只适用于UNIX、Linux这样的操作系统。
 
 # 操作类型SelectionKey
 
@@ -738,9 +718,10 @@ Reactor设计模式是一种为处理并发服务请求，并将请求提交到�
 
 ## Channel
 
-​		通道表示与实体的开放连接，例如硬件设备、文件、网络套接字或能够执行一个或多个不同 I/O 操作（例如读取或写入）的程序组件。fw
+​ 通道表示与实体的开放连接，例如硬件设备、文件、网络套接字或能够执行一个或多个不同 I/O 操作（例如读取或写入）的程序组件。fw
 
-​		通道，被建立的一个应用程序和操作系统交互事件、传递内容的渠道(注意是连接到操作系统)。一个通道会有一个专属的文件状态描述符。那么既然是和操作系统进行内容的传递，那么说明应用程序可以通过通道读取数据，也可以通过通道向操作系统写数据。
+​ 通道，被建立的一个应用程序和操作系统交互事件、传递内容的渠道(注意是连接到操作系统)
+。一个通道会有一个专属的文件状态描述符。那么既然是和操作系统进行内容的传递，那么说明应用程序可以通过通道读取数据，也可以通过通道向操作系统写数据。
 
 ## Buffer
 
@@ -752,7 +733,8 @@ Selector的英文含义是“选择器”，不过根据我们详细介绍的Sel
 
 # IOCP
 
-**输入输出完成端口**（Input/Output Completion Port，IOCP）, 是支持多个同时发生的异步I/O操作的应用程序编程接口，由于Linux下没有Windows下的IOCP技术提供真正的 异步IO 支持，所以Linux下使用epoll模拟异步IO。
+**输入输出完成端口**（Input/Output Completion Port，IOCP）, 是支持多个同时发生的异步I/O操作的应用程序编程接口，由于Linux下没有Windows下的IOCP技术提供真正的
+异步IO 支持，所以Linux下使用epoll模拟异步IO。
 
 ## 典型的多路复用IO实现
 
@@ -766,17 +748,20 @@ Selector的英文含义是“选择器”，不过根据我们详细介绍的Sel
 
    **缺点**
 
-   - 单个进程可监视的fd熟练被限制，即能监听端口的数量有限。当然可以进行修改，但是受限制，一般32位机器是1024个，64位机器是2048个。
-   - 对socket是线性扫描，即轮询，效率较低： 仅知道有I/O事件发生，却不知哪几个流，只会无差异轮询所有流，找出能读/写数据的流进行操作。同时处理的流越多，无差别轮询时间越长 - O(n)。
+    - 单个进程可监视的fd熟练被限制，即能监听端口的数量有限。当然可以进行修改，但是受限制，一般32位机器是1024个，64位机器是2048个。
+    - 对socket是线性扫描，即轮询，效率较低：
+      仅知道有I/O事件发生，却不知哪几个流，只会无差异轮询所有流，找出能读/写数据的流进行操作。同时处理的流越多，无差别轮询时间越长 -
+      O(n)。
 
 2. **poll**
 
-   和select类似，只是描述fd集合的方式不同，poll使用`pollfd`结构而非select的`fd_set`结构。管理多个描述符也是进行轮询，根据描述符的状态进行处理，但**poll无最大文件描述符数量的限制**。
+   和select类似，只是描述fd集合的方式不同，poll使用`pollfd`结构而非select的`fd_set`结构。管理多个描述符也是进行轮询，根据描述符的状态进行处理，但
+   **poll无最大文件描述符数量的限制**。
 
    无最大连接数限制，因其基于链表存储，缺点：
 
-   - 大量fd数组被整体复制于用户态和内核地址空间间，而不管是否有意义
-   - 若报告了fd后，没有被处理，则下次poll时会再次报告该fd
+    - 大量fd数组被整体复制于用户态和内核地址空间间，而不管是否有意义
+    - 若报告了fd后，没有被处理，则下次poll时会再次报告该fd
 
 3. **epoll（基于Linux2.4.5）**
 

@@ -17,10 +17,8 @@ public class MemoryLimitCalculator {
     // 它可以更加方便的做字节码增强操作，允许我们对已经加载甚至还没有被加载的类进行修改的操作，实现类似于性能监控的功能
     // 2、ManagementFactory，JConsole的页面信息就是从 ManagementFactory 里面拿的
     private static final MemoryMXBean MX_BEAN = ManagementFactory.getMemoryMXBean();
-
-    private static volatile long maxAvailable;
-
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
+    private static volatile long maxAvailable;
 
     static {
         // immediately refresh when this class is loaded to prevent maxAvailable from being 0

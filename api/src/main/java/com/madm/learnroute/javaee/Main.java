@@ -17,7 +17,7 @@ public class Main {
 }
 
 class Super_A {
-//    private Field_Super a = new Field_Super(1);
+    //    private Field_Super a = new Field_Super(1);
     private Field_Sub a = new Field_Sub(1);
 
     public Field_Sub getA() {

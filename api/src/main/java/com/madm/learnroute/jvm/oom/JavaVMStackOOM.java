@@ -5,19 +5,19 @@ package com.madm.learnroute.jvm.oom;
  */
 public class JavaVMStackOOM {
 
-    private void dontStop(){
-        while(true){
-
-        }
-    }
-
     public static void main(String[] args) {
         JavaVMStackOOM oom = new JavaVMStackOOM();
         oom.stackLeakByThread();
     }
 
+    private void dontStop() {
+        while (true) {
+
+        }
+    }
+
     private void stackLeakByThread() {
-        while(true){
+        while (true) {
             new Thread(() -> {
                 dontStop();
             }).start();

@@ -25,18 +25,17 @@ public class DelayQueuePractice {
         //触发时间/秒
         private long time;
 
+        public Student(String name, long time) {
+            this.name = name;
+            this.time = time * 1000 + System.currentTimeMillis();
+        }
+
         public String getName() {
             return name;
         }
 
-
         public long getTime() {
             return time;
-        }
-
-        public Student(String name, long time) {
-            this.name = name;
-            this.time = time * 1000 + System.currentTimeMillis();
         }
 
         @Override

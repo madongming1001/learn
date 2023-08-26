@@ -1,61 +1,10 @@
 package com.madm.learnroute.javaee;
 
-import com.mdm.pojo.AuthParam;
-
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ABAProblemExample {
-    static class Stack {
-        private ReentrantLock rl = new ReentrantLock(true);
-        private AtomicReference<Node> top = new AtomicReference<>();
-
-        static class Node {
-            String value;
-
-            Node next;
-
-            public Node(String value) {
-                this.value = value;
-            }
-        }
-
-        //出栈
-        public Node pop(int time) {
-            Node newTop;
-            Node oldTop;
-
-            do {
-                oldTop = top.get();
-                if (oldTop == null) {
-                    return null;
-                }
-                newTop = oldTop.next;
-                try {
-                    //休眠一段时间，模拟ABA问题
-                    TimeUnit.SECONDS.sleep(time);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while (!top.compareAndSet(oldTop, newTop));
-            return oldTop;
-        }
-
-        public void push(Node node) {
-            Node oldTop;
-            do {
-                oldTop = top.get();
-                node.next = oldTop;
-            } while (!top.compareAndSet(oldTop, node));
-        }
-
-        public AtomicReference<Node> getTop() {
-            return top;
-        }
-
-
-    }
     public static void main(String[] args) throws InterruptedException {
         Stack stack = new Stack();
         Stack.Node a = new Stack.Node("A");
@@ -92,5 +41,55 @@ public class ABAProblemExample {
             System.out.println(top.value);
             top = top.next;
         } while (top != null);
+    }
+
+    static class Stack {
+        private ReentrantLock rl = new ReentrantLock(true);
+        private AtomicReference<Node> top = new AtomicReference<>();
+
+        //出栈
+        public Node pop(int time) {
+            Node newTop;
+            Node oldTop;
+
+            do {
+                oldTop = top.get();
+                if (oldTop == null) {
+                    return null;
+                }
+                newTop = oldTop.next;
+                try {
+                    //休眠一段时间，模拟ABA问题
+                    TimeUnit.SECONDS.sleep(time);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } while (!top.compareAndSet(oldTop, newTop));
+            return oldTop;
+        }
+
+        public void push(Node node) {
+            Node oldTop;
+            do {
+                oldTop = top.get();
+                node.next = oldTop;
+            } while (!top.compareAndSet(oldTop, node));
+        }
+
+        public AtomicReference<Node> getTop() {
+            return top;
+        }
+
+        static class Node {
+            String value;
+
+            Node next;
+
+            public Node(String value) {
+                this.value = value;
+            }
+        }
+
+
     }
 }

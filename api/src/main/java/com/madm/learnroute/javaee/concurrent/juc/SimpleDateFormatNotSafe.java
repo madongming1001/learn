@@ -8,15 +8,15 @@ import java.util.Locale;
 /**
  * 可知每个SimpleDateFormat实例里面有一个Calendar对象，从后面会知道其实SimpleDateFormat之所以是线程不安全的就是因为Calendar是线程不安全的。
  * parse(){
- *
- *      calb.establish(calendar).getTime();
+ * <p>
+ * calb.establish(calendar).getTime();
  * }
  * establish(){
- *    //（3）重置日期对象cal的属性值
- *    cal.clear();
- *    //(4) 使用calb中中属性设置cal
- *    ...
- *    //(5)返回设置好的cal对象
+ * //（3）重置日期对象cal的属性值
+ * cal.clear();
+ * //(4) 使用calb中中属性设置cal
+ * ...
+ * //(5)返回设置好的cal对象
  * }
  * 参考文章：https://www.jianshu.com/p/d9977a048dab
  */

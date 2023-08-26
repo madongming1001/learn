@@ -33,6 +33,40 @@ public class BinarySearchPractice {
         return -1;
     }
 
+    /**
+     * 查找最后一个小于等于给定值的元素
+     */
+    public static int binarySearchLastLessForValue(int[] a, int n, int value) {
+        int low = 0;
+        int high = n - 1;
+        while (low <= high) {
+            int mid = low + ((high - low) >> 1);
+            if (a[mid] > value) {
+                high = mid - 1;
+            } else {
+                if ((mid == n - 1) || (a[mid + 1] > value)) return mid;
+                else low = mid + 1;
+            }
+        }
+        return -1;
+    }
+
+    public static int binarySearch(int[] ints, int target) {
+        int left = 0;
+        int right = ints.length - 1;
+        while (left < right) {
+            int mid = left + ((right - left) >> 1);
+            if (ints[mid] == target) {
+                return mid;
+            } else if (ints[mid] < target) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        return -1;
+    }
+
     public int bsearch(int[] a, int n, int value) {
         int low = 0;
         int high = n - 1;
@@ -103,41 +137,6 @@ public class BinarySearchPractice {
                 else high = mid - 1;
             } else {
                 low = mid + 1;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * 查找最后一个小于等于给定值的元素
-     */
-    public static int binarySearchLastLessForValue(int[] a, int n, int value) {
-        int low = 0;
-        int high = n - 1;
-        while (low <= high) {
-            int mid = low + ((high - low) >> 1);
-            if (a[mid] > value) {
-                high = mid - 1;
-            } else {
-                if ((mid == n - 1) || (a[mid + 1] > value)) return mid;
-                else low = mid + 1;
-            }
-        }
-        return -1;
-    }
-
-
-    public static int binarySearch(int[] ints, int target) {
-        int left = 0;
-        int right = ints.length - 1;
-        while (left < right) {
-            int mid = left + ((right - left) >> 1);
-            if (ints[mid] == target) {
-                return mid;
-            } else if (ints[mid] < target) {
-                left = mid + 1;
-            } else {
-                right = mid;
             }
         }
         return -1;

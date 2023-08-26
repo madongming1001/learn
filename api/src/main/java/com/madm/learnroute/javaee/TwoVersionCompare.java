@@ -20,7 +20,7 @@ public class TwoVersionCompare {
     }
 
     public static int twoVersionCompare(String[] version1, String[] version2, int vl) {
-        if(version1.length == version2.length && version1.length == vl){
+        if (version1.length == version2.length && version1.length == vl) {
             return 0;
         }
         int result;

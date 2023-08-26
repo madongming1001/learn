@@ -1,4 +1,5 @@
 package com.madm.learnroute.javaee.concurrent.juc;
+
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -26,12 +27,12 @@ public class ConTest2 {
     }
 
     class Consumer extends Thread {
+        volatile boolean flag = true;
+
         @Override
         public void run() {
             consume();
         }
-
-        volatile boolean flag = true;
 
         private void consume() {
             System.out.println("先走的Consumer");
@@ -57,12 +58,12 @@ public class ConTest2 {
     }
 
     class Producer extends Thread {
+        volatile boolean flag = true;
+
         @Override
         public void run() {
             produce();
         }
-
-        volatile boolean flag = true;
 
         private void produce() {
             System.out.println("先走的Producer");

@@ -1,15 +1,6 @@
 package com.madm.interview_guide;
 
 public class JosephusQuestion {
-    class Node {
-        public int value;
-        public Node next;
-
-        public Node(int data) {
-            this.value = data;
-        }
-    }
-
     public Node josephusKill(Node head, int m) {
         if (head == null || head.next == head || m < 1) {
             return head;
@@ -29,5 +20,14 @@ public class JosephusQuestion {
             head = last.next;
         }
         return head;
+    }
+
+    class Node {
+        public int value;
+        public Node next;
+
+        public Node(int data) {
+            this.value = data;
+        }
     }
 }

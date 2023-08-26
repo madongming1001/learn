@@ -1,7 +1,6 @@
 package com.madm.data_structure;
 
 import java.util.Arrays;
-import java.util.Stack;
 
 /**
  * 大顶堆 数组话显示
@@ -10,7 +9,6 @@ import java.util.Stack;
  * 非稳定
  * 如果节点的下标是 i，那左子节点的下标就是 2*i+1，右子节点的下标就是 2*i+2，父节点的下标就是 i−1/2。
  * 利用数组存储堆
- * 
  */
 public class Heap {
     private int[] a; // 数组，从下标1开始存储数据
@@ -33,6 +31,29 @@ public class Heap {
 
     }
 
+    /**
+     * 优先级队列实现小顶堆
+     */
+    private static <T> void siftUpComparable(int k, T x, Object[] arr) {
+        Comparable<? super T> key = (Comparable<? super T>) x;
+        while (k > 0) {
+            int parent = (k - 1) >>> 1;
+            Object e = arr[parent];
+            if (key.compareTo((T) e) >= 0)
+                break;
+            arr[k] = e;
+            k = parent;
+        }
+        arr[k] = key;
+    }
+
+    public static void main(String[] args) {
+        Heap heap = new Heap();
+        int[] intr = {0, 33, 17, 31, 16, 13, 15, 9, 5, 6, 7, 8, 1, 2, 0};
+        heap.sort(intr, intr.length);
+        System.out.println(Arrays.toString(intr));
+    }
+
     public void insert(int data) {
         if (count >= n) return; // 堆满了
         ++count;
@@ -43,7 +64,6 @@ public class Heap {
             i = i / 2;
         }
     }
-
 
     /**
      * 最大堆的删除  从上往下的堆化
@@ -57,9 +77,9 @@ public class Heap {
 
     /**
      * 第二种方式建立堆
-     *
+     * <p>
      * 从后往前处理数组，并且每个数据都是从上往下堆化。
-     *
+     * <p>
      * 因为叶子节点往下堆化只能自己跟自己比较，所以我们直接从最后一个非叶子节点开始，依次堆化就行了。
      */
     private void buildHeap(int[] a, int n) {
@@ -100,28 +120,5 @@ public class Heap {
             --k;
             heapify(a, k, 1);
         }
-    }
-
-    /**
-     * 优先级队列实现小顶堆
-     */
-    private static <T> void siftUpComparable(int k, T x, Object[] arr) {
-        Comparable<? super T> key = (Comparable<? super T>) x;
-        while (k > 0) {
-            int parent = (k - 1) >>> 1;
-            Object e = arr[parent];
-            if (key.compareTo((T) e) >= 0)
-                break;
-            arr[k] = e;
-            k = parent;
-        }
-        arr[k] = key;
-    }
-
-    public static void main(String[] args) {
-        Heap heap = new Heap();
-        int[] intr = {0, 33, 17, 31, 16, 13, 15, 9, 5, 6, 7, 8, 1, 2, 0};
-        heap.sort(intr,intr.length);
-        System.out.println(Arrays.toString(intr));
     }
 }

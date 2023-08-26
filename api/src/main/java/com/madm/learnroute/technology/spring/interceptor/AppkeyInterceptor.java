@@ -1,7 +1,6 @@
 package com.madm.learnroute.technology.spring.interceptor;
 
 import cn.hutool.extra.spring.SpringUtil;
-import com.alibaba.cloud.nacos.NacosConfigProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;

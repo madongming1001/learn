@@ -1,7 +1,5 @@
 package com.madm.data_structure;
 
-import java.util.Arrays;
-
 /**
  * Trie 树的本质，就是利用字符串之间的公共前缀，将重复的前缀合并在一起
  */

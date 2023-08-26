@@ -27,6 +27,7 @@ public class OrphanNode {
     }
 
 }
+
 class Node {
     public int index;//用来表示自己位于ROOT[n]中的位置序号
     public Node next;//用来表示自己指向的下一级Node

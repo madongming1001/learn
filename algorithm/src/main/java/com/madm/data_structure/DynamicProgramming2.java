@@ -2,7 +2,25 @@ package com.madm.data_structure;
 
 public class DynamicProgramming2 {
 
+    public int[][] matrix =
+            {{1, 3, 5, 9}, {2, 1, 3, 4}, {5, 2, 6, 7}, {6, 8, 4, 3}};
     private int minDist = Integer.MAX_VALUE; // 全局变量或者成员变量
+    private int n = 4;
+    private int[][] mem = new int[4][4];
+    private char[] a = "mitcmu".toCharArray();
+    private char[] b = "mtacnu".toCharArray();
+    private int m = 6;
+
+    public static void main(String[] args) {
+        int[][] matrix =
+                {{1, 3, 5, 9}, {2, 1, 3, 4}, {5, 2, 6, 7}, {6, 8, 4, 3}};
+        System.out.println(matrix.length);
+//        DynamicProgramming2 dp = new DynamicProgramming2();
+////        System.out.println(dp.minDistDP(matrix, 4));
+//        char[] a = {'m', 'i', 't', 'c', 'm', 'u'};
+//        char[] b = {'c', 't', 'a', 'c', 'n', 'u'};
+//        System.out.println(dp.lwstDP(a, a.length, b, b.length));
+    }
 
     // 调用方式：minDistBacktracing(0, 0, 0, w, n);
     public void minDistBT(int i, int j, int dist, int[][] w, int n) {
@@ -40,12 +58,6 @@ public class DynamicProgramming2 {
         return states[n - 1][n - 1];
     }
 
-
-    public int[][] matrix =
-            {{1, 3, 5, 9}, {2, 1, 3, 4}, {5, 2, 6, 7}, {6, 8, 4, 3}};
-    private int n = 4;
-    private int[][] mem = new int[4][4];
-
     public int minDist(int i, int j) { // 调用minDist(n-1, n-1);
         if (i == 0 && j == 0) return matrix[0][0];
         if (mem[i][j] > 0) return mem[i][j];
@@ -63,11 +75,6 @@ public class DynamicProgramming2 {
         return currMinDist;
     }
 
-
-    private char[] a = "mitcmu".toCharArray();
-    private char[] b = "mtacnu".toCharArray();
-    private int m = 6;
-
     // 调用方式 lwstBT(0, 0, 0);
     public void lwstBT(int i, int j, int edist) {
         if (i == n || j == m) {
@@ -84,7 +91,6 @@ public class DynamicProgramming2 {
             lwstBT(i + 1, j + 1, edist + 1); // 将a[i]和b[j]替换为相同字符
         }
     }
-
 
     public int lwstDP(char[] a, int n, char[] b, int m) {
         int[][] minDist = new int[n][m];
@@ -115,7 +121,6 @@ public class DynamicProgramming2 {
         if (z < minv) minv = z;
         return minv;
     }
-
 
     /**
      * 最长公共子串长度
@@ -149,16 +154,5 @@ public class DynamicProgramming2 {
         if (y > maxv) maxv = y;
         if (z > maxv) maxv = z;
         return maxv;
-    }
-
-    public static void main(String[] args) {
-        int[][] matrix =
-                {{1, 3, 5, 9}, {2, 1, 3, 4}, {5, 2, 6, 7}, {6, 8, 4, 3}};
-        System.out.println(matrix.length);
-//        DynamicProgramming2 dp = new DynamicProgramming2();
-////        System.out.println(dp.minDistDP(matrix, 4));
-//        char[] a = {'m', 'i', 't', 'c', 'm', 'u'};
-//        char[] b = {'c', 't', 'a', 'c', 'n', 'u'};
-//        System.out.println(dp.lwstDP(a, a.length, b, b.length));
     }
 }

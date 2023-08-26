@@ -1,6 +1,5 @@
 package com.mdm.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -15,7 +14,7 @@ public class RestResponse<T> {
 
     private String msg;
 
-//    @JsonInclude(value = JsonInclude.Include.NON_NULL)
+    //    @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private T body;
 
     public RestResponse() {
@@ -45,21 +44,21 @@ public class RestResponse<T> {
         return new RestResponse(200, "success");
     }
 
-    public boolean ok() {
-        return this.code == 0 || this.code == 200;
-    }
-
     public static ResResultBuilder code(int code) {
         return new ResResultBuilder(code);
+    }
+
+    public static <T> ResResultBuilder<T> builder() {
+        return new ResResultBuilder<T>();
+    }
+
+    public boolean ok() {
+        return this.code == 0 || this.code == 200;
     }
 
     @Override
     public String toString() {
         return "RestResponse{" + "code=" + code + ", message='" + msg + '\'' + ", body=" + body + '}';
-    }
-
-    public static <T> ResResultBuilder<T> builder() {
-        return new ResResultBuilder<T>();
     }
 
     public static final class ResResultBuilder<T> {

@@ -7,8 +7,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
 
-import javax.annotation.PreDestroy;
-
 /**
  * @author dongming.ma
  * @date 2023/8/15 21:41

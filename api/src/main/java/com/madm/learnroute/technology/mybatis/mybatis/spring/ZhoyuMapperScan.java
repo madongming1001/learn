@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Import(ZhouyuImportBeanDefinitionRegistrar.class)
 public @interface ZhoyuMapperScan {
-	String value();
+    String value();
 }

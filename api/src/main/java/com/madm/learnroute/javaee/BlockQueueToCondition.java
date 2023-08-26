@@ -6,6 +6,28 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
 public class BlockQueueToCondition {
+    public static void main(String[] args) {
+        final BoudedBuffer bf = new BoudedBuffer();
+        IntStream.rangeClosed(1, 10).forEach(i -> {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    bf.put("zhouzhixiang[" + i + "]");
+                }
+            }).start();
+        });
+
+        IntStream.rangeClosed(1, 5).forEach(i -> {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    bf.take();
+                }
+            }).start();
+        });
+
+    }
+
     static class BoudedBuffer {
         final Lock lock = new ReentrantLock();
         final Condition notEmpty = lock.newCondition();
@@ -16,13 +38,13 @@ public class BlockQueueToCondition {
         public void put(Object x) {
             lock.lock();
             try {
-                System.out.println(Thread.currentThread().getName()+" ready to put .....");
+                System.out.println(Thread.currentThread().getName() + " ready to put .....");
                 while (count == buffer.length) {
-                    System.err.println("put data to buffer["+input_index+"] : error : buffer full cannot insert ....");
+                    System.err.println("put data to buffer[" + input_index + "] : error : buffer full cannot insert ....");
                     notFull.await();
                 }
                 buffer[input_index] = x;
-                System.out.println("put data to buffer["+input_index+"] : success : buffer insert data" + String.valueOf(x));
+                System.out.println("put data to buffer[" + input_index + "] : success : buffer insert data" + String.valueOf(x));
                 if (++input_index == buffer.length) {
                     input_index = 0;
                 }
@@ -38,12 +60,12 @@ public class BlockQueueToCondition {
         public Object take() {
             lock.lock();
             try {
-                System.out.println(Thread.currentThread().getName()+" ready to take .....");
+                System.out.println(Thread.currentThread().getName() + " ready to take .....");
                 while (count == 0) {
-                    System.err.print("take from buffer["+take_index+"] : error : buffer is empty now");
+                    System.err.print("take from buffer[" + take_index + "] : error : buffer is empty now");
                     notEmpty.await();
                 }
-                System.out.println("take from buffer["+take_index+"] : success : take data is " + String.valueOf(buffer[take_index]));
+                System.out.println("take from buffer[" + take_index + "] : success : take data is " + String.valueOf(buffer[take_index]));
                 if (++take_index == buffer.length) {
                     take_index = 0;
                 }
@@ -56,26 +78,6 @@ public class BlockQueueToCondition {
             }
             return buffer[take_index];
         }
-
-    }
-
-    public static void main(String[] args) {
-        final BoudedBuffer bf = new BoudedBuffer();
-        IntStream.rangeClosed(1, 10).forEach(i -> {
-            new Thread(new Runnable() {
-                @Override public void run() {
-                    bf.put("zhouzhixiang["+i+"]");
-                }
-            }).start();
-        });
-
-        IntStream.rangeClosed(1, 5).forEach(i -> {
-            new Thread(new Runnable() {
-                @Override public void run() {
-                    bf.take();
-                }
-            }).start();
-        });
 
     }
 }

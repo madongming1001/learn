@@ -14,18 +14,18 @@ public class RedisTemplatePractice {
     RedisTemplate redisTemplate;
 
     @PostConstruct
-    public void setRedisTemplate(){
+    public void setRedisTemplate() {
         redisTemplate.opsForValue().set("444444", 4L);
 
         List<Map<String, Object>> candidate = new ArrayList<>();
         Map<String, Object> stringObjectHashMap = new HashMap<>();
-        stringObjectHashMap.put("1","1");
+        stringObjectHashMap.put("1", "1");
         Map<String, Object> stringObjectHashMap1 = new HashMap<>();
-        stringObjectHashMap1.put("1","2");
+        stringObjectHashMap1.put("1", "2");
         Map<String, Object> stringObjectHashMap2 = new HashMap<>();
-        stringObjectHashMap2.put("1","3");
+        stringObjectHashMap2.put("1", "3");
         Map<String, Object> stringObjectHashMap3 = new HashMap<>();
-        stringObjectHashMap3.put("1","4");
+        stringObjectHashMap3.put("1", "4");
         candidate.add(stringObjectHashMap);
         candidate.add(stringObjectHashMap1);
         candidate.add(stringObjectHashMap2);

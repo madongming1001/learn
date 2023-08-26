@@ -1,6 +1,5 @@
 package com.madm.learnroute.technology.redis;
 
-import com.google.common.base.Strings;
 import com.mdm.pojo.User;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
@@ -24,10 +23,6 @@ public class BloomFilterPractice {
 
         RLock rLock = readWriteLock.readLock();
         RLock wLock = readWriteLock.writeLock();
-
-
-
-
 
 
         RBloomFilter<User> bloomFilter = redisson.getBloomFilter("user");

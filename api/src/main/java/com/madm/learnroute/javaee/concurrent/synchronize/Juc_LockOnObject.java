@@ -13,11 +13,11 @@ public class Juc_LockOnObject {
 
     private Integer stock = 10;
 
-    public void decrStock(){
+    public void decrStock() {
         //T1,T2
-        synchronized (object){
+        synchronized (object) {
             --stock;
-            if(stock <= 0){
+            if (stock <= 0) {
                 System.out.println("库存售罄");
                 return;
             }

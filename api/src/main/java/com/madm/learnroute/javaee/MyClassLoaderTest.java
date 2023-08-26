@@ -9,6 +9,27 @@ import java.lang.reflect.Method;
  */
 public class MyClassLoaderTest {
 
+    public static void main(String[] args) throws Exception {
+        /**
+         * bootstrapLoader加载以下文件：-Xbootclasspath、sun.boot.class.path
+         * extClassloader加载以下文件：java.ext.dirs
+         * appClassLoader加载以下文件：java.class.path
+         */
+        CustomClassLoader classLoader = new CustomClassLoader("/Users/madongming/IdeaProjects/learn/classloader");
+        Class clazz = classLoader.loadClass("com.madm.learnroute.model.Employee1");
+        Constructor[] constructors = clazz.getConstructors();
+        Object obj = null;
+        for (Constructor constructor : constructors) {
+            if (constructor.getParameterCount() == 2) {
+                obj = constructor.newInstance(10L, "10");
+                break;
+            }
+        }
+        Method method = clazz.getDeclaredMethod("print", null);
+        method.invoke(obj, null);
+        System.out.println(clazz.getClassLoader().getClass().getName());
+    }
+
     static class CustomClassLoader extends ClassLoader {
         private String classPath;
 
@@ -41,12 +62,9 @@ public class MyClassLoaderTest {
         /**
          * 模拟实现Tomcat的webappClassLoader加载自己war包应用内不同版本类实现相互共存与隔离
          * 破坏双亲委派是重写loadClass不往上查找就好了
-         * @param name
-         *         The <a href="#name">binary name</a> of the class
          *
-         * @param resolve
-         *         If <tt>true</tt> then resolve the class
-         *
+         * @param name    The <a href="#name">binary name</a> of the class
+         * @param resolve If <tt>true</tt> then resolve the class
          * @return
          * @throws ClassNotFoundException
          */
@@ -59,9 +77,9 @@ public class MyClassLoaderTest {
                     // If still not found, then invoke findClass in order
                     // to find the class.
                     long t1 = System.nanoTime();
-                    if(!name.startsWith("Employee")){
+                    if (!name.startsWith("Employee")) {
                         c = this.getParent().loadClass(name);
-                    }else{
+                    } else {
                         c = findClass(name);
                     }
                     // this is the defining class loader; record the stats
@@ -74,27 +92,6 @@ public class MyClassLoaderTest {
                 return c;
             }
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        /**
-         * bootstrapLoader加载以下文件：-Xbootclasspath、sun.boot.class.path
-         * extClassloader加载以下文件：java.ext.dirs
-         * appClassLoader加载以下文件：java.class.path
-         */
-        CustomClassLoader classLoader =  new CustomClassLoader("/Users/madongming/IdeaProjects/learn/classloader");
-        Class clazz = classLoader.loadClass("com.madm.learnroute.model.Employee1");
-        Constructor[] constructors = clazz.getConstructors();
-        Object obj = null;
-        for (Constructor constructor : constructors) {
-            if (constructor.getParameterCount() == 2) {
-                obj = constructor.newInstance(10L, "10");
-                break;
-            }
-        }
-        Method method = clazz.getDeclaredMethod("print", null);
-        method.invoke(obj, null);
-        System.out.println(clazz.getClassLoader().getClass().getName());
     }
 
 }

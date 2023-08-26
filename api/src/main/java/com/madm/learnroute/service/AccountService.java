@@ -1,6 +1,5 @@
 package com.madm.learnroute.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.madm.learnroute.model.Account;
 
 import java.util.List;

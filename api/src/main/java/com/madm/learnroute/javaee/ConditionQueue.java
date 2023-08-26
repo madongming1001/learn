@@ -18,43 +18,6 @@ public class ConditionQueue {
     private static boolean hasCig = false;
     private static boolean hasTakeOutFood = false;
 
-    //送烟
-    public void cigratee() {
-        lock.lock();
-        try {
-//            while (!hasCig) {
-                try {
-                    log.debug("没有烟，歇一会");
-                    noCig.await();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-//            }
-            log.debug("有烟了，干活");
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    //送外卖
-    public void takeout() {
-        lock.lock();
-        try {
-//            while (!hasTakeOutFood) {
-                try {
-                    log.debug("没有饭，歇一会");
-                    noTakeOutFood.await();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-//            }
-            log.debug("有饭了，干活");
-        } finally {
-            lock.unlock();
-        }
-    }
-
     public static void main(String[] args) {
         ConditionQueue test = new ConditionQueue();
         new Thread(() -> {
@@ -86,5 +49,42 @@ public class ConditionQueue {
                 lock.unlock();
             }
         }, "t2").start();
+    }
+
+    //送烟
+    public void cigratee() {
+        lock.lock();
+        try {
+//            while (!hasCig) {
+            try {
+                log.debug("没有烟，歇一会");
+                noCig.await();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+//            }
+            log.debug("有烟了，干活");
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    //送外卖
+    public void takeout() {
+        lock.lock();
+        try {
+//            while (!hasTakeOutFood) {
+            try {
+                log.debug("没有饭，歇一会");
+                noTakeOutFood.await();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+//            }
+            log.debug("有饭了，干活");
+        } finally {
+            lock.unlock();
+        }
     }
 }

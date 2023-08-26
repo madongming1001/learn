@@ -3,8 +3,6 @@ package com.madm.learnroute.service;
 import com.madm.learnroute.technology.mybatis.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author dongming.ma

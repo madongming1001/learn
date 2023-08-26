@@ -9,7 +9,7 @@ public class GrantTypeController {
     private QueryGrantTypeService queryGrantTypeService;
 
     @PostMapping("/grantType")
-    public String test(String resourceName,String resourceId) {
-        return queryGrantTypeService.getResult(resourceName,resourceId);
+    public String test(String resourceName, String resourceId) {
+        return queryGrantTypeService.getResult(resourceName, resourceId);
     }
 }

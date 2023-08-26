@@ -1,18 +1,15 @@
 package com.mdm.headfirst.decorator.starbuzz;
 
-import com.mdm.headfirst.decorator.starbuzz.Beverage;
-import com.mdm.headfirst.decorator.starbuzz.CondimentDecorator;
-
 public class Soy extends CondimentDecorator {
-	public Soy(Beverage beverage) {
-		this.beverage = beverage;
-	}
+    public Soy(Beverage beverage) {
+        this.beverage = beverage;
+    }
 
-	public String getDescription() {
-		return beverage.getDescription() + ", Soy";
-	}
+    public String getDescription() {
+        return beverage.getDescription() + ", Soy";
+    }
 
-	public double cost() {
-		return .15 + beverage.cost();
-	}
+    public double cost() {
+        return .15 + beverage.cost();
+    }
 }

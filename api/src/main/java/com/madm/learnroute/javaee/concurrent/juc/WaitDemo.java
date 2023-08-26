@@ -3,14 +3,14 @@ package com.madm.learnroute.javaee.concurrent.juc;
 public class WaitDemo {
 
     private static Object lock = new Object();
-    private static  boolean flag = true;
+    private static boolean flag = true;
 
     public static void main(String[] args) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                synchronized (lock){
-                    while (flag){
+                synchronized (lock) {
+                    while (flag) {
                         try {
                             System.out.println("wait start .......");
                             //等待
@@ -28,9 +28,9 @@ public class WaitDemo {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if (flag){
-                    synchronized (lock){
-                        if (flag){
+                if (flag) {
+                    synchronized (lock) {
+                        if (flag) {
 
                             try {
                                 Thread.sleep(2000);

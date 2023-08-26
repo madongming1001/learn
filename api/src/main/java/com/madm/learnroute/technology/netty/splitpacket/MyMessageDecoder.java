@@ -17,8 +17,8 @@ public class MyMessageDecoder extends ByteToMessageDecoder {
         //需要将得到二进制字节码-> MyMessageProtocol 数据包(对象)
         System.out.println(in);
 
-        if(in.readableBytes() >= 4) {
-            if (length == 0){
+        if (in.readableBytes() >= 4) {
+            if (length == 0) {
                 length = in.readInt();
             }
             if (in.readableBytes() < length) {
@@ -26,7 +26,7 @@ public class MyMessageDecoder extends ByteToMessageDecoder {
                 return;
             }
             byte[] content = new byte[length];
-            if (in.readableBytes() >= length){
+            if (in.readableBytes() >= length) {
                 in.readBytes(content);
 
                 //封装成MyMessageProtocol对象，传递到下一个handler业务处理

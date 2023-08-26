@@ -7,6 +7,7 @@ import io.netty.handler.timeout.IdleStateEvent;
 public class HeartBeatServerHandler extends SimpleChannelInboundHandler {
 
     int readIdleTimes = 0;
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         System.out.println(" ====== > [server] message received : " + msg);

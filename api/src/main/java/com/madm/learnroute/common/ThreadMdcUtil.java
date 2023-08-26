@@ -1,9 +1,9 @@
 package com.madm.learnroute.common;
 
+import org.slf4j.MDC;
+
 import java.util.Map;
 import java.util.concurrent.Callable;
-
-import org.slf4j.MDC;
 
 import static com.madm.learnroute.constant.TraceLogEnum.TRACE_LOG_ID;
 import static com.madm.learnroute.technology.spring.interceptor.TraceLogInterceptor.getTraceId;

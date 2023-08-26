@@ -10,11 +10,11 @@ public class Demo {
             //业务逻辑
 //            System.out.println("我是皮球");
             new PiQiuHandler().AA("皮球");
-        }else  if ("蜗牛".equals(nickName)){
+        } else if ("蜗牛".equals(nickName)) {
             //业务逻辑
 //            System.out.println("我是蜗牛");
             new WoNiuHandler().AA("蜗牛");
-        }else  if ("牛蛙".equals(nickName)){
+        } else if ("牛蛙".equals(nickName)) {
             //业务逻辑
             System.out.println("我是牛蛙");
             System.out.println("呱呱呱");

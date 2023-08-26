@@ -19,8 +19,8 @@ package com.madm.learnroute.jvm.jmm;
  **/
 public class Jmm04_CodeAtomic {
 
-    private volatile static int counter = 0;
     static Object object = new Object();
+    private volatile static int counter = 0;
 
     public static void main(String[] args) {
         for (int i = 0; i < 10; i++) {

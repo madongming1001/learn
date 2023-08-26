@@ -15,6 +15,14 @@ public class BankWaterService implements Runnable {
     /*** 保存每个sheet计算出的银流结果 */
     private ConcurrentHashMap<String, Integer> sheetBankWaterCount = new ConcurrentHashMap();
 
+    public static void main(String[] args) {
+        BankWaterService bankWaterCount = new BankWaterService();
+        bankWaterCount.count();
+
+        long two_day = TimeUnit.DAYS.toMillis(2);
+        System.out.println(two_day);
+    }
+
     private void count() {
         for (int i = 0; i < 4; i++) {
             executor.execute(new Runnable() {
@@ -41,13 +49,5 @@ public class BankWaterService implements Runnable {
         // 将结果输出
         sheetBankWaterCount.put("result", result);
         System.out.println(result);
-    }
-
-    public static void main(String[] args) {
-        BankWaterService bankWaterCount = new BankWaterService();
-        bankWaterCount.count();
-
-        long two_day = TimeUnit.DAYS.toMillis(2);
-        System.out.println(two_day);
     }
 }

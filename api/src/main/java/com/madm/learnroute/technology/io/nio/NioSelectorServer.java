@@ -18,7 +18,7 @@ public class NioSelectorServer {
         // 创建NIO ServerSocketChannel
         //通道，被建立的一个应用程序和操作系统交互事件、传递内容的渠道（注意是连接到操作系统）。
         ServerSocketChannel serverSocket = ServerSocketChannel.open();
-        serverSocket.socket().bind(new InetSocketAddress(9000),1024);
+        serverSocket.socket().bind(new InetSocketAddress(9000), 1024);
         // 设置ServerSocketChannel为非阻塞
         serverSocket.configureBlocking(false);
         // 打开Selector处理Channel，即创建epoll epoll_create 命令创建

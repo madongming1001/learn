@@ -1,20 +1,14 @@
 package com.madm.learnroute.technology.spring;
 
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.LocalDateTimeUtil;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringApplicationRunListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import static cn.hutool.core.date.DatePattern.NORM_DATETIME_MS_FORMATTER;
-import static cn.hutool.core.date.DatePattern.NORM_DATETIME_PATTERN;
 
 /**
  * @author dongming.ma

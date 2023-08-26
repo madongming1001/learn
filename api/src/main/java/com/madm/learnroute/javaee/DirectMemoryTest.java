@@ -3,7 +3,6 @@ package com.madm.learnroute.javaee;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
-import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.CopyOnWriteArrayList;

@@ -10,7 +10,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- *  批量重偏向与批量撤销 机制
+ * 批量重偏向与批量撤销 机制
  * <p>
  * -XX:BiasedLockingBulkRebiasThreshold = 20   // 默认偏向锁批量重偏向阈值
  * -XX:BiasedLockingBulkRevokeThreshold = 40   // 默认偏向锁批量撤销阈值 超过阈值之后new出来的对象没有偏向锁状态 如果对象加锁的话 直接是轻量级锁

@@ -14,13 +14,13 @@ public class OneValueCache {
 
     public OneValueCache(BigInteger lastNumber, BigInteger[] lastFactors) {
         this.lastNumber = lastNumber;
-        this.lastFactors = Arrays.copyOf(lastFactors,lastFactors.length);
+        this.lastFactors = Arrays.copyOf(lastFactors, lastFactors.length);
     }
 
-    public BigInteger[] getFactors(BigInteger i){
-        if(lastNumber == null || !lastNumber.equals(i)){
+    public BigInteger[] getFactors(BigInteger i) {
+        if (lastNumber == null || !lastNumber.equals(i)) {
             return null;
         }
-        return Arrays.copyOf(lastFactors,lastFactors.length);
+        return Arrays.copyOf(lastFactors, lastFactors.length);
     }
 }

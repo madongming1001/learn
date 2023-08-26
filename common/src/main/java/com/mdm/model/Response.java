@@ -41,7 +41,7 @@ public class Response<T> {
     }
 
     public static <T> Response<T> error(Object msg) {
-        return error(HttpStatus.INTERNAL_SERVER_ERROR.value(),msg);
+        return error(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
     }
 
     public static <T> Response<T> exception(Object msg) {

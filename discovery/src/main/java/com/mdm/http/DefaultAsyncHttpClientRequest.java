@@ -17,26 +17,17 @@
 package com.mdm.http;
 
 import com.alibaba.nacos.common.http.Callback;
-import com.alibaba.nacos.common.http.HttpRestResult;
 import com.alibaba.nacos.common.http.client.handler.ResponseHandler;
 import com.alibaba.nacos.common.http.client.request.AsyncHttpClientRequest;
-import com.alibaba.nacos.common.http.client.request.DefaultHttpClientRequest;
-import com.alibaba.nacos.common.http.client.response.DefaultClientHttpResponse;
 import com.alibaba.nacos.common.model.RequestHttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.utils.HttpClientUtils;
-import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
-import org.apache.http.impl.nio.reactor.ExceptionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 
 /**
  * {@link AsyncHttpClientRequest} implementation that uses apache async http client to execute streaming requests.
@@ -44,15 +35,15 @@ import java.util.List;
  * @author mai.jh
  */
 public class DefaultAsyncHttpClientRequest implements AsyncHttpClientRequest {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAsyncHttpClientRequest.class);
-    
+
     private final CloseableHttpAsyncClient asyncClient;
-    
+
     private final DefaultConnectingIOReactor ioreactor;
-    
+
     private final RequestConfig defaultConfig;
-    
+
     public DefaultAsyncHttpClientRequest(CloseableHttpAsyncClient asyncClient, DefaultConnectingIOReactor ioreactor, RequestConfig defaultConfig) {
         this.asyncClient = asyncClient;
         this.ioreactor = ioreactor;
@@ -61,10 +52,10 @@ public class DefaultAsyncHttpClientRequest implements AsyncHttpClientRequest {
             this.asyncClient.start();
         }
     }
-    
+
     @Override
     public <T> void execute(URI uri, String httpMethod, RequestHttpEntity requestHttpEntity,
-            final ResponseHandler<T> responseHandler, final Callback<T> callback) throws Exception {
+                            final ResponseHandler<T> responseHandler, final Callback<T> callback) throws Exception {
 //        HttpRequestBase httpRequestBase = DefaultHttpClientRequest.build(uri, httpMethod, requestHttpEntity, defaultConfig);
 //        try {
 //            asyncClient.execute(httpRequestBase, new FutureCallback<HttpResponse>() {
@@ -104,7 +95,7 @@ public class DefaultAsyncHttpClientRequest implements AsyncHttpClientRequest {
 //            throw e;
 //        }
     }
-    
+
     @Override
     public void close() throws IOException {
         this.asyncClient.close();

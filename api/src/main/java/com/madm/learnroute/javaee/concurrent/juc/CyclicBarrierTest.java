@@ -3,6 +3,17 @@ package com.madm.learnroute.javaee.concurrent.juc;
 import java.util.concurrent.CyclicBarrier;
 
 public class CyclicBarrierTest {
+    public static void main(String[] args) {
+        int threadCount = 3;
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(threadCount);
+
+        for (int i = 0; i < threadCount; i++) {
+            System.out.println("创建工作线程" + i);
+            Worker worker = new Worker(cyclicBarrier);
+            worker.start();
+        }
+    }
+
     // 自定义工作线程
     private static class Worker extends Thread {
         private CyclicBarrier cyclicBarrier;
@@ -25,17 +36,6 @@ public class CyclicBarrierTest {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    public static void main(String[] args) {
-        int threadCount = 3;
-        CyclicBarrier cyclicBarrier = new CyclicBarrier(threadCount);
-
-        for (int i = 0; i < threadCount; i++) {
-            System.out.println("创建工作线程" + i);
-            Worker worker = new Worker(cyclicBarrier);
-            worker.start();
         }
     }
 }

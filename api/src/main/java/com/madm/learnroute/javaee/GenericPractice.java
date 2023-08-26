@@ -1,16 +1,36 @@
 package com.madm.learnroute.javaee;
 
-import cn.hutool.core.util.RandomUtil;
 import com.mdm.pojo.User;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+
+interface TestInterface1<T> {
+
+}
+
+interface TestInterface2<T> {
+
+}
+
+interface ServiceA<T> {
+}
+
+interface ServiceB<T> {
+}
+
+interface OutputInterface {
+    default String innerMethod() {
+        return null;
+    }
+
+    Type getType();
+}
 
 /**
  * generic范型 获取范型信息
@@ -34,20 +54,11 @@ import java.util.function.Function;
  * @author dongming.ma
  * @date 2022/11/15 14:54
  */
-public class GenericPractice<T> extends TestClass<String> implements TestInterface1<Integer>, TestInterface2<Long> ,OutputInterface{
-
-    private List<Integer> list;
-
-    private Map<Integer, String> map;
+public class GenericPractice<T> extends TestClass<String> implements TestInterface1<Integer>, TestInterface2<Long>, OutputInterface {
 
     private final Type type;
-
-    public List<String> aa() {
-        return null;
-    }
-
-    public void bb(List<Long> list) {
-    }
+    private List<Integer> list;
+    private Map<Integer, String> map;
 
     public GenericPractice() {
         System.out.println(this.getClass());
@@ -65,22 +76,17 @@ public class GenericPractice<T> extends TestClass<String> implements TestInterfa
         return (T) clazz.newInstance();
     }
 
-    public Type getType() {
-        return type;
-    }
-
-
     @SneakyThrows
     public static void main(String[] args) {
         System.out.println(TestInterface1.class);
 
-        OutputInterface oi =  new GenericPractice<String>() {
+        OutputInterface oi = new GenericPractice<String>() {
             public String innerMethod() {
                 return "1";
             }
         };
-        System.out.println(oi.getType()+ "---------------");
-        System.out.println(oi.innerMethod()+ "---------------");
+        System.out.println(oi.getType() + "---------------");
+        System.out.println(oi.innerMethod() + "---------------");
 
 
         List<String> list = new ArrayList<>();
@@ -136,27 +142,24 @@ public class GenericPractice<T> extends TestClass<String> implements TestInterfa
         }
     }
 
+    public List<String> aa() {
+        return null;
+    }
+
+    public void bb(List<Long> list) {
+    }
+
+    public Type getType() {
+        return type;
+    }
+
 }
 
 class TestClass<T> {
 
 }
 
-interface TestInterface1<T> {
-
-}
-
-interface TestInterface2<T> {
-
-}
-
 abstract class SuperClass<T> {
-}
-
-interface ServiceA<T> {
-}
-
-interface ServiceB<T> {
 }
 
 class ServiceImpl implements ServiceA<EntityA>, ServiceB<EntityB> {
@@ -188,12 +191,4 @@ class EntityA {
 }
 
 class EntityB {
-}
-
-interface OutputInterface {
-    default String innerMethod() {
-        return null;
-    }
-
-    Type getType();
 }

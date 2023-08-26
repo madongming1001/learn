@@ -5,19 +5,9 @@ public class LockOnObject {
 
     private Integer stock = 10;
 
-    public void decrStock(){
-        synchronized (object){
-            --stock;
-            if(stock <= 0){
-                System.out.println("库存售罄");
-                return;
-            }
-        }
-    }
-
     public static void main(String[] args) {
         int type = 3;
-        switch (type){
+        switch (type) {
             case 1:
                 type = 2;
             case 2:
@@ -26,8 +16,18 @@ public class LockOnObject {
                 System.out.println(3333);
         }
         System.out.println("什么方法也没有执行");
-        while(true){
+        while (true) {
 
+        }
+    }
+
+    public void decrStock() {
+        synchronized (object) {
+            --stock;
+            if (stock <= 0) {
+                System.out.println("库存售罄");
+                return;
+            }
         }
     }
 }

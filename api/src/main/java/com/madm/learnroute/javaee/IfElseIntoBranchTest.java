@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * if else-if短路判断有一个为真后续就不走了
+ *
  * @author dongming.ma
  * @date 2023/3/6 12:36
  */
@@ -21,7 +22,7 @@ public class IfElseIntoBranchTest {
             log.info("4");
         }
 
-        if (condition){
+        if (condition) {
             log.info("5");
         } else if (condition) {
             log.info("6");

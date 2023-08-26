@@ -16,7 +16,7 @@ public class LockSupportTest {
         LockSupport.unpark(parkThread);
     }
 
-    static class ParkThread implements Runnable{
+    static class ParkThread implements Runnable {
 
         @Override
         public void run() {

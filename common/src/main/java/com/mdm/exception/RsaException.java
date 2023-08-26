@@ -11,7 +11,7 @@ public class RsaException extends RuntimeException {
     }
 
     public RsaException() {
-        super(null,null);
+        super(null, null);
     }
 
 }

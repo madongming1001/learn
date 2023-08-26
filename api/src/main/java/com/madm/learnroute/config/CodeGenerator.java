@@ -18,6 +18,12 @@ import java.util.Map;
 @RefreshScope
 public class CodeGenerator {
 
+    private static String finalProjectPath;
+
+    static {
+        finalProjectPath = System.getProperty("user.dir") + "/api";
+    }
+
     @Value("${spring.datasource.dynamic.datasource.master.url}")
     private String url;
     @Value("${spring.datasource.dynamic.datasource.master.username}")
@@ -26,11 +32,6 @@ public class CodeGenerator {
     private String password;
     @Value("${mybatiscode.generate:false}")
     private boolean generate;
-    private static String finalProjectPath;
-
-    static {
-        finalProjectPath = System.getProperty("user.dir") + "/api";
-    }
 
     public void generator() {
         if (generate) {

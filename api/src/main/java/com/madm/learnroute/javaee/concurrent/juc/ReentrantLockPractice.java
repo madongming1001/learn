@@ -46,31 +46,6 @@ public class ReentrantLockPractice {
         t3.start();
     }
 
-    public void await() {
-        try {
-            lock.lock();
-            countdown.countDown();
-            if (countdown.getCount() == 0) {
-//                TimeUnit.DAYS.sleep(1L);
-            }
-            System.out.println("await时间为：" + System.currentTimeMillis());
-            System.out.println("await等待结束");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public void signal() {
-        try {
-            lock.lock();
-            System.out.println("signal时间为：" + System.currentTimeMillis());
-        } finally {
-            lock.unlock();
-        }
-    }
-
     public static void debugCondition() throws InterruptedException {
         ReentrantLock lock = new ReentrantLock();
         //创建新的条件变量
@@ -93,9 +68,9 @@ public class ReentrantLockPractice {
         });
         thread0.setName("thread-01");
         thread0.start();
-        log.info("thread0 未设置中断之前的中断状态为: {}",thread0.isInterrupted());
+        log.info("thread0 未设置中断之前的中断状态为: {}", thread0.isInterrupted());
         thread0.interrupt();
-        log.info("thread0 未设置中断之后的中断状态为: {}",thread0.isInterrupted());
+        log.info("thread0 未设置中断之后的中断状态为: {}", thread0.isInterrupted());
         //叫醒
         Thread thread1 = new Thread(() -> {
             try {
@@ -119,5 +94,30 @@ public class ReentrantLockPractice {
 
         thread0.join();
         thread1.join();
+    }
+
+    public void await() {
+        try {
+            lock.lock();
+            countdown.countDown();
+            if (countdown.getCount() == 0) {
+//                TimeUnit.DAYS.sleep(1L);
+            }
+            System.out.println("await时间为：" + System.currentTimeMillis());
+            System.out.println("await等待结束");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void signal() {
+        try {
+            lock.lock();
+            System.out.println("signal时间为：" + System.currentTimeMillis());
+        } finally {
+            lock.unlock();
+        }
     }
 }

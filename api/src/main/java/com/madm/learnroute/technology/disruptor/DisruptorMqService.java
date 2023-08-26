@@ -7,6 +7,7 @@ package com.madm.learnroute.technology.disruptor;
 public interface DisruptorMqService {
     /**
      * 消息
+     *
      * @param message
      */
     void sayHelloMq(String message);

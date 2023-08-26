@@ -1,7 +1,5 @@
 package com.madm.interview_guide;
 
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.json.JSONObjectIter;
 import lombok.Data;
 
 import java.math.BigDecimal;

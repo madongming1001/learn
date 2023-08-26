@@ -12,8 +12,8 @@ package com.madm.design.strategy.enumlambda.celue;
  */
 public class TeT {
 
- public static void main(String[] args) {
+    public static void main(String[] args) {
 
 
- }
+    }
 }

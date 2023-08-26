@@ -1,34 +1,36 @@
 package com.mdm.headfirst.builder.vacation;
 
-import com.mdm.headfirst.builder.vacation.Accommodation;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Vacation {
-	String name;
-	List<Accommodation> accommodations = new ArrayList<Accommodation>();
-	List<String> events = new ArrayList<String>();
- 
-	public void setName(String name) {
-		this.name = name;
-	}
-	public void setAccommodations(List<Accommodation> accommodations) {
-		this.accommodations = accommodations;
-	}
-	public void setEvents(List<String> events) {
-		this.events = events;
-	}
-	public String toString() {
-		StringBuffer display = new StringBuffer();
-		display.append("---- " + this.name + " ----\n");
-		for (Accommodation a : accommodations) {
-			display.append(a);
-		}
-		for (String e : events) {
-			display.append(e + "\n");
-		}
-		return display.toString();
-	}
+    String name;
+    List<Accommodation> accommodations = new ArrayList<Accommodation>();
+    List<String> events = new ArrayList<String>();
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAccommodations(List<Accommodation> accommodations) {
+        this.accommodations = accommodations;
+    }
+
+    public void setEvents(List<String> events) {
+        this.events = events;
+    }
+
+    public String toString() {
+        StringBuffer display = new StringBuffer();
+        display.append("---- " + this.name + " ----\n");
+        for (Accommodation a : accommodations) {
+            display.append(a);
+        }
+        for (String e : events) {
+            display.append(e + "\n");
+        }
+        return display.toString();
+    }
 }
 
  

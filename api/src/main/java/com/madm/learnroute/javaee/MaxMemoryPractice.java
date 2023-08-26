@@ -7,19 +7,17 @@ import com.mdm.pojo.Teacher;
  */
 public class MaxMemoryPractice {
 
+    public static final int initData = 666;
+    public static Teacher user = new Teacher();
     private String name;
     private Integer age;
 
     public MaxMemoryPractice() {
     }
-
     public MaxMemoryPractice(String name, Integer age) {
         this.name = name;
         this.age = age;
     }
-
-    public static final int initData = 666;
-    public static Teacher user = new Teacher();
 
     //    一个方法对应一块栈帧内存区域
     public int compute() {

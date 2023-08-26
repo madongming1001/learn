@@ -4,9 +4,49 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class RedBlackTree {
-    TreeNode root;
     final static boolean RED = true;
     final static boolean BLACK = false;
+    TreeNode root;
+
+    //中序遍历
+    public static void inOrderTraversal(TreeNode node) {
+        if (node != null) {
+            inOrderTraversal(node.left);
+            System.out.print(node);
+            inOrderTraversal(node.right);
+        }
+    }
+
+    //层序遍历
+    public static void levelOrderTraversal(TreeNode root) {
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            System.out.print(node);
+            if (node.left != null) {
+                queue.offer(node.left);
+            }
+            if (node.right != null) {
+                queue.offer(node.right);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        RedBlackTree rbTree = new RedBlackTree();
+        int input[] = {13, 8, 17, 1, 11, 15, 25, 6, 22, 27};
+        for (int i = 0; i < input.length; i++) {
+            rbTree.insert(input[i]);
+        }
+        rbTree.remove(8);
+        System.out.println("中序遍历: ");
+        inOrderTraversal(rbTree.root);
+        System.out.println();
+        System.out.println("层序遍历: ");
+        levelOrderTraversal(rbTree.root);
+        System.out.println();
+    }
 
     //查找结点
     public TreeNode search(int data) {
@@ -286,31 +326,6 @@ public class RedBlackTree {
         left.right = node;
     }
 
-    //中序遍历
-    public static void inOrderTraversal(TreeNode node) {
-        if (node != null) {
-            inOrderTraversal(node.left);
-            System.out.print(node);
-            inOrderTraversal(node.right);
-        }
-    }
-
-    //层序遍历
-    public static void levelOrderTraversal(TreeNode root) {
-        Queue<TreeNode> queue = new LinkedList<>();
-        queue.offer(root);
-        while (!queue.isEmpty()) {
-            TreeNode node = queue.poll();
-            System.out.print(node);
-            if (node.left != null) {
-                queue.offer(node.left);
-            }
-            if (node.right != null) {
-                queue.offer(node.right);
-            }
-        }
-    }
-
     class TreeNode {
         int data;
         boolean color;
@@ -327,21 +342,6 @@ public class RedBlackTree {
         public String toString() {
             return data + (color ? "(red)" : "(black)") + "  ";
         }
-    }
-
-    public static void main(String[] args) {
-        RedBlackTree rbTree = new RedBlackTree();
-        int input[] = {13, 8, 17, 1, 11, 15, 25, 6, 22, 27};
-        for (int i = 0; i < input.length; i++) {
-            rbTree.insert(input[i]);
-        }
-        rbTree.remove(8);
-        System.out.println("中序遍历: ");
-        inOrderTraversal(rbTree.root);
-        System.out.println();
-        System.out.println("层序遍历: ");
-        levelOrderTraversal(rbTree.root);
-        System.out.println();
     }
 }
  

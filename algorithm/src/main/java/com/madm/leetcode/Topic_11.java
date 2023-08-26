@@ -25,6 +25,10 @@ package com.madm.leetcode;
  * 输出：1
  */
 public class Topic_11 {
+    public static void main(String[] args) {
+        System.out.println(new Topic_11().maxArea(new int[]{1, 8, 6, 2, 5, 4, 8, 3, 7}));
+    }
+
     /**
      * 解题思路：
      * 对O(n)的算法写一下自己的理解，一开始两个指针一个指向开头一个指向结尾，此时容器的底是最大的，
@@ -46,9 +50,5 @@ public class Topic_11 {
             }
         }
         return ans;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(new Topic_11().maxArea(new int[]{1, 8, 6, 2, 5, 4, 8, 3, 7}));
     }
 }

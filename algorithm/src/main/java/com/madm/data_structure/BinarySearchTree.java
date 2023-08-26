@@ -7,6 +7,32 @@ package com.madm.data_structure;
 public class BinarySearchTree {
     private Node root;
 
+    //中序遍历
+    public static void inOrderTraversal(Node node) {
+        if (node == null) {
+            return;
+        }
+        inOrderTraversal(node.left);
+
+        System.out.print(node.data + " ");
+        inOrderTraversal(node.right);
+    }
+
+    public static void main(String[] args) {
+        BinarySearchTree tree = new BinarySearchTree();
+        int input[] = {6, 3, 8, 2, 5, 7, 9, 1, 4};
+        for (int i = 0; i < input.length; i++) {
+            tree.insert(input[i]);
+        }
+        inOrderTraversal(tree.root);
+        System.out.println();
+        tree.search(3);
+        tree.delete(3);
+        tree.search(3);
+        tree.delete(6);
+        inOrderTraversal(tree.root);
+    }
+
     //查找结点
     public Node search(int data) {
         Node targetNode = root;
@@ -23,17 +49,6 @@ public class BinarySearchTree {
             System.out.println("已找到结点：" + data);
         }
         return targetNode;
-    }
-
-    //中序遍历
-    public static void inOrderTraversal(Node node) {
-        if (node == null) {
-            return;
-        }
-        inOrderTraversal(node.left);
-
-        System.out.print(node.data + " ");
-        inOrderTraversal(node.right);
     }
 
     //插入结点
@@ -146,20 +161,5 @@ public class BinarySearchTree {
         Node(int data) {
             this.data = data;
         }
-    }
-
-    public static void main(String[] args) {
-        BinarySearchTree tree = new BinarySearchTree();
-        int input[] = {6, 3, 8, 2, 5, 7, 9, 1, 4};
-        for (int i = 0; i < input.length; i++) {
-            tree.insert(input[i]);
-        }
-        inOrderTraversal(tree.root);
-        System.out.println();
-        tree.search(3);
-        tree.delete(3);
-        tree.search(3);
-        tree.delete(6);
-        inOrderTraversal(tree.root);
     }
 }

@@ -1,17 +1,18 @@
 package com.mdm.headfirst.command.party;
 
 public class HottubOffCommand implements Command {
-	Hottub hottub;
+    Hottub hottub;
 
-	public HottubOffCommand(Hottub hottub) {
-		this.hottub = hottub;
-	}
+    public HottubOffCommand(Hottub hottub) {
+        this.hottub = hottub;
+    }
 
-	public void execute() {
-		hottub.setTemperature(98);
-		hottub.off();
-	}
-	public void undo() {
-		hottub.on();
-	}
+    public void execute() {
+        hottub.setTemperature(98);
+        hottub.off();
+    }
+
+    public void undo() {
+        hottub.on();
+    }
 }

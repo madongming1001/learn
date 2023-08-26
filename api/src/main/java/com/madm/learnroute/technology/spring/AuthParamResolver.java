@@ -5,7 +5,6 @@ import com.mdm.pojo.AuthParam;
 import org.springframework.core.MethodParameter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
-import org.springframework.stereotype.Component;
 
 /**
  * @Author MaDongMing

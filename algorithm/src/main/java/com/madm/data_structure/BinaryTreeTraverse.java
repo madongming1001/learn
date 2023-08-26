@@ -10,18 +10,6 @@ import java.util.Stack;
 public class BinaryTreeTraverse {
     private Node head;
 
-    static class Node<T> {
-        T value;
-        public Node left;
-        public Node right;
-
-        public Node(T value) {
-            this.value = value;
-        }
-
-    }
-
-
     public static Node createBinaryTree(LinkedList<Integer> inputList) {
         Node node = null;
         if (CollectionUtils.isEmpty(inputList)) {
@@ -38,6 +26,7 @@ public class BinaryTreeTraverse {
 
     /**
      * 前序遍历
+     *
      * @param node
      */
     public static void preOrderTraveral(Node node) {
@@ -51,6 +40,7 @@ public class BinaryTreeTraverse {
 
     /**
      * 中序遍历
+     *
      * @param node
      */
     public static void inOrderTraveral(Node node) {
@@ -64,6 +54,7 @@ public class BinaryTreeTraverse {
 
     /**
      * 后序遍历
+     *
      * @param node
      */
     public static void postOrderTraveral(Node node) {
@@ -127,7 +118,6 @@ public class BinaryTreeTraverse {
         return null;
     }
 
-
     public void insert(int data) {
         if (head == null) {
             head = new Node(data);
@@ -150,7 +140,6 @@ public class BinaryTreeTraverse {
             }
         }
     }
-
 
     public void delete(int data) {
         Node<Integer> p = head; // p指向要删除的节点，初始化指向根节点
@@ -184,6 +173,17 @@ public class BinaryTreeTraverse {
         if (pp == null) head = child; // 删除的是根节点
         else if (pp.left == p) pp.left = child;
         else pp.right = child;
+    }
+
+    static class Node<T> {
+        public Node left;
+        public Node right;
+        T value;
+
+        public Node(T value) {
+            this.value = value;
+        }
+
     }
 
 }

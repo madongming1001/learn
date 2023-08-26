@@ -2,16 +2,13 @@ package com.madm.learnroute.javaee;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
-import com.mdm.pojo.AuthParam;
 import com.mdm.pojo.Student;
 import com.mdm.pojo.User;
-import com.mdm.utils.GsonObject;
 import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.curator.shaded.com.google.common.collect.Lists;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.LongAdder;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -25,15 +22,15 @@ import java.util.stream.Stream;
  */
 public class HashMapPractice {
 
-    private static final AtomicInteger userNumber = new AtomicInteger();
     static final HashMap<String, String> map = new HashMap<>(2);
+    private static final AtomicInteger userNumber = new AtomicInteger();
 
     public static void main(String[] args) {
 
         Optional.of(new Object()).orElse(new AtomicInteger());
         Optional.ofNullable(new Object()).ifPresent((obj) -> {
 
-        } );
+        });
 
         HashBasedTable<String, String, String> table = HashBasedTable.create();
         table.put("1", "2", "3");

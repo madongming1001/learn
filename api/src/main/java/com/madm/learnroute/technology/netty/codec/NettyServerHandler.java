@@ -10,7 +10,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         //System.out.println("从客户端读取到String：" + msg.toString());
         //System.out.println("从客户端读取到Object：" + ((User)msg).toString());
-         //测试用protostuff对对象编解码
+        //测试用protostuff对对象编解码
         ByteBuf buf = (ByteBuf) msg;
         byte[] bytes = new byte[buf.readableBytes()];
         buf.readBytes(bytes);

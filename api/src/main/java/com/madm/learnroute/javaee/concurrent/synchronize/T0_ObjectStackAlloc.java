@@ -6,7 +6,7 @@ package com.madm.learnroute.javaee.concurrent.synchronize;
  * -XX:+PrintAssembly -Xcomp
  * -XX:CompileCommand=dontinline,*Bar.sum
  * -XX:CompileCommand=compileonly,*Bar.sum
- *
+ * <p>
  * /Users/madongming/software/hsdis
  */
 public class T0_ObjectStackAlloc {
@@ -15,10 +15,10 @@ public class T0_ObjectStackAlloc {
      * 进行两种测试
      * 关闭逃逸分析，同时调大堆空间，避免堆内GC的发生，如果有GC信息将会被打印出来
      * VM运行参数：-Xmx4G -Xms4G -XX:-DoEscapeAnalysis -XX:+PrintGCDetails -XX:+HeapDumpOnOutOfMemoryError
-     *
+     * <p>
      * 开启逃逸分析
      * VM运行参数：-Xmx4G -Xms4G -XX:+DoEscapeAnalysis -XX:+PrintGCDetails -XX:+HeapDumpOnOutOfMemoryError
-     *
+     * <p>
      * 执行main方法后
      * jps 查看进程
      * jmap -histo 进程ID

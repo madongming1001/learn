@@ -8,7 +8,7 @@ public class MyClientHandler extends SimpleChannelInboundHandler<MyMessageProtoc
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        for(int i = 0; i< 2; i++) {
+        for (int i = 0; i < 2; i++) {
             String msg = "你好，我是张三！";
             //创建协议包对象
             MyMessageProtocol messageProtocol = new MyMessageProtocol();

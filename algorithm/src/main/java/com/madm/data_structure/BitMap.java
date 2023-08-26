@@ -18,6 +18,25 @@ public class BitMap {
         this.bytes = new char[nBits / 16 + 1]; // 一个字符占2个字节，也就是2*8=16bit，最少为1 由于左移动最少需要1，所以每个index最多存储15位数
     }
 
+    public static void main(String[] args) {
+        int[] arr = new int[]{6, 2, 7, 14, 3};
+        int maxArr = Arrays.stream(arr).max().getAsInt();
+        // 指定BitMap长度
+        BitMap bitMap = new BitMap(32);
+        bitMap.set(32);
+        System.out.println(bitMap.get(32));
+
+
+//        // 数组的整数放进BitMap
+//        for (int i = 0; i < arr.length; i++) {
+//            bitMap.set(arr[i]);
+//        }
+//        // 判断哪些值存在
+//        for (int i = 0; i < maxArr + 1; i++) {
+//            log.info(i + ",是否在BitMap内-----》:" + bitMap.get(i));
+//        }
+    }
+
     public int length() {
         return bytes.length;
     }
@@ -43,24 +62,5 @@ public class BitMap {
         int bitIndex = k % 16;
 
         return (bytes[byteIndex] & (1 << bitIndex)) != 0;
-    }
-
-    public static void main(String[] args) {
-        int[] arr = new int[]{6, 2, 7, 14, 3};
-        int maxArr = Arrays.stream(arr).max().getAsInt();
-        // 指定BitMap长度
-        BitMap bitMap = new BitMap(32);
-        bitMap.set(32);
-        System.out.println(bitMap.get(32));
-
-
-//        // 数组的整数放进BitMap
-//        for (int i = 0; i < arr.length; i++) {
-//            bitMap.set(arr[i]);
-//        }
-//        // 判断哪些值存在
-//        for (int i = 0; i < maxArr + 1; i++) {
-//            log.info(i + ",是否在BitMap内-----》:" + bitMap.get(i));
-//        }
     }
 }

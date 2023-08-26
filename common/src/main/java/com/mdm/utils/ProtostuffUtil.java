@@ -1,7 +1,5 @@
 package com.mdm.utils;
 
-import com.google.common.collect.Lists;
-import com.mdm.pojo.User;
 import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtostuffIOUtil;
 import io.protostuff.Schema;

@@ -13,6 +13,54 @@ public class SkipList {
     private Node head = new Node(MAX_LEVEL);
     private Random r = new Random();
 
+    public static void main(String[] args) {
+        SkipList list = new SkipList();
+        list.insert(1, 3);
+        list.insert(2, 3);
+        list.insert(3, 2);
+        list.insert(4, 4);
+        list.insert(5, 10);
+        list.insert(6, 4);
+        list.insert(8, 5);
+        list.insert(7, 4);
+        list.printAll_beautiful();
+        list.printAll();
+        /**
+         * 结果如下：
+         * 									    null:15-------
+         * 									    null:14-------
+         * 									    null:13-------
+         * 									    null:12-------
+         * 									    null:11-------
+         * 									    null:10-------
+         * 										   5:9-------
+         * 										   5:8-------
+         * 										   5:7-------
+         * 										   5:6-------
+         * 										   5:5-------
+         * 										   5:4-------					 8:4-------
+         * 							     4:3-------5:3-------6:3-------7:3-------8:3-------
+         * 1:2-------2:2-------		     4:2-------5:2-------6:2-------7:2-------8:2-------
+         * 1:1-------2:1-------3:1-------4:1-------5:1-------6:1-------7:1-------8:1-------
+         * 1:0-------2:0-------3:0-------4:0-------5:0-------6:0-------7:0-------8:0-------
+         * { data: 1; levels: 3 } { data: 2; levels: 3 } { data: 3; levels: 2 } { data: 4; levels: 4 }
+         * { data: 5; levels: 10 } { data: 6; levels: 4 } { data: 7; levels: 4 } { data: 8; levels: 5 }
+         */
+        // 优化后insert()
+
+        SkipList list2 = new SkipList();
+        list2.add(1);
+        list2.add(2);
+        list2.add(6);
+        list2.add(7);
+        list2.add(8);
+        list2.add(3);
+        list2.add(4);
+        list2.add(5);
+        System.out.println();
+        list2.printAll_beautiful();
+    }
+
     public Node find(int value) {
         Node p = head;
         // 从最大层开始查找，找到前一节点，通过--i，移动到下层再开始查找
@@ -246,53 +294,5 @@ public class SkipList {
             builder.append(" }");
             return builder.toString();
         }
-    }
-
-    public static void main(String[] args) {
-        SkipList list = new SkipList();
-        list.insert(1, 3);
-        list.insert(2, 3);
-        list.insert(3, 2);
-        list.insert(4, 4);
-        list.insert(5, 10);
-        list.insert(6, 4);
-        list.insert(8, 5);
-        list.insert(7, 4);
-        list.printAll_beautiful();
-        list.printAll();
-        /**
-         * 结果如下：
-         * 									    null:15-------
-         * 									    null:14-------
-         * 									    null:13-------
-         * 									    null:12-------
-         * 									    null:11-------
-         * 									    null:10-------
-         * 										   5:9-------
-         * 										   5:8-------
-         * 										   5:7-------
-         * 										   5:6-------
-         * 										   5:5-------
-         * 										   5:4-------					 8:4-------
-         * 							     4:3-------5:3-------6:3-------7:3-------8:3-------
-         * 1:2-------2:2-------		     4:2-------5:2-------6:2-------7:2-------8:2-------
-         * 1:1-------2:1-------3:1-------4:1-------5:1-------6:1-------7:1-------8:1-------
-         * 1:0-------2:0-------3:0-------4:0-------5:0-------6:0-------7:0-------8:0-------
-         * { data: 1; levels: 3 } { data: 2; levels: 3 } { data: 3; levels: 2 } { data: 4; levels: 4 }
-         * { data: 5; levels: 10 } { data: 6; levels: 4 } { data: 7; levels: 4 } { data: 8; levels: 5 }
-         */
-        // 优化后insert()
-
-        SkipList list2 = new SkipList();
-        list2.add(1);
-        list2.add(2);
-        list2.add(6);
-        list2.add(7);
-        list2.add(8);
-        list2.add(3);
-        list2.add(4);
-        list2.add(5);
-        System.out.println();
-        list2.printAll_beautiful();
     }
 }

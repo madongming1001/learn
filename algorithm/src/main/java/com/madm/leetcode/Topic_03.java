@@ -17,6 +17,13 @@ import java.util.Set;
  */
 public class Topic_03 {
 
+    public static void main(String[] args) {
+        Topic_03 tp = new Topic_03();
+        System.out.println(tp.lengthOfLongestSubstring01("abcabcbb"));
+        System.out.println(tp.lengthOfLongestSubstring02("abcabcbb"));
+        System.out.println(tp.lengthOfLongestSubstring03("abcabcbb"));//最优
+    }
+
     public int lengthOfLongestSubstring01(String str) {
         int left = 0, right = 0, max = 0, len = 0;
         Set<Character> set = new HashSet();
@@ -68,12 +75,5 @@ public class Topic_03 {
         }
 
         return max;
-    }
-
-    public static void main(String[] args) {
-        Topic_03 tp = new Topic_03();
-        System.out.println(tp.lengthOfLongestSubstring01("abcabcbb"));
-        System.out.println(tp.lengthOfLongestSubstring02("abcabcbb"));
-        System.out.println(tp.lengthOfLongestSubstring03("abcabcbb"));//最优
     }
 }

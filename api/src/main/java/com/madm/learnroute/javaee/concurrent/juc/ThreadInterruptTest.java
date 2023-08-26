@@ -21,9 +21,9 @@ public class ThreadInterruptTest {
                     System.out.println(i);
                     try {
                         Thread.sleep(10000);
-                        log.debug("未调用interrupted方法之前状态时：{}",Thread.currentThread().isInterrupted());
+                        log.debug("未调用interrupted方法之前状态时：{}", Thread.currentThread().isInterrupted());
                     } catch (InterruptedException e) {
-                        log.debug("未调用interrupted方法之后状态时：{}",Thread.currentThread().isInterrupted());
+                        log.debug("未调用interrupted方法之后状态时：{}", Thread.currentThread().isInterrupted());
                         e.printStackTrace();
                     }
 

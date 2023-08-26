@@ -1,7 +1,6 @@
 package com.madm.learnroute.jvm.jmm;
 
 /**
- *
  * @author ：杨过
  * @date ：Created in 2020/8/5
  * @version: V1.0
@@ -10,7 +9,7 @@ package com.madm.learnroute.jvm.jmm;
  **/
 public class T {
 
-    public void methdo(){
+    public void methdo() {
         new Object();
     }
 }

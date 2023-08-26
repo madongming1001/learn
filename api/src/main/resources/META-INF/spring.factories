@@ -1,4 +1,3 @@
-
 # Run Listeners
 org.springframework.boot.SpringApplicationRunListener=\
 com.madm.learnroute.technology.spring.SpringBootStartupMonitor

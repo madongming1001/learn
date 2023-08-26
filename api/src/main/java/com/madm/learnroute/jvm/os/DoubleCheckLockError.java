@@ -49,8 +49,8 @@ public class DoubleCheckLockError {
     }
 
     static class SingleObj {
-        private int index;
         private static SingleObj single;
+        private int index;
 
         private SingleObj() {
 //            index = 1;

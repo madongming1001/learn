@@ -2,9 +2,6 @@ package com.madm.design.visitor;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-
 @Slf4j
 public class TestMain {
     public static void main(String[] args) {

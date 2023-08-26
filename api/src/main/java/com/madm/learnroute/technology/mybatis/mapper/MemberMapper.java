@@ -7,6 +7,6 @@ import org.apache.ibatis.annotations.Select;
  */
 public interface MemberMapper {
 
-	@Select("select 'member'")
-	String selectById();
+    @Select("select 'member'")
+    String selectById();
 }

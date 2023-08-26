@@ -1,9 +1,6 @@
 package com.madm.learnroute.javaee;
 
 
-
-
-
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -16,6 +13,13 @@ public class ThreadLocalUnsafe<T> implements Runnable {
     //把static去掉就正确了,让每个线程都拥有自己独立的number.此时十个线程的输出都是1
 //    public Number number = new Number(0);
     public static ThreadLocal<Number> value = new ThreadLocal();
+
+    public static void main(String[] args) {
+        for (int i = 0; i < 10; i++) {
+            new Thread(new ThreadLocalUnsafe()).start();
+        }
+    }
+
     @Override
     public void run() {
         //每个线程计数加一
@@ -31,11 +35,11 @@ public class ThreadLocalUnsafe<T> implements Runnable {
     }
 
     private static class Number {
+        private int num;
+
         public Number(int num) {
             this.num = num;
         }
-
-        private int num;
 
         public int getNum() {
             return num;
@@ -48,12 +52,6 @@ public class ThreadLocalUnsafe<T> implements Runnable {
         @Override
         public String toString() {
             return "Number [num=" + num + "]";
-        }
-    }
-
-    public static void main(String[] args) {
-        for (int i = 0; i < 10; i++) {
-            new Thread(new ThreadLocalUnsafe()).start();
         }
     }
 

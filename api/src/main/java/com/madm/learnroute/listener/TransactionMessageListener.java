@@ -2,7 +2,6 @@ package com.madm.learnroute.listener;
 
 import com.mdm.pojo.Order;
 import org.apache.lucene.queryparser.flexible.core.util.StringUtils;
-import org.apache.rocketmq.spring.annotation.RocketMQTransactionListener;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionListener;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionState;
 import org.apache.rocketmq.spring.support.RocketMQHeaders;

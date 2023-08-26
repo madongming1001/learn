@@ -1,7 +1,6 @@
 package com.madm.learnroute.javaee;
 
 import cn.hutool.core.io.resource.UrlResource;
-import com.mdm.utils.PrintUtil;
 import lombok.SneakyThrows;
 import org.apache.ibatis.io.Resources;
 import org.springframework.core.io.Resource;

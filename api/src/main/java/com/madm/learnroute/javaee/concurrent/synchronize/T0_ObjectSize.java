@@ -17,7 +17,7 @@ public class T0_ObjectSize {
         TimeUnit.SECONDS.sleep(5);
         Object o = new Object();
         System.out.println(ClassLayout.parseInstance(o).toPrintable());
-        synchronized (o){
+        synchronized (o) {
             System.out.println(ClassLayout.parseInstance(o).toPrintable());
         }
     }

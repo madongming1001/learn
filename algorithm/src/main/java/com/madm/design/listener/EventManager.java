@@ -18,10 +18,6 @@ public class EventManager {
         }
     }
 
-    public enum EventType {
-        MQ, Message
-    }
-
     /**
      * ᦈᴅ
      *
@@ -50,12 +46,16 @@ public class EventManager {
      * ᭗Ꭳ
      *
      * @param eventType 事件类型
-     * @param result  结果
+     * @param result    结果
      */
     public void notify(Enum<EventType> eventType, LotteryResult result) {
         List<EventListener> users = listeners.get(eventType);
         for (EventListener listener : users) {
             listener.doEvent(result);
         }
+    }
+
+    public enum EventType {
+        MQ, Message
     }
 }

@@ -6,7 +6,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ public class TeacherStrategy implements InitializingBean, ApplicationContextAwar
         //getObject方法返回的bean 会存在 factoryBeanObjectCache 结构中
         MyObject internalBean = (MyObject) applicationContext.getBean("myFactoryBean"); //getObject()对象
         // owner bean
-        MyFactoryBean externalBean = (MyFactoryBean)applicationContext.getBean("&myFactoryBean");
+        MyFactoryBean externalBean = (MyFactoryBean) applicationContext.getBean("&myFactoryBean");
         log.info("internalBean 获取 information is ：{}", internalBean);
         log.info("externalBean 获取 information is ：{}", externalBean);
     }

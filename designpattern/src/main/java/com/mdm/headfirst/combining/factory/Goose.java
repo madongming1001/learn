@@ -1,11 +1,11 @@
 package com.mdm.headfirst.combining.factory;
 
 public class Goose {
-	public void honk() {
-		System.out.println("Honk");
-	}
+    public void honk() {
+        System.out.println("Honk");
+    }
 
-	public String toString() {
-		return "Goose";
-	}
+    public String toString() {
+        return "Goose";
+    }
 }

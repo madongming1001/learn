@@ -8,7 +8,6 @@ import java.util.Objects;
  * jdk6:‐Xms6M ‐Xmx6M ‐XX:PermSize=6M ‐XX:MaxPermSize=6M
  * jdk8:‐Xms6M ‐Xmx6M ‐XX:MetaspaceSize=6M ‐XX:MaxMetaspaceSize=6M
  * VM Args: -Xms10m -Xmx10m -XX:+PrintGcDetail
- *
  */
 public class RuntimeConstantPoolOOMPractice {
     public static void main(String[] args) {
@@ -22,12 +21,10 @@ public class RuntimeConstantPoolOOMPractice {
 //        }
 
         Teacher user = new Teacher();
-        if (Objects.equals(user.getName(),0)) {
+        if (Objects.equals(user.getName(), 0)) {
             System.out.println("ssss");
         }
         System.out.println(user);
-
-
 
 
     }

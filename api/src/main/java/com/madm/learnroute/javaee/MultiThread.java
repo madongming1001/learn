@@ -13,7 +13,7 @@ public class MultiThread {
         ThreadInfo[] threadInfos = threadMXBean.dumpAllThreads(false, false);
         //遍历线程信息，仅打印线程ID和线程名称信息
         for (ThreadInfo threadInfo : threadInfos) {
-            System.out.println("["+threadInfo.getThreadId()+"]" + threadInfo.getThreadName());
+            System.out.println("[" + threadInfo.getThreadId() + "]" + threadInfo.getThreadName());
         }
         /**
          * [5]Monitor Ctrl-Break

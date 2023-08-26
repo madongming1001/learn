@@ -5,10 +5,10 @@ import java.util.concurrent.locks.LockSupport;
 
 /**
  * @author Fox
- *
+ * <p>
  * -XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly -Xcomp
  * hsdis-amd64.dll：HSDIS(HotSpot disassembler)，一个Sun官方推荐的HotSpot虚拟机JIT编译代码的反汇编插件，其实际上就是一个动态库。
- *  可见性案例
+ * 可见性案例
  */
 public class VisibilityPractice {
     // storeLoad  JVM内存屏障  ---->  (汇编层面指令)  lock; addl $0,0(%%rsp)
@@ -19,9 +19,32 @@ public class VisibilityPractice {
 
     private Integer count = 0;
 
+    public static void main(String[] args) throws InterruptedException {
+        VisibilityPractice test = new VisibilityPractice();
+
+        // 线程threadA模拟数据加载场景
+        Thread threadA = new Thread(() -> test.load(), "threadA");
+        threadA.start();
+
+        // 让threadA执行一会儿
+        Thread.sleep(1000);
+        // 线程threadB通过flag控制threadA的执行时间
+        Thread threadB = new Thread(() -> test.refresh(), "threadB");
+        threadB.start();
+
+    }
+
+    public static void shortWait(long interval) {
+        long start = System.nanoTime();
+        long end;
+        do {
+            end = System.nanoTime();
+        } while (start + interval >= end);
+    }
+
     public void refresh() {
         flag = false;
-        System.out.println(Thread.currentThread().getName() + "修改flag:"+flag);
+        System.out.println(Thread.currentThread().getName() + "修改flag:" + flag);
     }
 
     public void load() {
@@ -55,28 +78,5 @@ public class VisibilityPractice {
             // 当前线程对共享变量的操作会存在读不到，或者不能立即读到另一个线程对此变量的写操作 不能穷举
         }
         System.out.println(Thread.currentThread().getName() + "跳出循环: count=" + count);
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        VisibilityPractice test = new VisibilityPractice();
-
-        // 线程threadA模拟数据加载场景
-        Thread threadA = new Thread(() -> test.load(), "threadA");
-        threadA.start();
-
-        // 让threadA执行一会儿
-        Thread.sleep(1000);
-        // 线程threadB通过flag控制threadA的执行时间
-        Thread threadB = new Thread(() -> test.refresh(), "threadB");
-        threadB.start();
-
-    }
-
-    public static void shortWait(long interval) {
-        long start = System.nanoTime();
-        long end;
-        do {
-            end = System.nanoTime();
-        } while (start + interval >= end);
     }
 }

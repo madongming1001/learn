@@ -6,12 +6,12 @@ import lombok.Data;
 /**
  * 浅拷贝
  * 1、implements Cloneable 参考 Cloneable 接口的源码注释部分，如果一个类实现了 Cloneable 接口，那么 Object 的 clone 方法将返回该对象的逐个属性（field-by-field）拷贝
- *
+ * <p>
  * 深拷贝
  * 1、序列化（serialization）方式
- *      先对对象进行序列化，再进行反序列化，得到一个新的深拷贝的对象
+ * 先对对象进行序列化，再进行反序列化，得到一个新的深拷贝的对象
  * 2、二次调用 clone 方式
- *      先调用对象的 clone() 方法对对象的引用类型的属性值，继续调用 clone() 方法进行拷贝
+ * 先调用对象的 clone() 方法对对象的引用类型的属性值，继续调用 clone() 方法进行拷贝
  *
  * @author dongming.ma
  * @date 2022/7/4 20:28

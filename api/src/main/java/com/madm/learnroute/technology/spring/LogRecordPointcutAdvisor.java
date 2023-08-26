@@ -1,12 +1,10 @@
 package com.madm.learnroute.technology.spring;
 
-import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.PointcutAdvisor;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 

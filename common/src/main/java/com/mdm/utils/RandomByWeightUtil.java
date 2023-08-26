@@ -1,11 +1,11 @@
 package com.mdm.utils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 角色对应的权重
+ *
  * @author dongming.ma
  * @date 2022/7/5 19:46
  */

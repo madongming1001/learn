@@ -10,17 +10,17 @@ public enum StrategySelector {
     private Integer code;
     private String strategy;
 
+    StrategySelector(Integer code, String strategy) {
+        this.code = code;
+        this.strategy = strategy;
+    }
+
     public String getStrategy() {
         return strategy;
     }
 
     public Integer getCode() {
         return code;
-    }
-
-    StrategySelector(Integer code, String strategy) {
-        this.code = code;
-        this.strategy = strategy;
     }
 }
 

@@ -8,6 +8,6 @@ public interface IMethodCallBack {
 
     String getMethodName();
 
-    ToBean callMethod(FromBean frombean)  throws Exception;
+    ToBean callMethod(FromBean frombean) throws Exception;
 
 }

@@ -4,26 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ *
  */
 public class LRUCache<K, V> {
-    class Node<K, V> {
-        K key;
-        V value;
-        Node<K, V> pre;
-        Node<K, V> next;
-
-        public Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     Node<K, V> head;
     Node<K, V> tail;
-
     private Integer capacity;
     private Map<K, Node<K, V>> caches;
-
     public LRUCache(int capacity) {
         if (capacity < 1) {
             throw new RuntimeException("should be more than 0.");
@@ -86,6 +73,18 @@ public class LRUCache<K, V> {
             tail.next = newNode;
             newNode.pre = tail;
             tail = newNode;
+        }
+    }
+
+    class Node<K, V> {
+        K key;
+        V value;
+        Node<K, V> pre;
+        Node<K, V> next;
+
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
         }
     }
 }

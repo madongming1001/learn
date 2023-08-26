@@ -15,10 +15,10 @@ public class T0_heavyWeightMonitor {
         Thread.sleep(5000);
         Object a = new Object();
 
-        Thread thread1 = new Thread(){
+        Thread thread1 = new Thread() {
             @Override
             public void run() {
-                synchronized (a){
+                synchronized (a) {
                     System.out.println("thread1 locking");
                     System.out.println(ClassLayout.parseInstance(a).toPrintable());
                     try {
@@ -30,10 +30,10 @@ public class T0_heavyWeightMonitor {
                 }
             }
         };
-        Thread thread2 = new Thread(){
+        Thread thread2 = new Thread() {
             @Override
             public void run() {
-                synchronized (a){
+                synchronized (a) {
                     System.out.println("thread2 locking");
                     System.out.println(ClassLayout.parseInstance(a).toPrintable());
                     try {

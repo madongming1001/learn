@@ -1,10 +1,7 @@
 package com.madm.learnroute.technology.spring.custom;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.DataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 //@RestControllerAdvice
 public class ExceptionAdvice {

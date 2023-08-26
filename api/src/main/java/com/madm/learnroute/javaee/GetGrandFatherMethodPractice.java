@@ -27,7 +27,7 @@ class Son extends Father {
             Field lookupImpl = MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP");
             lookupImpl.setAccessible(true);
             MethodHandles.Lookup lookup = (MethodHandles.Lookup) lookupImpl.get(null);
-            MethodHandle mh = lookup.findSpecial(GrandFather.class,"thinking",mt,GrandFather.class);
+            MethodHandle mh = lookup.findSpecial(GrandFather.class, "thinking", mt, GrandFather.class);
             mh.invoke(this);
         } catch (Exception e) {
             e.printStackTrace();

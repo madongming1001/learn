@@ -10,11 +10,11 @@ package com.madm.learnroute.javaee.concurrent.synchronize;
 public class Juc_LockOnClass {
     static int stock;
 
-    public static synchronized void decrStock(){
+    public static synchronized void decrStock() {
         System.out.println(--stock);
     }
 
-    public static synchronized void cgg(){
+    public static synchronized void cgg() {
         System.out.println();
     }
 

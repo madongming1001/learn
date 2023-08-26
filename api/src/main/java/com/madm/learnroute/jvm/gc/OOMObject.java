@@ -16,8 +16,8 @@ public class OOMObject {
     public static void fillHeap(int num) throws InterruptedException {
         List<OOMObject> list = new ArrayList<OOMObject>();
         for (int i = 0; i < num; i++) {
-        // 稍作延时，令监视曲线的变化更加明显
-         Thread.sleep(50);
+            // 稍作延时，令监视曲线的变化更加明显
+            Thread.sleep(50);
             list.add(new OOMObject());
         }
         System.gc();
@@ -26,13 +26,13 @@ public class OOMObject {
     public static void main(String[] args) throws Exception {
 //        fillHeap(1000);
         int runtimeCount = 0;
-        for (long pid : new long[]{1338L,1337L,1336L,1335L}) {
+        for (long pid : new long[]{1338L, 1337L, 1336L, 1335L}) {
             runtimeCount++;
             if (Objects.equals(pid, 1338L)) {
                 System.out.println("相等");
             }
         }
-        System.out.println("一共运行了:"+runtimeCount);
+        System.out.println("一共运行了:" + runtimeCount);
     }
 
 }

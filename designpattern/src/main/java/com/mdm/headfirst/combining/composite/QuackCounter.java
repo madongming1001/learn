@@ -1,23 +1,23 @@
 package com.mdm.headfirst.combining.composite;
 
 public class QuackCounter implements Quackable {
-	Quackable duck;
-	static int numberOfQuacks;
-  
-	public QuackCounter(Quackable duck) {
-		this.duck = duck;
-	}
-  
-	public void quack() {
-		duck.quack();
-		numberOfQuacks++;
-	}
- 
-	public static int getQuacks() {
-		return numberOfQuacks;
-	}
-   
-	public String toString() {
-		return duck.toString();
-	}
+    static int numberOfQuacks;
+    Quackable duck;
+
+    public QuackCounter(Quackable duck) {
+        this.duck = duck;
+    }
+
+    public static int getQuacks() {
+        return numberOfQuacks;
+    }
+
+    public void quack() {
+        duck.quack();
+        numberOfQuacks++;
+    }
+
+    public String toString() {
+        return duck.toString();
+    }
 }

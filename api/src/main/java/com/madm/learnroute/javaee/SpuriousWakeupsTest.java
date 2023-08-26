@@ -7,6 +7,43 @@ import java.util.concurrent.TimeUnit;
  * @date 2023/3/8 11:05
  */
 public class SpuriousWakeupsTest {
+    public static void main(String[] args) {
+        Product product = new Product();
+        new Thread(() -> {
+            for (int i = 0; i < 20; i++) {
+                try {
+                    /** 睡眠，便于观察结果 */
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                product.purchase();
+            }
+        }, "生产者A").start();
+
+        new Thread(() -> {
+            for (int i = 0; i < 20; i++) {
+                product.sale();
+            }
+
+        }, "消费者C").start();
+
+        new Thread(() -> {
+            for (int i = 0; i < 20; i++) {
+
+                product.purchase();
+            }
+
+        }, "生产者B").start();
+
+        new Thread(() -> {
+            for (int i = 0; i < 20; i++) {
+                product.sale();
+            }
+
+        }, "消费者D").start();
+    }
+
     static class Product {
         /**
          * 产品数
@@ -52,42 +89,5 @@ public class SpuriousWakeupsTest {
             /** 唤醒其他线程 */
             this.notify();
         }
-    }
-
-    public static void main(String[] args) {
-        Product product = new Product();
-        new Thread(() -> {
-            for (int i = 0; i < 20; i++) {
-                try {
-                    /** 睡眠，便于观察结果 */
-                    TimeUnit.SECONDS.sleep(2);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                product.purchase();
-            }
-        }, "生产者A").start();
-
-        new Thread(() -> {
-            for (int i = 0; i < 20; i++) {
-                product.sale();
-            }
-
-        }, "消费者C").start();
-
-        new Thread(() -> {
-            for (int i = 0; i < 20; i++) {
-
-                product.purchase();
-            }
-
-        }, "生产者B").start();
-
-        new Thread(() -> {
-            for (int i = 0; i < 20; i++) {
-                product.sale();
-            }
-
-        }, "消费者D").start();
     }
 }

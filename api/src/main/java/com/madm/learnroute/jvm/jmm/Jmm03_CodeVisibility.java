@@ -3,23 +3,23 @@ package com.madm.learnroute.jvm.jmm;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- *                  ,;,,;
- *                ,;;'(    社
- *      __      ,;;' ' \   会
- *   /'  '\'~~'~' \ /'\.)  主
+ * ,;,,;
+ * ,;;'(    社
+ * __      ,;;' ' \   会
+ * /'  '\'~~'~' \ /'\.)  主
  * ,;(      )    /  |.     义
- *,;' \    /-.,,(   ) \    码
- *     ) /       ) / )|    农
- *     ||        ||  \)     
- *     (_\       (_\
+ * ,;' \    /-.,,(   ) \    码
+ * ) /       ) / )|    农
+ * ||        ||  \)
+ * (_\       (_\
+ *
  * @author ：杨过
  * @date ：Created in 2020/4/29 14:04
  * @version: V1.0
  * @slogan: 天下风云出我辈，一入代码岁月催
  * @description: -server -Xcomp -XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly -XX:CompileCommand=compileonly,*Jmm03_CodeVisibility.refresh
- *      -Djava.compiler=NONE
+ * -Djava.compiler=NONE
  * LD_LIBRARY_PATH=/Users/madongming/software/hsdis
- *
  **/
 @Slf4j
 public class Jmm03_CodeVisibility {
@@ -28,22 +28,22 @@ public class Jmm03_CodeVisibility {
 
     private volatile static int counter = 0;
 
-    public static void refresh(){
+    public static void refresh() {
         log.info("refresh data.......");
         initFlag = true;
         log.info("refresh data success.......");
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         System.out.println("main()方法开始执行");
-        Thread threadA = new Thread(()->{
-            while (!initFlag){
+        Thread threadA = new Thread(() -> {
+            while (!initFlag) {
                 //System.out.println("runing");
                 //counter++;
             }
             log.info("线程：" + Thread.currentThread().getName()
                     + "当前线程嗅探到initFlag的状态的改变");
-        },"threadA");
+        }, "threadA");
         threadA.start();
 
         try {
@@ -52,9 +52,9 @@ public class Jmm03_CodeVisibility {
             e.printStackTrace();
         }
 
-        Thread threadB = new Thread(()->{
+        Thread threadB = new Thread(() -> {
             refresh();
-        },"threadB");
+        }, "threadB");
         threadB.start();
     }
 }

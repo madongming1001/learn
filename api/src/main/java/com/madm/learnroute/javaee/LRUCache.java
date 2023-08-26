@@ -9,16 +9,6 @@ import java.util.Map;
 public class LRUCache<K, V> {
 
     /**
-     * 双链表的元素节点
-     */
-    private class Entry<K, V> {
-        Entry<K, V> pre;
-        Entry<K, V> next;
-        private K key;
-        private V value;
-    }
-
-    /**
      * 缓存容量大小
      */
     private Integer capacity;
@@ -34,9 +24,22 @@ public class LRUCache<K, V> {
      * 用来存储所有元素
      */
     private Map<K, Entry<K, V>> caches = new HashMap<>();
-
     public LRUCache(int capacity) {
         this.capacity = capacity;
+    }
+
+    public static void main(String[] args) {
+        char c = 110;
+        System.out.println((char) 110);
+        System.out.println(c ^ 32);
+        System.out.println(Integer.toBinaryString(c));
+        System.out.println(Integer.toBinaryString(32));
+        System.out.println(Integer.valueOf("100_1110", 2));
+        System.out.println("=====================================");
+        System.out.println(Integer.valueOf("1001110", 2));
+        System.out.println(Integer.toBinaryString(1101110));
+        System.out.println(Integer.valueOf("1001110", 2));
+        System.out.println(Integer.valueOf("0101110", 2));
     }
 
     public V get(K key) {
@@ -136,17 +139,13 @@ public class LRUCache<K, V> {
         }
     }
 
-    public static void main(String[] args) {
-        char c = 110;
-        System.out.println((char)110);
-        System.out.println(c ^ 32);
-        System.out.println(Integer.toBinaryString(c));
-        System.out.println(Integer.toBinaryString(32));
-        System.out.println(Integer.valueOf("100_1110", 2));
-        System.out.println("=====================================");
-        System.out.println(Integer.valueOf("1001110", 2));
-        System.out.println(Integer.toBinaryString(1101110));
-        System.out.println(Integer.valueOf("1001110", 2));
-        System.out.println(Integer.valueOf("0101110",2));
+    /**
+     * 双链表的元素节点
+     */
+    private class Entry<K, V> {
+        Entry<K, V> pre;
+        Entry<K, V> next;
+        private K key;
+        private V value;
     }
 }

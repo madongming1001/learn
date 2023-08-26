@@ -13,11 +13,6 @@ public class Juc_LockOnThisObject {
 
     private Integer stock = 10;
 
-    public synchronized void decrStock(){
-        --stock;
-        System.out.println(ClassLayout.parseInstance(this).toPrintable());
-    }
-
     public static void main(String[] args) {
         /*try {
             TimeUnit.SECONDS.sleep(5);
@@ -30,5 +25,10 @@ public class Juc_LockOnThisObject {
 
         Juc_LockOnThisObject to1 = new Juc_LockOnThisObject();
         to1.decrStock();
+    }
+
+    public synchronized void decrStock() {
+        --stock;
+        System.out.println(ClassLayout.parseInstance(this).toPrintable());
     }
 }

@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 public class UnsafePractice {
     static Unsafe unsafe = null;
     static long stateOffset = 0;
-    private volatile long state = 0;
+
     static {
         try {
             unsafe = UnsafePractice.getUnsafe();
@@ -16,6 +16,8 @@ public class UnsafePractice {
             e.printStackTrace();
         }
     }
+
+    private volatile long state = 0;
 
     private static Unsafe getUnsafe() {
         try {

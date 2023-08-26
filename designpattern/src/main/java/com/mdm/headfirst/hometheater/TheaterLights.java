@@ -1,25 +1,25 @@
 package com.mdm.headfirst.hometheater;
 
 public class TheaterLights {
-	String description;
+    String description;
 
-	public TheaterLights(String description) {
-		this.description = description;
-	}
+    public TheaterLights(String description) {
+        this.description = description;
+    }
 
-	public void on() {
-		System.out.println(description + " on");
-	}
+    public void on() {
+        System.out.println(description + " on");
+    }
 
-	public void off() {
-		System.out.println(description + " off");
-	}
+    public void off() {
+        System.out.println(description + " off");
+    }
 
-	public void dim(int level) {
-		System.out.println(description + " dimming to " + level  + "%");
-	}
+    public void dim(int level) {
+        System.out.println(description + " dimming to " + level + "%");
+    }
 
-	public String toString() {
-		return description;
-	}
+    public String toString() {
+        return description;
+    }
 }

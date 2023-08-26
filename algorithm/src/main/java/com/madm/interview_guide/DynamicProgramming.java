@@ -2,7 +2,6 @@ package com.madm.interview_guide;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.RandomUtil;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

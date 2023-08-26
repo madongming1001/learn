@@ -19,12 +19,13 @@ public enum GenderEnum {
     @JsonValue
     private String desc;
 
+    public static GenderEnum getRandomGender() {
+        return values()[(int) (Math.random() * 2)];
+    }
+
     @Override
     public String toString() {
         return this.desc;
-    }
-    public static GenderEnum getRandomGender() {
-        return values()[(int) (Math.random() * 2)];
     }
 }
 

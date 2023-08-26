@@ -31,6 +31,6 @@ public class User implements Serializable {
         this.id = id;
         if (Objects.nonNull(name)) {
             this.auth = Arrays.stream(name).map(AuthParam::new).collect(Collectors.toList());
+        }
     }
-}
 }

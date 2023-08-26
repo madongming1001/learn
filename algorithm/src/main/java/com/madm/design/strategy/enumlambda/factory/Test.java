@@ -2,6 +2,7 @@ package com.madm.design.strategy.enumlambda.factory;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
 //Java8中方便又实用的Map函数
 public class Test {
 
@@ -23,29 +24,10 @@ public class Test {
         System.out.println(userMap);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
         Map<Integer, List<User>> collectMap = users.
                 stream().
                 collect(Collectors.groupingBy(item -> item.getPayType()));
         System.out.println(collectMap);
-
-
-
-
-
-
-
 
 
         Map<Integer, List<User>> userMapNew = new HashMap<>();
@@ -55,18 +37,12 @@ public class Test {
         }
 
 
-
-
-
-
-
         List<User> userNews = users;
         Map<Integer, List<User>> userTypeMap = new DefaultHashMap<>(ArrayList::new);
         for (User userNew : userNews) {
             userTypeMap.get(userNew.getPayType())
                     .add(userNew);
         }
-
 
 
     }

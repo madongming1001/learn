@@ -21,8 +21,8 @@ public class T0_BasicLock {
         Object o = new Object();
         log.info(ClassLayout.parseInstance(o).toPrintable());
 
-        new Thread(()->{
-            synchronized (o){
+        new Thread(() -> {
+            synchronized (o) {
                 log.info(ClassLayout.parseInstance(o).toPrintable());
             }
         }).start();
@@ -34,8 +34,8 @@ public class T0_BasicLock {
         }
 
         log.info(ClassLayout.parseInstance(o).toPrintable());
-        new Thread(()->{
-            synchronized (o){
+        new Thread(() -> {
+            synchronized (o) {
                 log.info(ClassLayout.parseInstance(o).toPrintable());
             }
         }).start();

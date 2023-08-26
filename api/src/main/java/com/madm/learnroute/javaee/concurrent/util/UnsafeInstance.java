@@ -24,8 +24,8 @@ public class UnsafeInstance {
     }
 
     public static void main(String[] args) {
-        int j=1;
+        int j = 1;
         reflectGetUnsafe().loadFence();
-        int i= 0;
+        int i = 0;
     }
 }

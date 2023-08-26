@@ -13,10 +13,10 @@ public class Juc_LockAppend {
     Object object = new Object();
 
     //锁的消除
-    private void method1(){
+    private void method1() {
         Object object1 = new Object();
 
-        synchronized (object1){
+        synchronized (object1) {
             //
             //sdf
             //asdf
@@ -25,13 +25,13 @@ public class Juc_LockAppend {
 
     }
 
-    private void method(){
+    private void method() {
         /*stb.append("杨过");
         stb.append("小龙女");
         stb.append("大雕");
         stb.append("郭靖");*/
 
-        synchronized (object){
+        synchronized (object) {
             System.out.println("");
 
             System.out.println("");

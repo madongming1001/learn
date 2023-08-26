@@ -13,12 +13,12 @@ public class Piped {
 //        Thread printThread = new Thread(new Print(in), "PrintThread");
 //        printThread.start();
         int receive = 0;
-        try{
-            while((receive = System.in.read()) != -1){
+        try {
+            while ((receive = System.in.read()) != -1) {
                 out.write(receive);
-                System.out.print((char)receive);
+                System.out.print((char) receive);
             }
-        }finally{
+        } finally {
             out.close();
         }
 

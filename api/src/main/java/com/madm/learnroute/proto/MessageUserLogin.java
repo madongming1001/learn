@@ -4,1495 +4,1625 @@
 package com.madm.learnroute.proto;
 
 public final class MessageUserLogin {
-  private MessageUserLogin() {}
-  public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistryLite registry) {
-  }
+    private static final com.google.protobuf.Descriptors.Descriptor
+            internal_static_MessageUserLoginRequest_descriptor;
+    private static final
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+            internal_static_MessageUserLoginRequest_fieldAccessorTable;
+    private static final com.google.protobuf.Descriptors.Descriptor
+            internal_static_MessageUserLoginResponse_descriptor;
+    private static final
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+            internal_static_MessageUserLoginResponse_fieldAccessorTable;
+    private static com.google.protobuf.Descriptors.FileDescriptor
+            descriptor;
 
-  public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistry registry) {
-    registerAllExtensions(
-        (com.google.protobuf.ExtensionRegistryLite) registry);
-  }
-  public interface MessageUserLoginRequestOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:MessageUserLoginRequest)
-      com.google.protobuf.MessageOrBuilder {
+    static {
+        java.lang.String[] descriptorData = {
+                "\n3api/src/main/resources/proto/MessageUs" +
+                        "erLogin.proto\"=\n\027MessageUserLoginRequest" +
+                        "\022\020\n\010username\030\001 \001(\t\022\020\n\010password\030\002 \001(\t\"B\n\030" +
+                        "MessageUserLoginResponse\022\024\n\014access_token" +
+                        "\030\001 \001(\t\022\020\n\010username\030\002 \001(\tB\033\n\031com.madm.lea" +
+                        "rnroute.protob\006proto3"
+        };
+        descriptor = com.google.protobuf.Descriptors.FileDescriptor
+                .internalBuildGeneratedFileFrom(descriptorData,
+                        new com.google.protobuf.Descriptors.FileDescriptor[]{
+                        });
+        internal_static_MessageUserLoginRequest_descriptor =
+                getDescriptor().getMessageTypes().get(0);
+        internal_static_MessageUserLoginRequest_fieldAccessorTable = new
+                com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+                internal_static_MessageUserLoginRequest_descriptor,
+                new java.lang.String[]{"Username", "Password",});
+        internal_static_MessageUserLoginResponse_descriptor =
+                getDescriptor().getMessageTypes().get(1);
+        internal_static_MessageUserLoginResponse_fieldAccessorTable = new
+                com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+                internal_static_MessageUserLoginResponse_descriptor,
+                new java.lang.String[]{"AccessToken", "Username",});
+    }
 
-    /**
-     * <code>string username = 1;</code>
-     * @return The username.
-     */
-    java.lang.String getUsername();
-    /**
-     * <code>string username = 1;</code>
-     * @return The bytes for username.
-     */
-    com.google.protobuf.ByteString
+    private MessageUserLogin() {
+    }
+
+    public static void registerAllExtensions(
+            com.google.protobuf.ExtensionRegistryLite registry) {
+    }
+
+    public static void registerAllExtensions(
+            com.google.protobuf.ExtensionRegistry registry) {
+        registerAllExtensions(
+                (com.google.protobuf.ExtensionRegistryLite) registry);
+    }
+
+    public static com.google.protobuf.Descriptors.FileDescriptor
+    getDescriptor() {
+        return descriptor;
+    }
+
+    public interface MessageUserLoginRequestOrBuilder extends
+            // @@protoc_insertion_point(interface_extends:MessageUserLoginRequest)
+            com.google.protobuf.MessageOrBuilder {
+
+        /**
+         * <code>string username = 1;</code>
+         *
+         * @return The username.
+         */
+        java.lang.String getUsername();
+
+        /**
+         * <code>string username = 1;</code>
+         *
+         * @return The bytes for username.
+         */
+        com.google.protobuf.ByteString
         getUsernameBytes();
 
-    /**
-     * <code>string password = 2;</code>
-     * @return The password.
-     */
-    java.lang.String getPassword();
-    /**
-     * <code>string password = 2;</code>
-     * @return The bytes for password.
-     */
-    com.google.protobuf.ByteString
+        /**
+         * <code>string password = 2;</code>
+         *
+         * @return The password.
+         */
+        java.lang.String getPassword();
+
+        /**
+         * <code>string password = 2;</code>
+         *
+         * @return The bytes for password.
+         */
+        com.google.protobuf.ByteString
         getPasswordBytes();
-  }
-  /**
-   * Protobuf type {@code MessageUserLoginRequest}
-   */
-  public static final class MessageUserLoginRequest extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:MessageUserLoginRequest)
-      MessageUserLoginRequestOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use MessageUserLoginRequest.newBuilder() to construct.
-    private MessageUserLoginRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private MessageUserLoginRequest() {
-      username_ = "";
-      password_ = "";
     }
 
-    @java.lang.Override
-    @SuppressWarnings({"unused"})
-    protected java.lang.Object newInstance(
-        UnusedPrivateParameter unused) {
-      return new MessageUserLoginRequest();
+    public interface MessageUserLoginResponseOrBuilder extends
+            // @@protoc_insertion_point(interface_extends:MessageUserLoginResponse)
+            com.google.protobuf.MessageOrBuilder {
+
+        /**
+         * <code>string access_token = 1;</code>
+         *
+         * @return The accessToken.
+         */
+        java.lang.String getAccessToken();
+
+        /**
+         * <code>string access_token = 1;</code>
+         *
+         * @return The bytes for accessToken.
+         */
+        com.google.protobuf.ByteString
+        getAccessTokenBytes();
+
+        /**
+         * <code>string username = 2;</code>
+         *
+         * @return The username.
+         */
+        java.lang.String getUsername();
+
+        /**
+         * <code>string username = 2;</code>
+         *
+         * @return The bytes for username.
+         */
+        com.google.protobuf.ByteString
+        getUsernameBytes();
     }
 
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private MessageUserLoginRequest(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              username_ = s;
-              break;
-            }
-            case 18: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              password_ = s;
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginRequest_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginRequest_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest.class, com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest.Builder.class);
-    }
-
-    public static final int USERNAME_FIELD_NUMBER = 1;
-    private volatile java.lang.Object username_;
-    /**
-     * <code>string username = 1;</code>
-     * @return The username.
-     */
-    @java.lang.Override
-    public java.lang.String getUsername() {
-      java.lang.Object ref = username_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        username_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string username = 1;</code>
-     * @return The bytes for username.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getUsernameBytes() {
-      java.lang.Object ref = username_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        username_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int PASSWORD_FIELD_NUMBER = 2;
-    private volatile java.lang.Object password_;
-    /**
-     * <code>string password = 2;</code>
-     * @return The password.
-     */
-    @java.lang.Override
-    public java.lang.String getPassword() {
-      java.lang.Object ref = password_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        password_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string password = 2;</code>
-     * @return The bytes for password.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getPasswordBytes() {
-      java.lang.Object ref = password_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        password_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(username_)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, username_);
-      }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(password_)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, password_);
-      }
-      unknownFields.writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(username_)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, username_);
-      }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(password_)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, password_);
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest)) {
-        return super.equals(obj);
-      }
-      com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest other = (com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest) obj;
-
-      if (!getUsername()
-          .equals(other.getUsername())) return false;
-      if (!getPassword()
-          .equals(other.getPassword())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + USERNAME_FIELD_NUMBER;
-      hash = (53 * hash) + getUsername().hashCode();
-      hash = (37 * hash) + PASSWORD_FIELD_NUMBER;
-      hash = (53 * hash) + getPassword().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
     /**
      * Protobuf type {@code MessageUserLoginRequest}
      */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:MessageUserLoginRequest)
-        com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequestOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginRequest_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginRequest_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest.class, com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest.Builder.class);
-      }
-
-      // Construct using com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        username_ = "";
-
-        password_ = "";
-
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginRequest_descriptor;
-      }
-
-      @java.lang.Override
-      public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest getDefaultInstanceForType() {
-        return com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest build() {
-        com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest buildPartial() {
-        com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest result = new com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest(this);
-        result.username_ = username_;
-        result.password_ = password_;
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest) {
-          return mergeFrom((com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest other) {
-        if (other == com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest.getDefaultInstance()) return this;
-        if (!other.getUsername().isEmpty()) {
-          username_ = other.username_;
-          onChanged();
-        }
-        if (!other.getPassword().isEmpty()) {
-          password_ = other.password_;
-          onChanged();
-        }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-
-      private java.lang.Object username_ = "";
-      /**
-       * <code>string username = 1;</code>
-       * @return The username.
-       */
-      public java.lang.String getUsername() {
-        java.lang.Object ref = username_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          username_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string username = 1;</code>
-       * @return The bytes for username.
-       */
-      public com.google.protobuf.ByteString
-          getUsernameBytes() {
-        java.lang.Object ref = username_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          username_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string username = 1;</code>
-       * @param value The username to set.
-       * @return This builder for chaining.
-       */
-      public Builder setUsername(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        username_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string username = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearUsername() {
-        
-        username_ = getDefaultInstance().getUsername();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string username = 1;</code>
-       * @param value The bytes for username to set.
-       * @return This builder for chaining.
-       */
-      public Builder setUsernameBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        username_ = value;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object password_ = "";
-      /**
-       * <code>string password = 2;</code>
-       * @return The password.
-       */
-      public java.lang.String getPassword() {
-        java.lang.Object ref = password_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          password_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string password = 2;</code>
-       * @return The bytes for password.
-       */
-      public com.google.protobuf.ByteString
-          getPasswordBytes() {
-        java.lang.Object ref = password_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          password_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string password = 2;</code>
-       * @param value The password to set.
-       * @return This builder for chaining.
-       */
-      public Builder setPassword(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        password_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string password = 2;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearPassword() {
-        
-        password_ = getDefaultInstance().getPassword();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string password = 2;</code>
-       * @param value The bytes for password to set.
-       * @return This builder for chaining.
-       */
-      public Builder setPasswordBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        password_ = value;
-        onChanged();
-        return this;
-      }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
-
-      // @@protoc_insertion_point(builder_scope:MessageUserLoginRequest)
-    }
-
-    // @@protoc_insertion_point(class_scope:MessageUserLoginRequest)
-    private static final com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest();
-    }
-
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<MessageUserLoginRequest>
-        PARSER = new com.google.protobuf.AbstractParser<MessageUserLoginRequest>() {
-      @java.lang.Override
-      public MessageUserLoginRequest parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new MessageUserLoginRequest(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<MessageUserLoginRequest> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<MessageUserLoginRequest> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
-  public interface MessageUserLoginResponseOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:MessageUserLoginResponse)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>string access_token = 1;</code>
-     * @return The accessToken.
-     */
-    java.lang.String getAccessToken();
-    /**
-     * <code>string access_token = 1;</code>
-     * @return The bytes for accessToken.
-     */
-    com.google.protobuf.ByteString
-        getAccessTokenBytes();
-
-    /**
-     * <code>string username = 2;</code>
-     * @return The username.
-     */
-    java.lang.String getUsername();
-    /**
-     * <code>string username = 2;</code>
-     * @return The bytes for username.
-     */
-    com.google.protobuf.ByteString
-        getUsernameBytes();
-  }
-  /**
-   * Protobuf type {@code MessageUserLoginResponse}
-   */
-  public static final class MessageUserLoginResponse extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:MessageUserLoginResponse)
-      MessageUserLoginResponseOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use MessageUserLoginResponse.newBuilder() to construct.
-    private MessageUserLoginResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private MessageUserLoginResponse() {
-      accessToken_ = "";
-      username_ = "";
-    }
-
-    @java.lang.Override
-    @SuppressWarnings({"unused"})
-    protected java.lang.Object newInstance(
-        UnusedPrivateParameter unused) {
-      return new MessageUserLoginResponse();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private MessageUserLoginResponse(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              accessToken_ = s;
-              break;
+    public static final class MessageUserLoginRequest extends
+            com.google.protobuf.GeneratedMessageV3 implements
+            // @@protoc_insertion_point(message_implements:MessageUserLoginRequest)
+            MessageUserLoginRequestOrBuilder {
+        public static final int USERNAME_FIELD_NUMBER = 1;
+        public static final int PASSWORD_FIELD_NUMBER = 2;
+        private static final long serialVersionUID = 0L;
+        // @@protoc_insertion_point(class_scope:MessageUserLoginRequest)
+        private static final com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest DEFAULT_INSTANCE;
+        private static final com.google.protobuf.Parser<MessageUserLoginRequest>
+                PARSER = new com.google.protobuf.AbstractParser<MessageUserLoginRequest>() {
+            @java.lang.Override
+            public MessageUserLoginRequest parsePartialFrom(
+                    com.google.protobuf.CodedInputStream input,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                    throws com.google.protobuf.InvalidProtocolBufferException {
+                return new MessageUserLoginRequest(input, extensionRegistry);
             }
-            case 18: {
-              java.lang.String s = input.readStringRequireUtf8();
+        };
 
-              username_ = s;
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
+        static {
+            DEFAULT_INSTANCE = new com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest();
         }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
+
+        private volatile java.lang.Object username_;
+        private volatile java.lang.Object password_;
+        private byte memoizedIsInitialized = -1;
+
+        // Use MessageUserLoginRequest.newBuilder() to construct.
+        private MessageUserLoginRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+            super(builder);
+        }
+
+        private MessageUserLoginRequest() {
+            username_ = "";
+            password_ = "";
+        }
+
+        private MessageUserLoginRequest(
+                com.google.protobuf.CodedInputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            this();
+            if (extensionRegistry == null) {
+                throw new java.lang.NullPointerException();
+            }
+            com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+                    com.google.protobuf.UnknownFieldSet.newBuilder();
+            try {
+                boolean done = false;
+                while (!done) {
+                    int tag = input.readTag();
+                    switch (tag) {
+                        case 0:
+                            done = true;
+                            break;
+                        case 10: {
+                            java.lang.String s = input.readStringRequireUtf8();
+
+                            username_ = s;
+                            break;
+                        }
+                        case 18: {
+                            java.lang.String s = input.readStringRequireUtf8();
+
+                            password_ = s;
+                            break;
+                        }
+                        default: {
+                            if (!parseUnknownField(
+                                    input, unknownFields, extensionRegistry, tag)) {
+                                done = true;
+                            }
+                            break;
+                        }
+                    }
+                }
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                throw e.setUnfinishedMessage(this);
+            } catch (java.io.IOException e) {
+                throw new com.google.protobuf.InvalidProtocolBufferException(
+                        e).setUnfinishedMessage(this);
+            } finally {
+                this.unknownFields = unknownFields.build();
+                makeExtensionsImmutable();
+            }
+        }
+
+        public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginResponse_descriptor;
-    }
+            return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginRequest_descriptor;
+        }
 
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
+                java.nio.ByteBuffer data)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
+                java.nio.ByteBuffer data,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
+                com.google.protobuf.ByteString data)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
+                com.google.protobuf.ByteString data,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(byte[] data)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
+                byte[] data,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(java.io.InputStream input)
+                throws java.io.IOException {
+            return com.google.protobuf.GeneratedMessageV3
+                    .parseWithIOException(PARSER, input);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
+                java.io.InputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws java.io.IOException {
+            return com.google.protobuf.GeneratedMessageV3
+                    .parseWithIOException(PARSER, input, extensionRegistry);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseDelimitedFrom(java.io.InputStream input)
+                throws java.io.IOException {
+            return com.google.protobuf.GeneratedMessageV3
+                    .parseDelimitedWithIOException(PARSER, input);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseDelimitedFrom(
+                java.io.InputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws java.io.IOException {
+            return com.google.protobuf.GeneratedMessageV3
+                    .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
+                com.google.protobuf.CodedInputStream input)
+                throws java.io.IOException {
+            return com.google.protobuf.GeneratedMessageV3
+                    .parseWithIOException(PARSER, input);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parseFrom(
+                com.google.protobuf.CodedInputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws java.io.IOException {
+            return com.google.protobuf.GeneratedMessageV3
+                    .parseWithIOException(PARSER, input, extensionRegistry);
+        }
+
+        public static Builder newBuilder() {
+            return DEFAULT_INSTANCE.toBuilder();
+        }
+
+        public static Builder newBuilder(com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest prototype) {
+            return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest getDefaultInstance() {
+            return DEFAULT_INSTANCE;
+        }
+
+        public static com.google.protobuf.Parser<MessageUserLoginRequest> parser() {
+            return PARSER;
+        }
+
+        @java.lang.Override
+        @SuppressWarnings({"unused"})
+        protected java.lang.Object newInstance(
+                UnusedPrivateParameter unused) {
+            return new MessageUserLoginRequest();
+        }
+
+        @java.lang.Override
+        public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+            return this.unknownFields;
+        }
+
+        @java.lang.Override
+        protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginResponse_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse.class, com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse.Builder.class);
-    }
+            return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginRequest_fieldAccessorTable
+                    .ensureFieldAccessorsInitialized(
+                            com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest.class, com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest.Builder.class);
+        }
 
-    public static final int ACCESS_TOKEN_FIELD_NUMBER = 1;
-    private volatile java.lang.Object accessToken_;
-    /**
-     * <code>string access_token = 1;</code>
-     * @return The accessToken.
-     */
-    @java.lang.Override
-    public java.lang.String getAccessToken() {
-      java.lang.Object ref = accessToken_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        accessToken_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string access_token = 1;</code>
-     * @return The bytes for accessToken.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getAccessTokenBytes() {
-      java.lang.Object ref = accessToken_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        accessToken_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
+        /**
+         * <code>string username = 1;</code>
+         *
+         * @return The username.
+         */
+        @java.lang.Override
+        public java.lang.String getUsername() {
+            java.lang.Object ref = username_;
+            if (ref instanceof java.lang.String) {
+                return (java.lang.String) ref;
+            } else {
+                com.google.protobuf.ByteString bs =
+                        (com.google.protobuf.ByteString) ref;
+                java.lang.String s = bs.toStringUtf8();
+                username_ = s;
+                return s;
+            }
+        }
 
-    public static final int USERNAME_FIELD_NUMBER = 2;
-    private volatile java.lang.Object username_;
-    /**
-     * <code>string username = 2;</code>
-     * @return The username.
-     */
-    @java.lang.Override
-    public java.lang.String getUsername() {
-      java.lang.Object ref = username_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        username_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string username = 2;</code>
-     * @return The bytes for username.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
+        /**
+         * <code>string username = 1;</code>
+         *
+         * @return The bytes for username.
+         */
+        @java.lang.Override
+        public com.google.protobuf.ByteString
         getUsernameBytes() {
-      java.lang.Object ref = username_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        username_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+            java.lang.Object ref = username_;
+            if (ref instanceof java.lang.String) {
+                com.google.protobuf.ByteString b =
+                        com.google.protobuf.ByteString.copyFromUtf8(
+                                (java.lang.String) ref);
+                username_ = b;
+                return b;
+            } else {
+                return (com.google.protobuf.ByteString) ref;
+            }
+        }
+
+        /**
+         * <code>string password = 2;</code>
+         *
+         * @return The password.
+         */
+        @java.lang.Override
+        public java.lang.String getPassword() {
+            java.lang.Object ref = password_;
+            if (ref instanceof java.lang.String) {
+                return (java.lang.String) ref;
+            } else {
+                com.google.protobuf.ByteString bs =
+                        (com.google.protobuf.ByteString) ref;
+                java.lang.String s = bs.toStringUtf8();
+                password_ = s;
+                return s;
+            }
+        }
+
+        /**
+         * <code>string password = 2;</code>
+         *
+         * @return The bytes for password.
+         */
+        @java.lang.Override
+        public com.google.protobuf.ByteString
+        getPasswordBytes() {
+            java.lang.Object ref = password_;
+            if (ref instanceof java.lang.String) {
+                com.google.protobuf.ByteString b =
+                        com.google.protobuf.ByteString.copyFromUtf8(
+                                (java.lang.String) ref);
+                password_ = b;
+                return b;
+            } else {
+                return (com.google.protobuf.ByteString) ref;
+            }
+        }
+
+        @java.lang.Override
+        public final boolean isInitialized() {
+            byte isInitialized = memoizedIsInitialized;
+            if (isInitialized == 1) return true;
+            if (isInitialized == 0) return false;
+
+            memoizedIsInitialized = 1;
+            return true;
+        }
+
+        @java.lang.Override
+        public void writeTo(com.google.protobuf.CodedOutputStream output)
+                throws java.io.IOException {
+            if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(username_)) {
+                com.google.protobuf.GeneratedMessageV3.writeString(output, 1, username_);
+            }
+            if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(password_)) {
+                com.google.protobuf.GeneratedMessageV3.writeString(output, 2, password_);
+            }
+            unknownFields.writeTo(output);
+        }
+
+        @java.lang.Override
+        public int getSerializedSize() {
+            int size = memoizedSize;
+            if (size != -1) return size;
+
+            size = 0;
+            if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(username_)) {
+                size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, username_);
+            }
+            if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(password_)) {
+                size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, password_);
+            }
+            size += unknownFields.getSerializedSize();
+            memoizedSize = size;
+            return size;
+        }
+
+        @java.lang.Override
+        public boolean equals(final java.lang.Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (!(obj instanceof com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest)) {
+                return super.equals(obj);
+            }
+            com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest other = (com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest) obj;
+
+            if (!getUsername()
+                    .equals(other.getUsername())) return false;
+            if (!getPassword()
+                    .equals(other.getPassword())) return false;
+            if (!unknownFields.equals(other.unknownFields)) return false;
+            return true;
+        }
+
+        @java.lang.Override
+        public int hashCode() {
+            if (memoizedHashCode != 0) {
+                return memoizedHashCode;
+            }
+            int hash = 41;
+            hash = (19 * hash) + getDescriptor().hashCode();
+            hash = (37 * hash) + USERNAME_FIELD_NUMBER;
+            hash = (53 * hash) + getUsername().hashCode();
+            hash = (37 * hash) + PASSWORD_FIELD_NUMBER;
+            hash = (53 * hash) + getPassword().hashCode();
+            hash = (29 * hash) + unknownFields.hashCode();
+            memoizedHashCode = hash;
+            return hash;
+        }
+
+        @java.lang.Override
+        public Builder newBuilderForType() {
+            return newBuilder();
+        }
+
+        @java.lang.Override
+        public Builder toBuilder() {
+            return this == DEFAULT_INSTANCE
+                    ? new Builder() : new Builder().mergeFrom(this);
+        }
+
+        @java.lang.Override
+        protected Builder newBuilderForType(
+                com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+            Builder builder = new Builder(parent);
+            return builder;
+        }
+
+        @java.lang.Override
+        public com.google.protobuf.Parser<MessageUserLoginRequest> getParserForType() {
+            return PARSER;
+        }
+
+        @java.lang.Override
+        public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest getDefaultInstanceForType() {
+            return DEFAULT_INSTANCE;
+        }
+
+        /**
+         * Protobuf type {@code MessageUserLoginRequest}
+         */
+        public static final class Builder extends
+                com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+                // @@protoc_insertion_point(builder_implements:MessageUserLoginRequest)
+                com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequestOrBuilder {
+            private java.lang.Object username_ = "";
+            private java.lang.Object password_ = "";
+
+            // Construct using com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest.newBuilder()
+            private Builder() {
+                maybeForceBuilderInitialization();
+            }
+
+            private Builder(
+                    com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+                super(parent);
+                maybeForceBuilderInitialization();
+            }
+
+            public static final com.google.protobuf.Descriptors.Descriptor
+            getDescriptor() {
+                return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginRequest_descriptor;
+            }
+
+            @java.lang.Override
+            protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+            internalGetFieldAccessorTable() {
+                return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginRequest_fieldAccessorTable
+                        .ensureFieldAccessorsInitialized(
+                                com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest.class, com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest.Builder.class);
+            }
+
+            private void maybeForceBuilderInitialization() {
+                if (com.google.protobuf.GeneratedMessageV3
+                        .alwaysUseFieldBuilders) {
+                }
+            }
+
+            @java.lang.Override
+            public Builder clear() {
+                super.clear();
+                username_ = "";
+
+                password_ = "";
+
+                return this;
+            }
+
+            @java.lang.Override
+            public com.google.protobuf.Descriptors.Descriptor
+            getDescriptorForType() {
+                return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginRequest_descriptor;
+            }
+
+            @java.lang.Override
+            public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest getDefaultInstanceForType() {
+                return com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest.getDefaultInstance();
+            }
+
+            @java.lang.Override
+            public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest build() {
+                com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest result = buildPartial();
+                if (!result.isInitialized()) {
+                    throw newUninitializedMessageException(result);
+                }
+                return result;
+            }
+
+            @java.lang.Override
+            public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest buildPartial() {
+                com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest result = new com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest(this);
+                result.username_ = username_;
+                result.password_ = password_;
+                onBuilt();
+                return result;
+            }
+
+            @java.lang.Override
+            public Builder clone() {
+                return super.clone();
+            }
+
+            @java.lang.Override
+            public Builder setField(
+                    com.google.protobuf.Descriptors.FieldDescriptor field,
+                    java.lang.Object value) {
+                return super.setField(field, value);
+            }
+
+            @java.lang.Override
+            public Builder clearField(
+                    com.google.protobuf.Descriptors.FieldDescriptor field) {
+                return super.clearField(field);
+            }
+
+            @java.lang.Override
+            public Builder clearOneof(
+                    com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+                return super.clearOneof(oneof);
+            }
+
+            @java.lang.Override
+            public Builder setRepeatedField(
+                    com.google.protobuf.Descriptors.FieldDescriptor field,
+                    int index, java.lang.Object value) {
+                return super.setRepeatedField(field, index, value);
+            }
+
+            @java.lang.Override
+            public Builder addRepeatedField(
+                    com.google.protobuf.Descriptors.FieldDescriptor field,
+                    java.lang.Object value) {
+                return super.addRepeatedField(field, value);
+            }
+
+            @java.lang.Override
+            public Builder mergeFrom(com.google.protobuf.Message other) {
+                if (other instanceof com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest) {
+                    return mergeFrom((com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest) other);
+                } else {
+                    super.mergeFrom(other);
+                    return this;
+                }
+            }
+
+            public Builder mergeFrom(com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest other) {
+                if (other == com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest.getDefaultInstance())
+                    return this;
+                if (!other.getUsername().isEmpty()) {
+                    username_ = other.username_;
+                    onChanged();
+                }
+                if (!other.getPassword().isEmpty()) {
+                    password_ = other.password_;
+                    onChanged();
+                }
+                this.mergeUnknownFields(other.unknownFields);
+                onChanged();
+                return this;
+            }
+
+            @java.lang.Override
+            public final boolean isInitialized() {
+                return true;
+            }
+
+            @java.lang.Override
+            public Builder mergeFrom(
+                    com.google.protobuf.CodedInputStream input,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                    throws java.io.IOException {
+                com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest parsedMessage = null;
+                try {
+                    parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+                } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                    parsedMessage = (com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginRequest) e.getUnfinishedMessage();
+                    throw e.unwrapIOException();
+                } finally {
+                    if (parsedMessage != null) {
+                        mergeFrom(parsedMessage);
+                    }
+                }
+                return this;
+            }
+
+            /**
+             * <code>string username = 1;</code>
+             *
+             * @return The username.
+             */
+            public java.lang.String getUsername() {
+                java.lang.Object ref = username_;
+                if (!(ref instanceof java.lang.String)) {
+                    com.google.protobuf.ByteString bs =
+                            (com.google.protobuf.ByteString) ref;
+                    java.lang.String s = bs.toStringUtf8();
+                    username_ = s;
+                    return s;
+                } else {
+                    return (java.lang.String) ref;
+                }
+            }
+
+            /**
+             * <code>string username = 1;</code>
+             *
+             * @param value The username to set.
+             * @return This builder for chaining.
+             */
+            public Builder setUsername(
+                    java.lang.String value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+
+                username_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>string username = 1;</code>
+             *
+             * @return The bytes for username.
+             */
+            public com.google.protobuf.ByteString
+            getUsernameBytes() {
+                java.lang.Object ref = username_;
+                if (ref instanceof String) {
+                    com.google.protobuf.ByteString b =
+                            com.google.protobuf.ByteString.copyFromUtf8(
+                                    (java.lang.String) ref);
+                    username_ = b;
+                    return b;
+                } else {
+                    return (com.google.protobuf.ByteString) ref;
+                }
+            }
+
+            /**
+             * <code>string username = 1;</code>
+             *
+             * @param value The bytes for username to set.
+             * @return This builder for chaining.
+             */
+            public Builder setUsernameBytes(
+                    com.google.protobuf.ByteString value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+                checkByteStringIsUtf8(value);
+
+                username_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>string username = 1;</code>
+             *
+             * @return This builder for chaining.
+             */
+            public Builder clearUsername() {
+
+                username_ = getDefaultInstance().getUsername();
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>string password = 2;</code>
+             *
+             * @return The password.
+             */
+            public java.lang.String getPassword() {
+                java.lang.Object ref = password_;
+                if (!(ref instanceof java.lang.String)) {
+                    com.google.protobuf.ByteString bs =
+                            (com.google.protobuf.ByteString) ref;
+                    java.lang.String s = bs.toStringUtf8();
+                    password_ = s;
+                    return s;
+                } else {
+                    return (java.lang.String) ref;
+                }
+            }
+
+            /**
+             * <code>string password = 2;</code>
+             *
+             * @param value The password to set.
+             * @return This builder for chaining.
+             */
+            public Builder setPassword(
+                    java.lang.String value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+
+                password_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>string password = 2;</code>
+             *
+             * @return The bytes for password.
+             */
+            public com.google.protobuf.ByteString
+            getPasswordBytes() {
+                java.lang.Object ref = password_;
+                if (ref instanceof String) {
+                    com.google.protobuf.ByteString b =
+                            com.google.protobuf.ByteString.copyFromUtf8(
+                                    (java.lang.String) ref);
+                    password_ = b;
+                    return b;
+                } else {
+                    return (com.google.protobuf.ByteString) ref;
+                }
+            }
+
+            /**
+             * <code>string password = 2;</code>
+             *
+             * @param value The bytes for password to set.
+             * @return This builder for chaining.
+             */
+            public Builder setPasswordBytes(
+                    com.google.protobuf.ByteString value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+                checkByteStringIsUtf8(value);
+
+                password_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>string password = 2;</code>
+             *
+             * @return This builder for chaining.
+             */
+            public Builder clearPassword() {
+
+                password_ = getDefaultInstance().getPassword();
+                onChanged();
+                return this;
+            }
+
+            @java.lang.Override
+            public final Builder setUnknownFields(
+                    final com.google.protobuf.UnknownFieldSet unknownFields) {
+                return super.setUnknownFields(unknownFields);
+            }
+
+            @java.lang.Override
+            public final Builder mergeUnknownFields(
+                    final com.google.protobuf.UnknownFieldSet unknownFields) {
+                return super.mergeUnknownFields(unknownFields);
+            }
+
+
+            // @@protoc_insertion_point(builder_scope:MessageUserLoginRequest)
+        }
+
     }
 
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(accessToken_)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, accessToken_);
-      }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(username_)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, username_);
-      }
-      unknownFields.writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(accessToken_)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, accessToken_);
-      }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(username_)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, username_);
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse)) {
-        return super.equals(obj);
-      }
-      com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse other = (com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse) obj;
-
-      if (!getAccessToken()
-          .equals(other.getAccessToken())) return false;
-      if (!getUsername()
-          .equals(other.getUsername())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + ACCESS_TOKEN_FIELD_NUMBER;
-      hash = (53 * hash) + getAccessToken().hashCode();
-      hash = (37 * hash) + USERNAME_FIELD_NUMBER;
-      hash = (53 * hash) + getUsername().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
     /**
      * Protobuf type {@code MessageUserLoginResponse}
      */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:MessageUserLoginResponse)
-        com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponseOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginResponse_descriptor;
-      }
+    public static final class MessageUserLoginResponse extends
+            com.google.protobuf.GeneratedMessageV3 implements
+            // @@protoc_insertion_point(message_implements:MessageUserLoginResponse)
+            MessageUserLoginResponseOrBuilder {
+        public static final int ACCESS_TOKEN_FIELD_NUMBER = 1;
+        public static final int USERNAME_FIELD_NUMBER = 2;
+        private static final long serialVersionUID = 0L;
+        // @@protoc_insertion_point(class_scope:MessageUserLoginResponse)
+        private static final com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse DEFAULT_INSTANCE;
+        private static final com.google.protobuf.Parser<MessageUserLoginResponse>
+                PARSER = new com.google.protobuf.AbstractParser<MessageUserLoginResponse>() {
+            @java.lang.Override
+            public MessageUserLoginResponse parsePartialFrom(
+                    com.google.protobuf.CodedInputStream input,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                    throws com.google.protobuf.InvalidProtocolBufferException {
+                return new MessageUserLoginResponse(input, extensionRegistry);
+            }
+        };
 
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginResponse_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse.class, com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse.Builder.class);
-      }
-
-      // Construct using com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
+        static {
+            DEFAULT_INSTANCE = new com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse();
         }
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        accessToken_ = "";
 
-        username_ = "";
+        private volatile java.lang.Object accessToken_;
+        private volatile java.lang.Object username_;
+        private byte memoizedIsInitialized = -1;
 
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginResponse_descriptor;
-      }
-
-      @java.lang.Override
-      public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse getDefaultInstanceForType() {
-        return com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse build() {
-        com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
+        // Use MessageUserLoginResponse.newBuilder() to construct.
+        private MessageUserLoginResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+            super(builder);
         }
-        return result;
-      }
 
-      @java.lang.Override
-      public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse buildPartial() {
-        com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse result = new com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse(this);
-        result.accessToken_ = accessToken_;
-        result.username_ = username_;
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse) {
-          return mergeFrom((com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
+        private MessageUserLoginResponse() {
+            accessToken_ = "";
+            username_ = "";
         }
-      }
 
-      public Builder mergeFrom(com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse other) {
-        if (other == com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse.getDefaultInstance()) return this;
-        if (!other.getAccessToken().isEmpty()) {
-          accessToken_ = other.accessToken_;
-          onChanged();
+        private MessageUserLoginResponse(
+                com.google.protobuf.CodedInputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            this();
+            if (extensionRegistry == null) {
+                throw new java.lang.NullPointerException();
+            }
+            com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+                    com.google.protobuf.UnknownFieldSet.newBuilder();
+            try {
+                boolean done = false;
+                while (!done) {
+                    int tag = input.readTag();
+                    switch (tag) {
+                        case 0:
+                            done = true;
+                            break;
+                        case 10: {
+                            java.lang.String s = input.readStringRequireUtf8();
+
+                            accessToken_ = s;
+                            break;
+                        }
+                        case 18: {
+                            java.lang.String s = input.readStringRequireUtf8();
+
+                            username_ = s;
+                            break;
+                        }
+                        default: {
+                            if (!parseUnknownField(
+                                    input, unknownFields, extensionRegistry, tag)) {
+                                done = true;
+                            }
+                            break;
+                        }
+                    }
+                }
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                throw e.setUnfinishedMessage(this);
+            } catch (java.io.IOException e) {
+                throw new com.google.protobuf.InvalidProtocolBufferException(
+                        e).setUnfinishedMessage(this);
+            } finally {
+                this.unknownFields = unknownFields.build();
+                makeExtensionsImmutable();
+            }
         }
-        if (!other.getUsername().isEmpty()) {
-          username_ = other.username_;
-          onChanged();
+
+        public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+            return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginResponse_descriptor;
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
 
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
+                java.nio.ByteBuffer data)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
         }
-        return this;
-      }
 
-      private java.lang.Object accessToken_ = "";
-      /**
-       * <code>string access_token = 1;</code>
-       * @return The accessToken.
-       */
-      public java.lang.String getAccessToken() {
-        java.lang.Object ref = accessToken_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          accessToken_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
+                java.nio.ByteBuffer data,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
         }
-      }
-      /**
-       * <code>string access_token = 1;</code>
-       * @return The bytes for accessToken.
-       */
-      public com.google.protobuf.ByteString
-          getAccessTokenBytes() {
-        java.lang.Object ref = accessToken_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          accessToken_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
+                com.google.protobuf.ByteString data)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
         }
-      }
-      /**
-       * <code>string access_token = 1;</code>
-       * @param value The accessToken to set.
-       * @return This builder for chaining.
-       */
-      public Builder setAccessToken(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        accessToken_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string access_token = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearAccessToken() {
-        
-        accessToken_ = getDefaultInstance().getAccessToken();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string access_token = 1;</code>
-       * @param value The bytes for accessToken to set.
-       * @return This builder for chaining.
-       */
-      public Builder setAccessTokenBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        accessToken_ = value;
-        onChanged();
-        return this;
-      }
 
-      private java.lang.Object username_ = "";
-      /**
-       * <code>string username = 2;</code>
-       * @return The username.
-       */
-      public java.lang.String getUsername() {
-        java.lang.Object ref = username_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          username_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
+                com.google.protobuf.ByteString data,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
         }
-      }
-      /**
-       * <code>string username = 2;</code>
-       * @return The bytes for username.
-       */
-      public com.google.protobuf.ByteString
-          getUsernameBytes() {
-        java.lang.Object ref = username_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          username_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(byte[] data)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
         }
-      }
-      /**
-       * <code>string username = 2;</code>
-       * @param value The username to set.
-       * @return This builder for chaining.
-       */
-      public Builder setUsername(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        username_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string username = 2;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearUsername() {
-        
-        username_ = getDefaultInstance().getUsername();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string username = 2;</code>
-       * @param value The bytes for username to set.
-       * @return This builder for chaining.
-       */
-      public Builder setUsernameBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        username_ = value;
-        onChanged();
-        return this;
-      }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
 
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
+                byte[] data,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(java.io.InputStream input)
+                throws java.io.IOException {
+            return com.google.protobuf.GeneratedMessageV3
+                    .parseWithIOException(PARSER, input);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
+                java.io.InputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws java.io.IOException {
+            return com.google.protobuf.GeneratedMessageV3
+                    .parseWithIOException(PARSER, input, extensionRegistry);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseDelimitedFrom(java.io.InputStream input)
+                throws java.io.IOException {
+            return com.google.protobuf.GeneratedMessageV3
+                    .parseDelimitedWithIOException(PARSER, input);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseDelimitedFrom(
+                java.io.InputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws java.io.IOException {
+            return com.google.protobuf.GeneratedMessageV3
+                    .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
+                com.google.protobuf.CodedInputStream input)
+                throws java.io.IOException {
+            return com.google.protobuf.GeneratedMessageV3
+                    .parseWithIOException(PARSER, input);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parseFrom(
+                com.google.protobuf.CodedInputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws java.io.IOException {
+            return com.google.protobuf.GeneratedMessageV3
+                    .parseWithIOException(PARSER, input, extensionRegistry);
+        }
+
+        public static Builder newBuilder() {
+            return DEFAULT_INSTANCE.toBuilder();
+        }
+
+        public static Builder newBuilder(com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse prototype) {
+            return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+        }
+
+        public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse getDefaultInstance() {
+            return DEFAULT_INSTANCE;
+        }
+
+        public static com.google.protobuf.Parser<MessageUserLoginResponse> parser() {
+            return PARSER;
+        }
+
+        @java.lang.Override
+        @SuppressWarnings({"unused"})
+        protected java.lang.Object newInstance(
+                UnusedPrivateParameter unused) {
+            return new MessageUserLoginResponse();
+        }
+
+        @java.lang.Override
+        public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+            return this.unknownFields;
+        }
+
+        @java.lang.Override
+        protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+            return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginResponse_fieldAccessorTable
+                    .ensureFieldAccessorsInitialized(
+                            com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse.class, com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse.Builder.class);
+        }
+
+        /**
+         * <code>string access_token = 1;</code>
+         *
+         * @return The accessToken.
+         */
+        @java.lang.Override
+        public java.lang.String getAccessToken() {
+            java.lang.Object ref = accessToken_;
+            if (ref instanceof java.lang.String) {
+                return (java.lang.String) ref;
+            } else {
+                com.google.protobuf.ByteString bs =
+                        (com.google.protobuf.ByteString) ref;
+                java.lang.String s = bs.toStringUtf8();
+                accessToken_ = s;
+                return s;
+            }
+        }
+
+        /**
+         * <code>string access_token = 1;</code>
+         *
+         * @return The bytes for accessToken.
+         */
+        @java.lang.Override
+        public com.google.protobuf.ByteString
+        getAccessTokenBytes() {
+            java.lang.Object ref = accessToken_;
+            if (ref instanceof java.lang.String) {
+                com.google.protobuf.ByteString b =
+                        com.google.protobuf.ByteString.copyFromUtf8(
+                                (java.lang.String) ref);
+                accessToken_ = b;
+                return b;
+            } else {
+                return (com.google.protobuf.ByteString) ref;
+            }
+        }
+
+        /**
+         * <code>string username = 2;</code>
+         *
+         * @return The username.
+         */
+        @java.lang.Override
+        public java.lang.String getUsername() {
+            java.lang.Object ref = username_;
+            if (ref instanceof java.lang.String) {
+                return (java.lang.String) ref;
+            } else {
+                com.google.protobuf.ByteString bs =
+                        (com.google.protobuf.ByteString) ref;
+                java.lang.String s = bs.toStringUtf8();
+                username_ = s;
+                return s;
+            }
+        }
+
+        /**
+         * <code>string username = 2;</code>
+         *
+         * @return The bytes for username.
+         */
+        @java.lang.Override
+        public com.google.protobuf.ByteString
+        getUsernameBytes() {
+            java.lang.Object ref = username_;
+            if (ref instanceof java.lang.String) {
+                com.google.protobuf.ByteString b =
+                        com.google.protobuf.ByteString.copyFromUtf8(
+                                (java.lang.String) ref);
+                username_ = b;
+                return b;
+            } else {
+                return (com.google.protobuf.ByteString) ref;
+            }
+        }
+
+        @java.lang.Override
+        public final boolean isInitialized() {
+            byte isInitialized = memoizedIsInitialized;
+            if (isInitialized == 1) return true;
+            if (isInitialized == 0) return false;
+
+            memoizedIsInitialized = 1;
+            return true;
+        }
+
+        @java.lang.Override
+        public void writeTo(com.google.protobuf.CodedOutputStream output)
+                throws java.io.IOException {
+            if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(accessToken_)) {
+                com.google.protobuf.GeneratedMessageV3.writeString(output, 1, accessToken_);
+            }
+            if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(username_)) {
+                com.google.protobuf.GeneratedMessageV3.writeString(output, 2, username_);
+            }
+            unknownFields.writeTo(output);
+        }
+
+        @java.lang.Override
+        public int getSerializedSize() {
+            int size = memoizedSize;
+            if (size != -1) return size;
+
+            size = 0;
+            if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(accessToken_)) {
+                size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, accessToken_);
+            }
+            if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(username_)) {
+                size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, username_);
+            }
+            size += unknownFields.getSerializedSize();
+            memoizedSize = size;
+            return size;
+        }
+
+        @java.lang.Override
+        public boolean equals(final java.lang.Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (!(obj instanceof com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse)) {
+                return super.equals(obj);
+            }
+            com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse other = (com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse) obj;
+
+            if (!getAccessToken()
+                    .equals(other.getAccessToken())) return false;
+            if (!getUsername()
+                    .equals(other.getUsername())) return false;
+            if (!unknownFields.equals(other.unknownFields)) return false;
+            return true;
+        }
+
+        @java.lang.Override
+        public int hashCode() {
+            if (memoizedHashCode != 0) {
+                return memoizedHashCode;
+            }
+            int hash = 41;
+            hash = (19 * hash) + getDescriptor().hashCode();
+            hash = (37 * hash) + ACCESS_TOKEN_FIELD_NUMBER;
+            hash = (53 * hash) + getAccessToken().hashCode();
+            hash = (37 * hash) + USERNAME_FIELD_NUMBER;
+            hash = (53 * hash) + getUsername().hashCode();
+            hash = (29 * hash) + unknownFields.hashCode();
+            memoizedHashCode = hash;
+            return hash;
+        }
+
+        @java.lang.Override
+        public Builder newBuilderForType() {
+            return newBuilder();
+        }
+
+        @java.lang.Override
+        public Builder toBuilder() {
+            return this == DEFAULT_INSTANCE
+                    ? new Builder() : new Builder().mergeFrom(this);
+        }
+
+        @java.lang.Override
+        protected Builder newBuilderForType(
+                com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+            Builder builder = new Builder(parent);
+            return builder;
+        }
+
+        @java.lang.Override
+        public com.google.protobuf.Parser<MessageUserLoginResponse> getParserForType() {
+            return PARSER;
+        }
+
+        @java.lang.Override
+        public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse getDefaultInstanceForType() {
+            return DEFAULT_INSTANCE;
+        }
+
+        /**
+         * Protobuf type {@code MessageUserLoginResponse}
+         */
+        public static final class Builder extends
+                com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+                // @@protoc_insertion_point(builder_implements:MessageUserLoginResponse)
+                com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponseOrBuilder {
+            private java.lang.Object accessToken_ = "";
+            private java.lang.Object username_ = "";
+
+            // Construct using com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse.newBuilder()
+            private Builder() {
+                maybeForceBuilderInitialization();
+            }
+
+            private Builder(
+                    com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+                super(parent);
+                maybeForceBuilderInitialization();
+            }
+
+            public static final com.google.protobuf.Descriptors.Descriptor
+            getDescriptor() {
+                return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginResponse_descriptor;
+            }
+
+            @java.lang.Override
+            protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+            internalGetFieldAccessorTable() {
+                return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginResponse_fieldAccessorTable
+                        .ensureFieldAccessorsInitialized(
+                                com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse.class, com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse.Builder.class);
+            }
+
+            private void maybeForceBuilderInitialization() {
+                if (com.google.protobuf.GeneratedMessageV3
+                        .alwaysUseFieldBuilders) {
+                }
+            }
+
+            @java.lang.Override
+            public Builder clear() {
+                super.clear();
+                accessToken_ = "";
+
+                username_ = "";
+
+                return this;
+            }
+
+            @java.lang.Override
+            public com.google.protobuf.Descriptors.Descriptor
+            getDescriptorForType() {
+                return com.madm.learnroute.proto.MessageUserLogin.internal_static_MessageUserLoginResponse_descriptor;
+            }
+
+            @java.lang.Override
+            public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse getDefaultInstanceForType() {
+                return com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse.getDefaultInstance();
+            }
+
+            @java.lang.Override
+            public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse build() {
+                com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse result = buildPartial();
+                if (!result.isInitialized()) {
+                    throw newUninitializedMessageException(result);
+                }
+                return result;
+            }
+
+            @java.lang.Override
+            public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse buildPartial() {
+                com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse result = new com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse(this);
+                result.accessToken_ = accessToken_;
+                result.username_ = username_;
+                onBuilt();
+                return result;
+            }
+
+            @java.lang.Override
+            public Builder clone() {
+                return super.clone();
+            }
+
+            @java.lang.Override
+            public Builder setField(
+                    com.google.protobuf.Descriptors.FieldDescriptor field,
+                    java.lang.Object value) {
+                return super.setField(field, value);
+            }
+
+            @java.lang.Override
+            public Builder clearField(
+                    com.google.protobuf.Descriptors.FieldDescriptor field) {
+                return super.clearField(field);
+            }
+
+            @java.lang.Override
+            public Builder clearOneof(
+                    com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+                return super.clearOneof(oneof);
+            }
+
+            @java.lang.Override
+            public Builder setRepeatedField(
+                    com.google.protobuf.Descriptors.FieldDescriptor field,
+                    int index, java.lang.Object value) {
+                return super.setRepeatedField(field, index, value);
+            }
+
+            @java.lang.Override
+            public Builder addRepeatedField(
+                    com.google.protobuf.Descriptors.FieldDescriptor field,
+                    java.lang.Object value) {
+                return super.addRepeatedField(field, value);
+            }
+
+            @java.lang.Override
+            public Builder mergeFrom(com.google.protobuf.Message other) {
+                if (other instanceof com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse) {
+                    return mergeFrom((com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse) other);
+                } else {
+                    super.mergeFrom(other);
+                    return this;
+                }
+            }
+
+            public Builder mergeFrom(com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse other) {
+                if (other == com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse.getDefaultInstance())
+                    return this;
+                if (!other.getAccessToken().isEmpty()) {
+                    accessToken_ = other.accessToken_;
+                    onChanged();
+                }
+                if (!other.getUsername().isEmpty()) {
+                    username_ = other.username_;
+                    onChanged();
+                }
+                this.mergeUnknownFields(other.unknownFields);
+                onChanged();
+                return this;
+            }
+
+            @java.lang.Override
+            public final boolean isInitialized() {
+                return true;
+            }
+
+            @java.lang.Override
+            public Builder mergeFrom(
+                    com.google.protobuf.CodedInputStream input,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                    throws java.io.IOException {
+                com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse parsedMessage = null;
+                try {
+                    parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+                } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                    parsedMessage = (com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse) e.getUnfinishedMessage();
+                    throw e.unwrapIOException();
+                } finally {
+                    if (parsedMessage != null) {
+                        mergeFrom(parsedMessage);
+                    }
+                }
+                return this;
+            }
+
+            /**
+             * <code>string access_token = 1;</code>
+             *
+             * @return The accessToken.
+             */
+            public java.lang.String getAccessToken() {
+                java.lang.Object ref = accessToken_;
+                if (!(ref instanceof java.lang.String)) {
+                    com.google.protobuf.ByteString bs =
+                            (com.google.protobuf.ByteString) ref;
+                    java.lang.String s = bs.toStringUtf8();
+                    accessToken_ = s;
+                    return s;
+                } else {
+                    return (java.lang.String) ref;
+                }
+            }
+
+            /**
+             * <code>string access_token = 1;</code>
+             *
+             * @param value The accessToken to set.
+             * @return This builder for chaining.
+             */
+            public Builder setAccessToken(
+                    java.lang.String value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+
+                accessToken_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>string access_token = 1;</code>
+             *
+             * @return The bytes for accessToken.
+             */
+            public com.google.protobuf.ByteString
+            getAccessTokenBytes() {
+                java.lang.Object ref = accessToken_;
+                if (ref instanceof String) {
+                    com.google.protobuf.ByteString b =
+                            com.google.protobuf.ByteString.copyFromUtf8(
+                                    (java.lang.String) ref);
+                    accessToken_ = b;
+                    return b;
+                } else {
+                    return (com.google.protobuf.ByteString) ref;
+                }
+            }
+
+            /**
+             * <code>string access_token = 1;</code>
+             *
+             * @param value The bytes for accessToken to set.
+             * @return This builder for chaining.
+             */
+            public Builder setAccessTokenBytes(
+                    com.google.protobuf.ByteString value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+                checkByteStringIsUtf8(value);
+
+                accessToken_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>string access_token = 1;</code>
+             *
+             * @return This builder for chaining.
+             */
+            public Builder clearAccessToken() {
+
+                accessToken_ = getDefaultInstance().getAccessToken();
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>string username = 2;</code>
+             *
+             * @return The username.
+             */
+            public java.lang.String getUsername() {
+                java.lang.Object ref = username_;
+                if (!(ref instanceof java.lang.String)) {
+                    com.google.protobuf.ByteString bs =
+                            (com.google.protobuf.ByteString) ref;
+                    java.lang.String s = bs.toStringUtf8();
+                    username_ = s;
+                    return s;
+                } else {
+                    return (java.lang.String) ref;
+                }
+            }
+
+            /**
+             * <code>string username = 2;</code>
+             *
+             * @param value The username to set.
+             * @return This builder for chaining.
+             */
+            public Builder setUsername(
+                    java.lang.String value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+
+                username_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>string username = 2;</code>
+             *
+             * @return The bytes for username.
+             */
+            public com.google.protobuf.ByteString
+            getUsernameBytes() {
+                java.lang.Object ref = username_;
+                if (ref instanceof String) {
+                    com.google.protobuf.ByteString b =
+                            com.google.protobuf.ByteString.copyFromUtf8(
+                                    (java.lang.String) ref);
+                    username_ = b;
+                    return b;
+                } else {
+                    return (com.google.protobuf.ByteString) ref;
+                }
+            }
+
+            /**
+             * <code>string username = 2;</code>
+             *
+             * @param value The bytes for username to set.
+             * @return This builder for chaining.
+             */
+            public Builder setUsernameBytes(
+                    com.google.protobuf.ByteString value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+                checkByteStringIsUtf8(value);
+
+                username_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>string username = 2;</code>
+             *
+             * @return This builder for chaining.
+             */
+            public Builder clearUsername() {
+
+                username_ = getDefaultInstance().getUsername();
+                onChanged();
+                return this;
+            }
+
+            @java.lang.Override
+            public final Builder setUnknownFields(
+                    final com.google.protobuf.UnknownFieldSet unknownFields) {
+                return super.setUnknownFields(unknownFields);
+            }
+
+            @java.lang.Override
+            public final Builder mergeUnknownFields(
+                    final com.google.protobuf.UnknownFieldSet unknownFields) {
+                return super.mergeUnknownFields(unknownFields);
+            }
 
 
-      // @@protoc_insertion_point(builder_scope:MessageUserLoginResponse)
+            // @@protoc_insertion_point(builder_scope:MessageUserLoginResponse)
+        }
+
     }
 
-    // @@protoc_insertion_point(class_scope:MessageUserLoginResponse)
-    private static final com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse();
-    }
-
-    public static com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<MessageUserLoginResponse>
-        PARSER = new com.google.protobuf.AbstractParser<MessageUserLoginResponse>() {
-      @java.lang.Override
-      public MessageUserLoginResponse parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new MessageUserLoginResponse(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<MessageUserLoginResponse> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<MessageUserLoginResponse> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.madm.learnroute.proto.MessageUserLogin.MessageUserLoginResponse getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_MessageUserLoginRequest_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_MessageUserLoginRequest_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_MessageUserLoginResponse_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_MessageUserLoginResponse_fieldAccessorTable;
-
-  public static com.google.protobuf.Descriptors.FileDescriptor
-      getDescriptor() {
-    return descriptor;
-  }
-  private static  com.google.protobuf.Descriptors.FileDescriptor
-      descriptor;
-  static {
-    java.lang.String[] descriptorData = {
-      "\n3api/src/main/resources/proto/MessageUs" +
-      "erLogin.proto\"=\n\027MessageUserLoginRequest" +
-      "\022\020\n\010username\030\001 \001(\t\022\020\n\010password\030\002 \001(\t\"B\n\030" +
-      "MessageUserLoginResponse\022\024\n\014access_token" +
-      "\030\001 \001(\t\022\020\n\010username\030\002 \001(\tB\033\n\031com.madm.lea" +
-      "rnroute.protob\006proto3"
-    };
-    descriptor = com.google.protobuf.Descriptors.FileDescriptor
-      .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
-        });
-    internal_static_MessageUserLoginRequest_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_MessageUserLoginRequest_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_MessageUserLoginRequest_descriptor,
-        new java.lang.String[] { "Username", "Password", });
-    internal_static_MessageUserLoginResponse_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_MessageUserLoginResponse_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_MessageUserLoginResponse_descriptor,
-        new java.lang.String[] { "AccessToken", "Username", });
-  }
-
-  // @@protoc_insertion_point(outer_class_scope)
+    // @@protoc_insertion_point(outer_class_scope)
 }

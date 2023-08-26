@@ -2,7 +2,6 @@ package com.madm.learnroute.controller;
 
 import cn.hutool.core.util.ArrayUtil;
 import com.madm.learnroute.model.BookStock;
-import com.madm.learnroute.service.BookStockService;
 import com.madm.learnroute.service.impl.BookStockServiceImpl;
 import com.mdm.model.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * @author dongming.ma

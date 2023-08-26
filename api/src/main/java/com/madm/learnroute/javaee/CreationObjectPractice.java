@@ -7,15 +7,15 @@ import java.lang.reflect.Constructor;
  * <p>
  * 1、使用 new 关键字
  * 2、反射机制
- *      1、Class.newInstance()
- *      2、Constructor.newInstance()
+ * 1、Class.newInstance()
+ * 2、Constructor.newInstance()
  * 3、实现 Cloneable 接口，使用 clone 方法创建对象
  * 4、序列化和反序列化
- *
+ * <p>
  * JVM 对使用 new 方法创建对象的方式进行了优化，默认情况下，new 的效率更高。
  * new 方式创建对象时，会调用类的构造函数。若构造函数中有耗时操作，则会影响 new 方法创建对象的效率。
  * clone 方式创建对象，并不会调用类的构造函数。
- *
+ * <p>
  * 参考文章：https://www.jianshu.com/p/18d329ec4c80
  */
 public class CreationObjectPractice {
@@ -24,6 +24,7 @@ public class CreationObjectPractice {
 
     /**
      * new 和 clone 的方式效率对比
+     *
      * @param args
      * @throws CloneNotSupportedException
      */
@@ -46,8 +47,6 @@ public class CreationObjectPractice {
 
         System.out.println(mmp1);
         System.out.println(mmp2);
-
-
 
 
     }

@@ -1,6 +1,5 @@
 package com.madm.interview_guide;
 
-import com.mdm.utils.PrintUtil;
 import lombok.Data;
 
 import java.util.ArrayList;

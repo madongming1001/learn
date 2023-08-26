@@ -8,16 +8,6 @@ public class ABAProblemCase {
         // 将top放在原子类中
         private AtomicReference<Node> top = new AtomicReference<>();
 
-        // 栈中节点信息
-        static class Node {
-            int value;
-            Node next;
-
-            public Node(int value) {
-                this.value = value;
-            }
-        }
-
         // 出栈操作
         public Node pop() {
             for (; ; ) {
@@ -48,6 +38,16 @@ public class ABAProblemCase {
                 if (top.compareAndSet(next, node)) {
                     return;
                 }
+            }
+        }
+
+        // 栈中节点信息
+        static class Node {
+            int value;
+            Node next;
+
+            public Node(int value) {
+                this.value = value;
             }
         }
     }

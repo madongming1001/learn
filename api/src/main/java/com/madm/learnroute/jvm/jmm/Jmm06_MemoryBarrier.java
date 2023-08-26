@@ -18,10 +18,10 @@ package com.madm.learnroute.jvm.jmm;
  * @description:
  **/
 public class Jmm06_MemoryBarrier {
-    int a=0;
-    int c=0;
     public volatile int m1 = 1;
     public volatile int m2 = 2;
+    int a = 0;
+    int c = 0;
 
     public void readAndWrite() {
         int i = m1;   // 第一个volatile读
