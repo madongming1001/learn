@@ -3,7 +3,7 @@ package com.madm.learnroute.technology.redis;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * HyperLogLog 是最早由Flajolet及其同事在 2007 年提出的一种 估算基数的近似最优算法。
+ * HyperLogLog 是最早由Flajolet及其同事在 2007 年提出的一种估算基数的近似最优算法。
  * 基数统计(Cardinality Counting) 通常是用来统计一个集合中不重复的元素个数。
  * 实际上目前还没有发现更好的在大数据场景中准确计算基数的高效算法，因此在不追求绝对精确的情
  * 况下，使用概率算法算是一个不错的解决方案.

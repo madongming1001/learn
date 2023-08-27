@@ -80,7 +80,7 @@ public class ReentrantLockPractice {
             try {
                 System.out.println("线程0获取锁");
                 // sleep不会释放锁
-                Thread.sleep(50000000l);
+                Thread.sleep(50000000L);
                 //进入休息室等待
                 System.out.println("线程0释放锁，进入等待");
 //                condition.await();
@@ -99,7 +99,7 @@ public class ReentrantLockPractice {
         //叫醒
         Thread thread1 = new Thread(() -> {
             try {
-                TimeUnit.DAYS.sleep(2l);
+                TimeUnit.DAYS.sleep(2L);
             } catch (Exception e) {
                 e.printStackTrace();
             }

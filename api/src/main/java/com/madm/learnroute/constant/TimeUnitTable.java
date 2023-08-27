@@ -9,7 +9,7 @@ import java.time.temporal.TemporalAdjusters;
  */
 public interface TimeUnitTable {
     long allDayOfYear = LocalDateTime.now().with(TemporalAdjusters.lastDayOfYear()).getDayOfYear();
-    long MILLISECOND = 1l;
+    long MILLISECOND = 1L;
     long SECOND = MILLISECOND * 1000;
     long MINUTE = 60 * SECOND;
     long HOUR = 60 * MINUTE;

@@ -19,7 +19,7 @@ public class ReptileTask implements Runnable {
     public void run() {
         try {
             //模拟爬虫时长
-            TimeUnit.SECONDS.sleep(3l);
+            TimeUnit.SECONDS.sleep(3L);
             System.out.println(Thread.currentThread().getName() + " 已爬完～");
             //等待其他参与者
             phaser.arriveAndAwaitAdvance();//到达屏障后，需等待其他参与者，并返回阶段编号。

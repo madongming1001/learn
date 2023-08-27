@@ -46,7 +46,7 @@ class CachedData {
     void execReadLock() {
         readLock.lock();
         log.info("当前持有读锁线程数是：{}", readWriteLock.getReadHoldCount());
-        TimeUnit.DAYS.sleep(2l);
+        TimeUnit.DAYS.sleep(2L);
         readLock.unlock();
     }
 

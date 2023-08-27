@@ -19,7 +19,7 @@ public class ReduceTask implements Runnable {
     public void run() {
         try {
             //模拟爬虫时长
-            TimeUnit.SECONDS.sleep(3l);
+            TimeUnit.SECONDS.sleep(3L);
             System.out.println(Thread.currentThread().getName() + " 收集完毕！");
             //等待其他参与者
             phaser.arrive();

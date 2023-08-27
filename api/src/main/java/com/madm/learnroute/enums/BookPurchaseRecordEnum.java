@@ -12,14 +12,13 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum BookPurchaseRecordEnum {
-    BUYER(1, "accountServiceImpl"),
-    BOOK(2, "bookServiceImpl,bookStockServiceImpl");
+    BUYER(1, "accountServiceImpl"), BOOK(2, "bookServiceImpl,bookStockServiceImpl");
     private Integer code;
     private String className;
 
     public void execute(Integer code) {
         for (BookPurchaseRecordEnum element : values()) {
-            if (element.getCode() == code) {
+            if (element.getCode().equals(code)) {
                 for (String className : element.className.split(StringPool.COMMA)) {
                     BeanManager.getHandler(className).findAccountById(1);
                 }

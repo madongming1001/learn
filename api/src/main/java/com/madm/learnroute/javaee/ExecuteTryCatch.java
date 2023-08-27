@@ -11,7 +11,9 @@ import java.util.Objects;
  */
 public class ExecuteTryCatch {
     private int getThenAddNoJudge(JSONObject json, String key) {
-        if (Objects.isNull(json)) throw new IllegalArgumentException("参数异常");
+        if (Objects.isNull(json)) {
+            throw new IllegalArgumentException("参数异常");
+        }
         int num;
         try {
             // 不校验 key 是否未空值，直接调用 toString 每次触发空指针异常并被捕获
@@ -23,7 +25,9 @@ public class ExecuteTryCatch {
     }
 
     private int getThenAddWithJudge(JSONObject json, String key) {
-        if (Objects.isNull(json)) throw new IllegalArgumentException("参数异常");
+        if (Objects.isNull(json)) {
+            throw new IllegalArgumentException("参数异常");
+        }
         int num;
         try {
             // 校验 key 是否未空值

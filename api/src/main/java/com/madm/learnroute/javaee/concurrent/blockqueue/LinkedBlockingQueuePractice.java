@@ -13,7 +13,7 @@ public class LinkedBlockingQueuePractice {
     public static void main(String[] args) {
         new ThreadExecutionPractice("asyncThread", () -> {
             try {
-                TimeUnit.SECONDS.sleep(2l);
+                TimeUnit.SECONDS.sleep(2L);
                 objects1.put("ssss");
             } catch (InterruptedException e) {
                 e.printStackTrace();

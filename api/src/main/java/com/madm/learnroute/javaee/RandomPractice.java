@@ -29,19 +29,19 @@ public class RandomPractice {
         int[] ints = RandomUtil.randomInts(100);
         System.out.println(Arrays.toString(ints));
 
-//        stop:
-//        while (true) {
-//            List<String> chinese1 = com.mdm.utils.RandomUtil.randomChinese(4, 100);
-//            List<String> chinese2 = com.mdm.utils.RandomUtil.randomChinese(4, 100);
-//            for (String s1 : chinese1) {
-//                for (String s2 : chinese2) {
-//                    if (s1.hashCode() == s2.hashCode() && !Objects.equals(s1, s2)) {
-//                        System.out.println("hashcode相等，equals不相等的情况下，字符串是1：" + s1 + " 字符串2是：" + s2);
-//                        break stop;
-//                    }
-//                }
-//            }
-//        }
+        stop:
+        while (true) {
+            List<String> chinese1 = com.mdm.utils.RandomUtil.randomChinese2(4, 100);
+            List<String> chinese2 = com.mdm.utils.RandomUtil.randomChinese2(4, 100);
+            for (String s1 : chinese1) {
+                for (String s2 : chinese2) {
+                    if (s1.hashCode() == s2.hashCode() && !Objects.equals(s1, s2)) {
+                        System.out.println("hashcode相等，equals不相等的情况下，字符串是1：" + s1 + " 字符串2是：" + s2);
+                        break stop;
+                    }
+                }
+            }
+        }
         long startTime = System.currentTimeMillis();
         List<String> chinese1 = com.mdm.utils.RandomUtil.randomChinese1(4, 5248);
         long endTime = System.currentTimeMillis();

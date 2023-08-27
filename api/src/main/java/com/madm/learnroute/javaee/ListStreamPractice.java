@@ -3,9 +3,9 @@ package com.madm.learnroute.javaee;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.mdm.pojo.Apple;
 import com.mdm.pojo.Invitee;
 import com.mdm.pojo.Teacher;
-import com.mdm.pojo.Apple;
 import com.mdm.pojo.User;
 import com.mdm.utils.PrintUtil;
 import lombok.SneakyThrows;
@@ -102,11 +102,11 @@ public class ListStreamPractice {
         //存放apple对象集合
 
 
-        List<Invitee> invitees = Lists.newArrayList(new Invitee(1l, "1", "1"), new Invitee(2l, "2", "2"));
+        List<Invitee> invitees = Lists.newArrayList(new Invitee(1L, "1", "1"), new Invitee(2L, "2", "2"));
         List<String> newInstance = Lists.newArrayList("1", "2", "3", "4", "5", "6", "1");
         List<String> oldInstance = Lists.newArrayList("3", "232", "35", "24", "5", "6", "1");
 
-        List<Invitee> inviteeCompression = Stream.of(invitees, Arrays.asList(new Invitee(3l, "2", "3"), new Invitee(36l, "36", "36"))).flatMap(invitee -> invitee.stream()).collect(Collectors.toList());
+        List<Invitee> inviteeCompression = Stream.of(invitees, Arrays.asList(new Invitee(3L, "2", "3"), new Invitee(36L, "36", "36"))).flatMap(invitee -> invitee.stream()).collect(Collectors.toList());
 
 
         //add：加、subtract：减、multiply：乘、divide：除

@@ -1,10 +1,7 @@
 package com.madm.learnroute.javaee.concurrent.juc.threadpool;
 
 import lombok.SneakyThrows;
-import org.junit.Test;
 
-import java.sql.SQLOutput;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -55,7 +52,7 @@ public class ThreadPoolExecutorPractice {
     }
 
     private static void threadPoolParameterTest() {
-        System.out.println(Long.toBinaryString(4294967296l));
+        System.out.println(Long.toBinaryString(4294967296L));
         System.out.println(Integer.MAX_VALUE);
         System.out.println(Integer.toBinaryString(2147483647));
 

@@ -2653,3 +2653,26 @@ cleanupAfterCompletion
 
 ![image-20230821114312050](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230821114312050.png)
 
+# Springboot的各种什么dto vo po entity pojo bo之类的区别 在什么样的情况下使用？
+
+在Spring Boot中，常见的数据对象有DTO（Data Transfer Object）、VO（Value Object）、PO（Persistent Object）、Entity、POJO（Plain Old
+Java Object）和BO（Business Object），它们之间有一些区别和用法。
+
+1. DTO：DTO用于在不同层之间传输数据，通常是一种轻量级的数据封装对象。*
+   *DTO的设计目标是根据业务需求，将多个领域对象或实体对象的部分数据组合成一个DTO对象，以减少网络传输量和提高性能。DTO通常用于服务层和控制器层之间的数据交互。
+   **
+
+2. VO：VO用于在前端页面展示数据，是一种与页面展示直接相关的数据对象。VO通常包含了展示所需的属性和转换逻辑，并且可以根据前端需要进行定制。VO在控制器层将数据传递给前端视图层时使用。
+
+3. PO/Entity：PO（Persistent Object）和Entity通常用于持久化数据到数据库中。它们是与数据库表结构一一对应的对象模型，包含了表中的字段及其对应的getter和setter方法。
+   **PO是面向数据库的纯粹持久化对象**，而**Entity可能会包含一些业务逻辑**。ORM框架（如Hibernate）通常会将PO或Entity对象映射到数据库表中。
+
+4. POJO：POJO（Plain Old Java Object）是一种简单的Java对象，它不依赖于特定的框架或技术。POJO是一种轻量级的数据对象，通常只包含属性和对应的getter和setter方法。
+   **POJO常用于数据传输、业务逻辑处理或其他一般的Java对象**。
+
+5. BO：BO（Business Object）是一种面向业务的对象模型，用于封装具有业务含义的数据。BO通常包含了一些业务逻辑，并且可以进行业务处理和操作。BO可以用于服务层和业务逻辑处理。
+
+在选择使用哪种数据对象时，可以根据以下几点考虑： - 如果需要在不同层之间传输数据，则可以使用DTO。 -
+如果需要在前端页面展示数据，则可以使用VO。 - 如果需要持久化数据到数据库，则可以使用PO/Entity。 -
+如果只需要一个简单的Java对象，则可以使用POJO。 - 如果需要封装具有业务含义的数据和业务逻辑，则可以使用BO。
+需要根据具体的项目需求和团队约定来选择合适的数据对象，上述的区别和用法只是一种常见的概念。

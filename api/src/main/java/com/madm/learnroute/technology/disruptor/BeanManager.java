@@ -20,7 +20,7 @@ import java.util.Map;
 @Component
 public class BeanManager implements ApplicationContextAware, InitializingBean, DisposableBean {
 
-    private static ApplicationContext applicationContext;
+    private static ApplicationContext applicationContext = null;
 
     private final static Map<String, AccountService> handlerMap = new HashMap<>();
 

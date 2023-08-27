@@ -301,11 +301,15 @@ public static final int OP_ACCEPT = 1 << 4;
 
 ## SSL和TLS
 
-SSL 是指安全套接字层，简而言之，它是一项标准技术，可确保互联网连接安全，保护两个系统之间发送的任何敏感数据，防止网络犯罪分子读取和修改任何传输信息，包括个人资料。两个系统可能是指服务器和客户端（例如，浏览器和购物网站），或两个服务器之间（例如，含个人身份信息或工资单信息的应用程序）。
+**SSL （Secure Socket Layer 安全套接字层）**
+，简而言之，它是一项标准技术，可确保互联网连接安全，保护两个系统之间发送的任何敏感数据，防止网络犯罪分子读取和修改任何传输信息，包括个人资料。两个系统可能是指服务器和客户端（例如，浏览器和购物网站），或两个服务器之间（例如，含个人身份信息或工资单信息的应用程序）。
 
-此举可确保在用户和站点之间，或两个系统之间传输的数据无法被读取。它使用加密算法打乱传输中的数据，防止数据通过连接传输时被黑客读取。这里所说的数据是指任何敏感或个人信息，例如信用卡号和其他财务信息、个人姓名和住址等。
+此举可确保在用户和站点之间，或两个系统之间传输的数据无法被读取。**它使用加密算法打乱传输中的数据，防止数据通过连接传输时被黑客读取
+**。这里所说的数据是指任何敏感或个人信息，例如信用卡号和其他财务信息、个人姓名和住址等。
 
-TLS（传输层安全）是更为安全的升级版 SSL。由于 SSL 这一术语更为常用，因此我们仍然将我们的安全证书称作 SSL。但当您从DigiCert[购买 SSL](https://www.websecurity.digicert.com/zh/cn/ssl-certificate?inid=infoctr_buylink_sslhome) 时，您真正购买的是最新的 TLS 证书，有[ ECC、RSA 或 DSA 三种加密方式](https://www.websecurity.digicert.com/zh/cn/security-topics/how-ssl-works)可以选择。
+**TLS（Transport Layer Security 传输层安全）**是更为安全的升级版 SSL。由于 SSL 这一术语更为常用，因此我们仍然将我们的安全证书称作
+SSL。但当您从DigiCert[购买 SSL](https://www.websecurity.digicert.com/zh/cn/ssl-certificate?inid=infoctr_buylink_sslhome)
+时，您真正购买的是最新的 TLS 证书，有**ECC、RSA 或 DSA** 三种加密方式可以选择。
 
 ```java
 //添加编码解码handler

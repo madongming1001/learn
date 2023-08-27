@@ -16,7 +16,9 @@ public class ArthasPractice {
         CompletableFuture.allOf(CompletableFuture.runAsync(() -> cpuHigh()),CompletableFuture.runAsync(() -> deadThread())).join();
         // 不断的向 hashSet 集合增加数据
 //        addHashSetThread();
-        while (viability) System.out.println("111");
+        while (viability) {
+            System.out.println("111");
+        }
         Runtime.getRuntime().addShutdownHook(new Thread(() -> viability = false));
     }
 
