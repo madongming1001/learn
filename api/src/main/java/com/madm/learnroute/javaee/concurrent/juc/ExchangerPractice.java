@@ -4,7 +4,7 @@ import java.util.concurrent.Exchanger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ExchangerTest {
+public class ExchangerPractice {
     private static final Exchanger<String> exgr = new Exchanger();
     private static ExecutorService threadPool = Executors.newFixedThreadPool(2);
 

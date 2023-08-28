@@ -1497,7 +1497,9 @@ beanFactory.registerResolvableDependency(ApplicationContext.class, this);
 - ApplicationReadyEvent：Application 启动**成功** 事件。**running（）**
 - ApplicationFailedEvent：Application 启动**失败** 事件。**failed（）**
 
-
+```txt
+EventPublishingRunListener 所有的时间都在这里发布
+```
 
 # CORS
 
@@ -2658,8 +2660,8 @@ cleanupAfterCompletion
 在Spring Boot中，常见的数据对象有DTO（Data Transfer Object）、VO（Value Object）、PO（Persistent Object）、Entity、POJO（Plain Old
 Java Object）和BO（Business Object），它们之间有一些区别和用法。
 
-1. DTO：DTO用于在不同层之间传输数据，通常是一种轻量级的数据封装对象。*
-   *DTO的设计目标是根据业务需求，将多个领域对象或实体对象的部分数据组合成一个DTO对象，以减少网络传输量和提高性能。DTO通常用于服务层和控制器层之间的数据交互。
+1. DTO：DTO用于在不同层之间传输数据，通常是一种轻量级的数据封装对象。
+   **DTO的设计目标是根据业务需求，将多个领域对象或实体对象的部分数据组合成一个DTO对象，以减少网络传输量和提高性能。DTO通常用于服务层和控制器层之间的数据交互。
    **
 
 2. VO：VO用于在前端页面展示数据，是一种与页面展示直接相关的数据对象。VO通常包含了展示所需的属性和转换逻辑，并且可以根据前端需要进行定制。VO在控制器层将数据传递给前端视图层时使用。
