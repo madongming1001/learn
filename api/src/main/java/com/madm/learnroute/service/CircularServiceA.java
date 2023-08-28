@@ -1,9 +1,12 @@
 package com.madm.learnroute.service;
 
 
+import cn.hutool.extra.spring.SpringUtil;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 public class CircularServiceA {
@@ -14,6 +17,7 @@ public class CircularServiceA {
 
     @Transactional
     public void methodA(String a, String b) {
+        SqlSessionFactory sqlSessionFactory = (SqlSessionFactory) TransactionSynchronizationManager.getResource(SpringUtil.getBean("sqlSessionFactory"));
 //        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 //            @Override
 //            public void suspend() {

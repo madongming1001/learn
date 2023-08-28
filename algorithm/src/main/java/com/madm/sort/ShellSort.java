@@ -3,6 +3,7 @@ package com.madm.sort;
 import java.util.Arrays;
 
 /**
+ * 希尔排序
  * @author dongming.ma
  * @date 2023/3/14 13:08
  */

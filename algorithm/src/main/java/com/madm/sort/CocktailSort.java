@@ -5,6 +5,8 @@ import java.util.Arrays;
 import static cn.hutool.core.util.ArrayUtil.swap;
 
 /**
+ * 鸡尾酒排序
+ *
  * 第一轮从左到右排序遍历一遍
  * 第二轮从右到左排序遍历一遍
  * 第三轮从左到右再排序遍历一遍

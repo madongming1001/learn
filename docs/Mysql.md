@@ -3122,7 +3122,7 @@ slow_query_log_file,/usr/local/mysql/mysql-slow.log
 # SQL优化
 
 1. 避免使用select *。
-2. 使用union all 代替 union。
+2. 使用union all 代替 union。（会默认比较去重）
 3. 小表驱动大表 select in 先处理**子查询** 后处理**外部查询** select exists 先处理**外部查询** 在根据查询结果**跟子查询比较匹配
    **。in适用于用于左边大表，右边小表：exists适用于右边大表，左边小表
 4. 批量操作。
