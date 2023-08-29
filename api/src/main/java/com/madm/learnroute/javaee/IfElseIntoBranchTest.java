@@ -11,21 +11,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class IfElseIntoBranchTest {
     public static void main(String[] args) {
-        boolean condition = true;
-        if (!condition) {
-            log.info("1");
-        } else if (condition) {
-            log.info("2");
-        } else if (!condition) {
-            log.info("3");
-        } else if (condition) {
-            log.info("4");
-        }
-
-        if (condition) {
-            log.info("5");
-        } else if (condition) {
-            log.info("6");
+        for (int i = 0; ; i++) {
+            boolean condition = true;
+            if (!condition) {
+                log.info("1");
+            } else if (condition) {
+                System.out.println("当前id值" + i);
+                log.info("2");
+            } else if (!condition) {
+                log.info("3");
+            } else if (condition) {
+                System.out.println();
+                System.out.println("当前id值" + i);
+                break;
+            }
+            if (condition) {
+                log.info("5");
+            } else if (condition) {
+                log.info("6");
+            }
         }
     }
 }

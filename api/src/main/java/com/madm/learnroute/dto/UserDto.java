@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * @author madongming
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,7 +26,7 @@ import java.util.stream.Collectors;
 public class UserDto implements Serializable {
     private Integer id;
     @NonNull
-    @JsonProperty("name")//用于反序列化和序列化都为name
+    @JsonProperty("name")//用于反序列化和序列化都为name jackson
     @JsonAlias(value = {"userName", "accountName"})//用于反序列化，把设置的值都映射为name jackson
     @JSONField(name = "name")//fastjson
     private String name;

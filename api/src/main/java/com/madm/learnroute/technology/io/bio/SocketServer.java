@@ -16,6 +16,7 @@ public class SocketServer {
             //单线程处理可以接受多个客户端，但是只能处理一个客户端的数据
             //多线程处理客户端的数据 handler(socket);
             for (; ; ) {
+                //当创建服务端之后，会一直等待客户端，这里会造成阻塞
                 Socket socket = serverSocket.accept();
                 System.out.println("有客户端连接了");
                 new Thread(() -> {
@@ -36,6 +37,7 @@ public class SocketServer {
         byte[] bytes = new byte[1024];
         System.out.println("准备read。。");
         InputStream in = socket.getInputStream();
+        //在获取客户端消息的时候，服务端的线程也会一直等待，也会造成阻塞
         int read = socket.getInputStream().read(bytes);
         System.out.println("read完毕。。");
         if (read != 1) {

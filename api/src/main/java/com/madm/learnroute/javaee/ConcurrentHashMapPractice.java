@@ -12,9 +12,38 @@ public class ConcurrentHashMapPractice {
     @SneakyThrows
     public static void main(String[] args) {
         ConcurrentHashMap<String, Boolean> conMap = new ConcurrentHashMap<>(2);
+        //返回修改之前的值 不会覆盖 value为null报空指针异常
+        ConcurrentHashMap<String, Object> map = new ConcurrentHashMap<>();
+//        System.out.println("put:" + map.putIfAbsent("null putifabsent", null));
+//        System.out.println("put:" + map.putIfAbsent("hello", "123"));
+        //onlyIfAbsent参数控制 相同key已经存在的情况下覆盖不服该旧值 true表示不覆盖 false表示覆盖
+//        System.out.println("put:" + map.putIfAbsent("hello", "12312414"));
+        System.out.println(map.get("hello"));
+//        System.out.println("put:" + map.putIfAbsent("hello", "456"));
+        System.out.println(map.get("hello"));
+        //返回修改之后的值 不会覆盖 value为null不会建立映射关系
+        System.out.println("put:" + map.computeIfAbsent("null compute if absent", (v) -> null));
+        System.out.println(map.get("null compute if absent"));
+        System.out.println(map.size());
+        System.out.println("put:" + map.computeIfAbsent("test", (v) -> "python"));
+        System.out.println(map.get("test"));
+        System.out.println("put:" + map.computeIfAbsent("test", (v) -> "javascript"));
+        System.out.println(map.get("test"));
+        System.out.println("hello 有值加1 没值就设置默认值：" + map.compute("hello", (key, oldVal) -> oldVal == null ? 1 : Integer.parseInt((String) oldVal) + 1));
+
+        //当值不存在的时候返回的是null
+        System.out.println(map.computeIfPresent("hello", (key, val) -> (int) val + 12352353));
+        //当值存在的时候会覆盖
+        System.out.println(map.get("hello"));
+        map.getOrDefault("hello", 1);
+
+
+        System.out.println("----------------------------------------------------------------");
 //        System.out.println(5 << 2 == 5 * 2);
 //        System.out.println(31 - Integer.numberOfLeadingZeros(29));
         System.out.println(5 << 2);
+        //0101 -> 10 0100 -> 1 0100
+
         calculateArrayElementPosition();
         System.out.println(1 << (16 - 1));
         System.out.println(245275 << 16);

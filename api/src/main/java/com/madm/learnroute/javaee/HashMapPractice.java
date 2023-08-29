@@ -28,9 +28,7 @@ public class HashMapPractice {
     public static void main(String[] args) {
 
         Optional.of(new Object()).orElse(new AtomicInteger());
-        Optional.ofNullable(new Object()).ifPresent((obj) -> {
-
-        });
+        Optional.ofNullable(new Object()).orElseGet(ArrayList::new);
 
         HashBasedTable<String, String, String> table = HashBasedTable.create();
         table.put("1", "2", "3");

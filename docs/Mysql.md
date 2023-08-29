@@ -97,8 +97,7 @@ Id列越大执行优先级越高，id相同则从上往下执行，id为NULL最�
 
 ### key列
 
-实际使用的索引，如果为NULL，则没有使用索引。如果想强制mysql使用或忽视possible_keys列中的索引，在查询中使用 **force index**、*
-*ignore index**。
+实际使用的索引，如果为NULL，则没有使用索引。如果想强制mysql使用或忽视possible_keys列中的索引，在查询中使用 **force index**、**ignore index**。
 
 ### key_len列
 
@@ -2779,6 +2778,10 @@ limit (curPage - 1) * pageSize, pageSize
 数据库实例是应用程序,**是位于用户与操作系统之间的一层数据管理软件**
 ，用户对数据库进行操作，包括定义表结构，数据查询，数据维护等控制，都是在数据库实例下进行的，可以这样理解，应用程序通过数据库实例才能和数据库打交道。
 
+## 23.MySQL字符集charset和collation的区别和作用?
+
+在MySQL创建数据库时，我们需要指定字符集charset和collation（排序规则），如果不指定，MySQL会自动指定为默认字符集charset和collation（排序规则）。
+
 # 常用命令
 
 ## 查看单个SQL最大限制
@@ -3232,4 +3235,3 @@ slow_query_log_file,/usr/local/mysql/mysql-slow.log
 MySQL UNION 操作符用于连接两个以上的 SELECT 语句的结果组合到一个结果集合中。多个 SELECT 语句会删除重复的数据。
 
 UNION操作效果和UNION类似会选择出所有重复的值
-
