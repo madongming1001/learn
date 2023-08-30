@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.madm.learnroute.enums.GenderEnum;
+import com.madm.learnroute.technology.spring.custom.LengthOfByte;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -24,6 +25,7 @@ import static com.madm.learnroute.enums.GenderEnum.getRandomGender;
 @TableName("account")
 public class Account {
     @TableId(type = IdType.AUTO)
+    @LengthOfByte(max = 1)
     private Long id;
     private BigDecimal balance;
     @TableField(value = "username")

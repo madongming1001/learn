@@ -1,10 +1,12 @@
 package com.madm.learnroute.javaee;
 
+import com.mdm.utils.PrintUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -21,8 +23,8 @@ public class ConcurrentHashMapPractice {
         System.out.println(map.get("hello"));
 //        System.out.println("put:" + map.putIfAbsent("hello", "456"));
         System.out.println(map.get("hello"));
-        //返回修改之后的值 不会覆盖 value为null不会建立映射关系
-        System.out.println("put:" + map.computeIfAbsent("null compute if absent", (v) -> null));
+        //返回修改之后的值 不会覆盖 value为null不会建立映射关系 如果没有值可以根据传入的key进行映射
+        System.out.println("put:" + map.computeIfAbsent("put", (String t) -> map.computeIfAbsent("put", (String i) -> "i")));
         System.out.println(map.get("null compute if absent"));
         System.out.println(map.size());
         System.out.println("put:" + map.computeIfAbsent("test", (v) -> "python"));
@@ -38,7 +40,24 @@ public class ConcurrentHashMapPractice {
         map.getOrDefault("hello", 1);
 
 
-        System.out.println("----------------------------------------------------------------");
+        HashMap<Integer, String> objectName = new HashMap<>();
+        objectName.putIfAbsent(11, "Java265.com");
+        objectName.putIfAbsent(88, "Java爱好者");
+        objectName.putIfAbsent(100, "Java网站");
+        objectName.putIfAbsent(77, "Java265.com-2");
+
+        // 键值不存在
+        String v1 = objectName.merge(101, "-我是新添加的value-1", (oldValue, newValue) -> oldValue + "a" + newValue);
+        // 键值存在
+        String v2 = objectName.merge(100, "-我是新添加的value-2", (oldValue, newValue) -> oldValue + "b" + newValue);
+        PrintUtil.printSplitLine();
+        System.out.println("添加的返回值:" + v1);
+        System.out.println("添加的返回值:" + v2);
+
+        System.out.println("objectName:" + objectName);
+        PrintUtil.printSplitLine();
+
+
 //        System.out.println(5 << 2 == 5 * 2);
 //        System.out.println(31 - Integer.numberOfLeadingZeros(29));
         System.out.println(5 << 2);

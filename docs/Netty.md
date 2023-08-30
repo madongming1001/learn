@@ -711,8 +711,7 @@ Selector的英文含义是“选择器”，不过根据我们详细介绍的Sel
 
 # IOCP
 
-**输入输出完成端口**（Input/Output Completion Port，IOCP）, **是支持多个同时发生的异步I/O操作的应用程序编程接口**，由于Linux下没有Windows下的IOCP技术提供真正的
-异步IO 支持，所以Linux下使用epoll模拟异步IO。
+**输入输出完成端口**（Input/Output Completion Port，IOCP）, **是支持多个同时发生的异步I/O操作的应用程序编程接口**，由于Linux下没有Windows下的IOCP技术提供真正的异步IO 支持，所以Linux下使用epoll模拟异步IO。
 
 ## 典型的多路复用IO实现
 

@@ -4,6 +4,9 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
 
+/**
+ * @author madongming
+ */
 @Documented
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -13,7 +16,7 @@ public @interface LengthOfByte {
 
     int max() default Integer.MAX_VALUE;
 
-    String message() default "{com.madm.learnroute.spring.custom.LengthOfByte.java.message}";
+    String message() default "{com.madm.learnroute.technology.spring.custom.LengthOfByte.message}";
 
     Class<?>[] groups() default {};
 

@@ -6,6 +6,9 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * @author madongming
+ */
 @Slf4j
 public class LengthOfByteValidator implements ConstraintValidator<LengthOfByte, CharSequence> {
 

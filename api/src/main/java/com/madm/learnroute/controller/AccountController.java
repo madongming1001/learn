@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -43,7 +42,7 @@ public class AccountController {
     }
 
     @GetMapping("/findAccountById")
-    public Account findAccountById(@RequestBody @Nullable AccountRequest requestParam) {
+    public Account findAccountById(@RequestBody AccountRequest requestParam) {
         RLock rLock = redisson.getLock("accountSearch");
         rLock.lock();
         Account account = accountService.findAccountById(requestParam.getId());
