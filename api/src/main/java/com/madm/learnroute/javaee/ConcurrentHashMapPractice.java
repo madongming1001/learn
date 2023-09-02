@@ -7,6 +7,8 @@ import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -38,6 +40,11 @@ public class ConcurrentHashMapPractice {
         //当值存在的时候会覆盖
         System.out.println(map.get("hello"));
         map.getOrDefault("hello", 1);
+
+        Set<Map.Entry<String, Boolean>> entries = conMap.entrySet();
+        for (Map.Entry<String, Boolean> entry : entries) {
+
+        }
 
 
         HashMap<Integer, String> objectName = new HashMap<>();

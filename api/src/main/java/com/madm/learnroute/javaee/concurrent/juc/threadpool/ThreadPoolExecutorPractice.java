@@ -30,6 +30,13 @@ public class ThreadPoolExecutorPractice {
 
     @SneakyThrows
     public static void main(String[] args) {
+        System.out.println(Integer.toBinaryString(-1));
+        System.out.println(Integer.toBinaryString(-8));
+        System.out.println(-1 << 29);//116
+        System.out.println(0 << 29);//116
+        System.out.println(1 << 29);//116
+        System.out.println(2 << 29);//116
+        System.out.println(3 << 29);//116
 //        ExecutorService executorService = Executors.newFixedThreadPool(1);
 //
 //        executorService.submit(() -> {

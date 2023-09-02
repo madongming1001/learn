@@ -271,5 +271,9 @@
             <artifactId>alipay-sdk-java</artifactId>
             <version>4.35.79.ALL</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+        </dependency>
     </dependencies>
 </project>
