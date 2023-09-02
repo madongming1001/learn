@@ -6,6 +6,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 子线程在没有set值的情况下的，可以直接使用到父线程在 InheritableThreadLocal 设置的值，这里是实现了父线程向子线程共享数据。
+ * 子线程重新设置了一个新的值，这个值的作为范围只在子线程上，不会影响到父线程的数据。
+ *
+ * 因为父线程InheritableThreadLocal添加值的时候会初始化父线程的inheritableThreadLocal
+ * 在父线程执行的时候创建一个子线程默认创建的子线程的父线程都是外侧的父线程，子线程创建的时候就会判断如果父线程的 InheritableThreadLocal 有值
+ * 就把父线程的 InheritableThreadLocal 赋值给子线程的 InheritableThreadLocal
+ * 这样子线程在里面get的时候默认就会有 父线程 InheritableThreadLocal 的值
+ * 但是在子线程里面添加值的时候添加的是子线程的 InheritableThreadLocal 所以在父线程在获取值的时候不会被修改 数据还是创建子线程时候的数据
+ */
 class LocalVariable {
     private Long[] a = new Long[1024 * 1024];
 }

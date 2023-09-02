@@ -22,7 +22,7 @@ public class Singleton {
      *
      * @return
      */
-    public static Singleton getInstance1() {
+    public static Singleton getInstanceForDCL() {
         if (myinstance == null) {
             synchronized (Singleton.class) {
                 if (myinstance == null) {
@@ -33,7 +33,7 @@ public class Singleton {
         return myinstance;
     }
 
-    public static Instance getInstance2() {
+    public static Instance getInstanceForStaticClass() {
         return InstanceHolder.instance;
     }
 

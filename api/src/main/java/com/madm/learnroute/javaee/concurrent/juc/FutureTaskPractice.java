@@ -2,7 +2,7 @@ package com.madm.learnroute.javaee.concurrent.juc;
 
 import java.util.concurrent.*;
 
-public class FutureTaskTest {
+public class FutureTaskPractice {
 
     private static final ConcurrentMap<Object, Future<String>> taskCache = new ConcurrentHashMap<Object, Future<String>>();
 
@@ -15,6 +15,7 @@ public class FutureTaskTest {
             if (future == null) {
                 Callable<String> task = () -> taskName; // 1.2创建任务
                 FutureTask<String> futureTask = new FutureTask(task);
+                futureTask.cancel(true);
                 future = taskCache.putIfAbsent(taskName, futureTask); // 1.3
                 System.out.println(futureTask);
                 if (future == null) {

@@ -440,7 +440,7 @@ InstantiationModelAwarePointcutAdvisorImpl
 
 ## 1.调用被代理的方法
 
-Cglib无法代理final修饰的方法和类还有私有方法。
+Cglib无法代理final修饰的方法和类还有私有方法 static。JDK代理无法代理代理类中的final方法，private以及static方法
 
 2.找到cglib文件
 
@@ -679,8 +679,7 @@ public interface TransactionStatus {
 
 ### 编程式事务管理
 
-通过 `TransactionTemplate`或者`TransactionManager`手动管理事务，实际应用中很少使用，但是对于你理解 Spring
-事务管理原理有帮助。`TransactionTemplate`是执行事务，`PlatformTransactionManager`是提交事务
+通过 `TransactionTemplate`或者`TransactionManager`手动管理事务，实际应用中很少使用，但是对于你理解 Spring事务管理原理有帮助。`TransactionTemplate`是执行事务，`PlatformTransactionManager`是提交事务
 
 使用`TransactionTemplate` 进行编程式事务管理的示例代码如下：
 
@@ -898,8 +897,7 @@ AbstractPlatformTransactionManager$prepareForCommit()提交事务之前回掉方
 
  2、设置TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
-**3、spring事务切面的优先级顺序最低，但如果自定义的切面优先级和他一样且自定义的切面没有正确处理异常，则会同业务自己捕获异常的那种场景一样。
-**
+**3、spring事务切面的优先级顺序最低，但如果自定义的切面优先级和他一样且自定义的切面没有正确处理异常，则会同业务自己捕获异常的那种场景一样。**
 
  解决方法：1、在切面中将异常原样抛出
 
@@ -909,9 +907,11 @@ AbstractPlatformTransactionManager$prepareForCommit()提交事务之前回掉方
 
 **4、spring是无默认生效的方法权限都必须为public**
 
- 解决方法：1、将方法改为public
+ 解决方法：
 
- 2、修改TransactionAttributeSource.将publicMethodsOnly修改为false
+1、将方法改为public
+
+2、修改TransactionAttributeSource.将publicMethodsOnly修改为false
 
 ```java
 @Bean
@@ -1145,8 +1145,7 @@ protected void addPropertySources(ConfigurableEnvironment environment,ResourceLo
         }
 ```
 
-初始化**Loader**的时候会读取spring.factories下面的所有实现了PropertySourceLoader类的配置，*
-*YamlPropertySourceLoader、PropertiesPropertySourceLoader**
+初始化**Loader**的时候会读取spring.factories下面的所有实现了PropertySourceLoader类的配置，**YamlPropertySourceLoader、PropertiesPropertySourceLoader**
 ，在进入load方法就会按照顺序读取默认地址下的文件，根据上述两loader加载文件名称不同去加载不同配置文件，有active拼接active，
 
 ```java
@@ -1164,7 +1163,7 @@ public String[]getFileExtensions(){
 
 # 须知事项
 
-spring-configuration-metadata.json配置文件用来在配置文件输入的时候提示
+**spring-configuration-metadata.json、additional-spring-configuration-metadata.json**配置文件用来在配置文件输入的时候提示
 
 ## Spring实例化bean的5种方式
 
@@ -2644,8 +2643,7 @@ POST、SSL连接、cookie支持、断点续传...。
 
 # springAOP和AspectJ有关系吗？
 
-**AOP是通过“预编译方式”和“运行期间动态代理”实现程序功能的统一维护的一种技术。AOP是一个概念，其实现技术有AspectJ和springAOP
-**。
+**AOP是通过“预编译方式”和“运行期间动态代理”实现程序功能的统一维护的一种技术。AOP是一个概念，其实现技术有AspectJ和springAOP**。
 
 ### 1、AspectJ
 
@@ -2714,8 +2712,7 @@ cleanupAfterCompletion
 
  cleanupAfterCompletion
 
-@EnableTransactionManagement（TransactionManagementConfigurationSelector）会注入两个类，一个是AutoProxyRegistrar，另一个是*
-*ProxyTransactionManagementConfiguration**，其中ProxyTransactionManagementConfiguration父类会注入一个*
+@EnableTransactionManagement（TransactionManagementConfigurationSelector）会注入两个类，一个是AutoProxyRegistrar，另一个是**ProxyTransactionManagementConfiguration**，其中ProxyTransactionManagementConfiguration父类会注入一个*
 *TransactionalEventListenerFactory**
 的bean,在所有bean注册完成之后会查找所有实现了SmartInitializingSingleton接口的调用其afterSingletonsInstantiated方法，其中调用TransactionalEventListenerFactory的就是
 **EventListenerMethodProcessor**类。

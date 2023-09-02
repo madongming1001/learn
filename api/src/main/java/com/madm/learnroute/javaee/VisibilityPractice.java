@@ -73,7 +73,7 @@ public class VisibilityPractice {
             }
 
             //总结：  Java中可见性如何保证？ 方式归类有两种：
-            // 1.  jvm层面 storeLoad内存屏障    ===>  x86   lock替代了mfence
+            // 1.  jvm层面 storeLoad内存屏障    ===>  x86   lock替代了 mfence
             // 2.  上下文切换   Thread.yield();
             // 当前线程对共享变量的操作会存在读不到，或者不能立即读到另一个线程对此变量的写操作 不能穷举
         }

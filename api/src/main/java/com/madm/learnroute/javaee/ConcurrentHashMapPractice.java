@@ -24,7 +24,7 @@ public class ConcurrentHashMapPractice {
 //        System.out.println("put:" + map.putIfAbsent("hello", "456"));
         System.out.println(map.get("hello"));
         //返回修改之后的值 不会覆盖 value为null不会建立映射关系 如果没有值可以根据传入的key进行映射
-        System.out.println("put:" + map.computeIfAbsent("put", (String t) -> map.computeIfAbsent("put", (String i) -> "i")));
+//        System.out.println("put:" + map.computeIfAbsent("put", (String t) -> map.computeIfAbsent("put", (String i) -> "i")));
         System.out.println(map.get("null compute if absent"));
         System.out.println(map.size());
         System.out.println("put:" + map.computeIfAbsent("test", (v) -> "python"));
@@ -69,6 +69,8 @@ public class ConcurrentHashMapPractice {
         System.out.println(12 >>> 3);
         System.out.println(64 < 64 == true);
         System.out.println(Integer.numberOfLeadingZeros(16) | (1 << (16 - 1)));
+
+        System.out.println(1L << (31));
     }
 
     private static void calculateArrayElementPosition() throws NoSuchFieldException, IllegalAccessException {

@@ -14,7 +14,7 @@ import java.util.Locale;
  * establish(){
  * //（3）重置日期对象cal的属性值
  * cal.clear();
- * //(4) 使用calb中中属性设置cal
+ * //(4) 使用calb中属性设置cal
  * ...
  * //(5)返回设置好的cal对象
  * }

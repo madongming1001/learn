@@ -19,20 +19,14 @@ public class InstructionRearrangement {
         int i = 0;
         for (; ; ) {
             i++;
-            Thread t1 = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    shortWait(10000);
-                    a = 1;
-                    x = b;
-                }
+            Thread t1 = new Thread(() -> {
+                shortWait(10000);
+                a = 1;
+                x = b;
             });
-            Thread t2 = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    b = 1;
-                    y = a;
-                }
+            Thread t2 = new Thread(() -> {
+                b = 1;
+                y = a;
             });
             t1.start();
             t1.run();

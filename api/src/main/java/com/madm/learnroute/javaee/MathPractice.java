@@ -14,5 +14,7 @@ public class MathPractice {
         System.out.println(Math.round(11.2));
         //用来求 x 的 y 次幂（次方），其原型为：
         System.out.println(Math.pow(2, 5));
+        //参数小于等于0返回参数本身 参数无穷大就是无穷大 否则返回最接近真正的数学平方根的参数值的double值。
+        System.out.println(Math.sqrt(5));
     }
 }

@@ -1,4 +1,4 @@
-package com.madm.learnroute.jvm.os;
+package com.madm.learnroute.jvm.jmm.dcl;
 
 /**
  * 在早期的JVM中，synchronized（甚至是无竞争的synchronized）存在巨大的性能开销。因此，人们想出了一个聪明的"技巧"

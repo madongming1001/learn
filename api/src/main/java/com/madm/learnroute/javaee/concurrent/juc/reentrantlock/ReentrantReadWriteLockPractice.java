@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author dongming.ma
  * @date 2022/7/12 19:52
  */
-public class ReentrantReadWriteLockTest {
+public class ReentrantReadWriteLockPractice {
     public static void main(String[] args) {
         CachedData cachedData = new CachedData();
         Thread t1 = new Thread(() -> {

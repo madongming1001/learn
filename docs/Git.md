@@ -164,3 +164,15 @@ mvn dependency:resolve -Dclassifier=sources
 git update-index --assume-unchanged ${文件路径}
 ###本地文件修改追踪
 git update-index --no-assume-unchanged ${文件路径}
+
+
+
+# git rebase
+
+**功能1:**合并本地提交的多条commit
+
+git rebase -i HEAD～commit条数量
+
+**功能2:**合并分支
+
+先在checkout上分支**(feature 1)**出来的分支上去 git rebase原分支，在切换到原分支**（master）**，git merge **feature 1** 这样在看主git分支的线就是一条直线，当把feature 1分支删除之后，先里面就不会有分支线的情况，看起来就像是在一个分支上修改的。解决了多个merge分支线条的情况。

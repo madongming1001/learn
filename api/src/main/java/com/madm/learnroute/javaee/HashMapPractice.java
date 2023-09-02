@@ -221,6 +221,9 @@ public class HashMapPractice {
 
         //Optional[6]
         Stream.of(studentA, studentB, studentC).map(student -> student.getName().length()).collect(Collectors.reducing(Integer::sum));
+//        Stream.of(Optional.of(Lists.newArrayList(studentA, studentB, studentC))).map(students -> students.flatMap((val) -> {
+//            System.out.println(val);
+//        })).map(student -> student.getName().length()).collect(Collectors.reducing(Integer::sum));
 
         //6
         //或者这样，指定初始值，这样可以防止没有元素的情况下正常执行

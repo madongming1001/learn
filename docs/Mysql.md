@@ -151,7 +151,7 @@ timestamp：4个字节+秒精度字节 时间到2039年
 
 - **Using where**
   显示MySQL通过索引条件定位之后还需要返回表中获得所需要的数据。
-- **Impossible WHERE**
+- **Impossible where**
   where子句的条件永远都不可能为真。
 
 - **Using join buffer** (Block Nested Loop), Using join buffer (Batched Key Access)
@@ -177,11 +177,11 @@ timestamp：4个字节+秒精度字节 时间到2039年
 
 ## COMPACT
 
-![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4beb83ce7efa4ed99596da1f82241e33~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp)
+![image-20230901131212283](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230901131212283.png)
 
 ## Redundant
 
-![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d0e85ebd3593473eb497f838c1cb038c~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp)
+![image-20230901131059941](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230901131059941.png)
 
 ## COMPRESSED 和 DYNAMIC
 
@@ -189,10 +189,9 @@ Compressed 和 Dynamic 行记录格式与 Compact 行记录格式是类似的，
 
 这两种格式采用完全的行溢出方式，数据页不会存储真实数据的前768字节，只存储20个字节的指针来指向溢出页。而实际的数据都存储在溢出页中，看起来就像下面这样：
 
-![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/76ef672336474d93b309077f7df324c4~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp)
+![image-20230901131123592](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230901131123592.png)
 
-Compressed 与 Dynamic 相比，Compressed 存储的行数据会以zlib的算法进行压缩以节省空间，因此对于 BLOB、TEXT、VARCHAR
-这类大长度类型的数据能够进行非常有效的存储。
+Compressed 与 Dynamic 相比，Compressed 存储的行数据会以zlib的算法进行压缩以节省空间，因此对于 BLOB、TEXT、VARCHAR 这类大长度类型的数据能够进行非常有效的存储。
 
 ## VARCHAR类型
 
@@ -707,7 +706,7 @@ MySQL提供了日志分析工具`mysqldumpslow`
 
 ## Nested Loop Join 算法
 
-**拿驱动表的条件索引去被驱动表根据索引找就叫做Index Nested-Loop Join**
+**拿驱动表的条件索引去被驱动表根据索引找就叫做Index Nested-Loop Join)**
 
 我们来看一下这个语句：
 
@@ -809,11 +808,9 @@ id。这样通过排序以后，再去主键索引查数据，才能体现出“
 
 ## Batched Key Access （8.0禁用）
 
-理解了 MRR 性能提升的原理，我们就能理解 MySQL 在 5.6 版本后开始引入的 Batched Key Access(BKA) 算法了。这个 BKA 算法，其实就是对
-NLJ 算法的优化。
+理解了 MRR 性能提升的原理，我们就能理解 MySQL 在 5.6 版本后开始引入的 Batched Key Access(BKA) 算法了。这个 BKA 算法，其实就是对NLJ 算法的优化。
 
-NLJ 算法执行的逻辑是：从驱动表 t1，一行行地取出 a 的值，再到被驱动表 t2 去做 join。也就是说，对于表 t2 来说，每次都是匹配一个值。这时，MRR
-的优势就用不上了。
+NLJ 算法执行的逻辑是：从驱动表 t1，一行行地取出 a 的值，再到被驱动表 t2 去做 join。也就是说，对于表 t2 来说，每次都是匹配一个值。这时，MRR的优势就用不上了。
 
 那怎么才能一次性地多传些值给表 t2 呢？方法就是，从表 t1 里一次性地多拿些行出来，一起传给表 t2。
 
@@ -1300,18 +1297,12 @@ lock table mylock write；
 
 ## MVCC多版本并发控制机制
 
-**MVCC 是一种并发控制机制，用于在多个并发事务同时读写数据库时保持数据的一致性和隔离性。它是通过在每个数据行上维护多个版本的数据来实现的。
-**
+**MVCC 是一种并发控制机制，用于在多个并发事务同时读写数据库时保持数据的一致性和隔离性。它是通过在每个数据行上维护多个版本的数据来实现的。**
 
-**Mysql在可重复读隔离级别下如何保证事务较高的隔离性，同样的sql查询语句在一个事务里多次执行查询结果相同，就算其它事务对数据有修改也不会影响当前事务sql语句的查询结果。
-**
+**Mysql在可重复读隔离级别下如何保证事务较高的隔离性，同样的sql查询语句在一个事务里多次执行查询结果相同，就算其它事务对数据有修改也不会影响当前事务sql语句的查询结果。**
 
-**为了防止数据库中的版本无限增长，MVCC 会定期进行版本的回收。回收机制会删除已经不再需要的旧版本数据，从而释放空间。purge线程
-**
-
-这个隔离性就是靠MVCC(**Multi-Version Concurrency Control**)机制来保证的，对一行数据的读和写两个操作默认是不会通过加锁互斥来保证隔离性，避免了频繁加锁互斥，
-**而在串行化隔离级别为了保证较高的隔离性是通过将所有操作加锁互斥来实现的。该级别通过强制事务按序执行，使不同事务之间不可能产生冲突。
-**
+**为了防止数据库中的版本无限增长，MVCC 会定期进行版本的回收。回收机制会删除已经不再需要的旧版本数据，从而释放空间。purge线程**这个隔离性就是靠MVCC(**Multi-Version Concurrency Control**)机制来保证的，对一行数据的读和写两个操作默认是不会通过加锁互斥来保证隔离性，避免了频繁加锁互斥，
+**而在串行化隔离级别为了保证较高的隔离性是通过将所有操作加锁互斥来实现的。该级别通过强制事务按序执行，使不同事务之间不可能产生冲突。**
 
 InnoDB 的行数据有多个版本，每个数据版本有自己的 row trx_id，每个事务或者语句有自己的一致性视图。普通查询语句是一致性读，一致性读会根据
 row trx_id 和一致性视图确定数据版本的可见性。
@@ -2071,15 +2062,6 @@ block的写入操作，还需要更新前2kb部分的信息，这些信息对于
 
 例如，页P1的LSN为10000，而数据库启动时，InnoDB检测到写入重做日志中的LSN为13000，并且该事务已经提交，那么数据库需要进行恢复操作，将重做日志应用到P1页中，同样的，对于重做日志中LSN小于P1页的LSN，不需要进行重做，因为P1页中的LSn表示页已经被刷新到该位置。
 
-**控制重做日志刷新到磁盘的策略**
-
-```sql
-innodb_flush_log_at_trx_commit
-0 提交时不进行写入重做日志操作，仅在master thread每隔一秒钟进行一次fsync重做日志文件的写入
-1 默认，表示事务提交时必须调用一次fsync操作
-2 表示事务提交时仅写入操作系统的文件缓冲区，有操作系统决定何时写入
-```
-
 **binlog和redolog区别**
 
 1. 所处层面不同，binlog时server的，redo时innodb特有的
@@ -2088,51 +2070,70 @@ innodb_flush_log_at_trx_commit
 
 **为什么会有两份日志呢？**
 
-因为最开始 MySQL 里并没有 InnoDB 引擎。MySQL 自带的引擎是 MyISAM，但是 MyISAM 没有 crash-safe 的能力，**binlog 日志只能用于归档
-**。而 InnoDB 是另一个公司以插件形式引入 MySQL 的，既然只依靠 binlog 是没有 crash-safe 能力的，所以 InnoDB 使用另外一套日志系统——也就是
-redo log 来实现 **crash-safe** 能力。
+因为最开始 MySQL 里并没有 InnoDB 引擎。MySQL 自带的引擎是 MyISAM，但是 MyISAM 没有 crash-safe 的能力，**binlog 日志只能用于归档**。而 InnoDB 是另一个公司以插件形式引入 MySQL 的，既然只依靠 binlog 是没有 crash-safe 能力的，所以 InnoDB 使用另外一套日志系统——也就是redo log 来实现 **crash-safe** 能力。
 
 **redolog**
 
 同样，在 MySQL 里也有这个问题，**如果每一次的更新操作都需要写进磁盘，然后磁盘也要找到对应的那条记录，然后再更新，整个过程 IO成本、查找成本都很高。**为了解决这个问题，MySQL 的设计者就用了类似酒店掌柜粉板的思路来提升更新效率。
 
-而粉板和账本配合的整个过程，其实就是 MySQL 里经常说到的 WAL 技术，WAL 的全称是 **Write-Ahead Logging（预写式记录）**
-，它的关键点就是先写日志，再写磁盘，也就是先写粉板，等不忙的时候再写账本。
+而粉板和账本配合的整个过程，其实就是 MySQL 里经常说到的 WAL 技术，WAL 的全称是 **Write-Ahead Logging（预写式记录）**，它的关键点就是先写日志，再写磁盘，也就是先写粉板，等不忙的时候再写账本。
 
 **现在你就能理解了，WAL 机制主要得益于两个方面：**
 
 1. redo log 和 binlog 都是顺序写，磁盘的顺序写比随机写速度要快；
 2. 组提交机制，可以大幅度降低磁盘的 IOPS 消耗。
 
-具体来说，当有一条记录需要更新的时候，InnoDB 引擎就会先把记录写到 redo log（粉板）里面，**并更新内存，这个时候更新就算完成了**
-。同时，InnoDB 引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做，这就像打烊以后掌柜做的事。
+具体来说，当有一条记录需要更新的时候，InnoDB 引擎就会先把记录写到 redo log（粉板）里面，**并更新内存，这个时候更新就算完成了**。同时，InnoDB 引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做，这就像打烊以后掌柜做的事。
 
-如果今天赊账的不多，掌柜可以等打烊后再整理。但如果某天赊账的特别多，粉板写满了，又怎么办呢？这个时候掌柜只好放下手中的活儿，把粉板中的一部分赊账记录更新到账本中，然后把这些记录从粉板上擦掉，为记新账腾出空间。
-
-与此类似，InnoDB 的 redo log 是固定大小的，比如可以配置为一组 4 个文件，每个文件的大小是 1GB，那么这块“粉板”总共就可以记录 **4GB** 的操作。从头开始写，写到末尾就又回到开头循环写，如下面这个图所示。
+如果今天赊账的不多，掌柜可以等打烊后再整理。但如果某天赊账的特别多，粉板写满了，又怎么办呢？这个时候掌柜只好放下手中的活儿，把粉板中的一部分赊账记录更新到账本中，然后把这些记录从粉板上擦掉，为记新账腾出空间。与此类似，InnoDB 的 redo log 是固定大小的，比如可以配置为一组 4 个文件，每个文件的大小是 1GB，那么这块“粉板”总共就可以记录 **4GB** 的操作。从头开始写，写到末尾就又回到开头循环写，如下面这个图所示。
 
 write pos 是当前记录的位置，一边写一边后移，写到第 3 号文件末尾后就回到 0 号文件开头。checkpoint
 是当前要擦除的位置，也是往后推移并且循环的，擦除记录前要把记录更新到数据文件。
 
 write pos 和 checkpoint 之间的是“粉板”上还空着的部分，可以用来记录新的操作。如果 write pos 追上
-checkpoint，表示“粉板”满了，这时候不能再执行新的更新，得停下来先擦掉一些记录，把 checkpoint 推进一下。
+checkpoint，表示“粉板”满了，这时候不能再执行新的更新，得停下来先擦掉一些记录，把 checkpoint 推进一下。有了 redo log，InnoDB 就可以保证即使数据库发生异常重启，之前提交的记录都不会丢失，这个能力称为**crash-safe**。
 
-有了 redo log，InnoDB 就可以保证即使数据库发生异常重启，之前提交的记录都不会丢失，这个能力称为**crash-safe**。
+![img](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/16a7950217b3f0f4ed02db5db59562a7.png)
 
 **参考文章：**http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/02%20%20%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%80%E6%9D%A1SQL%E6%9B%B4%E6%96%B0%E8%AF%AD%E5%8F%A5%E6%98%AF%E5%A6%82%E4%BD%95%E6%89%A7%E8%A1%8C%E7%9A%84%EF%BC%9F.md
 
+**redo log 的写入机制**
+
+事务在执行过程中，生成的 redo log 是要先写到 **redo log buffe**r 的。
+
+![image-20230821121501697](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230821121501697.png)
+
+**redolog的三种状态分别是：**
+
+1. 存在 redo log buffer 中，物理上是在 MySQL 进程内存中，就是图中的红色部分；
+2. 写到磁盘 (write)，但是没有持久化（fsync)，物理上是在文件系统的 page cache 里面，也就是图中的黄色部分；
+3. 持久化到磁盘，对应的是 hard disk，也就是图中的绿色部分。
+
+**为了控制 redo log 的写入策略，InnoDB 提供了 innodb_flush_log_at_trx_commit 参数，它有三种可能取值：**
+
+1. 设置为 0 的时候，表示每次事务提交时都只是把 **redo log留在 redo log buffer 中** ;
+2. 设置为 1 的时候，表示每次事务提交时都将 **redo log 直接持久化到磁盘**；
+3. 设置为 2 的时候，表示每次事务提交时都只是把 **redo log 写到 page cache**。
+
+InnoDB 有一个后台线程，**每隔 1 秒**，就会把 r**edo log buffer** 中的日志，调用 write 写到文件系统的 page cache，然后调用 fsync持久化到磁盘。
+
+实际上，除了后台线程每秒一次的轮询操作外，**还有两种场景会让一个没有提交的事务的 redo log 写入到磁盘中。**
+
+1. **一种是，redo log buffer 占用的空间即将达到 innodb_log_buffer_size 一半的时候，后台线程会主动写盘。**注意，由于这个事务并没有提交，所以这个写盘动作只是 write，而没有调用 fsync，也就是只留在了文件系统的 page cache。
+2. **另一种是，并行的事务提交的时候，顺带将这个事务的 redo log buffer 持久化到磁盘。**假设一个事务 A 执行到一半，已经写了一些redo log 到 buffer 中，这时候有另外一个线程的事务 B 提交，如果innodb_flush_log_at_trx_commit 设置的是 1，那么按照这个参数的逻辑，事务
+   B 要把 redo log buffer 里的日志全部持久化到磁盘。这时候，就会带上事务 A 在 redo log buffer 里的日志一起持久化到磁盘。
+
+每秒一次后台轮询刷盘，再加上崩溃恢复这个逻辑，InnoDB 就认为 **redo log 在 commit** 的时候就不需要 fsync 了，只会 write
+到文件系统的 page cache 中就够了。**innodb_flush_log_at_trx_commit = 1设置的是在prepare阶段redo log就已经落盘。**mysql每执行一条DML语句都先写入 redo log buffer。（共享内存区域）
+
 **组提交机制**
 
-为了提高磁盘fsync的效率，当前数据都提供了group commit的功能，即**一次fsync可以刷新确保多个事务日志被写入文件。**
-
-**这里，我需要先和你介绍日志逻辑序列号（log sequence number，LSN）的概念。LSN 是单调递增的，用来对应 redo log 的一个个写入点。每次写入长度为length 的 redo log， LSN 的值就会加上 length。**
-
-LSN 也会写到 InnoDB 的数据页中，来确保数据页不会被多次执行重复的 redo log。关于 LSN 和 redo log、checkpoint的关系，我会在后面的文章中详细展开。
+为了提高磁盘fsync的效率，当前数据都提供了group commit的功能，即**一次fsync可以刷新确保多个事务日志被写入文件。**这里，我需要先和你介绍日志逻辑序列号（log sequence number，LSN）的概念。LSN 是单调递增的，用来对应 redo log 的一个个写入点。每次写入长度为length 的 redo log， LSN 的值就会加上 length。LSN 也会写到 InnoDB 的数据页中，来确保数据页不会被多次执行重复的 redo log。关于 LSN 和 redo log、checkpoint的关系，我会在后面的文章中详细展开。
 
 如图 3 所示，是三个并发事务 (trx1, trx2, trx3) 在 prepare 阶段，都写完 redo log buffer，持久化到磁盘的过程，对应的 LSN 分别是
 50、120 和 160。
 
-![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/933fdc052c6339de2aa3bf3f65b188cc.png)
+![img](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/933fdc052c6339de2aa3bf3f65b188cc.png)
 
 图 3 redo log 组提交
 
@@ -2149,7 +2150,7 @@ LSN 也会写到 InnoDB 的数据页中，来确保数据页不会被多次执�
 
 为了让一次 fsync 带的组员更多，MySQL 有一个很有趣的优化：拖时间。在介绍两阶段提交的时候，我曾经给你画了一个图，现在我把它截过来。
 
-![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/98b3b4ff7b36d6d72e38029b86870551.png)
+![img](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/98b3b4ff7b36d6d72e38029b86870551.png)
 
 图 4 两阶段提交
 
@@ -2160,7 +2161,7 @@ LSN 也会写到 InnoDB 的数据页中，来确保数据页不会被多次执�
 
 MySQL 为了让组提交的效果更好，把 redo log 做 fsync 的时间拖到了步骤 1 之后。也就是说，上面的图变成了这样：
 
-![img](http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/5ae7d074c34bc5bd55c82781de670c28.png)
+![img](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2/assets/5ae7d074c34bc5bd55c82781de670c28.png)
 
 图 5 两阶段提交细化
 
@@ -2196,38 +2197,6 @@ MySQL 为了让组提交的效果更好，把 redo log 做 fsync 的时间拖到
 3. 将 innodb_flush_log_at_trx_commit 设置为 2。这样做的风险是，主机掉电的时候会丢数据。
 
 我不建议你把 innodb_flush_log_at_trx_commit 设置成 0。因为把这个参数设置成 0，表示 redo log 只保存在内存中，这样的话 MySQL本身异常重启也会丢数据，风险太大。而 redo log 写到文件系统的 page cache 的速度也是很快的，所以将这个参数设置成 2 跟设置成 0其实性能差不多，但这样做 MySQL 异常重启时就不会丢数据了，相比之下风险会更小。
-
-**redo log 的写入机制**
-
-事务在执行过程中，生成的 redo log 是要先写到 **redo log buffe**r 的。
-
-![image-20230821121501697](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230821121501697.png)
-
-**redolog的三种状态分别是：**
-
-1. 存在 redo log buffer 中，物理上是在 MySQL 进程内存中，就是图中的红色部分；
-2. 写到磁盘 (write)，但是没有持久化（fsync)，物理上是在文件系统的 page cache 里面，也就是图中的黄色部分；
-3. 持久化到磁盘，对应的是 hard disk，也就是图中的绿色部分。
-
-**为了控制 redo log 的写入策略，InnoDB 提供了 innodb_flush_log_at_trx_commit 参数，它有三种可能取值：**
-
-1. 设置为 0 的时候，表示每次事务提交时都只是把 **redo log留在 redo log buffer 中** ;
-2. 设置为 1 的时候，表示每次事务提交时都将 **redo log 直接持久化到磁盘**；
-3. 设置为 2 的时候，表示每次事务提交时都只是把 **redo log 写到 page cache**。
-
-InnoDB 有一个后台线程，**每隔 1 秒**，就会把 r**edo log buffer** 中的日志，调用 write 写到文件系统的 page cache，然后调用 fsync持久化到磁盘。
-
-实际上，除了后台线程每秒一次的轮询操作外，**还有两种场景会让一个没有提交的事务的 redo log 写入到磁盘中。**
-
-1. **一种是，redo log buffer 占用的空间即将达到 innodb_log_buffer_size 一半的时候，后台线程会主动写盘。**
-   注意，由于这个事务并没有提交，所以这个写盘动作只是 write，而没有调用 fsync，也就是只留在了文件系统的 page cache。
-2. **另一种是，并行的事务提交的时候，顺带将这个事务的 redo log buffer 持久化到磁盘。**假设一个事务 A 执行到一半，已经写了一些redo log 到 buffer 中，这时候有另外一个线程的事务 B 提交，如果 innodb_flush_log_at_trx_commit 设置的是 1，那么按照这个参数的逻辑，事务
-   B 要把 redo log buffer 里的日志全部持久化到磁盘。这时候，就会带上事务 A 在 redo log buffer 里的日志一起持久化到磁盘。
-
-每秒一次后台轮询刷盘，再加上崩溃恢复这个逻辑，InnoDB 就认为 **redo log 在 commit** 的时候就不需要 fsync 了，只会 write
-到文件系统的 page cache 中就够了。**innodb_flush_log_at_trx_commit = 1设置的是在prepare阶段redo log就已经落盘。**
-
-**mysql每执行一条DML语句都先写入 redo log buffer。**
 
 **IOPS**
 
@@ -2551,7 +2520,7 @@ innodb_print_all_deadlocks;
 show variables  like  '%innodb_lock_wait_timeout%';
 ```
 
-![img](https://segmentfault.com/img/remote/1460000038352608)
+![image-20230830222259778](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230830222259778.png)
 
 这两个命令找出来的进程id 是同一个。
 
@@ -2733,6 +2702,41 @@ limit (curPage - 1) * pageSize, pageSize
 ## 23.MySQL字符集charset和collation的区别和作用?
 
 在MySQL创建数据库时，我们需要指定字符集charset和collation（排序规则），如果不指定，MySQL会自动指定为默认字符集charset和collation（排序规则）。
+
+## 24.如果要存 IP 地址，用什么数据类型比较好？
+
+本机IP地址192.168.0.1 127.0.0.1 **varchar(15)**并不是最优解 用INT（4字节）无符号整数4字节
+
+点分十进制转换为10进制的方法(对应位置的数✖️对应位置的数)
+
+| **IP**      | **数字地址**                                |
+| ----------- | ------------------------------------------- |
+| 192.168.0.1 | 2^24 * 192 + 2^16 * 168 + 2^8 * 0 + 2^0 * 1 |
+
+MySQL 非常贴心地提供了 IPv4 地址点分十进制和无符号整数的相互转换函数，`inet_aton` 和 `inet_ntoa`（底层是二进制移位操作，速度很快）
+
+![image-20230830223112461](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230830223112461.png)
+
+所谓**有符号数**其实就是将**最高位作为符号位**，比如 32 位的有符号 INT，最高位是符号位，**剩下 31 位才是真实的数值**，所以有符号 INT 的取值区间为：
+
+无符号 INT 的取值区间为：0到bit位数区间
+
+在定义表时，可以在数据类型后面添加关键字 **UNSIGNED** 来定义无符号整数，否则**默认为有符号整数**
+
+|            类型             |              有符号数取值范围               |     无符号数取值范围      |
+| :-------------------------: | :-----------------------------------------: | :-----------------------: |
+|  TINYINT（1 字节，8 bit）   |                 -128 〜 127                 |         0 〜 255          |
+| SMALLINT（2 字节，16 bit）  |               -32768 〜 32767               |        0 〜 65535         |
+| MEDIUMINT（3 字节，24 bit） |             -8388608 〜 8388607             |       0 〜 16777215       |
+|    INT（4 字节，32 bit）    |          -2147483648 〜 2147483647          |      0 〜 4294967295      |
+|  BIGINT（8 字节，64 bit）   | -9223372036854775808 〜 9223372036854775807 | 0 〜 18446744073709551615 |
+
+1. **存储空间：**4 字节的 `INT` 类型 比15 字节的  `VARCHAR(15)` 更加节省存储空间。**另外，VARCHAR 除了会保存需要的字符数，还会另加一个字节来记录长度（如果列声明的长度超过 255，则使用两个字节记录长度），所以 `VARCHAR(15)` 其实要占用 16 个字节。
+2. **检索速度：**如果我们要在 **IP 地址上建立索引**，那么对于字符串索引来说，整数索引的检索速度简直就是降纬打击了，因为字符串类型的比较是需要从第一位字符开始遍历依次进行的，速度较慢。
+
+## 25.一次性插入多少数据到数据库合适
+
+个人感觉，最佳大小是`max_allowed_packet`的一半，也就是极限能插入64W，选用32W也许性能会更好一些，同时也不会对mysql的其他操作产生太大的影响。
 
 # 常用命令
 
@@ -3107,29 +3111,21 @@ slow_query_log_file,/usr/local/mysql/mysql-slow.log
 
 # 如果插入数据的值就是sql语句的最大值真的好吗？
 
->
-> 客户端用一个单独的数据包将查询请求发送给服务器，所以当查询语句很长的时候，需要设置`max_allowed_packet`
->
-参数。但是需要注意的是，如果查询实在是太大，服务端会拒绝接收更多数据并抛出异常。与之相反的是，服务器响应给用户的数据通常会很多，由多个数据包组成。但是当服务器响应客户端请求时，客户端必须完整的接收整个返回结果，而不能简单的只取前面几条结果，然后让服务器停止发送。因而在实际开发中，尽量保持查询简单且只返回必需的数据，减小通信间数据包的大小和数量是一个非常好的习惯，这也是查询中尽量避免使用`SELECT *`
-> 以及加上`LIMIT`限制的原因之一。
-
-后面通过各种百度，博主觉得最大只是代表传输数据包的最大长度，但性能是不是最佳就要从各个方面来分析了。比如下面列出的插入缓冲，
-**以及插入索引时对于缓冲区的剩余空间需求，以及事务占有的内存等**，都会影响批量插入的性能。
+>客户端用一个单独的数据包将查询请求发送给服务器，所以当查询语句很长的时候，需要设置`max_allowed_packet`参数。但是需要注意的是，如果查询实在是太大，服务端会拒绝接收更多数据并抛出异常。与之相反的是，服务器响应给用户的数据通常会很多，由多个数据包组成。但是当服务器响应客户端请求时，客户端必须完整的接收整个返回结果，而不能简单的只取前面几条结果，然后让服务器停止发送。因而在实际开发中，尽量保持查询简单且只返回必需的数据，减小通信间数据包的大小和数量是一个非常好的习惯，这也是查询中尽量避免使用`SELECT *`以及加上`LIMIT`限制的原因之一。
+>**以及插入索引时对于缓冲区的剩余空间需求，以及事务占有的内存等**，都会影响批量插入的性能。
 
 1. **首先是插入的时候，要注意缓冲区的大小使用情况**
 
-   如果`buffer pool`余量不足25%，插入失败，返回`DB_LOCK_TABLE_FULL`。这个错误并不是直接报错：`max_allowed_packet`
-   不够大之类的，这个错误是因为对于innodb引擎来说，一次插入是涉及到事务和锁的，在插入索引的时候，要判断缓冲区的剩余情况，所以插入并不能仅仅只考虑`max_allowed_packet`
+   如果`buffer pool`余量不足25%，插入失败，返回`DB_LOCK_TABLE_FULL`。这个错误并不是直接报错：`max_allowed_packet`不够大之类的，这个错误是因为对于innodb引擎来说，一次插入是涉及到事务和锁的，在插入索引的时候，要判断缓冲区的剩余情况，所以插入并不能仅仅只考虑`max_allowed_packet`
    的问题，也要考虑到缓冲区的大小。
-
+   
 2. **插入缓存**
 
-   另外对于innodb引擎来说，因为存在插入缓存（Insert
-   Buffer）这个概念，所以在插入的时候也是要耗费一定的缓冲池内存的。当写密集的情况下，插入缓冲会占用过多的缓冲池内存，默认最大可以占用到1/2的缓冲池内存，当插入缓冲占用太多缓冲池内存的情况下，会影响到其他的操作。
-
-   也就是说，插入缓冲受到缓冲池大小的影响，缓冲池大小为：
-
-   ```sql
+   另外对于innodb引擎来说，因为存在插入缓存（Insert Buffer）这个概念，所以在插入的时候也是要耗费一定的缓冲池内存的。当写密集的情况下，插入缓冲会占用过多的缓冲池内存，**默认最大可以占用到1/2的缓冲池内存**，当插入缓冲占用太多缓冲池内存的情况下，会影响到其他的操作。
+   
+也就是说，插入缓冲受到缓冲池大小的影响，缓冲池大小为：
+   
+```sql
    mysql> show variables like 'innodb_buffer_pool_size';
    +-------------------------+-----------+
    | Variable_name           | Value     |
@@ -3137,38 +3133,30 @@ slow_query_log_file,/usr/local/mysql/mysql-slow.log
    | innodb_buffer_pool_size | 134217728 |
    +-------------------------+-----------+
    ```
-
-   换算后的结果为：128M，也就是说，插入缓存最多可以占用64M的缓冲区大小。这个大小要超过咱们设置的sql语句大小，所以可以忽略不计。
-
-   >
-   我们都知道，在InnoDB引擎上进行插入操作时，一般需要按照主键顺序进行插入，这样才能获得较高的插入性能。当一张表中存在非聚簇的且不唯一的索引时，在插入时，数据页的存放还是按照主键进行顺序存放，但是对于非聚簇索引叶节点的插入不再是顺序的了，这时就需要离散的访问非聚簇索引页，由于随机读取的存在导致插入操作性能下降。
-
-   InnoDB为此设计了Insert
-   Buffer来进行插入优化。对于非聚簇索引的插入或者更新操作，不是每一次都直接插入到索引页中，而是先判断插入的非聚集索引是否在缓冲池中，若在，则直接插入；若不在，则先放入到一个`Insert Buffer`
-   中。
-
-   看似数据库这个非聚集的索引已经查到叶节点，而实际没有，这时存放在另外一个位置。然后再以一定的频率和情况进行`Insert Buffer`
-   和非聚簇索引页子节点的合并操作。这时通常能够将多个插入合并到一个操作中，这样就大大提高了对于非聚簇索引的插入性能。
-
+   
+换算后的结果为：128M，也就是说，插入缓存最多可以占用64M的缓冲区大小。这个大小要超过咱们设置的sql语句大小，所以可以忽略不计。
+   
+>
+   我们都知道，在InnoDB引擎上进行插入操作时，一般需要按照主键顺序进行插入，这样才能获得较高的插入性能。当一张表中存在非聚簇的且不唯一的索引时，在插入时，数据页的存放还是按照主键进行顺序存放，但是对于非聚簇索引叶子节点的插入不再是顺序的了，这时就需要离散的访问非聚簇索引页，由于随机读取的存在导致插入操作性能下降。
+   
+InnoDB为此设计了InsertBuffer来进行插入优化。**对于非聚簇索引的插入或者更新操作**，不是每一次都直接插入到索引页中，**而是先判断插入的非聚集索引是否在缓冲池中，若在，则直接插入；若不在，则先放入到一个Insert Buffer**中。看似数据库这个非聚集的索引已经查到叶节点，而实际没有，这时存放在另外一个位置。然后再以一定的频率和情况进行`Insert Buffer`和非聚簇索引页子节点的合并操作。这时通常能够将多个插入合并到一个操作中，这样就大大提高了对于非聚簇索引的插入性能。
+   
 3. **使用事务提高效率**
 
-   还有一种说法，使用事务可以提高数据的插入效率，这是因为进行一个`INSERT`操作时，MySQL内部会建立一个事务，在事务内才进行真正插入处理操作。
-
-   事务需要控制大小，事务太大可能会影响执行的效率。MySQL有`innodb_log_buffer_size`
-   配置项，超过这个值会把innodb的数据刷到磁盘中，这时，效率会有所下降。所以比较好的做法是，在数据达到这个这个值前进行事务提交。
+   还有一种说法，使用事务可以提高数据的插入效率，这是因为进行一个`INSERT`操作时，MySQL内部会建立一个事务，在事务内才进行真正插入处理操作。事务需要控制大小，事务太大可能会影响执行的效率。MySQL有`innodb_log_buffer_size`配置项，**超过这个值的百分之五十的时候会把innodb的数据刷到磁盘中（Myslq8.0）**，这时，效率会有所下降。所以比较好的做法是，在数据达到这个这个值前进行事务提交。
 
    查看：`show variables like '%innodb_log_buffer_size%';`
-
-   ```
+   
+```
    +------------------------+----------+
-           | Variable_name          | Value    |
+        | Variable_name          | Value    |
            +------------------------+----------+
            | innodb_log_buffer_size | 67108864 |
            +------------------------+----------+
    ```
-
+   
    大概是：64M
-
+   
 4. **通过配置来提高性能**
 
    也可以通过增大`innodb_buffer_pool_size` 缓冲区来提升读写性能

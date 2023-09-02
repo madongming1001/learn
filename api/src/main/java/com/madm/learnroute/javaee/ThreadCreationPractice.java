@@ -7,6 +7,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
 @Data
@@ -16,7 +17,8 @@ class CallerTask implements Callable<Integer> {
     private Integer id;
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
+        int i = 10 / 0;
         return id;
     }
 }
@@ -29,6 +31,15 @@ public class ThreadCreationPractice {
             FutureTask<Integer> futureTask = new FutureTask<>(new CallerTask(i));
             futureTaskList.add(futureTask);
             futureTask.run();
+            try {
+                futureTask.get();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            }finally {
+                System.out.println("走到了finally语句快");
+            }
         }
         futureTaskList.stream().forEach(f -> {
             try {
@@ -36,14 +47,16 @@ public class ThreadCreationPractice {
             } catch (Exception e) {
             }
         });
-        Thread thread = new Thread(new RunableTash());
-        thread.run();
+//        Thread thread = new Thread(new RunnableTrash());
+//        try {
+//            thread.run();
+//        } finally {
+//            System.out.println("走到了finally 语句块");
+//        }
     }
 
     public class ExpensiveObject {
     }
-
-    ;
 
     @NotThreadSafe
     public class LazyInitRaceO {
@@ -60,11 +73,12 @@ public class ThreadCreationPractice {
 
 
 @SuppressWarnings(value = {"unused", "Tash"})
-class RunableTash implements Runnable {
+class RunnableTrash implements Runnable {
 
     @Override
     public void run() {
         System.out.println(Thread.currentThread().getName());
         System.out.println("I am a child thread");
+        int i = 1 / 0;
     }
 }

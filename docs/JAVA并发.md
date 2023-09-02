@@ -214,9 +214,7 @@ OOP（programme）：面向对象编程，最后在进行编程
 
 ## FutureTask
 
-Future接口代表一个异步执行的任务。
-
-FutureTask类代表一个可取消的异步计算任务。
+Future接口代表一个异步执行的任务。FutureTask类代表一个可取消的异步计算任务。
 
 ![image-20211123210912275](noteImg/image-20211123210912275.png)
 
@@ -853,7 +851,7 @@ ObjectMonitor::ObjectMonitor() {
 
 ## 负数二进制表示形式
 
-1 求原码：即把-5的绝对值5转换为二进制 为 00000101
+1 求原码：为 10000101 即把-5的绝对值5转换为二进制 为 
 2 求反码：为 11111010
 3 求补码：为 11111011
 
@@ -905,8 +903,9 @@ ObjectMonitor::ObjectMonitor() {
 
 ### Object.wait() 方法
 
-如果不和synchzonized一起使用有可能出现方法乱序执行的情况，先执行了notify()之后在执行了wait()，后执行的wait()
-由于没有额外的notify()操作，所以该线程一直阻塞下去。
+如果不和synchronized一起使用有可能出现方法乱序执行的情况，先执行了notify()之后在执行了wait()，后执行的wait()
+由于没有额外的notify()操作，所以该线程一直阻塞下去。 该线程会释放该对象的锁。
+synchronized可以保证一个代码块的原子性，中间没有其他线程的插入，从头到尾执行。
 
 使用synchronized的情况下就保证了当前操作的是同一个对象。**由于上的锁未执行到wait之前所以是不会释放锁的。**
 
@@ -1204,9 +1203,7 @@ static final class Node {
 参考文章：https://www.baiyp.ren/CLH%E9%98%9F%E5%88%97%E9%94%81.html
 
 CLH锁是有由Craig, Landin, and Hagersten这三个人发明的锁，取了三个人名字的首字母，所以叫 CLH
-Lock。CLH锁是一个自旋锁。能确保无饥饿性。提供先来先服务的公平性。*
-*CLH队列锁也是一种基于链表的可扩展、高性能、公平的自旋锁，申请线程仅仅在本地变量上自旋，它不断轮询前驱的状态，假设发现前驱释放了锁就结束自旋。
-**
+Lock。CLH锁是一个自旋锁。能确保无饥饿性。提供先来先服务的公平性。**CLH队列锁也是一种基于链表的可扩展、高性能、公平的自旋锁，申请线程仅仅在本地变量上自旋，它不断轮询前驱的状态，假设发现前驱释放了锁就结束自旋。**
 
 # CPU访问内存方式
 
@@ -1358,18 +1355,13 @@ ClassLoader.getSystemResources(fullName);
 
 # 泛型擦除
 
-Java的泛型擦除是指在编译期间，Java编译器会将泛型类型信息擦除掉，生成的字节码中不再包含具体的泛型类型参数信息。这种擦除机制是为了保持Java的向后兼容性，因为Java泛型是在JDK
-5之后引入的。
-泛型擦除的实现原理是通过类型擦除来实现的。在编译过程中，编译器会将泛型类型参数替换为它们的上限边界（或者Object类型，如果没有明确的上限边界）。例如，对于`List<Integer>`
-，编译器会将其擦除为`List<Object>`。对于泛型方法，编译器也会进行类似的处理。
-在擦除之后，编译器会插入必要的类型转换操作来保证类型安全。这些转换操作会在字节码层面进行，以确保程序在运行时正确处理泛型类型。
-虽然在运行时泛型类型信息被擦除，但反射机制可以通过特殊的方法来获取泛型类型信息。此外，Java编译器还会在编译期间进行类型检查来确保类型的一致性，以避免出现类型错误。
-需要注意的是，泛型擦除可能会导致一些类型转换的问题和运行时异常，因此在使用泛型时需要特别注意类型安全性和正确性。
+javac Java的泛型擦除是指在编译期间，Java编译器会将泛型类型信息擦除掉，生成的字节码中不再包含具体的泛型类型参数信息。这种擦除机制是为了保持Java的向后兼容性，因为Java泛型是在JDK5之后引入的。
+泛型擦除的实现原理是通过类型擦除来实现的。在编译过程中，编译器会将泛型类型参数替换为它们的上限边界（或者Object类型，如果没有明确的上限边界）。例如，对于`List<Integer>`，编译器会将其擦除为`List<Object>`。对于泛型方法，编译器也会进行类似的处理。在擦除c之后，编译器会插入必要的类型转换操作来保证类型安全。这些转换操作会在字节码层面进行，以确保程序在运行时正确处理泛型类型。
+虽然在运行时泛型类型信息被擦除，但反射机制可以通过特殊的方法来获取泛型类型信息。此外，Java编译器还会在编译期间进行类型检查来确保类型的一致性，以避免出现类型错误。需要注意的是，泛型擦除可能会导致一些类型转换的问题和运行时异常，因此在使用泛型时需要特别注意类型安全性和正确性。
 
 # java并发
 
-竞争条件指多个线程或者进程在读写一个[共享数据](https://baike.baidu.com/item/共享数据/19845680?fromModule=lemma_inlink)
-时结果依赖于它们执行的相对[时间](https://baike.baidu.com/item/时间/25651?fromModule=lemma_inlink)的情形。
+竞争条件指多个线程或者进程在读写一个[共享数据](https://baike.baidu.com/item/共享数据/19845680?fromModule=lemma_inlink)时结果依赖于它们执行的相对[时间](https://baike.baidu.com/item/时间/25651?fromModule=lemma_inlink)的情形。
 
 竞争条件发生在当多个进程或者线程在读写数据时，其最终的的结果依赖于多个进程的指令执行顺序。
 
@@ -1378,8 +1370,23 @@ Java的泛型擦除是指在编译期间，Java编译器会将泛型类型信息
 假设两个进程P1和P2共享了[变量](https://baike.baidu.com/item/变量?fromModule=lemma_inlink)
 a。在某一执行时刻，P1更新a为1，在另一时刻，P2更新a为2。
 
-因此两个任务竞争地写变量a。在这个例子中，竞争的“[失败者](https://baike.baidu.com/item/失败者?fromModule=lemma_inlink)”(
-最后更新的进程）决定了变量a的最终值。
+因此两个任务竞争地写变量a。在这个例子中，竞争的“[失败者](https://baike.baidu.com/item/失败者?fromModule=lemma_inlink)”(最后更新的进程）决定了变量a的最终值。
 
 **多个进程并发访问和操作同一数据且执行结果与访问的特定顺序有关，称为竞争条件。**
 
+# ThreadPoolExecutor可以被子类重写的方法
+
+```java
+finalize()
+beforeExecute()
+afterExecute()
+terminated()
+```
+
+# Java如何选择合适的阻塞队列？
+
+1. **功能层面**：是否需要延迟，优先级排队等，DelayQueue和PriorityBlockingQueue
+2. **容量：**看是否有存储的需求，ArrayBlockingQueue是指定的，LinkedBlockingQueue默认Integer最大值，DealyQueue容量就是固定的Integer.MAX_VALUE。
+3. **能否扩容：**如果需要动态扩容的话就不能选择ArrayBlockingQueue，因为它的容量在创建的时候就确定了，无法扩容。相反，PriorityBlockingQueue即使在指定了初始化容量之后，后续如果有需要，也可以自动扩容。
+4. **内存结构：**ArrayBlockingQueue采用的是数组的方式，而LinkedBlockingQueue内部是采用链表。ArrayBlockingQueue没有链表所需要的节点对象，所以空间利用率高，连续 碎片 省空间。
+5. **性能：**LinkedBlockingQueue内部使用了两把锁，它的锁力度细，在并发高的时候相对于只有一把锁的ArrayBlockingQueue性能会更好，另外，SynchronousQueue性能会更好，因为它不需要消息存储，只是一个传递的作用，如果没有储存消息的需求，完全可以用它。
