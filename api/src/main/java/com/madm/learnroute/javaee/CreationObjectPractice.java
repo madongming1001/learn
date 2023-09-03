@@ -3,14 +3,14 @@ package com.madm.learnroute.javaee;
 import java.lang.reflect.Constructor;
 
 /**
- * 创建对象的 4 种方法如下
+ * 创建对象的 6 种方法如下
  * <p>
  * 1、使用 new 关键字
  * 2、反射机制
- * 1、Class.newInstance()
- * 2、Constructor.newInstance()
- * 3、实现 Cloneable 接口，使用 clone 方法创建对象
- * 4、序列化和反序列化
+ * 3、Class.newInstance()
+ * 4、Constructor.newInstance()
+ * 5、实现 Cloneable 接口，使用 clone 方法创建对象
+ * 6、序列化和反序列化
  * <p>
  * JVM 对使用 new 方法创建对象的方式进行了优化，默认情况下，new 的效率更高。
  * new 方式创建对象时，会调用类的构造函数。若构造函数中有耗时操作，则会影响 new 方法创建对象的效率。
