@@ -26,12 +26,12 @@ import java.util.stream.Stream;
 /**
  * flat 平的 扁平的意思
  * 当我们需要将具有层级结构的数据展平时，也就是将多层数据转换为单层数据操作时，我们可以使用 flatMap 方法。如果我们只是简单的对流中的数据计算或者转换时，可以使用 map 方法。
- *
+ * <p>
  * 举例：
  * ① 使用 flatMap：[a，b，c，d，[e，f [g，h，i]]] 转换为 [a，b，c，d，e，f，g，h，i]
  * ② 使用 map: [1，2，3，4，5，6] 转换为 [11，12，13，14，15，16]
  * ③ 使用 map: [a，b，c] 转换为 [A，B，C]
- *
+ * <p>
  * flatMap（）操作的效果是对流的元素应用一对多转换，然后将生成的元素展平为新的流。而 map 方法的返回是：返回由将给定函数应用于此流元素的结果组成的流。
  */
 
@@ -61,14 +61,14 @@ public class ListStreamPractice {
 
 
         List<String> list1 = new ArrayList<>(10);
+        Set<String> setStrs = new HashSet<>();
         list1.add("Bannana");
         list1.add("Apple");
         list1.add("Pear");
         list1.add("Pear");
         list1.add("Carrot");
 
-        System.out.println((Object) list1);
-
+        list1.parallelStream().forEach(System.out::println);
 
         if (list1.remove("pear")) {
             System.out.println("删除成功");
@@ -121,7 +121,7 @@ public class ListStreamPractice {
 
         PrintUtil.printSplitLine();
         List<Invitee> inviteeCompression = Stream.of(invitees, Arrays.asList(new Invitee(3L, "2", "3"), new Invitee(36L, "36", "36"))).flatMap(invitee -> invitee.stream()).collect(Collectors.toList());
-        System.out.println("------------------------------------------------------------"+inviteeCompression);
+        System.out.println("------------------------------------------------------------" + inviteeCompression);
 
         //add：加、subtract：减、multiply：乘、divide：除
         System.out.println(CollectionUtils.union(newInstance, oldInstance));//并集：给定两个集合A，B，把他们所有的元素合并在一起组成的集合

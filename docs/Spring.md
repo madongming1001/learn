@@ -1440,8 +1440,7 @@ ApplicationListenerDetector 在 prepareBeanFactory 注入的
 
 **@Configuration的类为什么会生成代理?**
 
-目的是防止@Bean方法的手动重复调用造成单例的破坏。类被分为full模式和lite模式，加了**@Configuration的是full模式**，*
-*@Bean、@Component、@ComponentScan、@Import、@ImportResource注解的就是lite**，之后会在BeanDefinition上设置configurationClass的属性值。
+目的是防止@Bean方法的手动重复调用造成单例的破坏。类被分为full模式和lite模式，加了**@Configuration的是full模式**，**@Bean、@Component、@ComponentScan、@Import、@ImportResource注解的就是lite**，之后会在BeanDefinition上设置configurationClass的属性值。
 
 **当配置类使用@Component修饰的时候**
 
@@ -1459,15 +1458,10 @@ public UserService userService(){
         }
 ```
 
-**⚠️注意**：就会出现myService使用的是自己new出来的，**走的正常方法调用**
-，正常想使用的是spring中的userService，所以就会导致用的不是同一个对象，比较的话肯定是false。
+**⚠️注意**：就会出现myService使用的是自己new出来的，**走的正常方法调用**，正常想使用的是spring中的userService，所以就会导致用的不是同一个对象，比较的话肯定是false。
 
 @Bean修饰的方法走的是工厂方法方式创建对象（**createBeanInstance()&instantiateUsingFactoryMethod()**），之后会把当前工厂方法存入到一个
-**isCurrentlyInvokedFactoryMethod()**
-Threadlocal之中，再然后调用方法走到拦截器，拦截器里面判断isCurrentlyInvokedFactoryMethod()
-是否有值，如果有值说明是spring正常在创建对象，如果没值的话说明是方法里面自己调用的，当执行到userService的时候由于该配置类每个方法都有拦截器所以又回到了拦截器的逻辑，又因为在**
-isCurrentlyInvokedFactoryMethod()**
-中不是当前工厂方法，所以获取的对象从spring中获取，存入到一级缓存，正常获取对象的逻辑，完事之后回到myService方法继续执行。当spring加载配置类下一个userSerivice方法创建对象的时候，由于spring容器中已经有该对象，就不需要创建了。，最终是为了保证两次调用用的都是同一个容器对象。
+**isCurrentlyInvokedFactoryMethod()**Threadlocal之中，再然后调用方法走到拦截器，拦截器里面判断**isCurrentlyInvokedFactoryMethod()**是否是当前方法，如果是说明是spring正常在创建对象，是当前方法就正常的进行方法创建对象。如果不是的话说明是方法里面自己调用的，当执行到**userService**的时候由于该配置类每个方法都有拦截器所以又回到了拦截器的逻辑，又因为在**isCurrentlyInvokedFactoryMethod()**中不是当前工厂方法，所以获取的对象从spring中获取，存入到一级缓存，正常获取对象的逻辑，完事之后回到myService方法继续执行。当spring加载配置类下一个userSerivice方法创建对象的时候，由于spring容器中已经有该对象，就不需要创建了。，最终是为了保证两次调用用的都是同一个容器对象。
 
 参考文章：https://blog.csdn.net/weixin_37689658/article/details/125664876
 
@@ -2744,3 +2738,7 @@ Java Object）和BO（Business Object），它们之间有一些区别和用法�
 如果需要在前端页面展示数据，则可以使用VO。 - 如果需要持久化数据到数据库，则可以使用PO/Entity。 -
 如果只需要一个简单的Java对象，则可以使用POJO。 - 如果需要封装具有业务含义的数据和业务逻辑，则可以使用BO。
 需要根据具体的项目需求和团队约定来选择合适的数据对象，上述的区别和用法只是一种常见的概念。
+
+
+
+**TaskExecutionAutoConfiguration会默认注入ThreadPoolTaskExecutor**

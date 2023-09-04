@@ -11,12 +11,9 @@ public class SafeDoubleCheckedLocking {
     private SafeDoubleCheckedLocking() {
     }
 
-    ;
-
     public static SafeDoubleCheckedLocking getInstance() {
-        //第一次检测,防止线程串行执行影响效率
+        //第一次检测,防止线程串行执行影响效率 防止新来一个线程就加锁
         if (instance == null) {
-            //同步
             synchronized (SafeDoubleCheckedLocking.class) {
                 //多线程下可能会出现问题的地方
                 //第二次检查，防止上一个线程已经创建好了对象，当前线程获取到锁继续执行的时候就会出现覆盖对象创建的操作

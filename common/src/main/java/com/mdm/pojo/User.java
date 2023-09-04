@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Accessors(chain = true)
 @Component
+@ToString
 public class User implements Serializable {
     private Integer id;
     @NonNull
@@ -32,5 +33,10 @@ public class User implements Serializable {
         if (Objects.nonNull(name)) {
             this.auth = Arrays.stream(name).map(AuthParam::new).collect(Collectors.toList());
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return 1;
     }
 }

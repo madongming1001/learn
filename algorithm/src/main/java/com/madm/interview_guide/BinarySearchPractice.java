@@ -142,5 +142,26 @@ public class BinarySearchPractice {
         return -1;
     }
 
+    //arr中，有两种数，出现奇数次
+    public static void printOldTimesNums2(int[] arr) {
+        int eor = 0;
+        for (int i = 0; i < arr.length; i++) {
+            eor ^= arr[i];
+        }
+        // eor = a ^ b
+        // eor != 0
+        // eor 必然有一个位置上是1
+        //0110010000
+        //0000010000
+        int rightOne = eor & (~eor + 1);//提取出最右侧的1
+        int onlyOne = 0;//eor‘
+        for (int i = 0; i < arr.length; i++) {
+            if ((arr[i] & rightOne) != 0) {
+                onlyOne ^= arr[i];
+            }
+        }
+        System.out.println(onlyOne + "、" + (eor ^ onlyOne));
+    }
+
 
 }

@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 /**
  * 学习 Collectors 用法
  * 参考文章：https://www.jianshu.com/p/6ee7e4cd5314
+ * https://blog.csdn.net/qq_43592352/article/details/129347838
  *
  * @author madongming
  */
@@ -73,6 +74,7 @@ public class HashMapPractice {
 //        System.out.println("runner");
         List<User> lists = Arrays.asList(new User(1, "group 1"), new User(2, "group 2"), new User(3, "group 3"), new User(4, "group 4"));
         Map<Integer, User> userMap = lists.stream().collect(Collectors.toConcurrentMap(x -> x.getId(), Function.identity(), BinaryOperator.maxBy(Comparator.comparing(User::getName))));
+        userMap.containsKey("1");
         userMap.computeIfAbsent(1, key -> {
             System.out.println(key);
             return new User(1000, "group 1000");

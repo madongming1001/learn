@@ -1,5 +1,7 @@
 package com.madm.sort;
 
+import static cn.hutool.core.util.ArrayUtil.swap;
+
 /**
  * 插入排序 O(n2)的复杂度
  * 算法描述
@@ -22,13 +24,9 @@ package com.madm.sort;
 public class InsertionSort {
     public static void insertionSort(int[] arr) {
         for (int i = 1; i < arr.length; i++) {
-            int curValue = arr[i];
-            int preIndex = i - 1;
-            //从右向左比较元素的同时，进行元素复制
-            for (; (preIndex >= 0) && (curValue < arr[preIndex]); preIndex--)
-                arr[preIndex + 1] = arr[preIndex];
-            //insertValue的值插入适当位置
-            arr[preIndex + 1] = curValue;
+            for (int j = i - 1; j >= 0 && arr[j] > arr[j + 1]; j--) {
+                swap(arr, j, j + 1);
+            }
         }
     }
 }

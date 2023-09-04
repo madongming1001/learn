@@ -7,6 +7,7 @@ import org.jsondoc.spring.boot.starter.EnableJSONDoc;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -40,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 @Import(MyDeferredImportSelector.class)
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
+@EnableConfigurationProperties
 public class LearnApiApplication {
 
     public static void main(String[] args) {

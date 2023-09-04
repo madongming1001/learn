@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
- * w-tinylfu
+ * w-TinyLFU
  * TinyLFU维护了近期访问记录的频率信息，作为一个过滤器，当新记录来时，只有满足TinyLFU要求的记录才可以被插入缓存。如前所述，作为现代的缓存，它需要解决两个挑战：
  * 一个是如何避免维护频率信息的高开销；
  * 另一个是如何反应随时间变化的访问模式。

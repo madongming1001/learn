@@ -10,7 +10,6 @@ import java.nio.charset.Charset;
  */
 public class OriginalArrayUtil {
 
-
     // char转byte
     public static byte[] getBytes(char[] chars) {
         Charset cs = Charset.forName("UTF-8");
@@ -30,4 +29,9 @@ public class OriginalArrayUtil {
         CharBuffer cb = cs.decode(bb);
         return cb.array();
     }
+
+
+
+
+
 }

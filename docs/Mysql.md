@@ -2803,6 +2803,14 @@ END;
 # drop function mock_data;
 
 select mock_data();
+
+CREATE PROCEDURE procedure_name
+    parameter1 datatype,
+    parameter2 datatype,
+    ...
+BEGIN
+    -- 存储过程的逻辑代码
+END;
 ```
 
 ## OVER 函数 OVER(PARTITION BY… ORDER BY…)
