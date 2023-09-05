@@ -1,15 +1,54 @@
 package com.madm.data_structure;
 
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
-public class Graph { // 无向图
+class Node {
+    public int value;
+    public int in;
+    public int out;
+    public ArrayList<Node> nexts;
+    public ArrayList<Edge> edges;
+
+    public Node(int value) {
+        this.value = value;
+        this.in = 0;
+        this.out = 0;
+        this.nexts = new ArrayList<>();
+        this.edges = new ArrayList<>();
+    }
+}
+
+class Edge {
+    public int weight;
+    public Node from;
+    public Node to;
+
+    public Edge(int weight, Node from, Node to) {
+        this.weight = weight;
+        this.from = from;
+        this.to = to;
+    }
+}
+
+class Graph {
+    public HashMap<Integer, Node> nodes;
+    public HashSet<Edge> edges;
+
+    public Graph() {
+        this.nodes = new HashMap<>();
+        this.edges = new HashSet<>();
+    }
+}
+
+public class GraphPractice { // 无向图
+
+
     boolean found = false; // 全局变量或者类成员变量
     private int v; // 顶点的个数
     private LinkedList<Integer>[] adj; // 邻接表
 
-    public Graph(int v) {
+    public GraphPractice(int v) {
         this.v = v;
         adj = new LinkedList[v];
         for (int i = 0; i < v; ++i) {
@@ -21,6 +60,31 @@ public class Graph { // 无向图
         adj[s].add(t);
         adj[t].add(s);
     }
+
+    public static Graph createGraph(Integer[][] matrix) {
+        Graph graph = new Graph();
+        for (int i = 0; i < matrix.length; i++) {
+            int from = matrix[i][0];
+            int to = matrix[i][1];
+            int weight = matrix[i][2];
+            if (!graph.nodes.containsKey(from)) {
+                graph.nodes.put(from, new Node(from));
+            }
+            if (!graph.nodes.containsKey(to)) {
+                graph.nodes.put(to, new Node(to));
+            }
+            Node fromNode = graph.nodes.get(from);
+            Node toNode = graph.nodes.get(to);
+            Edge newEdge = new Edge(weight, fromNode, toNode);
+            fromNode.nexts.add(toNode);
+            fromNode.edges.add(newEdge);
+            graph.edges.add(newEdge);
+            fromNode.out++;
+            toNode.in++;
+        }
+        return graph;
+    }
+
 
     /**
      * O(V+E) 顶点的数量+边的数量，Breadth-First Search 广度优先搜索算法

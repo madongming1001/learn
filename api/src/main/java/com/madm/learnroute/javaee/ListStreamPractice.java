@@ -120,10 +120,17 @@ public class ListStreamPractice {
         List<String> oldInstance = Lists.newArrayList("3", "232", "35", "24", "5", "6", "1");
 
         PrintUtil.printSplitLine();
+        synchronized (ListStreamPractice.class) {
+            Invitee[] inviteesArray = invitees.toArray(new Invitee[0]);
+            System.out.println(inviteesArray.length + "------");
+        }
+        PrintUtil.printSplitLine();
+
+        PrintUtil.printSplitLine();
         List<Invitee> inviteeCompression = Stream.of(invitees, Arrays.asList(new Invitee(3L, "2", "3"), new Invitee(36L, "36", "36"))).flatMap(invitee -> invitee.stream()).collect(Collectors.toList());
         System.out.println("------------------------------------------------------------" + inviteeCompression);
 
-        //add：加、subtract：减、multiply：乘、divide：除
+        //add：加、subtract：减、multiply：乘、di vide：除
         System.out.println(CollectionUtils.union(newInstance, oldInstance));//并集：给定两个集合A，B，把他们所有的元素合并在一起组成的集合
         System.out.println(CollectionUtils.intersection(newInstance, oldInstance));//交集：对于给定的两个集合，返回一个包含两个集合中共有元素的新集合。
         System.out.println(CollectionUtils.disjunction(newInstance, oldInstance));//差集：对于给定的两个集合，返回一个包含所有存在于第一个集合且不存在于第二个集合的元素的新集合

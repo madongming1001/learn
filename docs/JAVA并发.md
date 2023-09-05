@@ -1352,7 +1352,7 @@ terminated()
 
 3、内部实现：
 
-1. HashMap 数组+链表+红黑树（数组单个节点>=8个 并且 >=64个的时候采用红黑树），HashTable采用的是数组+链表
+1. HashMap 数组+链表+红黑树（数组单个节点>8个 并且 >=64个的时候采用红黑树），HashTable采用的是数组+链表
 2. HashMap初始化容量是16 Hashtable默认初始化容量11
 3. HashMap可以存储nullkey 用0来表示，hashtable不可以
 
@@ -1360,3 +1360,4 @@ terminated()
 
 
 
+“零和”是[博弈论](https://baike.baidu.com/item/博弈论/81545?fromModule=lemma_inlink)的一个概念，意思是双方博弈，一方得利必然意味着另一方吃亏，一方得益多少，另一方就吃亏多少，双方得失相抵，总数为零，所以称为“零和”。

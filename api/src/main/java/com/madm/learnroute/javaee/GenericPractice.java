@@ -88,6 +88,7 @@ public class GenericPractice<T> extends TestClass<String> implements TestInterfa
         System.out.println(oi.getType() + "---------------");
         System.out.println(oi.innerMethod() + "---------------");
 
+        Integer i = GenericPractice.get(new GenericPractice<Integer>() {});
 
         List<String> list = new ArrayList<>();
         //list.add(123);//编译错误，因为泛型是String类型

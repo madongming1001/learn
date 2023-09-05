@@ -2,30 +2,37 @@ package com.madm.learnroute.javaee.concurrent.juc;
 
 import com.madm.learnroute.javaee.Discount;
 import lombok.Data;
-import lombok.SneakyThrows;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class CompletableFuturePractice {
     static List<Shop> shops = Arrays.asList(new Shop("BestPrice"), new Shop("LetsSaveBig"), new Shop("MyFavoriteShop"), new Shop("BuyItAll"));
 
-    @SneakyThrows
     public static void main(String[] args) {
         Shop shop = new Shop("BestPrice");
         System.out.println(shop.getPrice("product"));
         CompletableFuture<Void> voidCompletableFuture = CompletableFuture.runAsync(() -> System.out.println(1001));
-        CompletableFuture<Object> objectCompletableFuture = CompletableFuture.supplyAsync(() -> 102);
-        System.out.println(voidCompletableFuture.get());
-        System.out.printf(String.valueOf(objectCompletableFuture.get()));
-        //有异常类型 CancellationException ExecutionException InterruptedException 检查异常 强制抛出
-        CompletableFuture.allOf(voidCompletableFuture, objectCompletableFuture).get();
+        CompletableFuture<Integer> objectCompletableFuture = CompletableFuture.supplyAsync(() -> 102);
+        try {
+            System.out.println(voidCompletableFuture.get());
+            System.out.printf(String.valueOf(objectCompletableFuture.get()));
+            //有异常类型 CancellationException ExecutionException InterruptedException 检查异常 强制抛出
+            CompletableFuture.allOf(voidCompletableFuture, objectCompletableFuture).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //无异常类型 CancellationException CompletionException 未经检查异常 不强制抛出
-        CompletableFuture.allOf(voidCompletableFuture, objectCompletableFuture).join();
+        CompletableFuture<Void> allCompletedTasks = CompletableFuture.allOf(voidCompletableFuture, objectCompletableFuture);
+
+        try {
+            allCompletedTasks.get();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
 
         List<CompletableFuture> futures = new ArrayList<>();
         futures.add(CompletableFuture.runAsync(() -> System.out.println(1001)));
