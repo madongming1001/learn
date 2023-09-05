@@ -1,7 +1,4 @@
 a
 b
 c
-master update 01
-master update 02
-feature update 01
-feature update 02
+m u 01
