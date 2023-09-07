@@ -2,7 +2,7 @@ package com.madm.learnroute.javaee.concurrent.juc;
 
 import java.util.concurrent.CyclicBarrier;
 
-public class CyclicBarrierTest {
+public class CyclicBarrierPractice {
     public static void main(String[] args) {
         int threadCount = 3;
         CyclicBarrier cyclicBarrier = new CyclicBarrier(threadCount);

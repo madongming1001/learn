@@ -7,12 +7,53 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
+
+/**
+ * void runAsync();
+ * result supplyAsync();
+ * //执行后运行，需不需要上一个返回值
+ * thenRun(Runnable runnable)，//任务 A 执行完执行 B，并且 B 不需要 A 的结果。
+ * thenAccept(Consumer action)，//任务 A 执行完执行 B，B 需要 A 的结果，但是任务 B 不返回值。
+ * thenApply(Function fn)，//任务 A 执行完执行 B，B 需要 A 的结果，同时任务 B 有返回值。
+ * resultDelivery();
+ * <p>
+ * //异常处理
+ * public CompletableFuture<T> exceptionally(Function<Throwable, ? extends T> fn);
+ * public <U> CompletionStage<U> handle(BiFunction<? super T, Throwable, ? extends U> fn);
+ * <p>
+ * //同时执行，组合结果，任务A 和任务B 同时执行，然后取它们的结果进行后续操作。这里强调的是任务之间的并行工作，没有先后执行顺序。
+ * cfA.runAfterBoth(cfB, () -> {});
+ * cfA.thenAcceptBoth(cfB, (resultA, resultB) -> {}); //没有返回值
+ * cfA.thenCombine(cfB, (resultA, resultB) -> "result A + B"); //有返回值
+ * //前面一个 CompletableFuture 实例的结果可以传递到下一个实例中，这就是 compose 和 combine 的主要区别。
+ * //取多个任务的结果
+ * public static CompletableFuture<Void> allOf(CompletableFuture<?>... cfs){...}
+ * public static CompletableFuture<Object> anyOf(CompletableFuture<?>... cfs) {...}
+ * <p>
+ * //两个结果之中的任意一个
+ * cfA.acceptEither(cfB, result -> {});
+ * cfA.acceptEitherAsync(cfB, result -> {});
+ * cfA.acceptEitherAsync(cfB, result -> {}, executorService);
+ * <p>
+ * cfA.applyToEither(cfB, result -> result);
+ * cfA.applyToEitherAsync(cfB, result -> result);
+ * cfA.applyToEitherAsync(cfB, result -> result, executorService);
+ * <p>
+ * cfA.runAfterEither(cfA, () -> {});
+ * cfA.runAfterEitherAsync(cfB, () -> {});
+ * cfA.runAfterEitherAsync(cfB, () -> {}, executorService);
+ */
+
 public class CompletableFuturePractice {
     static List<Shop> shops = Arrays.asList(new Shop("BestPrice"), new Shop("LetsSaveBig"), new Shop("MyFavoriteShop"), new Shop("BuyItAll"));
 
     public static void main(String[] args) {
         Shop shop = new Shop("BestPrice");
         System.out.println(shop.getPrice("product"));
+        FutureTask futureTask = new FutureTask<>(() -> {
+            return 1;
+        });
+        CompletableFuture.runAsync(futureTask);
         CompletableFuture<Void> voidCompletableFuture = CompletableFuture.runAsync(() -> System.out.println(1001));
         CompletableFuture<Integer> objectCompletableFuture = CompletableFuture.supplyAsync(() -> 102);
         try {
@@ -37,10 +78,7 @@ public class CompletableFuturePractice {
         List<CompletableFuture> futures = new ArrayList<>();
         futures.add(CompletableFuture.runAsync(() -> System.out.println(1001)));
         futures.add(CompletableFuture.runAsync(() -> System.out.println(1001)));
-        CompletableFuture<List<Object>> listCompletableFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(v -> futures.stream()
-                .map(CompletableFuture::join)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList()));
+        CompletableFuture<List<Object>> listCompletableFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(v -> futures.stream().map(CompletableFuture::join).filter(Objects::nonNull).collect(Collectors.toList()));
 
         //执行后运行，需不需要上一个返回值
         //thenRun(Runnable runnable)，任务 A 执行完执行 B，并且 B 不需要 A 的结果。

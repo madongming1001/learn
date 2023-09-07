@@ -71,6 +71,10 @@ public class ArrayListPractice {
 
         userMaps.forEach((k, v) -> System.out.println(k + v));
 
+        List<String> copies = Collections.nCopies(5, "tuitorial Point");
+        copies.add("ss");
+
+
 
         LinkedList linkedList = new LinkedList();
         ArrayListHandler handler = new ArrayListHandler();

@@ -1361,3 +1361,9 @@ terminated()
 
 
 “零和”是[博弈论](https://baike.baidu.com/item/博弈论/81545?fromModule=lemma_inlink)的一个概念，意思是双方博弈，一方得利必然意味着另一方吃亏，一方得益多少，另一方就吃亏多少，双方得失相抵，总数为零，所以称为“零和”。
+
+# Collection实现类
+
+![image-20230907144214144](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230907144214144.png)
+
+互斥同步 非阻塞同步 无同步方案 方法内部使用 未逃逸 线程独
