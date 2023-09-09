@@ -56,7 +56,6 @@ public class ListStreamPractice {
         //验证对过滤后的集合修改会影响原集合的内容
         affectTheOriginalCollection(apple1, apple2, apple3, apple4);
 
-
         PrintUtil.printSplitLine();
 
 
@@ -195,6 +194,7 @@ public class ListStreamPractice {
     private static void affectTheOriginalCollection(Apple apple1, Apple apple2, Apple apple3, Apple apple4) {
         System.out.println("begin of method： affectTheOriginalCollection");
         ArrayList<Apple> originalCollection = Lists.newArrayList(apple1, apple2, apple3, apple4);
+        originalCollection.forEach(System.out::print);
         List<Apple> currentCollection = originalCollection.stream().filter(apple -> apple.getId() > 2).collect(Collectors.toList());
         for (Apple apple : currentCollection) {
             apple.setName(apple.getName() + " 修改后的数据");

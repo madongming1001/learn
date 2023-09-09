@@ -58,6 +58,16 @@ public class ThreadPoolExecutorPractice {
         firstThreadBlockingOtherThreads();
     }
 
+
+
+    private static void testInvokeAnyOfExecutorService(){
+
+
+
+
+
+    }
+
     private static void threadPoolParameterTest() {
         System.out.println(Long.toBinaryString(4294967296L));
         System.out.println(Integer.MAX_VALUE);

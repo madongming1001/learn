@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * 带了一个 3 年的开发，不会循环删除 List 中的元素，心态崩了。。。
+ * 参考文章：https://mp.weixin.qq.com/s/j3k70kB3KPGO5ZKpOxJ4Pw
+ *
  * @author dongming.ma
  * @date 2023/3/8 18:06
  */
@@ -14,11 +17,11 @@ public class DeleteListCircularlyTest {
     public static List<String> initList = Arrays.asList("张三", "李四", "周一", "刘四", "李强", "李白");
 
     public static void main(String[] args) {
-//        remove1();//普通 for 循环删除（不可靠）
+//        remove1();//普通 for 循环删除（不可靠） 删不干净 由于listsize 不断减少
 //        remove2();//普通 for 循环提取变量删除（抛异常）
-//        remove3();//普通 for 循环倒序删除（可靠）
+        remove3();//普通 for 循环倒序删除（可靠）
 //        remove4();//增强 for 循环删除（抛异常）
-//        remove5();//迭代器循环迭代器删除（可靠）
+        remove5();//迭代器循环迭代器删除（可靠）
 //        remove6();//迭代器循环集合删除（抛异常）
 //        remove7();//集合 forEach 方法循环删除（抛异常）
         remove8();//stream filter 过滤（可靠）
@@ -67,7 +70,8 @@ public class DeleteListCircularlyTest {
      */
     public static void remove3() {
         List<String> list = new ArrayList(initList);
-        for (int i = list.size() - 1; i > 0; i--) {
+        System.out.println(6 >> 1);//向下取整 floor
+        for (int i = list.size() - 1; i >= 0; i--) {
             String str = list.get(i);
             if (str.startsWith("李")) {
                 list.remove(i);
