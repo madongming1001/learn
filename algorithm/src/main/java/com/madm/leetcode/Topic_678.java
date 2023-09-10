@@ -1,5 +1,7 @@
 package com.madm.leetcode;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Stack;
 
 /**
@@ -50,9 +52,30 @@ public class Topic_678 {
         return true;
     }
 
+    public static boolean isValid(String s) {
+        if (StringUtils.isEmpty(s)) {
+            return false;
+        }
+        char[] chas = s.toCharArray();
+        Stack<Character> stack = new Stack();
+        for (int i = 0; i < chas.length; i++) {
+            char cha = chas[i];
+            if (cha == '(' || cha == '{' || cha == '[') {
+                stack.push(cha == '(' ? ')' : cha == '{' ? '}' : ']');
+            } else {
+                if (stack.empty() || stack.pop() != cha) {
+                    return false;
+                }
+            }
+        }
+        return stack.isEmpty();
+    }
+
     public static void main(String[] args) {
         if (Topic_678.checkValidString("()")) {
             System.out.println("匹配");
         }
+
+        System.out.println(isValid("()"));
     }
 }

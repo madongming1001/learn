@@ -16,5 +16,9 @@ public class MathPractice {
         System.out.println(Math.pow(2, 5));
         //参数小于等于0返回参数本身 参数无穷大就是无穷大 否则返回最接近真正的数学平方根的参数值的double值。
         System.out.println(Math.sqrt(5));
+        //求平均值
+        System.out.println(Math.abs(-41));
+        //求最小值
+        System.out.println(Math.min(-1,-2));
     }
 }

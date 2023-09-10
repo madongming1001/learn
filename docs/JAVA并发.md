@@ -1,5 +1,7 @@
 Java线程池实现原理
 
+# 
+
 ## ThreadPoolExecutor类继承关系
 
 ![image-20211119112015735](noteImg/image-20211119112015735.png)
@@ -1388,3 +1390,25 @@ Java 中可以使用 java.util.Stream 对一个集合（实现了java.util.Colle
 
 流操作并不会影响原来的集合，可以简单认为，流操作是把集合中的一个元素逐个复制放到一个首尾相接的流动的水槽中。
 
+
+
+# ForkJoinPool
+
+### 核心思想: work-stealing(工作窃取)算法
+
+work-stealing(工作窃取)算法: 线程池内的所有工作线程都尝试找到并执行已经提交的任务，或者是被其他活动任务创建的子任务(如果不存在就阻塞等待)。这种特性使得 ForkJoinPool 在运行多个可以产生子任务的任务，或者是提交的许多小任务时效率更高。尤其是构建异步模型的 ForkJoinPool 时，对不需要合并(join)的事件类型任务也非常适用。
+
+在 ForkJoinPool 中，线程池中每个工作线程(ForkJoinWorkerThread)都对应一个任务队列(WorkQueue)，工作线程优先处理来自自身队列的任务(LIFO或FIFO顺序，参数 mode 决定)，然后以FIFO的顺序随机窃取其他队列中的任务。
+
+具体思路如下:
+
+- 每个线程都有自己的一个WorkQueue，该工作队列是一个双端队列。
+- 队列支持三个功能push、pop、poll
+- push/pop只能被队列的所有者线程调用，而poll可以被其他线程调用。
+- 划分的子任务调用fork时，都会被push到自己的队列中。
+- 默认情况下，工作线程从自己的双端队列获出任务并执行。
+- 当自己的队列为空时，线程随机从另一个线程的队列末尾调用poll方法窃取任务。
+
+![img](https://pdai.tech/images/thread/java-thread-x-forkjoin-3.png)
+
+![img](https://pdai.tech/images/thread/java-thread-x-forkjoin-5.png)
