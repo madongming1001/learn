@@ -4,7 +4,10 @@ import cn.hutool.core.util.RandomUtil;
 import lombok.Data;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
@@ -40,7 +43,28 @@ public class ForkJoinPoolPractice extends RecursiveTask<Integer> {
         ForkJoinTask<Integer> submit = ForkJoinPool.commonPool().submit(task);
         long endTime = System.nanoTime();
         System.out.println("Forkjoin compare: " + submit.join() + " in " + (endTime - startTime) / 1000 / 1000 + " ms.");
+
+
+        test();
     }
+
+    public static void test() {
+        //声明数据源集合
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            //添加100个元素到集合中
+            list.add(i);
+        }
+        //添加数据的集合,使用CopyOnWriteArrayList替换ArrayList
+        List<Integer> list2 = new CopyOnWriteArrayList<>();
+        //使用parallelStream的遍历方法来添加元素到新的集合
+        list.parallelStream().forEach(i -> {
+            list2.add(i);
+        });
+        //打印添加元素之后的集合长度
+        System.out.println(list2.size());
+    }
+
 
     @Override
     protected Integer compute() {

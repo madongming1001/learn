@@ -1,7 +1,3 @@
-Java线程池实现原理
-
-# 
-
 ## ThreadPoolExecutor类继承关系
 
 ![image-20211119112015735](noteImg/image-20211119112015735.png)
@@ -1396,7 +1392,7 @@ Java 中可以使用 java.util.Stream 对一个集合（实现了java.util.Colle
 
 ### 核心思想: work-stealing(工作窃取)算法
 
-work-stealing(工作窃取)算法: 线程池内的所有工作线程都尝试找到并执行已经提交的任务，或者是被其他活动任务创建的子任务(如果不存在就阻塞等待)。这种特性使得 ForkJoinPool 在运行多个可以产生子任务的任务，或者是提交的许多小任务时效率更高。尤其是构建异步模型的 ForkJoinPool 时，对不需要合并(join)的事件类型任务也非常适用。
+work-stealing(工作窃取)算法: 线程池内的所有工作线程都尝试找到并执行已经提交的任务，或者是被其他活动任务创建的子任务(如果不存在就阻塞等待)。这种特性使得 ForkJoinPool 在运行多个可以产生子任务的任务，或者是提交的许多小任务时效率更高。尤其是构建异步模型的 ForkJoinPool 时，对不需要合并(join)的事件类型任务也非常适用。ForkJoinTask 实现了 Future 接口，说明它也是一个可取消的异步运算任务，实际上ForkJoinTask 是 Future 的轻量级实现，**主要用在纯粹是计算的函数式任务或者操作完全独立的对象计算任务。**
 
 在 ForkJoinPool 中，线程池中每个工作线程(ForkJoinWorkerThread)都对应一个任务队列(WorkQueue)，工作线程优先处理来自自身队列的任务(LIFO或FIFO顺序，参数 mode 决定)，然后以FIFO的顺序随机窃取其他队列中的任务。
 
@@ -1412,3 +1408,259 @@ work-stealing(工作窃取)算法: 线程池内的所有工作线程都尝试找
 ![img](https://pdai.tech/images/thread/java-thread-x-forkjoin-3.png)
 
 ![img](https://pdai.tech/images/thread/java-thread-x-forkjoin-5.png)
+
+### 执行流程 - 外部任务(external/submissions task)提交
+
+向 ForkJoinPool 提交任务有三种方式:
+
+- invoke()会等待任务计算完毕并返回计算结果；
+- execute()是直接向池提交一个任务来异步执行，无返回结果；
+- submit()也是异步执行，但是会返回提交的任务，在适当的时候可通过task.get()获取执行结果。
+
+这三种提交方式都都是调用externalPush()方法来完成，所以接下来我们将从externalPush()方法开始逐步分析外部任务的执行过程。
+
+**ForkJoinPool 与 内部类 WorkQueue 共享的一些常量：**
+
+```java
+// Constants shared across ForkJoinPool and WorkQueue
+
+// 限定参数
+static final int SMASK = 0xffff;        //  低位掩码，也是最大索引位
+static final int MAX_CAP = 0x7fff;        //  工作线程最大容量
+static final int EVENMASK = 0xfffe;        //  偶数低位掩码
+static final int SQMASK = 0x007e;        //  workQueues 数组最多64个槽位
+
+// ctl 子域和 WorkQueue.scanState 的掩码和标志位
+static final int SCANNING = 1;             // 标记是否正在运行任务
+static final int INACTIVE = 1 << 31;       // 失活状态  负数
+static final int SS_SEQ = 1 << 16;       // 版本戳，防止ABA问题
+
+// ForkJoinPool.config 和 WorkQueue.config 的配置信息标记
+static final int MODE_MASK = 0xffff << 16;  // 模式掩码
+static final int LIFO_QUEUE = 0; //LIFO队列
+static final int FIFO_QUEUE = 1 << 16;//FIFO队列
+static final int SHARED_QUEUE = 1 << 31;       // 共享模式队列，负数
+```
+
+**ForkJoinPool 中的相关常量和实例字段：**
+
+```java
+//  低位和高位掩码
+private static final long SP_MASK = 0xffffffffL;
+private static final long UC_MASK = ~SP_MASK;
+
+// 活跃线程数
+private static final int AC_SHIFT = 48;
+private static final long AC_UNIT = 0x0001L << AC_SHIFT; //活跃线程数增量
+private static final long AC_MASK = 0xffffL << AC_SHIFT; //活跃线程数掩码
+
+// 工作线程数
+private static final int TC_SHIFT = 32;
+private static final long TC_UNIT = 0x0001L << TC_SHIFT; //工作线程数增量
+private static final long TC_MASK = 0xffffL << TC_SHIFT; //掩码
+private static final long ADD_WORKER = 0x0001L << (TC_SHIFT + 15);  // 创建工作线程标志
+
+// 池状态
+private static final int RSLOCK = 1;
+private static final int RSIGNAL = 1 << 1;
+private static final int STARTED = 1 << 2;
+private static final int STOP = 1 << 29;
+private static final int TERMINATED = 1 << 30;
+private static final int SHUTDOWN = 1 << 31;
+
+// 实例字段
+volatile long ctl;                   // 主控制参数
+volatile int runState;               // 运行状态锁
+final int config;                    // 并行度|模式
+int indexSeed;                       // 用于生成工作线程索引
+volatile WorkQueue[] workQueues;     // 主对象注册信息，workQueue
+final ForkJoinWorkerThreadFactory factory;// 线程工厂
+final UncaughtExceptionHandler ueh;  // 每个工作线程的异常信息
+final String workerNamePrefix;       // 用于创建工作线程的名称
+volatile AtomicLong stealCounter;    // 偷取任务总数，也可作为同步监视器
+
+/** 静态初始化字段 */
+//线程工厂
+public static final ForkJoinWorkerThreadFactory defaultForkJoinWorkerThreadFactory;
+//启动或杀死线程的方法调用者的权限
+private static final RuntimePermission modifyThreadPermission;
+// 公共静态pool
+static final ForkJoinPool common;
+//并行度，对应内部common池
+static final int commonParallelism;
+//备用线程数，在tryCompensate中使用
+private static int commonMaxSpares;
+//创建workerNamePrefix(工作线程名称前缀)时的序号
+private static int poolNumberSequence;
+//线程阻塞等待新的任务的超时值(以纳秒为单位)，默认2秒
+private static final long IDLE_TIMEOUT = 2000L * 1000L * 1000L; // 2sec
+//空闲超时时间，防止timer未命中
+private static final long TIMEOUT_SLOP = 20L * 1000L * 1000L;  // 20ms
+//默认备用线程数
+private static final int DEFAULT_COMMON_MAX_SPARES = 256;
+//阻塞前自旋的次数，用在在awaitRunStateLock和awaitWork中
+private static final int SPINS  = 0;
+//indexSeed的增量
+private static final int SEED_INCREMENT = 0x9e3779b9;
+```
+
+说明: ForkJoinPool 的内部状态都是通过一个64位的 long 型 变量ctl来存储，它由四个16位的子域组成:
+
+- AC: 正在运行工作线程数减去目标并行度，高16位
+- TC: 总工作线程数减去目标并行度，中高16位
+- SS: 栈顶等待线程的版本计数和状态，中低16位
+- ID: 栈顶 WorkQueue 在池中的索引(poolIndex)，低16位
+
+在后面的源码解析中，某些地方也提取了ctl的低32位(sp=(int)ctl)来检查工作线程状态，例如，当sp不为0时说明当前还有空闲工作线程。
+
+#### ForkJoinPool.WorkQueue 中的相关属性:
+
+```java
+//初始队列容量，2的幂
+static final int INITIAL_QUEUE_CAPACITY = 1 << 13;
+//最大队列容量
+static final int MAXIMUM_QUEUE_CAPACITY = 1 << 26; // 64M
+
+// 实例字段
+volatile int scanState;    // Woker状态, <0: inactive; odd:scanning
+int stackPred;             // 记录前一个栈顶的ctl
+int nsteals;               // 偷取任务数
+int hint;                  // 记录偷取者索引，初始为随机索引
+int config;                // 池索引和模式
+volatile int qlock;        // 1: locked, < 0: terminate; else 0
+volatile int base;         //下一个poll操作的索引(栈底/队列头)
+int top;                   //  下一个push操作的索引(栈顶/队列尾)
+ForkJoinTask<?>[] array;   // 任务数组
+final ForkJoinPool pool;   // the containing pool (may be null)
+final ForkJoinWorkerThread owner; // 当前工作队列的工作线程，共享模式下为null
+volatile Thread parker;    // 调用park阻塞期间为owner，其他情况为null
+volatile ForkJoinTask<?> currentJoin;  // 记录被join过来的任务
+volatile ForkJoinTask<?> currentSteal; // 记录从其他工作队列偷取过来的任务
+```
+
+# 为什么要实现序列化？
+
+工作中我们经常在进行持久化操作和返回数据时都会使用到javabean来统一封装参数，方便操作，一般我们也都会实现Serializable接口，那么问题来了，首先：为什么要进行序列化；其次：每个实体bean都必须实现serializabel接口吗？最后：我做一些项目的时候，没有实现序列化，同样没什么影响，到底什么时候应该进行序列化操作呢？
+
+网上找了很多资料，但是感觉大都没有说的很清楚，所以结合自己的理解做一下总结。
+
+首先第一个问题，实现序列化的两个原因：1、将对象的状态保存在存储媒体中以便可以在以后重新创建出完全相同的副本；2、按值将对象从一个应用程序域发送至另一个应用程序域。实现serializable接口的作用是就是可以把对象存到字节流，然后可以恢复，所以你想如果你的对象没实现序列化怎么才能进行持久化和网络传输呢，要持久化和网络传输就得转为字节流，所以在分布式应用中及设计数据持久化的场景中，你就得实现序列化。
+
+第二个问题，是不是每个实体bean都要实现序列化，答案其实还要回归到第一个问题，那就是你的bean是否需要持久化存储媒体中以及是否需要传输给另一个应用，没有的话就不需要，例如我们利用fastjson将实体类转化成json字符串时，并不涉及到转化为字节流，所以其实跟序列化没有关系。
+
+第三个问题，有的时候并没有实现序列化，依然可以持久化到[数据库](https://cloud.tencent.com/solution/database?from_column=20065&from=20065)。这个其实我们可以看看实体类中常用的数据类型，例如Date、String等等，它们已经实现了序列化，而一些基本类型，数据库里面有与之对应的数据结构，从我们的类声明来看，我们没有实现serializabel接口，其实是在声明的各个不同变量的时候，由具体的数据类型帮助我们实现了序列化操作。
+
+另外需要注意的是，在NoSql数据库中，并没有与我们java基本类型对应的数据结构，所以在往nosql数据库中存储时，我们就必须将对象进行序列化，同时在网络传输中我们要注意到两个应用中javabean的serialVersionUID要保持一致，不然就不能正常的进行反序列化。
+
+**参考文章：**https://cloud.tencent.com/developer/article/1680220
+
+## ProtocolBuffer
+
+**ProtocolBuffer是一种轻便高效的结构化数据存储格式，可以用于结构化数据序列化。**适合做数据存储或 RPC 数据交换格式。可用于通讯协议、数据存储等领域的语言无关、平台无关、可扩展的序列化结构数据格式。
+
+优点：跨语言；序列化后数据占用空间比JSON小，JSON有一定的格式，在数据量上还有可以压缩的空间。
+
+缺点：它以二进制的方式存储，无法直接读取编辑，除非你有 .proto 定义，否则无法直接读出 Protobuffer的任何内容。其与thrift的对比：两者语法类似，都支持版本向后兼容和向前兼容，thrift侧重点是构建跨语言的可伸缩的服务，支持的语言多，同时提供了全套RPC解决方案，可以很方便的直接构建服务，不需要做太多其他的工作。 Protobuffer主要是一种序列化机制，在数据序列化上进行性能比较，Protobuffer相对较好。
+
+ProtoBuff序列化对象可以很大程度上将其压缩，可以大大减少数据传输大小，提高系统性能。对于大量数据的缓存，也可以提高缓存中数据存储量。原始的ProtoBuff需要自己写.proto文件，通过编译器将其转换为java文件，显得比较繁琐。百度研发的**jprotobuf框架**将Google原始的protobuf进行了封装，对其进行简化，仅提供序列化和反序列化方法。其实用上也比较简洁，通过对JavaBean中的字段进行注解就行，不需要撰写.proto文件和实用编译器将其生成.java文件，百度的jprotobuf都替我们做了这些事情了。
+
+
+
+#  jdk6的code compile API是什么？
+
+JDK 6中的Code Compile API是指Java编译器提供的API，用于在运行时动态地将Java源代码编译为字节码文件。在JDK 6中，这个API主要由以下两个核心类组成： 1. **javax.tools.JavaCompiler**：这是一个接口，定义了编译Java源代码的方法和相关的参数。可以通过调用JavaCompiler的静态方法getSystemJavaCompiler()来获取当前平台上可用的Java编译器实例。 2. **javax.tools.ToolProvider**：这是一个工具类，提供了获取Java编译器实例的方法。其中，getSystemJavaCompiler()方法返回JavaCompiler的实例。 使用Code Compile API，你可以在程序运行时动态地编译Java源代码，并将编译生成的字节码文件加载到内存中，以便后续执行。例如，你可以通过JavaCompiler的run()方法来编译指定的Java源文件，然后使用自定义的ClassLoader加载编译生成的类文件，并通过反射机制调用其中的方法。 需要注意的是，JDK 6中的Code Compile API主要用于编译Java源代码，而不是直接编译已经编写好的Java类文件。如果你需要直接编译已有的类文件，可以考虑使用其他第三方工具或库。
+
+
+
+# IO
+
+![图片](https://mmbiz.qpic.cn/mmbiz_jpg/IJUXwBNpKliaDicLZfGhTPEwwBN3NxHr1DEvT5dBl0wVWuWSOpVs48sdAiawj06fFLYAicP6h1edYrTHuMhD5OJkibw/640?wx_fmt=jpeg&wxfrom=5&wx_lazy=1&wx_co=1)
+
+# 优雅停机
+
+**参考文章：**https://zhuanlan.zhihu.com/p/496603482
+
+## 一、操作系统的优雅停机
+
+优雅停机是指在停止应用时，执行一系列"操作"保证应用正常关闭。这些操作包括拒绝新请求和新连接、关闭服务注册、等待已有请求执行完成、关闭线程池、关闭连接、释放资源等。
+
+优雅停机可以避免非正常关闭程序可能造成的任务被抛弃、数据丢失、应用异常等问题。优雅停机本质上是进程即将关闭前执行的一些额外流程。
+
+操作系统本身也有对优雅停机的思考。
+
+我们停止一个进程是，会使用kill -9和kill -15命令。但是，我们一般不建议使用kill -9。
+
+**这是因为kill -9命令很强硬，它会向操作系统内核发出SIGKILL信号，该信号直接停止进程，不能被阻塞或者忽略。**
+
+kill -9显然不那么优雅，如果在发出SIGKILL信号的时候，进程还有未处理完成的任务，这时候任务就会被丢弃或者终止导致数据的不可预知错误。
+
+**使用kill -15就不一样了，这时候发给系统内核的是一个SIGTERM信号。**
+
+**当进程接收到SIGTERM信号时，具体要如何处理是由进程自己决定，进程就可以拒绝外部新的任务并完成已有任务后再停止。**
+
+**在Docker中，docker stop相当于kill -15，他会向容器内的进程发送SIGTERM信号，在10S之后（可通过参数指定）再发送SIGKILL信号。**
+
+**而docker kill就像kill -9，直接发送SIGKILL信号。**
+
+## 二、JVM的优雅下线
+
+我们Java应用运行时就是一个独立的进程，它的关闭也即是JVM的关闭。
+
+JVM的关闭也分为正常关闭、强制关闭、异常关闭。
+
+JVM的正常关闭是Java程序优雅停机的关键，正常关闭的过程中，JVM可以做一系列预善后工作，比如线程池、连接池任务的完成和资源的释放等。
+
+JVM还预留了钩子机制，供我们开发自行处理一些特定操作。
+
+这种钩子机制就是JDK中提供的shutdown hook，它有一个方法Java.Runtime.addShutdownHook(Thread hook)，可以注册一个JVM关闭的钩子。
+
+```java
+package com.tin.example.shutdown.hook;
+
+/**
+ * title: ShutdownHookTest
+ * <p>
+ * description:
+ *
+ * @author tin @公众号【看点代码再上班】 on 2022/4/5 下午12:27
+ */
+public class JVMShutdownHookTest {
+    public static void main(String[] args) throws Exception {
+        Runtime.getRuntime().addShutdownHook(new Thread(JVMShutdownHookTest::doSomething));
+
+        while (true) {
+            System.out.println("i am running...");
+            Thread.sleep(500);
+        }
+    }
+
+    /**
+     * 停机前处理事项
+     */
+    private static void doSomething() {
+        System.out.println("关闭【看点代码再上班】书库。");
+    }
+}
+```
+
+## 三、Spring容器的优雅下线
+
+Spring的优雅下线也使用到了JVM的ShutdownHook。
+
+首先，在application context被load时会注册一个ShutdownHook。这个ShutdownHook会在进程退出前执行销毁bean、容器的销毁等操作。
+
+同时，Spring除了销毁bean等操作之外，还会发出一个ContextClosedEvent事件，很多基于Spring容器的三方框架都可以监听这个事件实现更多的优雅停机操作。
+
+比如，我们可以监听Spring的事件：
+
+```java
+@Override
+    public void onApplicationContextEvent(ApplicationContextEvent event) {
+        if (event instanceof ContextClosedEvent) {
+            //自定一些容器关闭前业务要进行的操作
+            onContextClosedEvent((ContextClosedEvent) event);
+        }
+    }
+```
+
+![img](https://pic2.zhimg.com/80/v2-3a69d86d13c1ce944acdce96ee762eb1_720w.webp)

@@ -13,7 +13,7 @@ public class StringEqualsPractice {
 //        String abc1 = new String("abc");
 //        System.out.println(abc == abc1);
 
-//        String tags = "{\"name\":\"2\",\"id\":1}";
+        String tags = "{\"name\":\"2\",\"id\":1}";
 //        Map map = new HashMap();
 //        if (StringUtils.isNotEmpty(tags)) {
 //            map = JSONObject.parseObject(tags,HashMap.class);
@@ -79,6 +79,23 @@ public class StringEqualsPractice {
         System.out.println(Long.MAX_VALUE);
         System.out.println(IdUtil.fastUUID());
         System.out.println(IdUtil.fastSimpleUUID());
+
+
+        System.out.println((1L << 48) - 1);
+        System.out.println(Integer.toBinaryString(0xffff << 16));
+        System.out.println(Integer.toBinaryString(1 << 16));
+        System.out.println(Integer.toBinaryString(7 >> 16));
+
+        System.out.println(tableSizeFor(7));
+        System.out.println(tableSizeFor(31));
+
+        System.out.println(Float.MIN_VALUE);
+        System.out.println(Float.MAX_VALUE);
+
+        System.out.println(Double.MIN_VALUE);
+        System.out.println(Double.MIN_VALUE);
+        float fl = 1.234556672222222222f;
+
     }
 
 
@@ -96,6 +113,16 @@ public class StringEqualsPractice {
          */
 //        return (val & -val) == val;
         return (val & (val - 1)) == 0;
+    }
+
+    static final int tableSizeFor(int cap) {
+        int n = cap - 1;
+        n |= n >>> 1;
+        n |= n >>> 2;
+        n |= n >>> 4;
+        n |= n >>> 8;
+        n |= n >>> 16;
+        return (n < 0) ? 1 : (n >= Integer.MAX_VALUE) ? Integer.MAX_VALUE : n + 1;
     }
 }
 

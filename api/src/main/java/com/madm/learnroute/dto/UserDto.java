@@ -30,7 +30,7 @@ public class UserDto implements Serializable {
     @JsonAlias(value = {"userName", "accountName"})//用于反序列化，把设置的值都映射为name jackson
     @JSONField(name = "name")//fastjson
     private String name;
-    private List<AuthParam> auth;
+    transient private List<AuthParam> auth;
 
 
     public UserDto(UserDto userDto) {

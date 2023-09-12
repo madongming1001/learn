@@ -8,6 +8,7 @@ import com.madm.learnroute.validate.ClassNameCondition;
 import com.mdm.model.RestResponse;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +32,7 @@ public class AccountController {
     @Resource
     AccountServiceImpl accountService;
 
-    @Resource
+    @Autowired
     Redisson redisson;
 
     @GetMapping("/save")

@@ -1590,3 +1590,9 @@ $> jmap -dump:format=b,file=mydump.hprof pid
 ```
 
 **参考文章：**https://www.jianshu.com/p/3ff14a884acf
+
+
+
+# JVM加载顺序
+
+> 父类的静态字段 > 父类静态代码块 > 子类静态字段 > 子类静态代码块 > 父类成员变量 > 父类构造代码块 > 父类构造器 > 子类成员变量 > 子类构造代码块 > 子类构造器

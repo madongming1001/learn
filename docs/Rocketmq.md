@@ -368,12 +368,12 @@ Step3:调用DefaultMessageStore#putMessage进行消息存储。关于消息存�
 
 #### 异步发送
 
-​
+
 消息异步发送是指消息生产者调用发送的API后，无须阻塞等待消息服务器返回本次消息发送结果，只需要提供一个回调函数，供消息发送客户端在收到响应结果回调。异步方式相比同步方式，消息发送端的发送性能会显著提高，但为了保护消息服务器的负载压力，RocketMQ对消息发送的异步消息进行了井发控制，通过参数clientAsyncSemaphoreValue来控制，默认为65535。异步消息发送虽然也可以通过DefaultMQProducer#retryTimes­WhenSendAsyncFailed属性来控制消息重试次数，但是重试的调用人口是在收到服务端响应包时进行的，如果出现网络异常、网络超时等将不会重试。
 
 #### 单向发送
 
-​
+
 单向发送是指消息生产者调用消息发送的API后，无须等待消息服务器返回本次消息发送结果，并且无须提供回调函数，表示消息发送压根就不关心本次消息发送是否成功，其实现原理与异步消息发送相同，只是消息发送客户端在收到响应结果后什么都不做而已，并且没有重试机制。
 
 #### 批量消息
@@ -447,7 +447,7 @@ Queue>>consumeQueueTable:*//消息队列存储缓存表，按消息主题分组�
 
 #### CommitLog#DefaultAppendMessageCallback#doAppend
 
-​ DefaultAppendMessageCallback#doAppend只是将消息追加在内存中，需要根据是同步刷盘还是异步刷盘方式，将内存中的数据持久化到磁盘，关于刷盘操作后面会详细介绍。然后执行HA主从同步复制
+ DefaultAppendMessageCallback#doAppend只是将消息追加在内存中，需要根据是同步刷盘还是异步刷盘方式，将内存中的数据持久化到磁盘，关于刷盘操作后面会详细介绍。然后执行HA主从同步复制
 
 RocketMQ通过使用内存映射文件来提高IO访问性能
 
@@ -567,7 +567,7 @@ Store目录存储文件描述：
 
 ![image-20211121222746285](noteImg/image-20211121222746285.png)
 
-​
+
 单个ConsumeQueue文件中默认包含30万个条目，单个文件的长度为30w×20字节，单个ConsumeQueue文件可以看出是一个ConsumeQueue条目的数组，其下标为Consume­Queue的逻辑偏移量，消息消费进度存储的偏移量即逻辑偏移量。
 
 ​        **构建机制是当消息到达Commitlog文件后，由专门的线程产生消息转发任务，从而构建消息消费队列文件与下文提到的索引文件。
@@ -1052,3 +1052,190 @@ private void doCommit(){
 ![image-20230824101638179](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230824101638179.png)
 
 ![image-20230824101755029](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230824101755029.png)
+
+
+
+
+
+
+
+1、消费者和消费者组属于个体与群体的关系，非常容易理解，不赘述
+2、Topic是相当于一种消息类型，而队列queue则是属于某个Topic下的更细分的一种单元。举个例子。Topic代表老虎，是一种动物类型，而队列就相当于东北虎，是对老虎的更详细描述。
+
+3、在同一个消费者组下的消费者，不能同时消费同一个queue。
+4、一个消费者组下的消费者，可以同时消费同一个Topic下的不同队列的消息。
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2911b9bca6814f15ac4a8fe2358f15ee.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3l1YW5jaGFuZ2xpYW5n,size_16,color_FFFFFF,t_70)
+
+5、不同消费者组下的消费者，可以同时消费同一个Topic下的相同队列的消息。
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/1f8a917c2f6640f391e1604a409a97cd.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3l1YW5jaGFuZ2xpYW5n,size_16,color_FFFFFF,t_70)
+
+6、同消费者组下的消费者，不可以同时消费不同Topic下的消息。
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/86023764b9e348d7ae5f881b46a4a221.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3l1YW5jaGFuZ2xpYW5n,size_16,color_FFFFFF,t_70)
+
+# 基本概念
+
+## Topic
+
+**因此，RocketMQ的设计理念是基于Topic和消息队列的划分来实现高吞吐量和可伸缩性，并且确保了消息的有序性和高可靠性。**
+
+RocketMQ 中的一个 Topic 可以对应多个 Consumer Group。**每个 Consumer Group 都可以独立消费 Topic 中的消息，并且每个 Consumer Group 可以设置不同的消费策略，例如广播消费和顺序消费。**
+
+Topic是消息发布和订阅的逻辑概念，用于将消息进行分类和管理。而消息队列是Topic的物理实现，用于存储和传输消息。 在RocketMQ中，一个Topic可以有多个消息队列，每个消息队列都有一个唯一的标识（Queue ID）。当生产者发送消息到一个Topic时，RocketMQ会根据默认或自定义的路由策略，将消息均匀地分配到该Topic下的消息队列中。 每个消息队列只会被一个消费者消费，这样可以保证消息的顺序性。同时，RocketMQ还支持水平扩展，即可以动态增加或减少消息队列的数量，以满足不同业务场景的需求。 因此，RocketMQ的设计理念是基于Topic和消息队列的划分来实现高吞吐量和可伸缩性，并且确保了消息的有序性和高可靠性。
+
+RocketMQ提供了3种消息查询方式：
+
+- **按照Message Key 查询：**消息的key是业务开发同学在发送消息之前自行指定的，通常会把具有业务含义，区分度高的字段作为消息的key，如用户id，订单id等。
+- **按照Unique Key查询：**除了业务开发同学明确的指定消息中的key，RocketMQ生产者客户端在发送发送消息之前，会自动生成一个UNIQ_KEY，设置到消息的属性中，从逻辑上唯一代表一条消息。
+- **按照Message Id 查询：**Message Id 是消息发送后，在Broker端生成的，其包含了Broker的地址，和在CommitLog中的偏移信息，并会将Message Id作为发送结果的一部分进行返回。Message Id中属于精确匹配，从物理上唯一代表一条消息，查询效率更高。
+
+事实上，用户主动设置的Key以及客户端自动生成的Unique Key，最终都会设置到Message对象的properties属性
+
+
+
+# 消息重复消费的原因
+
+**Exactly-Once** 语义是消息系统和流式计算系统中消息流转的最理想状态，但是在业界并没有太多理想的实现。
+
+## 消息发送异常时重新发送
+
+**消息发送和消费过程大致如下：**
+
+- 生产者在发送消息之前根据负载均衡策略**(默认是轮询 + 最小延迟)**选择一个Queue，然后跟这个Queue所在的机器建立连接，把消息发送到这个Queue上
+- 消费者只要消费这个Queue，那么就能消费到消息
+
+但是当出现了异常时，这种异常包括消息发送超时、响应超时等等，RocketMQ为了保证消息成功发送，会进行消息发送的重试操作，默认情况下会最多会重试两次
+
+此时如果发生重试操作，那么势必会导致消息被发送了两次甚至更多次，导致服务端存了多条相同的消息，那么就一定会导致消费者**重复消费消息**。
+
+![在这里插入图片描述](https://ask.qcloudimg.com/http-save/5426480/5fkqgyipb0.png)
+
+ 默认实现：
+
+| 投递策略                 | 策略实现类                      | 说明                                                         |
+| :----------------------- | :------------------------------ | :----------------------------------------------------------- |
+| 随机分配策略             | SelectMessageQueueByRandom      | 使用了简单的随机数选择算法                                   |
+| 基于Hash分配策略         | SelectMessageQueueByHash        | 根据附加参数的Hash值，按照消息队列列表的大小取余数，得到消息队列的index |
+| 基于机器机房位置分配策略 | SelectMessageQueueByMachineRoom | 开源的版本没有具体的实现，基本的目的应该是机器的就近原则分配 |
+
+![在这里插入图片描述](https://ask.qcloudimg.com/http-save/5426480/xikpyqmf1v.png)
+
+| 算法名称                              | 含义                 |
+| :------------------------------------ | :------------------- |
+| AllocateMessageQueueAveragely         | 平均分配算法         |
+| AllocateMessageQueueAveragelyByCircle | 基于环形平均分配算法 |
+| AllocateMachineRoomNearby             | 基于机房临近原则算法 |
+| AllocateMessageQueueByMachineRoom     | 基于机房分配算法     |
+| AllocateMessageQueueConsistentHash    | 基于一致性hash算法   |
+| AllocateMessageQueueByConfig          | 基于配置分配算法     |
+
+
+
+## 消费消息抛出异常
+
+## 消费者提交offset失败
+
+## 服务端持久化offset失败
+
+## 主从同步offset失败
+
+## 重平衡
+
+## 清理长时间消费的消息
+
+# 顺序消费
+
+**Apache RocketMQ 顺序消息的顺序关系通过消息组（MessageGroup）判定和识别**，发送顺序消息时需要为每条消息设置归属的消息组，相同消息组的多条消息之间遵循先进先出的顺序关系，不同消息组、无消息组的消息之间不涉及顺序性。
+
+**如何保证消息的顺序性**
+
+Apache RocketMQ 的消息的顺序性分为两部分，生产顺序性和消费顺序性。
+
+**生产顺序性** ：
+
+如需保证消息生产的顺序性，则必须满足以下条件：
+
+- **单一生产者**：消息生产的顺序性仅支持单一生产者，不同生产者分布在不同的系统，即使设置相同的消息组，不同生产者之间产生的消息也无法判定其先后顺序。
+- **串行发送**：Apache RocketMQ 生产者客户端支持多线程安全访问，但如果生产者使用多线程并行发送，则不同线程间产生的消息将无法判定其先后顺序。
+
+满足以上条件的生产者，将顺序消息发送至 Apache RocketMQ 后，会保证设置了同一消息组的消息，按照发送顺序存储在同一队列中。
+
+**消费顺序性** ：
+
+如需保证消息消费的顺序性，则必须满足以下条件：
+
+- 投递顺序
+
+  Apache RocketMQ 通过客户端SDK和服务端通信协议保障消息按照服务端存储顺序投递，但业务方消费消息时需要严格按照接收---处理---应答的语义处理消息，避免因异步处理导致消息乱序。
+
+  备注
+
+  消费者类型为PushConsumer时， Apache RocketMQ 保证消息按照存储顺序一条一条投递给消费者，若消费者类型为SimpleConsumer，则消费者有可能一次拉取多条消息。此时，消息消费的顺序性需要由业务方自行保证。消费者类型的具体信息，请参见[消费者分类](https://rocketmq.apache.org/zh/docs/featureBehavior/06consumertype)。
+
+- 有限重试
+
+  Apache RocketMQ 顺序消息投递仅在重试次数限定范围内，即一条消息如果一直重试失败，超过最大重试次数后将不再重试，跳过这条消息消费，不会一直阻塞后续消息处理。
+
+  对于需要严格保证消费顺序的场景，请务设置合理的重试次数，避免参数不合理导致消息乱序。
+
+顺序消息分为两种情况：局部有序和全局有序。
+
+- 局部有序：值发送同一个队列的消息有序，可以在发送消息时指定队列，在消费消息时按顺序消费。例如同一个订单ID的消息要保证有序，不同订单的ID的消息没有约束，相互不影响，不同订单ID之间的消息是并行的。
+- 全局有序：设置Topic只有一个队列可以实现全局有序，创建topic时手动设置。此类场景极少，性能差，通常不推荐使用。
+
+springcloud stream发送顺序消息很简单
+
+- 在spring.properties配置文件中指定producer.sync=ture,默认是异步发送，此处改为同步发送。
+- MessageBuilder设置Header信息头（BinderHeaders.PARTITION_HEADER），表示这是一条顺序消息，将消息固定地发送到第几个消息队列。
+
+消费者端需要修改：
+
+- 修改spring.properties配置文件consumer.orderly=true，默认是并发消费，此处改为顺序消费
+
+RokcetMq支持两种消息模式：集群消费（Clustering）和广播消费（Broadcasting）。两者的区别是，**在广播消费模式下每条消息会被ConsumerGroup的每个Consumer消费，在集群消费模式下每条消息只会被ConsumerGroup的一个Consumer消费。**更新本地缓存使用广播消费。
+
+对于顺序消费来说如果消费线程出现异常，不会提交消费进度，会阻塞在这里继续等待并重试，从而保证顺序消息消费，阻塞当前消息知道超过最大重试次数，进入到死信队列。
+
+RocketMQ会为每个消费组都设置一个Topic名称为“%RETRY%+consumerGroup”的重试队列（这里需要注意的是，这个Topic的重试队列是针对消费组，而不是针对每个Topic设置的），用于暂时保存因为各种异常而导致Consumer端无法消费的消息。考虑到异常恢复起来需要一些时间，会为重试队列设置多个重试级别，每个重试级别都有与之对应的重新投递延时，重试次数越多投递延时就越大。RocketMQ对于重试消息的处理是先保存至Topic名称为“SCHEDULE_TOPIC_XXXX”的延迟队列中，后台定时任务按照对应的时间进行Delay后重新保存至“%RETRY%+consumerGroup”的重试队列中。
+
+**rocketmq支持两种消费方式：顺序消费和并发消费。**
+
+在所有消息系统中消费消息有三种模式：at-most-one（最多一次）、at-least-once（最少一次）和exactly-only-once（精确仅一次），分布式消息系统都是在三者间取平衡，前两者是可行的并且被广泛使用的。
+
+- at-most-once：消息投递后不论消费是否成功，不会再重复投递，有可能导致消息未被消费，RocketMQ未使用该种方式。
+- at-least-once：消息投递后，消费完成后，向服务器返回ACK（消费确认机制），没有消费则一定不会返回ACK消息。由于网络异常、客户端重启等原因，服务器未能收到客户端返回的ACK，服务器会再次投递，这就会导致可能重复消费，RocketMQ通过ACK来确保消息至少被消费一次。
+- exactly-only-once：必须下面两个条件都满足，才能认为消息是"Exactly Only Once"。1、发送消息阶段，不允许发送重复的消息；2、消费消息阶段，不允许消费重复的消息。在分布式系统环境下，如果要实现该模式，巨大的开销不可避免。RocketMQ为了追求高性能，并不保证此特性，无法避免消息重复，有业务上进行幂等性处理。
+
+# 事务消息
+
+```
+TransactionListener
+
+executeLocalTransaction
+checkLocalTransaction
+```
+
+![事务消息](https://help-static-aliyun-doc.aliyuncs.com/assets/img/zh-CN/3748939361/p365949.png)
+
+
+
+事务消息发送步骤如下：
+
+1. 生产者将半事务消息发送至云消息队列 RocketMQ 版服务端。
+2. 云消息队列 RocketMQ 版服务端将消息持久化成功之后，向生产者返回Ack确认消息已经发送成功，此时消息为半事务消息。
+3. 生产者开始执行本地事务逻辑。
+4. 生产者根据本地事务执行结果向服务端提交二次确认结果（Commit或是Rollback），服务端收到确认结果后处理逻辑如下：
+   - 二次确认结果为Commit：服务端将半事务消息标记为可投递，并投递给消费者。
+   - 二次确认结果为Rollback：服务端将回滚事务，不会将半事务消息投递给消费者。
+5. 在断网或者是生产者应用重启的特殊情况下，若服务端未收到发送者提交的二次确认结果，或服务端收到的二次确认结果为Unknown未知状态，经过固定时间后，服务端将对消息生产者即生产者集群中任一生产者实例发起消息回查。
+
+事务消息回查步骤如下：
+
+1. 生产者收到消息回查后，需要检查对应消息的本地事务执行的最终结果。
+2. 生产者根据检查得到的本地事务的最终状态再次提交二次确认，服务端仍按照步骤4对半事务消息进行处理。
+
+# JMS
+
+JMS即Java消息服务（Java Message Service）应用程序接口，是一个[Java平台](https://baike.baidu.com/item/Java平台?fromModule=lemma_inlink)中关于面向[消息中间件](https://baike.baidu.com/item/消息中间件/5899771?fromModule=lemma_inlink)（MOM）的[API](https://baike.baidu.com/item/API/10154?fromModule=lemma_inlink)，用于在两个应用程序之间，或[分布式系统](https://baike.baidu.com/item/分布式系统/4905336?fromModule=lemma_inlink)中发送消息，进行[异步通信](https://baike.baidu.com/item/异步通信/2273903?fromModule=lemma_inlink)。Java消息服务是一个与具体平台无关的API，绝大多数MOM提供商都对JMS提供支持。

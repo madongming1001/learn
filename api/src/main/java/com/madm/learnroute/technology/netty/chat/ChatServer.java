@@ -11,7 +11,6 @@ import io.netty.handler.codec.string.StringEncoder;
 public class ChatServer {
 
     public static void main(String[] args) throws Exception {
-
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup(8);
         try {
@@ -24,8 +23,7 @@ public class ChatServer {
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
                             //加入特殊分隔符分包解码器
-                            //pipeline.addLast(new DelimiterBasedFrameDecoder(1024, Unpooled.copiedBuffer("_"
-                            // .getBytes())));
+                            //pipeline.addLast(new DelimiterBasedFrameDecoder(1024, Unpooled.copiedBuffer("_".getBytes())));
                             //向pipeline加入解码器
                             pipeline.addLast("decoder", new StringDecoder());
                             //向pipeline加入编码器

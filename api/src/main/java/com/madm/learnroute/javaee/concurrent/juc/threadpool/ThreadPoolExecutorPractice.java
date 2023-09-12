@@ -1,5 +1,6 @@
 package com.madm.learnroute.javaee.concurrent.juc.threadpool;
 
+import cn.hutool.core.thread.ThreadFactoryBuilder;
 import lombok.SneakyThrows;
 
 import java.util.List;
@@ -30,13 +31,16 @@ public class ThreadPoolExecutorPractice {
 
     @SneakyThrows
     public static void main(String[] args) {
-        System.out.println(Integer.toBinaryString(-1));
-        System.out.println(Integer.toBinaryString(-8));
-        System.out.println(-1 << 29);//116
-        System.out.println(0 << 29);//116
-        System.out.println(1 << 29);//116
-        System.out.println(2 << 29);//116
-        System.out.println(3 << 29);//116
+//        approximateOfGetActiveCount();
+        firstThreadBlockingOtherThreads();
+//        test();
+//        System.out.println(Integer.toBinaryString(-1));
+//        System.out.println(Integer.toBinaryString(-8));
+//        System.out.println(-1 << 29);//116
+//        System.out.println(0 << 29);//116
+//        System.out.println(1 << 29);//116
+//        System.out.println(2 << 29);//116
+//        System.out.println(3 << 29);//116
 //        ExecutorService executorService = Executors.newFixedThreadPool(1);
 //
 //        executorService.submit(() -> {
@@ -55,15 +59,10 @@ public class ThreadPoolExecutorPractice {
 //        firstThreadBlockingOtherThreads();
 //        test();
 //        workStealingPoolTest();
-        firstThreadBlockingOtherThreads();
     }
 
 
-
-    private static void testInvokeAnyOfExecutorService(){
-
-
-
+    private static void testInvokeAnyOfExecutorService() {
 
 
     }
@@ -99,27 +98,27 @@ public class ThreadPoolExecutorPractice {
 
     @SneakyThrows
     private static void test() {
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 20, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
-        AtomicInteger atomicInteger = new AtomicInteger();
-        for (int i = 0; i < 3; i++) {
-            System.out.println(i + "1111");
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 1, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1));
+        AtomicInteger threadNum = new AtomicInteger();
+        for (int i = 0; i < 100; i++) {
             threadPoolExecutor.execute(() -> {
-                int number = atomicInteger.incrementAndGet();
-                while (true) {
+                int number = threadNum.incrementAndGet();
+                System.out.println(threadNum + "-------------------1111");
+//                while (true) {
 //                    try {
-                    System.out.println(number + "等待下次执行～");
+                System.out.println(number + "等待下次执行～");
 //                            try {
-                    try {
-                        int a = 1 / 0;
-                        Thread.sleep(1000L);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                try {
+//                        int a = 1 / 0;
+                    Thread.sleep(1000000L);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
 //                    } catch (Exception e) {
 
 //                        try {
-                    System.out.println(number + "睡觉10s");
+                System.out.println(number + "睡觉10s");
 //                            Thread.sleep(10000L);
 //                        } catch (InterruptedException ex) {
 ////                            throw new RuntimeException(ex);
@@ -132,7 +131,7 @@ public class ThreadPoolExecutorPractice {
 //                    } catch (Exception e) {
 //                        throw new RuntimeException(e);
 //                    }
-                }
+//                }
             });
         }
         threadPoolExecutor.execute(() -> {
@@ -161,6 +160,7 @@ public class ThreadPoolExecutorPractice {
             thread.setDefaultUncaughtExceptionHandler((Thread t1, Throwable e) -> System.out.println("线程工厂设置的exceptionHandler" + e.getMessage()));
             return thread;
         }) {
+
             @Override
             protected void beforeExecute(Thread t, Runnable r) {
 
@@ -180,16 +180,14 @@ public class ThreadPoolExecutorPractice {
         for (int i = 0; i < 5; i++) {
             threadPoolExecutor.execute(() -> {
                 int number = atomicInteger.getAndIncrement();
-                System.out.println("当前线程名称 ：" + Thread.currentThread().getThreadGroup().getName());
+                System.out.println("当前线程名称 ：" + Thread.currentThread().getName());
                 while (true) {
                     int a = 1 / 0;
                     try {
                         System.out.println(number + "等下次运行");
                         System.out.println("当前线程名称 ：" + Thread.currentThread().getName());
                         Thread.sleep(2000L);
-
                     } catch (Exception e) {
-//                        e.printStackTrace();
                     }
                 }
             });
@@ -285,6 +283,38 @@ public class ThreadPoolExecutorPractice {
             }
             return null;
         }).forEach(System.out::println);
+    }
+
+    private static void approximateOfGetActiveCount() {
+        // 创建线程池
+        ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNamePrefix("test-%d").build();
+        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(11, 11, 65, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), namedThreadFactory);
+
+        int i = 0;
+        do {
+            while (threadPool.getActiveCount() > 10) {
+                //第12个的时候才会进入到这里
+                try {
+                    Thread.sleep(1 * 1000);
+                    System.out.println("reach max pool size:" + threadPool.getPoolSize() + ", wait 1 second...");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            threadPool.execute(() -> {
+                work();
+            });
+            i++;
+        } while (i < 1000000);
+    }
+
+    private static void work() {
+        try {
+            Thread.sleep(5 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(Thread.currentThread().getName() + " is over");
     }
 
 }

@@ -10,9 +10,11 @@ public class ThreadLocalRandomPractice {
         Random random = new Random();
         for (int i = 0; i < 5; i++) {
             System.out.println(random.nextInt(10));
+            random.nextInt();
         }
 
         ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
+
         for (int i = 0; i < 5; i++) {
             System.out.println(threadLocalRandom.nextInt(10));
         }
