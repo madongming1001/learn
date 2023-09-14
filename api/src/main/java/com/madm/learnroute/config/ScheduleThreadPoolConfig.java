@@ -3,7 +3,6 @@ package com.madm.learnroute.config;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
@@ -15,7 +14,7 @@ import java.util.concurrent.Executors;
  * @author dongming.ma
  * @date 2022/6/29 09:11
  */
-@Configuration("scheduleTask")
+//@Configuration("scheduleTask")
 @Slf4j
 @Data
 public class ScheduleThreadPoolConfig implements SchedulingConfigurer {

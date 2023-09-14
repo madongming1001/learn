@@ -1,11 +1,10 @@
 package com.madm.data_structure;
 
 
+import cn.hutool.core.collection.CollUtil;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Stack;
+import java.util.*;
 
 public class BinaryTreeTraverse {
     private Node head;
@@ -67,6 +66,107 @@ public class BinaryTreeTraverse {
     }
 
     /**
+     * 1、弹出就打印
+     * 2、如果有右孩子，就压入右孩子
+     * 3、如果有左孩子，就压入左孩子
+     */
+    public static void pre(Node head) {
+        System.out.println("pre-order: ");
+        if (head != null) {
+            Stack<Node> stack = new Stack<>();
+            stack.add(head);
+            while (CollUtil.isNotEmpty(stack)) {
+                head = stack.pop();
+                System.out.println(head.value + " ");
+                if (head.right != null) {
+                    stack.push(head.right);
+                }
+                if (head.left != null) {
+                    stack.push(head.left);
+                }
+            }
+        }
+    }
+
+    /**
+     * 1、整条左边界依次入栈
+     * 2、1无法继续，弹出节点就打印，来到右树节点
+     * 中序遍历
+     */
+    public static void in(Node cur) {
+        System.out.print("in-order: ");
+        if (cur != null) {
+            Stack<Node> stack = new Stack<Node>();
+            while (!stack.isEmpty() || cur != null) {
+                if (cur != null) {
+                    stack.push(cur);
+                    cur = cur.left;
+                } else {
+                    cur = stack.pop();
+                    System.out.print(cur.value + " ");
+                    cur = cur.right;
+                }
+            }
+        }
+        System.out.println();
+    }
+
+
+    /**
+     * 1、弹出就放入到一个栈里面
+     * 2、如果有左孩子，就压入左孩子
+     * 3、如果有右孩子，就压入右孩子
+     * 4、最后输出栈
+     */
+    public static void pos1(Node head) {
+        System.out.print("pos-order: ");
+        if (head != null) {
+            Stack<Node> s1 = new Stack<>();
+            Stack<Node> s2 = new Stack<>();
+            s1.push(head);
+            while (!s1.isEmpty()) {
+                head = s1.pop(); // 头 右 左
+                s2.push(head);
+                if (head.left != null) {
+                    s1.push(head.left);
+                }
+                if (head.right != null) {
+                    s1.push(head.right);
+                }
+            }
+            // 左 右 头
+            while (!s2.isEmpty()) {
+                System.out.print(s2.pop().value + " ");
+            }
+        }
+        System.out.println();
+    }
+
+    /**
+     * 利用一个栈实现后序遍历
+     */
+    public static void pos2(Node h) {
+        System.out.print("pos-order: ");
+        if (h != null) {
+            Stack<Node> stack = new Stack<Node>();
+            stack.push(h);
+            Node c = null;
+            while (!stack.isEmpty()) {
+                c = stack.peek();
+                if (c.left != null && h != c.left && h != c.right) {
+                    stack.push(c.left);
+                } else if (c.right != null && h != c.right) {
+                    stack.push(c.right);
+                } else {
+                    System.out.print(stack.pop().value + " ");
+                    h = c;
+                }
+            }
+        }
+        System.out.println();
+    }
+
+    /**
      * 二叉树非递归前序遍历
      */
     public static void preOrderTraveralWithStack(Node root) {
@@ -87,6 +187,77 @@ public class BinaryTreeTraverse {
 
         }
     }
+
+    /**
+     * 找到层数节点最多的返回树
+     */
+    public static int maxWidthUseMap(Node head) {
+        if (head == null) {
+            return 0;
+        }
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(head);
+        // key 在 哪一层，value
+        HashMap<Node, Integer> levelMap = new HashMap<>();
+        levelMap.put(head, 1);
+        int curLevel = 1; // 当前你正在统计哪一层的宽度
+        int curLevelNodes = 0; // 当前层curLevel层，宽度目前是多少
+        int max = 0;
+        while (!queue.isEmpty()) {
+            Node cur = queue.poll();
+            int curNodeLevel = levelMap.get(cur);
+            if (cur.left != null) {
+                levelMap.put(cur.left, curNodeLevel + 1);
+                queue.add(cur.left);
+            }
+            if (cur.right != null) {
+                levelMap.put(cur.right, curNodeLevel + 1);
+                queue.add(cur.right);
+            }
+            if (curNodeLevel == curLevel) {
+                curLevelNodes++;
+            } else {
+                max = Math.max(max, curLevelNodes);
+                curLevel++;
+                curLevelNodes = 1;
+            }
+        }
+        max = Math.max(max, curLevelNodes);
+        return max;
+    }
+    /**
+     * 找到最宽的层树返回
+     */
+    public static int maxWidthNoMap(Node head) {
+        if (head == null) {
+            return 0;
+        }
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(head);
+        Node curEnd = head; // 当前层，最右节点是谁
+        Node nextEnd = null; // 下一层，最右节点是谁
+        int max = 0;
+        int curLevelNodes = 0; // 当前层的节点数
+        while (!queue.isEmpty()) {
+            Node cur = queue.poll();
+            if (cur.left != null) {
+                queue.add(cur.left);
+                nextEnd = cur.left;
+            }
+            if (cur.right != null) {
+                queue.add(cur.right);
+                nextEnd = cur.right;
+            }
+            curLevelNodes++;
+            if (cur == curEnd) {
+                max = Math.max(max, curLevelNodes);
+                curLevelNodes = 0;
+                curEnd = nextEnd;
+            }
+        }
+        return max;
+    }
+
 
     /**
      * 二叉树--广度优先遍历--层次遍历法

@@ -1,5 +1,6 @@
 package com.madm.learnroute.javaee;
 
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -18,12 +19,16 @@ import java.util.concurrent.TimeUnit;
  * <p>2,4 等到唤醒线程代码执行完毕才释放锁，被唤醒的线程才能获取锁<p/>
  */
 public class ABThreadCommunication {
+    private static int num = 1;
+    private static Semaphore ji = new Semaphore(1);
+    private static Semaphore ou = new Semaphore(0);
 
     private volatile static boolean flag = false;
 
     public static void main(String[] args) {
-        ABCommunicationForVolatile();
+//        ABCommunicationForVolatile();
 //        ABCommunicationForBlockingQueue();
+        ABCommunicationForSemaphore();
     }
 
     private static void ABCommunicationForBlockingQueue() {
@@ -81,6 +86,35 @@ public class ABThreadCommunication {
         });
         t1.start();
         t2.start();
+    }
+
+    private static void ABCommunicationForSemaphore() {
+        new Thread(() -> {
+            while (num < 100) {
+                try {
+                    ji.acquire();
+                    System.out.println("奇数：" + num);
+                    num++;
+//                    ou.release();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+        //偶数线程
+        new Thread(() -> {
+            while (num <= 100) {
+                try {
+                    ou.acquire();
+                    System.out.println("偶数：" + num);
+                    num++;
+                    ji.release();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
 }

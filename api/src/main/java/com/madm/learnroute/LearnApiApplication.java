@@ -1,7 +1,6 @@
 package com.madm.learnroute;
 
 import com.madm.learnroute.technology.spring.MyDeferredImportSelector;
-import com.mdm.pojo.User;
 import lombok.extern.slf4j.Slf4j;
 import org.jsondoc.spring.boot.starter.EnableJSONDoc;
 import org.mybatis.spring.annotation.MapperScan;
@@ -21,8 +20,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -67,11 +64,11 @@ public class LearnApiApplication {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
-        ses.schedule(() -> context.close(), 10, TimeUnit.SECONDS);
-
-        User user = (User) context.getBean("user");
-        System.out.println(user.getName());
+//        ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
+//        ses.schedule(() -> context.close(), 10, TimeUnit.SECONDS);
+//
+//        User user = (User) context.getBean("user");
+//        System.out.println(user.getName());
 
 //        context.registerShutdownHook();
         /**

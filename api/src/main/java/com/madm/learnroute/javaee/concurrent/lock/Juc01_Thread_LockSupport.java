@@ -16,21 +16,15 @@ public class Juc01_Thread_LockSupport {
 
     public static void main(String[] args) {
 
-        Thread t0 = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                Thread current = Thread.currentThread();
-                log.info("{},开始执行!", current.getName());
-                for (; ; ) {//spin 自旋
-                    log.info("准备park住当前线程：{}....", current.getName());
-                    log.info("未调用park，当前线程状态：{}", Thread.currentThread().getState());
-                    LockSupport.park();
-                    log.info("已调用park，当前线程状态：{}", Thread.currentThread().getState());
-                    log.info("当前线程{}已经被唤醒....", current.getName());
-                }
+        Thread t0 = new Thread(() -> {
+            Thread current = Thread.currentThread();
+            log.info("{},开始执行!", current.getName());
+            for (; ; ) {//spin 自旋
+                log.info("准备park住当前线程：{}....", current.getName());
+                log.info("未调用park，当前线程状态：{}", Thread.currentThread().getState());
+                log.info("已调用park，当前线程状态：{}", Thread.currentThread().getState());
+                log.info("当前线程{}已经被唤醒....", current.getName());
             }
-
         }, "t0");
         log.info("线程未启动状态是：{}", t0.getState());
         t0.start();

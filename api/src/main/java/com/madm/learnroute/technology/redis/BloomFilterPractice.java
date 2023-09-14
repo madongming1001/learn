@@ -23,9 +23,8 @@ public class BloomFilterPractice {
 
         RLock rLock = readWriteLock.readLock();
         RLock wLock = readWriteLock.writeLock();
-
-
         RBloomFilter<User> bloomFilter = redisson.getBloomFilter("user");
+
         // 初始化布隆过滤器，预计统计元素数量为55000000，期望误差率为0.03
         bloomFilter.tryInit(55000000L, 0.03);
         bloomFilter.add(new User(1));

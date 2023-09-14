@@ -1,5 +1,6 @@
 package com.madm.learnroute.javaee;
 
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -48,6 +50,12 @@ public class ListStreamPractice {
     }
 
     public static void main(String[] args) throws Exception {
+        int start = 1;
+        int end = 100;
+        //等比数列求和算法 (start + end) * end / 2
+        int streamSum = IntStream.rangeClosed(start, end).sum();
+        int arraySum = Arrays.stream(NumberUtil.range(1, 100)).sum();
+        System.out.println(streamSum == arraySum);
         Apple apple1 = appleList.get(0);
         Apple apple2 = appleList.get(1);
         Apple apple3 = appleList.get(2);

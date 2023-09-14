@@ -19,7 +19,7 @@ public class ThreadPoolExceptionPractice {
 
         executorService.execute(() -> sayHi("execute"));
         executorService.submit(() -> sayBay("submit"));
-        scheduledExecutorService.schedule(() -> sayBay("schedule"), 2, TimeUnit.SECONDS);
+        scheduledExecutorService.schedule(() -> sayBay("com/madm/learnroute/schedule"), 2, TimeUnit.SECONDS);
     }
 
     private static void sayHi(String name) {

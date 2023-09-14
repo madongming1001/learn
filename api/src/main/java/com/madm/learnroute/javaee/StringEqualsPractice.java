@@ -4,6 +4,8 @@ package com.madm.learnroute.javaee;
 import cn.hutool.core.util.IdUtil;
 import org.junit.Assert;
 
+import java.math.BigInteger;
+
 /**
  * -server -Xcomp -XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly -XX:CompileCommand=compileonly
  */
@@ -76,12 +78,13 @@ public class StringEqualsPractice {
 //        System.out.println(Integer.toBinaryString(97));//a
 
         //System.out.println(Float.floatToIntBits(234));
-        System.out.println(Long.MAX_VALUE);
+        System.out.println(Long.MAX_VALUE + " long maxvalue"); //2^63-1.
+        System.out.println(BigInteger.valueOf(1l).pow(63));
         System.out.println(IdUtil.fastUUID());
         System.out.println(IdUtil.fastSimpleUUID());
 
 
-        System.out.println((1L << 48) - 1);
+        System.out.println((1 << 48) + " sdfsfsdf s");
         System.out.println(Integer.toBinaryString(0xffff << 16));
         System.out.println(Integer.toBinaryString(1 << 16));
         System.out.println(Integer.toBinaryString(7 >> 16));

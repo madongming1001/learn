@@ -13,7 +13,6 @@ public class BinarySearchTree {
             return;
         }
         inOrderTraversal(node.left);
-
         System.out.print(node.data + " ");
         inOrderTraversal(node.right);
     }

@@ -18,6 +18,11 @@ import java.util.stream.Collectors;
  * 2.求文件中出现次数最多的数字的次数
  * <p>
  * https://www.bilibili.com/video/BV17B4y1W7jC
+ *
+ *  1、快速排序法 时间复杂度O(nlogn)
+ *  2、淘汰法 时间复杂度O(n + m^z)
+ *  3、分支法 数据分若干份 可以利用多线程没份单独排序找到单个文件前多少个最大的 最后在剩下的里面在归并排序寻找
+ *  4、最小堆算法 根据条件创建最小堆 时间复杂度 O(nmlogm) 空间复杂度常数 m是规定的大小
  */
 @Slf4j
 public class BiggestFileSort {

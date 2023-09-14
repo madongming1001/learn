@@ -44,10 +44,6 @@ ThreadPoolExecutor实现的顶层接口是**Executor**，顶层接口Executor提
 AbstractExecutorService则是上层的抽象类，将执行任务的流程串联了起来，保证下层的实现只需关注一个执行任务的方法即可。最下层的实现类ThreadPoolExecutor实现最复杂的运行部分，ThreadPoolExecutor将会一方面维护自身的生命周期，另一方面同时管理线程和任务，使两者良好的结合从而执行并行任务。
 **
 
-**ThreadPoolExecutor的运行状态有5种，分别为：**
-
-![img](https://p0.meituan.net/travelcube/62853fa44bfa47d63143babe3b5a4c6e82532.png)
-
 ## Worker线程管理
 
 **线程池为了掌握线程的状态并维护线程的生命周期**，设计了线程池内的工作线程Worker。我们来看一下它的部分代码：
@@ -63,7 +59,7 @@ Worker这个工作线程，实现了Runnable接口，并持有一个线程thread
 **也就对应核心线程创建时的情况**；如果这个值是null，那么就需要创建一个线程去执行任务列表（workQueue）中的任务，**也就是非核心线程的创建。
 **
 
-### 线程池的生命周期
+### **ThreadPoolExecutor的运行状态有5种，分别为：**
 
 **RUNNING：**接受新任务并处理排队任务
 
@@ -822,6 +818,10 @@ ObjectMonitor::ObjectMonitor() {
 >>>而无符号右移运算符是补上0，也就是说，对于正数移位来说等同于：>>，负数通过此移位运算符能移位成正数。以-733183670>>>8为例来画一下图
 ```
 
+**2的多少次方就是bit多少次数+1 比如2的63次方就是 64bit位是1 剩下全是0**
+
+**1往左移动多少位数也是位数加一的bit位是1剩下位数都是0**
+
 ## 负数二进制表示形式
 
 1 求原码：为 10000101 即把-5的绝对值5转换为二进制为
@@ -845,6 +845,19 @@ ObjectMonitor::ObjectMonitor() {
 5、基本LockSupport实现线程间的阻塞和唤醒
 
 其中2、4在线程A唤醒B的时候，线程B不是立马获取到锁，只是通知可以参与锁竞争了
+
+
+
+# 线程等待方式
+
+1. **CountDownLatch**
+2. **使用 join () 方法**
+3. **Future** get()
+4. **CompletionService** 阻塞等待 take方法
+5. **线程的 getState () 方法**
+6. **CyclicBarrier**
+
+
 
 # Thread.sleep、Object.wait、LockSupport.park 区别
 
@@ -1664,3 +1677,7 @@ Spring的优雅下线也使用到了JVM的ShutdownHook。
 ```
 
 ![img](https://pic2.zhimg.com/80/v2-3a69d86d13c1ce944acdce96ee762eb1_720w.webp)
+
+# 虚假唤醒
+
+**定义：**线程也可以在**不被通知、中断或超时**的情况下唤醒，即所谓的**虚假唤醒**。使用了wait和notify应该把判断条件放在while体里面 而不应该放在if里面。

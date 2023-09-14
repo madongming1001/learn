@@ -1,5 +1,8 @@
 package com.madm.learnroute.javaee;
 
+import cn.hutool.bloomfilter.bitMap.BitMap;
+import cn.hutool.bloomfilter.bitMap.IntMap;
+
 import java.util.Arrays;
 
 /**
@@ -12,5 +15,8 @@ public class BitMapPractice {
         int maxArr = Arrays.stream(arr).max().getAsInt();
         char[] chars = new char[14 / 16 + 1];
         System.out.println(chars.length);
+        BitMap bitMap = new IntMap();
+
+
     }
 }

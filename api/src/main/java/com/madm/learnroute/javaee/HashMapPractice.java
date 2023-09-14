@@ -138,7 +138,8 @@ public class HashMapPractice {
         mapArrayList.add(hashMap2);
         mapArrayList.add(hashMap3);
         mapArrayList.add(hashMap4);
-
+        String str = "10";
+        str.hashCode();
 
 //
 //        Map<String, Long> masterId = new HashMap<>();

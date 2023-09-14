@@ -2678,33 +2678,33 @@ springAOP作为AOP的一种实现，基于动态代理的实现AOP，意味着�
 3、当事务结束之后
 
 **completeTransactionAfterThrowing**嵌套方法异常抛出调用
-**triggerBeforeCompletion**
+				triggerBeforeCompletion	
 
-triggerAfterCompletion
+​				triggerAfterCompletion
 
-cleanupAfterCompletion
+​				cleanupAfterCompletion
 
 **commitTransactionAfterReturning**
 
- processRollback
+​		**processRollback**
 
- triggerBeforeCompletion
+ 	   		triggerBeforeCompletion
 
- triggerAfterCompletion
+ 	   		triggerAfterCompletion
 
- cleanupAfterCompletion
+ 	   		cleanupAfterCompletion
 
- processCommit
+ 	   **processCommit**
 
- triggerBeforeCommit(status);
+ 	   		triggerBeforeCommit(status);
 
- triggerBeforeCompletion(status);
+​        		triggerBeforeCompletion(status);
 
- triggerAfterCompletion
+​        		triggerAfterCompletion
 
- triggerAfterCommit
+​        		triggerAfterCommit
 
- cleanupAfterCompletion
+​        		cleanupAfterCompletion
 
 @EnableTransactionManagement（TransactionManagementConfigurationSelector）会注入两个类，一个是AutoProxyRegistrar，另一个是**ProxyTransactionManagementConfiguration**，其中ProxyTransactionManagementConfiguration父类会注入一个*
 *TransactionalEventListenerFactory**
@@ -2742,3 +2742,46 @@ Java Object）和BO（Business Object），它们之间有一些区别和用法�
 
 
 **TaskExecutionAutoConfiguration会默认注入ThreadPoolTaskExecutor**
+
+
+
+# spring配置的6种方式
+
+1. @Value
+2. @ConfigurationProperties(prefix="xxx")配合@Configuration设置到容器中 或者配合@EnableConfigurationProperties
+3. 使用Environment的方式获取bean，实现EnvironmentAware接口
+4. @PropertySources({@PropertySource(value="class:xxx.properties",encoding="utf-8")})只能获取外部.properties文件
+5. PropertySourcesPlaceholderConfigurerBean中创建YamlPropertiesFactoryBean.setResource(new ClassPathResource("xxx.yml")) configured.setProperties(Objects.requireNonNull(yaml.getObject()))
+6. java原生流的方式获取文件new Properties().load(inputStreamReader)
+
+# schedule
+
+开启方式@EnableSchedule @Import(**SchedulingConfiguration**.class) **ScheduledAnnotationBeanPostProcessor**实现BeanPostProcessor的**postProcessAfterInitialization**方法，找到当前bean的所有加了@Scheduled的方法，非为不同类型注册到list中。
+
+```java
+public ScheduledAnnotationBeanPostProcessor() {
+    this.registrar = new ScheduledTaskRegistrar();
+}
+```
+
+![image-20230913102156671](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230913102156671.png)
+
+TaskSchedulingAutoConfiguration会默认注入一个一个线程的线程池，所以默认定时任务都是单线程执行的，可以自己实现多线程执行。实现方式是实现**SchedulingConfigurer**configureTasks方法把线程池注入到**registrar**中，而这个方法调用的地方在**finishRefresh()**方法中发布了一个ContextRefreshedEvent时间。就会走到这里把registrar注入到configuretasks方法中，就可以设置registrar的executor进行替换。最后调用任务是在registrar的afterpropertiesSet里面进行所有的定时任务调用。
+
+```java
+@Override
+public void onApplicationEvent(ContextRefreshedEvent event) {
+    if (event.getApplicationContext() == this.applicationContext) {
+       // Running in an ApplicationContext -> register tasks this late...
+       // giving other ContextRefreshedEvent listeners a chance to perform
+       // their work at the same time (e.g. Spring Batch's job registration).
+       finishRegistration();
+    }
+}
+```
+
+![image-20230913102441210](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230913102441210.png)
+
+![image-20230913102450719](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230913102450719.png)
+
+![image-20230913102623654](/Users/madongming/IdeaProjects/learn/docs/noteImg/image-20230913102623654.png)

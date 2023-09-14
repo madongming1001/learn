@@ -20,14 +20,14 @@ public class CalledAfterStartupController implements DisposableBean {
     AccountController accountController;
     BookController bookController;
     BookStockController bookStockController;
-    ScheduleController scheduleController;
+//    ScheduleController scheduleController;
 
     @PostConstruct
     public void initializeCall() {
         accountController.save();
         bookController.save();
         bookStockController.save();
-        scheduleController.updateCron();
+//        scheduleController.updateCron();
     }
 
     @PreDestroy
