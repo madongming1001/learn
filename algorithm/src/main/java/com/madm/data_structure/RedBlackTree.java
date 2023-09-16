@@ -34,6 +34,8 @@ public class RedBlackTree {
     }
 
     public static void main(String[] args) {
+
+
         RedBlackTree rbTree = new RedBlackTree();
         int input[] = {13, 8, 17, 1, 11, 15, 25, 6, 22, 27};
         for (int i = 0; i < input.length; i++) {

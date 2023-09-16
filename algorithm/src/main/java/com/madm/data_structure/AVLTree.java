@@ -2,252 +2,259 @@ package com.madm.data_structure;
 
 /**
  * @author dongming.ma
- * @date 2023/3/15 01:03
+ * @date 2023/9/15 17:16
  */
-
-import java.util.LinkedList;
-import java.util.Queue;
-
 public class AVLTree {
-    private TreeNode root;
 
-    //中序遍历
-    public static void inOrderTraversal(TreeNode node) {
-        if (node != null) {
-            inOrderTraversal(node.left);
-            System.out.print(node.data + " ");
-            inOrderTraversal(node.right);
+    public static class AVLNode<K extends Comparable<K>, V> {
+        public K k;
+        public V v;
+        public AVLNode<K, V> l;
+        public AVLNode<K, V> r;
+        public int h;
+
+        public AVLNode(K key, V value) {
+            k = key;
+            v = value;
+            h = 1;
         }
     }
 
-    //层序遍历
-    public static void levelOrderTraversal(TreeNode root) {
-        Queue<TreeNode> queue = new LinkedList<>();
-        queue.offer(root);
-        while (!queue.isEmpty()) {
-            TreeNode node = queue.poll();
-            System.out.print(node.data + " ");
-            if (node.left != null) {
-                queue.offer(node.left);
+    public static class AVLTreeMap<K extends Comparable<K>, V> {
+        private AVLNode<K, V> root;
+        private int size;
+
+        public AVLTreeMap() {
+            root = null;
+            size = 0;
+        }
+
+        private AVLNode<K, V> rightRotate(AVLNode<K, V> cur) {
+            AVLNode<K, V> left = cur.l;
+            cur.l = left.r;
+            left.r = cur;
+            cur.h = Math.max((cur.l != null ? cur.l.h : 0), (cur.r != null ? cur.r.h : 0)) + 1;
+            left.h = Math.max((left.l != null ? left.l.h : 0), (left.r != null ? left.r.h : 0)) + 1;
+            return left;
+        }
+
+        private AVLNode<K, V> leftRotate(AVLNode<K, V> cur) {
+            AVLNode<K, V> right = cur.r;
+            cur.r = right.l;
+            right.l = cur;
+            cur.h = Math.max((cur.l != null ? cur.l.h : 0), (cur.r != null ? cur.r.h : 0)) + 1;
+            right.h = Math.max((right.l != null ? right.l.h : 0), (right.r != null ? right.r.h : 0)) + 1;
+            return right;
+        }
+
+        private AVLNode<K, V> maintain(AVLNode<K, V> cur) {
+            if (cur == null) {
+                return null;
             }
-            if (node.right != null) {
-                queue.offer(node.right);
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        AVLTree tree = new AVLTree();
-        int input[] = {5, 3, 7, 2, 4, 6, 9, 1};
-        for (int i = 0; i < input.length; i++) {
-            tree.insert(input[i]);
-        }
-        System.out.println("中序遍历: ");
-        inOrderTraversal(tree.root);
-        System.out.println();
-        System.out.println("层序遍历: ");
-        levelOrderTraversal(tree.root);
-        System.out.println();
-        System.out.printf("高度: %d\n", tree.height());
-        int deletedData = 3;
-
-        System.out.printf("删除根节点: %d\n", deletedData);
-        tree.remove(deletedData);
-
-        System.out.println("中序遍历: ");
-        inOrderTraversal(tree.root);
-        System.out.println();
-        System.out.println("层序遍历: ");
-        levelOrderTraversal(tree.root);
-        System.out.println();
-        System.out.printf("高度: %d\n", tree.height());
-    }
-
-    /*
-     * 获取树的高度
-     */
-    private int height(TreeNode node) {
-        if (node != null) return node.height;
-        return 0;
-    }
-
-    public int height() {
-        return height(root);
-    }
-
-    //查找结点
-    public TreeNode search(TreeNode node, int data) {
-        while (node != null) {
-            if (data < node.data) node = node.left;
-            else if (data > node.data) node = node.right;
-            else return node;
-        }
-        return node;
-    }
-
-    //左左局面旋转
-    private TreeNode leftLeftRotation(TreeNode node) {
-        //left 对应示意图中的结点B
-        TreeNode left = node.left;
-        node.left = left.right;
-        left.right = node;
-        //刷新结点A和结点B的高度
-        node.height = Math.max(height(node.left), height(node.right)) + 1;
-        left.height = Math.max(height(left.left), node.height) + 1;
-        //返回旋转后的父结点
-        return left;
-    }
-
-    //右右局面旋转
-    private TreeNode rightRightRotation(TreeNode node) {
-        //rightChildNode 对应示意图中的结点B
-        TreeNode rightChildNode = node.right;
-        node.right = rightChildNode.left;
-        rightChildNode.left = node;
-        //刷新结点A和结点B的高度
-        node.height = Math.max(height(node.left), height(node.right)) + 1;
-        rightChildNode.height = Math.max(height(rightChildNode.right), node.height) + 1;
-        //返回旋转后的父结点
-        return rightChildNode;
-    }
-
-    //左右局面旋转
-    private TreeNode leftRightRotation(TreeNode node) {
-        //先做左旋
-        node.left = rightRightRotation(node.left);
-        //再做右旋
-        return leftLeftRotation(node);
-    }
-
-    //右左局面旋转
-    private TreeNode rightLeftRotation(TreeNode node) {
-        //先做右旋
-        node.right = leftLeftRotation(node.right);
-        //再做左旋
-        return rightRightRotation(node);
-    }
-
-    //插入结点
-    public void insert(int data) {
-        root = insert(root, data);
-    }
-
-    //插入结点详细过程（递归）
-    private TreeNode insert(TreeNode node, int data) {
-        if (node == null) {
-            node = new TreeNode(data);
-        } else {
-            if (data < node.data) {
-                //新结点小于当前结点，选择当前结点的左子树插入
-                node.left = insert(node.left, data);
-                // 插入节点后，若AVL树失去平衡，则进行相应的调节。
-                if (node.getBalance() == 2) {
-                    if (data < node.left.data) {
-                        node = leftLeftRotation(node);
+            int leftHeight = cur.l != null ? cur.l.h : 0;
+            int rightHeight = cur.r != null ? cur.r.h : 0;
+            if (Math.abs(leftHeight - rightHeight) > 1) {
+                if (leftHeight > rightHeight) {
+                    int leftLeftHeight = cur.l != null && cur.l.l != null ? cur.l.l.h : 0;
+                    int leftRightHeight = cur.l != null && cur.l.r != null ? cur.l.r.h : 0;
+                    if (leftLeftHeight >= leftRightHeight) {
+                        cur = rightRotate(cur);
                     } else {
-                        node = leftRightRotation(node);
+                        cur.l = leftRotate(cur.l);
+                        cur = rightRotate(cur);
                     }
-                }
-            } else if (data > node.data) {
-                //新结点大于当前结点，选择当前结点的右子树插入
-                node.right = insert(node.right, data);
-                // 插入节点后，若AVL树失去平衡，则进行相应的调节。
-                if (node.getBalance() == -2) {
-                    if (data > node.right.data) {
-                        node = rightRightRotation(node);
-                    } else {
-                        node = rightLeftRotation(node);
-                    }
-                }
-            } else {
-                System.out.println("AVL树中已有重复的结点！");
-            }
-        }
-        //刷新结点的高度
-        node.height = Math.max(height(node.left), height(node.right)) + 1;
-        return node;
-    }
-
-    //删除结点
-    public void remove(int data) {
-        TreeNode deletedNode;
-        if ((deletedNode = search(root, data)) != null) root = remove(root, deletedNode);
-    }
-
-    //删除结点详细过程（递归）
-    private TreeNode remove(TreeNode node, TreeNode deletedNode) {
-        // 根为空 或者 没有要删除的节点，直接返回null。
-        if (node == null || deletedNode == null) return null;
-        if (deletedNode.data < node.data) {
-            //待删除结点小于当前结点，在当前结点的左子树继续执行
-            node.left = remove(node.left, deletedNode);
-            // 删除节点后，若AVL树失去平衡，则进行相应的调节。
-            if (height(node.right) - height(node.left) == 2) {
-                TreeNode r = node.right;
-                if (height(r.left) > height(r.right)) node = rightLeftRotation(node);
-                else node = rightRightRotation(node);
-            }
-        } else if (deletedNode.data > node.data) {
-            //待删除结点大于当前结点，在当前结点的右子树继续执行
-            node.right = remove(node.right, deletedNode);
-            // 删除节点后，若AVL树失去平衡，则进行相应的调节。
-            if (height(node.left) - height(node.right) == 2) {
-                TreeNode l = node.left;
-                if (height(l.right) > height(l.left)) node = leftRightRotation(node);
-                else node = leftLeftRotation(node);
-            }
-        } else {
-            // tree的左右孩子都非空
-            if ((node.left != null) && (node.right != null)) {
-                if (height(node.left) > height(node.right)) {
-                    // 如果node的左子树比右子树高，找出左子树最大结点赋值给Node，并删除最小结点
-                    TreeNode max = maximum(node.left);
-                    node.data = max.data;
-                    node.left = remove(node.left, max);
                 } else {
-                    // 如果node的右子树比左子树高，找出右子树最小结点赋值给Node，并删除最小结点
-                    TreeNode min = minimum(node.right);
-                    node.data = min.data;
-                    node.right = remove(node.right, min);
+                    int rightLeftHeight = cur.r != null && cur.r.l != null ? cur.r.l.h : 0;
+                    int rightRightHeight = cur.r != null && cur.r.r != null ? cur.r.r.h : 0;
+                    if (rightRightHeight >= rightLeftHeight) {
+                        cur = leftRotate(cur);
+                    } else {
+                        cur.r = rightRotate(cur.r);
+                        cur = leftRotate(cur);
+                    }
                 }
+            }
+            return cur;
+        }
+
+        private AVLNode<K, V> findLastIndex(K key) {
+            AVLNode<K, V> pre = root;
+            AVLNode<K, V> cur = root;
+            while (cur != null) {
+                pre = cur;
+                if (key.compareTo(cur.k) == 0) {
+                    break;
+                } else if (key.compareTo(cur.k) < 0) {
+                    cur = cur.l;
+                } else {
+                    cur = cur.r;
+                }
+            }
+            return pre;
+        }
+
+        private AVLNode<K, V> findLastNoSmallIndex(K key) {
+            AVLNode<K, V> ans = null;
+            AVLNode<K, V> cur = root;
+            while (cur != null) {
+                if (key.compareTo(cur.k) == 0) {
+                    ans = cur;
+                    break;
+                } else if (key.compareTo(cur.k) < 0) {
+                    ans = cur;
+                    cur = cur.l;
+                } else {
+                    cur = cur.r;
+                }
+            }
+            return ans;
+        }
+
+        private AVLNode<K, V> findLastNoBigIndex(K key) {
+            AVLNode<K, V> ans = null;
+            AVLNode<K, V> cur = root;
+            while (cur != null) {
+                if (key.compareTo(cur.k) == 0) {
+                    ans = cur;
+                    break;
+                } else if (key.compareTo(cur.k) < 0) {
+                    cur = cur.l;
+                } else {
+                    ans = cur;
+                    cur = cur.r;
+                }
+            }
+            return ans;
+        }
+
+        private AVLNode<K, V> add(AVLNode<K, V> cur, K key, V value) {
+            if (cur == null) {
+                return new AVLNode<K, V>(key, value);
             } else {
-                node = (node.left != null) ? node.left : node.right;
+                if (key.compareTo(cur.k) < 0) {
+                    cur.l = add(cur.l, key, value);
+                } else {
+                    cur.r = add(cur.r, key, value);
+                }
+                cur.h = Math.max(cur.l != null ? cur.l.h : 0, cur.r != null ? cur.r.h : 0) + 1;
+                return maintain(cur);
             }
         }
-        node.height = Math.max(height(node.left), height(node.right)) + 1;
-        return node;
-    }
 
-    //找出结点node为根的子树的最大节点
-    private TreeNode maximum(TreeNode node) {
-        if (node == null) return null;
-        while (node.right != null) node = node.right;
-        return node;
-    }
-
-    //找出结点node为根的子树的最小节点
-    private TreeNode minimum(TreeNode node) {
-        if (node == null) return null;
-        while (node.left != null) node = node.left;
-        return node;
-    }
-
-    class TreeNode {
-        int data;
-        int height;
-        TreeNode left;
-        TreeNode right;
-
-        public TreeNode(int data) {
-            this.data = data;
-            this.height = 0;
+        // 在cur这棵树上，删掉key所代表的节点
+        // 返回cur这棵树的新头部
+        private AVLNode<K, V> delete(AVLNode<K, V> cur, K key) {
+            if (key.compareTo(cur.k) > 0) {
+                cur.r = delete(cur.r, key);
+            } else if (key.compareTo(cur.k) < 0) {
+                cur.l = delete(cur.l, key);
+            } else {
+                if (cur.l == null && cur.r == null) {
+                    cur = null;
+                } else if (cur.l == null && cur.r != null) {
+                    cur = cur.r;
+                } else if (cur.l != null && cur.r == null) {
+                    cur = cur.l;
+                } else {
+                    AVLNode<K, V> des = cur.r;
+                    while (des.l != null) {
+                        des = des.l;
+                    }
+                    cur.r = delete(cur.r, des.k);
+                    des.l = cur.l;
+                    des.r = cur.r;
+                    cur = des;
+                }
+            }
+            if (cur != null) {
+                cur.h = Math.max(cur.l != null ? cur.l.h : 0, cur.r != null ? cur.r.h : 0) + 1;
+            }
+            return maintain(cur);
         }
 
-        //获得结点的平衡因子
-        public int getBalance() {
-            int left = (this.left == null ? 0 : this.left.height);
-            int right = (this.right == null ? 0 : this.right.height);
-            return left - right;
+        public int size() {
+            return size;
         }
+
+        public boolean containsKey(K key) {
+            if (key == null) {
+                return false;
+            }
+            AVLNode<K, V> lastNode = findLastIndex(key);
+            return lastNode != null && key.compareTo(lastNode.k) == 0 ? true : false;
+        }
+
+        public void put(K key, V value) {
+            if (key == null) {
+                return;
+            }
+            AVLNode<K, V> lastNode = findLastIndex(key);
+            if (lastNode != null && key.compareTo(lastNode.k) == 0) {
+                lastNode.v = value;
+            } else {
+                size++;
+                root = add(root, key, value);
+            }
+        }
+
+        public void remove(K key) {
+            if (key == null) {
+                return;
+            }
+            if (containsKey(key)) {
+                size--;
+                root = delete(root, key);
+            }
+        }
+
+        public V get(K key) {
+            if (key == null) {
+                return null;
+            }
+            AVLNode<K, V> lastNode = findLastIndex(key);
+            if (lastNode != null && key.compareTo(lastNode.k) == 0) {
+                return lastNode.v;
+            }
+            return null;
+        }
+
+        public K firstKey() {
+            if (root == null) {
+                return null;
+            }
+            AVLNode<K, V> cur = root;
+            while (cur.l != null) {
+                cur = cur.l;
+            }
+            return cur.k;
+        }
+
+        public K lastKey() {
+            if (root == null) {
+                return null;
+            }
+            AVLNode<K, V> cur = root;
+            while (cur.r != null) {
+                cur = cur.r;
+            }
+            return cur.k;
+        }
+
+        public K floorKey(K key) {
+            if (key == null) {
+                return null;
+            }
+            AVLNode<K, V> lastNoBigNode = findLastNoBigIndex(key);
+            return lastNoBigNode == null ? null : lastNoBigNode.k;
+        }
+
+        public K ceilingKey(K key) {
+            if (key == null) {
+                return null;
+            }
+            AVLNode<K, V> lastNoSmallNode = findLastNoSmallIndex(key);
+            return lastNoSmallNode == null ? null : lastNoSmallNode.k;
+        }
+
     }
 }

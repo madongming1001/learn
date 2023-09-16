@@ -2,6 +2,7 @@ package com.madm.learnroute.javaee;
 
 
 import cn.hutool.core.util.IdUtil;
+import com.mdm.utils.PrintUtil;
 import org.junit.Assert;
 
 import java.math.BigInteger;
@@ -38,8 +39,10 @@ public class StringEqualsPractice {
 
 //        System.out.println(abc1 == abc.intern());
 //        System.out.println(Long.parseLong("0x7fffffff"));
-        //assert (10 - 1) >> 1 == 21;
+        //assert (10 - 1) >> 1 == 20; 在正式运行时禁用
+        PrintUtil.printSplitLine();
         //Assert.equals((10 - 1) >> 1, 4);
+        cn.hutool.core.lang.Assert.isNull(null);
         Assert.assertEquals((10 - 1) >> 1, 4);
 
         // 这个就是那个音符字符，只不过由于当前的网页没支持这种编码，所以没显示。
