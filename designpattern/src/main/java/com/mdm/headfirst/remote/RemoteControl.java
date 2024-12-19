@@ -1,5 +1,8 @@
 package com.mdm.headfirst.remote;
 
+/**
+ * 复习java第一天 复习抽象类如何进行方法必须重写吗
+ */
 public abstract class RemoteControl {
     TV tv;
     TVFactory tvFactory;
