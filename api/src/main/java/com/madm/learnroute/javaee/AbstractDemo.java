@@ -7,5 +7,7 @@ package com.madm.learnroute.javaee;
 public class AbstractDemo {
     AbstractClass abstractClass;
     Object object;
+    public static int value1;
+    public static final int VALUE2 = 1;
 
 }
