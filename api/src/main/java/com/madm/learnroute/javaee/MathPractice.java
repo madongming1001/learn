@@ -6,6 +6,10 @@ package com.madm.learnroute.javaee;
  */
 public class MathPractice {
     public static void main(String[] args) {
+        //返回一个数的绝对值
+        int x = -10;
+        int absX = Math.abs(x);
+        System.out.println(absX); // 输出: 10
         //返回最小大于给定数值的整数 向上取整
         System.out.println(Math.ceil(11.2));
         //返回最大小于给定数值的整数 向下取整
