@@ -65,7 +65,7 @@ public class java8DateTimePractice {
     public static void main(String[] args) {
 //        testLocalDateAndTime();
         testPeriod();
-//        testDuration();
+        testDuration();
 //        long ctm = System.currentTimeMillis();
 //        long ztm = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
 //        long zdt = ZonedDateTime.now().toInstant().toEpochMilli();
