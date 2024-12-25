@@ -44,7 +44,7 @@ import static cn.hutool.core.date.DatePattern.NORM_DATETIME_PATTERN;
  * T表示分隔符，Z表示的是UTC。 UTC：世界标准时间，在标准时间上加上8小时，即东八区时间，也就是北京时间。
  */
 @Slf4j
-public class java8DateTimePractice {
+public class DateTimePractice {
 
     private final static Map<String, Long> timeUnitTable;
     static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
