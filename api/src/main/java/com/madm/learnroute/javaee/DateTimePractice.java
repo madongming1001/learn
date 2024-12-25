@@ -30,11 +30,11 @@ import static cn.hutool.core.date.DatePattern.NORM_DATETIME_PATTERN;
  * 全球共分为24个标准时区，相邻时区的时间相差一个小时。
  * 参考文章：https://champyin.com/2020/04/24/%E5%BD%BB%E5%BA%95%E5%BC%84%E6%87%82GMT%E3%80%81UTC%E3%80%81%E6%97%B6%E5%8C%BA%E5%92%8C%E5%A4%8F%E4%BB%A4%E6%97%B6/
  * <p>
- * Instant——它代表的是时间戳，注意这里默认的Instant是0时区，比北京少8个时区，例子：2018-10-08T09:50:21.852Z，相当于当天北京时间的17:50:21.852
- * LocalDate——不包含具体时间的日期，比如2014-01-14。它可以用来存储生日，周年纪念日，入职日期等。
- * LocalTime——它代表的是不含日期的时间
- * LocalDateTime——它包含了日期及时间，不过还是没有偏移信息或者说时区。
- * ZonedDateTime——这是一个包含时区的完整的日期时间，偏移量是以UTC/格林威治时间为基准的，如：2018-10-08T18:12:38.547+08:00[Asia/Shanghai]。
+ * <p>Instant——它代表的是时间戳，注意这里默认的 Instant 是0时区，比北京少8个时区，例子：2018-10-08T09:50:21.852Z，相当于当天北京时间的17:50:21.852 </p>
+ * <p>LocalDate——不包含具体时间的日期，比如2014-01-14。它可以用来存储生日，周年纪念日，入职日期等。</p>
+ * <p>LocalTime——它代表的是不含日期的时间</p>
+ * <p>LocalDateTime——它包含了日期及时间，不过还是没有偏移信息或者说时区。</p>
+ * <p>ZonedDateTime——这是一个包含时区的完整的日期时间，偏移量是以UTC/格林威治时间为基准的，如：2018-10-08T18:12:38.547+08:00[Asia/Shanghai]。</p>
  * <p>
  * 时区
  * 从格林威治本初子午线起，经度每向东或者向西间隔15°，就划分一个时区，在这个区域内，大家使用同样的标准时间
@@ -66,10 +66,11 @@ public class DateTimePractice {
 //        testLocalDateAndTime();
         testPeriod();
         testDuration();
-//        long ctm = System.currentTimeMillis();
-//        long ztm = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
-//        long zdt = ZonedDateTime.now().toInstant().toEpochMilli();
-//        System.out.println("ctm = " + ctm + " ztm = " + ztm + " zdt = " + zdt);
+        long ctm = System.currentTimeMillis();
+        long ztm = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+        long zdt = ZonedDateTime.now().toInstant().toEpochMilli();
+        System.out.println("ctm = " + ctm + " ztm = " + ztm + " zdt = " + zdt);
+
 //        Assert.isTrue(ctm == ztm);
 //
 //        System.out.println(LocalDate.now());
