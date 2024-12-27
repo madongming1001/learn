@@ -32,6 +32,7 @@ public class StampedLockPractice {
         long stamp = stampedLock.tryOptimisticRead();
         double currentX = x, currentY = y;
         // 检查乐观读锁后是否有其他写锁发生
+        // true 有写锁 false 无写锁
         if (!stampedLock.validate(stamp)) {
             // 乐观锁加成失败，重新获取读锁
             stamp = stampedLock.readLock();

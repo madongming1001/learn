@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -71,6 +72,7 @@ public class DateTimePractice {
         long zdt = ZonedDateTime.now().toInstant().toEpochMilli();
         System.out.println("ctm = " + ctm + " ztm = " + ztm + " zdt = " + zdt);
 
+        Calendar calendar = Calendar.getInstance();
 //        Assert.isTrue(ctm == ztm);
 //
 //        System.out.println(LocalDate.now());
